@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&family=Poppins:wght@400;500;600;700&family=Sora:wght@400;600&family=Inter:wght@400;600&family=Roboto:wght@400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 192 19% 22%;
+
+    --primary: 170 60% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 170 55% 35%;
+    --secondary-foreground: 0 0% 100%;
+
+    --tertiary: 260 50% 90%;
+    --tertiary-foreground: 259 30% 25%;
+
+    --neutral: 0 0% 98%;
+    --neutral-foreground: 250 15% 20%;
+
+    --success: 145 58% 45%;
+    --warning: 38 90% 52%;
+
+    --gray-50: 0 0% 98%;
+    --gray-100: 240 24% 94%;
+    --gray-200: 250 20% 90%;
+    --gray-300: 250 15% 80%;
+    --gray-400: 250 10% 65%;
+    --gray-500: 250 9% 50%;
+    --gray-600: 250 12% 40%;
+    --gray-700: 250 16% 30%;
+    --gray-800: 250 20% 20%;
+    --gray-900: 250 25% 10%;
+
+    --muted: 250 20% 90%;
+    --muted-foreground: 250 15% 40%;
+
+    --accent: 260 50% 90%;
+    --accent-foreground: 259 30% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 250 20% 90%;
+    --input: 250 20% 90%;
+    --ring: 170 60% 45%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 250 15% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 250 15% 20%;
+
+    --radius: 0.75rem;
+
+    --blueprimary: rgba(47, 62, 70, 1);
+    --heading-sora-1-font-family: "Sora", Helvetica;
+    --heading-sora-1-font-size: 36px;
+    --heading-sora-1-font-style: normal;
+    --heading-sora-1-font-weight: 400;
+    --heading-sora-1-letter-spacing: 0px;
+    --heading-sora-1-line-height: 40px;
+    --heading-sorabold-5-font-family: "Sora", Helvetica;
+    --heading-sorabold-5-font-size: 72px;
+    --heading-sorabold-5-font-style: normal;
+    --heading-sorabold-5-font-weight: 600;
+    --heading-sorabold-5-letter-spacing: 0px;
+    --heading-sorabold-5-line-height: 72px;
+    --inter-body-2xl-font-family: "Inter", Helvetica;
+    --inter-body-2xl-font-size: 28px;
+    --inter-body-2xl-font-style: normal;
+    --inter-body-2xl-font-weight: 400;
+    --inter-body-2xl-letter-spacing: 0px;
+    --inter-body-2xl-line-height: 32px;
+    --tealprimary: rgba(75, 170, 148, 1);
+    --purpleprimary: rgba(79, 55, 139, 1);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
