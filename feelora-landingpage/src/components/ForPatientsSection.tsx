@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { HeartIcon, CalendarIcon, BrainIcon, GlobeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import forPatientsImg from '@/assets/for_patients.png';
+import moodTrackerDemo from '@/assets/MoodTrackerDemo.png';
 
 export function ForPatientsSection() {
   const [ref, inView] = useInView({
@@ -95,7 +97,7 @@ export function ForPatientsSection() {
                             onMouseLeave={() => setIsHovered(false)}
                           >
                             <img
-                              src="src/assets/MoodTrackerDemo.png"
+                              src={moodTrackerDemo}
                               alt="Mood Tracker Preview"
                               className="w-full h-full object-cover"
                             />
@@ -112,7 +114,7 @@ export function ForPatientsSection() {
                               >
                                 <div className="bg-white rounded-2xl shadow-2xl p-4 w-80 border-2 border-tertiary">
                                   <img
-                                    src="src/assets/MoodTrackerDemo.png"
+                                    src={moodTrackerDemo}
                                     alt="Mood Tracker Demo"
                                     className="w-full h-auto object-contain rounded-lg"
                                   />
@@ -150,7 +152,7 @@ export function ForPatientsSection() {
               className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
             >
               <img
-                src="src/assets/for_patients.png"
+                src={forPatientsImg}
                 alt="patient digital therapy concept"
                 className="w-full h-auto object-cover"
                 loading="lazy"

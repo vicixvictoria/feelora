@@ -3,6 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import forTherapistsImg from '@/assets/for_therapists.png';
 
 export function ForTherapistsSection() {
   const [ref, inView] = useInView({
@@ -62,7 +63,7 @@ export function ForTherapistsSection() {
               className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
             >
               <img
-                src="src/assets/for_therapists.png"
+                src={forTherapistsImg}
                 alt="therapist connection concept"
                 className="w-full h-auto object-cover"
                 loading="lazy"

@@ -9,6 +9,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import logoFeelora from '@/assets/logo_feelora.png';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,7 +66,7 @@ export function Navbar() {
                onClick={() => scrollToSection('hero')}
           >
             <img
-              src="src/assets/logo_feelora.png"
+              src={logoFeelora}
               alt="Feelora Logo"
               className="h-[3rem] w-auto object-contain"
             />
