@@ -95,7 +95,7 @@ export function ForPatientsSection() {
                             onMouseLeave={() => setIsHovered(false)}
                           >
                             <img
-                              src="https://c.animaapp.com/mhahgsoyNVf0kG/img/moodtrackerdemo.png"
+                              src="src/assets/MoodTrackerDemo.png"
                               alt="Mood Tracker Preview"
                               className="w-full h-full object-cover"
                             />
@@ -112,7 +112,7 @@ export function ForPatientsSection() {
                               >
                                 <div className="bg-white rounded-2xl shadow-2xl p-4 w-80 border-2 border-tertiary">
                                   <img
-                                    src="https://c.animaapp.com/mhahgsoyNVf0kG/img/moodtrackerdemo.png"
+                                    src="src/assets/MoodTrackerDemo.png"
                                     alt="Mood Tracker Demo"
                                     className="w-full h-auto object-contain rounded-lg"
                                   />
