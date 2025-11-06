@@ -118,12 +118,14 @@ export function Navbar() {
               <span className="text-sm font-medium">{language.toUpperCase()}</span>
             </button>
 
+            {/*
             <Button
               onClick={() => scrollToSection('hero')}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
               {t[language].login}
             </Button>
+            */}
           </div>
 
           <button
@@ -173,12 +175,14 @@ export function Navbar() {
               <span className="font-medium">{language === 'de' ? 'Deutsch' : 'English'}</span>
             </button>
 
+            {/*
             <Button
               onClick={() => scrollToSection('hero')}
               className="w-full bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
               {t[language].login}
             </Button>
+            */}
           </div>
         </div>
       )}

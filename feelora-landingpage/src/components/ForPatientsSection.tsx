@@ -128,13 +128,14 @@ export function ForPatientsSection() {
               ))}
             </div>
 
-            <Button
+            {/* <Button
               size="lg"
               onClick={() => scrollToSection('hero')}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Jetzt Starten
             </Button>
+            */}
           </div>
 
           <motion.div

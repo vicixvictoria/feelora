@@ -105,13 +105,14 @@ export function ForTherapistsSection() {
               ))}
             </div>
 
-            <Button
+            {/*<Button
               size="lg"
               onClick={() => scrollToSection('hero')}
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen
             </Button>
+            */}
           </div>
         </motion.div>
       </div>
