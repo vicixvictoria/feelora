@@ -150,7 +150,7 @@ export function ForPatientsSection() {
               className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
             >
               <img
-                src="https://c.animaapp.com/mhahgsoyNVf0kG/img/gemini_generated_image_we6nyawe6nyawe6n.png"
+                src="src/assets/for_patients.png"
                 alt="patient digital therapy concept"
                 className="w-full h-auto object-cover"
                 loading="lazy"
