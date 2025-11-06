@@ -62,7 +62,7 @@ export function ForTherapistsSection() {
               className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
             >
               <img
-                src="https://c.animaapp.com/mhahgsoyNVf0kG/img/ai_3.png"
+                src="src/assets/for_therapists.png"
                 alt="therapist connection concept"
                 className="w-full h-auto object-cover"
                 loading="lazy"
