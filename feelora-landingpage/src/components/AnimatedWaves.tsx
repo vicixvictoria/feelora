@@ -1,111 +1,191 @@
 import { useEffect, useRef } from 'react';
 
 export function AnimatedWaves() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let time = 0;
-
-    const colors = [
-      '#E8E4F3',
-      '#4F378B',
-      '#4BAA94',
-      '#CCAADD',
-      '#DCD2F9',
-      '#F1F4F2',
-    ];
+    const svg = svgRef.current;
+    if (!svg) return;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      svg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
     };
 
     resize();
     window.addEventListener('resize', resize);
 
-    class Wave {
-      color: string;
-      amplitude: number;
-      frequency: number;
-      speed: number;
-      offset: number;
-      opacity: number;
-
-      constructor(color: string, amplitude: number, frequency: number, speed: number, offset: number, opacity: number) {
-        this.color = color;
-        this.amplitude = amplitude;
-        this.frequency = frequency;
-        this.speed = speed;
-        this.offset = offset;
-        this.opacity = opacity;
-      }
-
-      draw(ctx: CanvasRenderingContext2D, time: number, width: number, height: number) {
-        ctx.beginPath();
-        ctx.moveTo(0, height);
-
-        for (let x = 0; x <= width; x += 5) {
-          const y = height / 2 + 
-            Math.sin((x * this.frequency + time * this.speed + this.offset) * 0.01) * this.amplitude +
-            Math.sin((x * this.frequency * 0.5 + time * this.speed * 0.7 + this.offset) * 0.015) * (this.amplitude * 0.5);
-          
-          ctx.lineTo(x, y);
-        }
-
-        ctx.lineTo(width, height);
-        ctx.closePath();
-
-        ctx.fillStyle = this.color + Math.floor(this.opacity * 255).toString(16).padStart(2, '0');
-        ctx.fill();
-      }
-    }
-
-    const waves = [
-      new Wave(colors[5], 80, 0.8, 0.3, 0, 0.9),
-      new Wave(colors[0], 100, 1, 0.4, 100, 0.7),
-      new Wave(colors[4], 120, 0.6, 0.5, 200, 0.6),
-      new Wave(colors[3], 90, 1.2, 0.35, 300, 0.5),
-      new Wave(colors[2], 110, 0.9, 0.45, 400, 0.4),
-      new Wave(colors[1], 70, 1.1, 0.25, 500, 0.3),
-    ];
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, colors[4]);
-      gradient.addColorStop(1, colors[0]);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      waves.forEach(wave => {
-        wave.draw(ctx, time, canvas.width, canvas.height);
-      });
-
-      time += 1;
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
     return () => {
       window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-      style={{ opacity: 0.8 }}
-    />
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <svg
+        ref={svgRef}
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
+        style={{ opacity: 0.95 }}
+      >
+        <defs>
+          <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#b3e7e4" />
+            <stop offset="50%" stopColor="#c8d8e8" />
+            <stop offset="100%" stopColor="#d4baf0" />
+          </linearGradient>
+
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <style>
+            {`
+              @keyframes flowAnimation1 {
+                0% {
+                  stroke-dashoffset: 0;
+                  opacity: 0.5;
+                }
+                50% {
+                  opacity: 1;
+                }
+                100% {
+                  stroke-dashoffset: 2000;
+                  opacity: 0.5;
+                }
+              }
+
+              @keyframes flowAnimation2 {
+                0% {
+                  stroke-dashoffset: 0;
+                  opacity: 0.6;
+                }
+                50% {
+                  opacity: 0.95;
+                }
+                100% {
+                  stroke-dashoffset: 2000;
+                  opacity: 0.6;
+                }
+              }
+
+              @keyframes flowAnimation3 {
+                0% {
+                  stroke-dashoffset: 0;
+                  opacity: 0.55;
+                }
+                50% {
+                  opacity: 0.9;
+                }
+                100% {
+                  stroke-dashoffset: 2000;
+                  opacity: 0.55;
+                }
+              }
+
+              .flow-path-1 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.7);
+                stroke-width: 2.5;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation1 25s linear infinite;
+              }
+
+              .flow-path-2 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.85);
+                stroke-width: 2.5;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation2 18s linear infinite;
+                animation-delay: 5s;
+              }
+
+              .flow-path-3 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.75);
+                stroke-width: 3.5;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation3 22s linear infinite;
+                animation-delay: 10s;
+              }
+
+              .flow-path-4 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.65);
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation1 20s linear infinite;
+                animation-delay: 3s;
+              }
+
+              .flow-path-5 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.8);
+                stroke-width: 2.8;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation2 24s linear infinite;
+                animation-delay: 8s;
+              }
+
+              .flow-path-6 {
+                fill: none;
+                stroke: rgba(255, 255, 255, 0.7);
+                stroke-width: 2.2;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                filter: url(#glow);
+                animation: flowAnimation3 19s linear infinite;
+                animation-delay: 12s;
+              }
+            `}
+          </style>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#bgGradient)" />
+
+        <path
+          className="flow-path-1"
+          d="M 100 800 C 300 400, 700 500, 900 100"
+        />
+
+        <path
+          className="flow-path-2"
+          d="M 50 100 C 250 300, 450 200, 750 600"
+        />
+
+        <path
+          className="flow-path-3"
+          d="M 950 700 C 650 800, 350 300, 50 450"
+        />
+
+        <path
+          className="flow-path-4"
+          d="M 200 50 C 400 250, 600 150, 900 400"
+        />
+
+        <path
+          className="flow-path-5"
+          d="M 0 500 C 300 600, 500 300, 800 550"
+        />
+
+        <path
+          className="flow-path-6"
+          d="M 1000 200 C 700 100, 400 500, 100 350"
+        />
+      </svg>
+    </div>
   );
 }
