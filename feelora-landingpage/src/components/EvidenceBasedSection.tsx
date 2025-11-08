@@ -17,7 +17,7 @@ export function EvidenceBasedSection() {
 
     const duration = 1500;
     const startTime = Date.now();
-    const endValue = 80;
+    const endValue = 1;
 
     const animate = () => {
       const now = Date.now();
@@ -143,13 +143,13 @@ export function EvidenceBasedSection() {
             <Card className="bg-background/95 backdrop-blur-sm p-10 shadow-2xl max-w-md">
               <div className="text-center">
                 <div className="text-6xl font-headline font-bold text-tertiary-foreground mb-4" aria-live="polite">
-                  {effectiveness}%
+                  {effectiveness}st
                 </div>
                 <p className="text-h4 font-headline font-semibold text-gray-800 mb-3">
-                  Wirksamkeitsrate
+                  RBS Pitch Day Gewinner
                 </p>
                 <p className="text-body text-gray-600 leading-body">
-                  User berichten von einer deutlichen Verbesserung ihrer mentalen Gesundheit
+                  Das Konzept von Feelora hat den ersten Platz beim RBS-Pitch Day geholt
                 </p>
               </div>
             </Card>
