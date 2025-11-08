@@ -13,17 +13,17 @@ export function WhyFeeloraSection() {
   const stats = [
     {
       icon: UsersIcon,
-      value: 1300,
+      value: 50,
       suffix: '+',
-      label: 'Wachsende Community',
-      description: 'Immer mehr Patient:innen & Therapeut:innen vertrauen Feelora',
+      label: 'Vorregistrierung',
+      description: 'Es wurden schon vor dem Launch mehr als 50 Vorregistrierung von Interessenten gesammelt',
     },
     {
       icon: AwardIcon,
-      value: 95,
+      value: 71,
       suffix: '%',
-      label: 'Zufriedenheit',
-      description: 'Unsere User:Innen berichten von hoher Zufriedenheit mit ihren Therapie-Matches',
+      label: 'Zeigen großes Interesse',
+      description: 'Unsere Befragung hat gezeigt, dass 71% großes Interesse an Feelora haben',
     },
     {
       icon: ShieldIcon,
