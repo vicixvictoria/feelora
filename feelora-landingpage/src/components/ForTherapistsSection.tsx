@@ -4,8 +4,10 @@ import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import forTherapistsImg from '@/assets/for_therapists.png';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function ForTherapistsSection() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -21,23 +23,23 @@ export function ForTherapistsSection() {
   const features = [
     {
       icon: UsersIcon,
-      title: 'Smart Matching',
-      description: 'Erhalte passende Klient:innen, deren Bedürfnisse zu deinem Fachgebiet passen.',
+      title: t('therapists.feature1.title'),
+      description: t('therapists.feature1.desc'),
     },
     {
       icon: TrendingUpIcon,
-      title: 'Praxiswachstum leicht gemacht',
-      description: 'Erreiche neue Patient:innen, die aktiv nach Unterstützung suchen – online oder vor Ort.',
+      title:  t('therapists.feature2.title'),
+      description: t('therapists.feature2.desc'),
     },
     {
       icon: BriefcaseIcon,
-      title: 'Alles an einem Ort',
-      description: 'Verwalte Termine, Chats und Video-Sitzungen sicher und einfach auf einer Plattform.',
+      title:  t('therapists.feature3.title'),
+      description: t('therapists.feature3.desc'),
     },
     {
       icon: BarChartIcon,
-      title: 'Patient:innen Insights ',
-      description: 'Erhalte Einblicke aus dem Mood Tracker, um Behandlungen individuell anzupassen.',
+      title:  t('therapists.feature4.title'),
+      description: t('therapists.feature4.desc'),
     },
   ];
 
@@ -73,10 +75,10 @@ export function ForTherapistsSection() {
 
           <div className="order-1 lg:order-2">
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              Für Therapeut:Innen
+              {t('therapists.title')} 
             </h2>
             <p className="text-body-large text-gray-600 mb-12 leading-body">
-              Tritt unserem Netzwerk lizenzierter Fachleute bei und erweitere deine Praxis mit neuen Tools und Unterstützung.
+              {t('therapists.description')}
             </p>
 
             <div className="space-y-8 mb-12">

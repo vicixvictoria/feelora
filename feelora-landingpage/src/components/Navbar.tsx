@@ -10,31 +10,15 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import logoFeelora from '@/assets/logo_feelora.png';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'de' | 'en'>('de');
+  const { language, setLanguage, t } = useLanguage();
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'de' ? 'en' : 'de');
-  };
-
-  const t = {
-    de: {
-      forPatients: 'Für Patient:Innen',
-      forTherapists: 'Für Therapeut:Innen',
-      whyFeelora: 'Warum Feelora',
-      testimonials: 'Meinungen',
-      login: 'Log in',
-    },
-    en: {
-      forPatients: 'For Patients',
-      forTherapists: 'For Therapists',
-      whyFeelora: 'Why Feelora',
-      testimonials: 'Testimonials',
-      login: 'Log in',
-    },
+    setLanguage(language === 'de' ? 'en' : 'de');
   };
 
   useEffect(() => {
@@ -80,7 +64,7 @@ export function Navbar() {
                     onClick={() => scrollToSection('for-patients')}
                     className="text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal"
                   >
-                    {t[language].forPatients}
+                    {t('nav.forPatients')}
                   </button>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -88,7 +72,7 @@ export function Navbar() {
                     onClick={() => scrollToSection('for-therapists')}
                     className="text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal"
                   >
-                    {t[language].forTherapists}
+                    {t('nav.forTherapists')}
                   </button>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -96,7 +80,7 @@ export function Navbar() {
                     onClick={() => scrollToSection('why-feelora')}
                     className="text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal"
                   >
-                    {t[language].whyFeelora}
+                    {t('nav.whyFeelora')}
                   </button>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -104,7 +88,7 @@ export function Navbar() {
                     onClick={() => scrollToSection('testimonials')}
                     className="text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal"
                   >
-                    {t[language].testimonials}
+                    {t('nav.testimonials')}
                   </button>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -124,7 +108,7 @@ export function Navbar() {
               onClick={() => scrollToSection('hero')}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
-              {t[language].login}
+              {t('nav.login')}
             </Button>
             */}
           </div>
@@ -146,25 +130,25 @@ export function Navbar() {
               onClick={() => scrollToSection('for-patients')}
               className="block w-full text-left text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal py-3"
             >
-              {t[language].forPatients}
+              {t('nav.forPatients')}
             </button>
             <button
               onClick={() => scrollToSection('for-therapists')}
               className="block w-full text-left text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal py-3"
             >
-              {t[language].forTherapists}
+              {t('nav.forTherapists')}
             </button>
             <button
               onClick={() => scrollToSection('why-feelora')}
               className="block w-full text-left text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal py-3"
             >
-              {t[language].whyFeelora}
+              {t('nav.whyFeelora')}
             </button>
             <button
               onClick={() => scrollToSection('testimonials')}
               className="block w-full text-left text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal py-3"
             >
-              {t[language].testimonials}
+              {t('nav.testimonials')}
             </button>
             
             <button
@@ -181,7 +165,7 @@ export function Navbar() {
               onClick={() => scrollToSection('hero')}
               className="w-full bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
-              {t[language].login}
+              {t('nav.login')}
             </Button>
             */}
           </div>

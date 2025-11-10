@@ -1,0 +1,269 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+type Language = 'de' | 'en';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations = {
+  de: {
+    // Navbar
+    'nav.forPatients': 'Für Patient:Innen',
+    'nav.forTherapists': 'Für Therapeut:Innen',
+    'nav.whyFeelora': 'Warum Feelora',
+    'nav.testimonials': 'Meinungen',
+    'nav.login': 'Log in',
+
+    // Hero Section
+    'hero.title.feel': 'FEEL',
+    'hero.title.ora': 'ORA',
+    'hero.subtitle': 'Therapie, die mit dir mitfühlt.',
+    'hero.description': 'Feelora verknüpft persönliche Begleitung mit smarter Technologie: Finde den/die passenden Therapeut:in – und erhalte tägliche Unterstützung durch unseren Mood Tracker, der zwischen den Sitzungen für dich da ist.',
+    'hero.cta.register': 'Jetzt Registrieren',
+    'hero.cta.info': 'Mehr Information',
+    'hero.cta.regsiter.alt':'Lerne uns kennen',
+
+    // For Patients Section
+    'patients.title': 'Für Patient:Innen',
+    'patients.description': 'Übernimm die Kontrolle über deine mentale Gesundheit mit personalisierter Unterstützung, die auf deine individuellen Bedürfnisse zugeschnitten ist.',
+    'patients.feature1.title': 'Personalisierte Vermittlung',
+    'patients.feature1.desc': 'Beantworte ein paar Fragen – wir finden den oder die passende Therapeut:in für dich.',
+    'patients.feature2.title': 'Einfache Terminplanung',
+    'patients.feature2.desc': 'Buche Sitzungen online oder persönlich – direkt über unsere App.',
+    'patients.feature3.title': 'Immer verbunden',
+    'patients.feature3.desc': 'Chatte oder telefoniere mit deiner Therapeutin direkt in der App – wann immer du es brauchst.',
+    'patients.feature4.title': 'Mood Tracker & AI Assistant',
+    'patients.feature4.desc': 'Reflektiere dein Wohlbefinden mit einem intelligenten Stimmungs-Tagebuch. Deine Therapeutin kann – nur mit deinem Einverständnis – daraus wertvolle Einblicke für deine Behandlung gewinnen.',
+    'patients.cta': 'Jetzt Starten',
+
+    // For Therapists Section
+    'therapists.title': 'Für Therapeut:Innen',
+    'therapists.description': 'Tritt unserem Netzwerk lizenzierter Fachleute bei und erweitere deine Praxis mit neuen Tools und Unterstützung.',
+    'therapists.feature1.title': 'Smart Matching',
+    'therapists.feature1.desc': 'Erhalte passende Klient:innen, deren Bedürfnisse zu deinem Fachgebiet passen.',
+    'therapists.feature2.title': 'Praxiswachstum leicht gemacht',
+    'therapists.feature2.desc': 'Erreiche neue Patient:innen, die aktiv nach Unterstützung suchen – online oder vor Ort.',
+    'therapists.feature3.title': 'Alles an einem Ort',
+    'therapists.feature3.desc': 'Verwalte Termine, Chats und Video-Sitzungen sicher und einfach auf einer Plattform.',
+    'therapists.feature4.title': 'Patient:innen Insights',
+    'therapists.feature4.desc': 'Erhalte Einblicke aus dem Mood Tracker, um Behandlungen individuell anzupassen.',
+    'therapists.cta': 'Mitmachen',
+
+    // Why Feelora Section
+    'why.title': 'Warum Feelora',
+    'why.description': 'Wir setzen uns dafür ein, dass die psychische Gesundheitsversorgung für alle zugänglich, individuell und wirksam ist. Unsere Idee war Gewinner des RBS Pitch Day und wurde ausgezeichnet für Innovation im Mental-Health-Tech-Bereich.',
+    'why.stat1.label': 'Vorregistrierungen',
+    'why.stat1.desc': 'Es wurden schon vor dem Launch mehr als 50 Vorregistrierung von Interessenten gesammelt',
+    'why.stat2.label': 'Zeigen großes Interesse',
+    'why.stat2.desc': 'Unsere Befragung hat gezeigt, dass 71% großes Interesse an Feelora haben',
+    'why.stat3.label': 'Datenbasiert & Sicher',
+    'why.stat3.desc': 'Wir schützen deine Privatsphäre und sind DSGVO konform',
+
+    // Evidence Based Section
+    'evidence.title': 'Gesundheit unterstützt durch evidenzbasierte Technologie',
+    'evidence.description': 'Unser Ansatz kombiniert neuste Technologie mit bewährten therapeutischen Methoden, um messbare Ergebnisse zu erzielen.',
+    'evidence.digital.title': 'Digitalisierte mentale Gesundheit',
+    'evidence.digital.desc': 'Wir machen mentale Unterstützung einfacher erreichbar - für alle jederzeit. Denn eine digitale Begleitung stärkt die Beziehung zwischen Patient:in & Therapeut:in nachweislich wirksam.',
+    'evidence.digital.point1': 'Zugänglich und Flexibel',
+    'evidence.digital.point2': 'Bessere Resultate',
+    'evidence.digital.point3': '24/7 Zugriff',
+    'evidence.based.title': 'Evidencebasiert & Wirksam',
+    'evidence.based.desc': 'Digitale Tools können die Therapie nachweislich unterstützen und Ergebnisse verbessern. Unsere Methoden basieren auf neuesten Studien – geprüft und validiert.',
+    'evidence.based.point1': 'Wissenschaftlich fundierte Methoden',
+    'evidence.based.point2': 'Nachgewiesene Wirksamkeit',
+    'evidence.based.point3': 'Kontinuierliche Ergebnisüberwachung',
+    'evidence.effectiveness': 'RBS Pitch Day Gewinner',
+    'evidence.effectiveness.desc': 'Das Konzept von Feelora hat den ersten Platz beim RBS-Pitch Day für Innovation im Mental-Health-Tech-Bereich geholt',
+
+    // Testimonials Section
+    'testimonials.title': 'Was unsere User sagen',
+    'testimonials.description': 'Wahre Geschichten von Menschen welche die passende Unterstützung gefunden haben.',
+    'testimonials.review1':'Feelora hat mir geholfen, den perfekten Therapeuten zu finden, der meine Bedürfnisse wirklich versteht. Die Plattform ist einfach zu bedienen und die Unterstützung hat mein Leben verändert.',
+    'testimonials.review2':'Als Therapeut hat mir Feelora geholfen, meine Praxis auszubauen und mit Klienten in Kontakt zu treten, die zu mir passen. Die Tools sind intuitiv und sparen mir viel Zeit.',
+    'testimonials.review3':'Ich war skeptisch gegenüber der Online-Therapie, aber Feelora hat sie so angenehm und zugänglich gemacht. Mein Therapeut ist fantastisch und ich kann die Sitzungen in meinen vollen Terminkalender einplanen.',
+    'testimonials.review4':'Der Moodtracker-Funktion war unglaublich hilfreich, um meine Muster zu verstehen. In Kombination mit regelmäßigen Therapiesitzungen habe ich das Gefühl, mehr Kontrolle zu haben als je zuvor.',
+
+    // About Us
+    'aboutus.title': 'Unsere Geschichte',
+    'aboutus.title.subtitle': 'Wir glauben, mentale Gesundheit verdient mehr als Wartelisten und Zufall.',
+    'aboutus.title.desc': 'Darum haben wir Feelora gegründet – eine Plattform, die Menschen und Therapeut:innen nicht einfach verbindet, sondern wirklich matcht. Mit smarter Technologie, die Empathie versteht. Mit einem Mood Tracker, der den Alltag zwischen den Sitzungen sichtbar macht. Und mit einem Design, das sich so leicht anfühlt, wie der erste Schritt zu mehr Balance.',
+    'aboutus.title2': 'Die Idee entstand aus echter Erfahrung.',
+    'aboutus.title2.desc': 'Unsere Gründerin Aylin Schatz erkannte während ihres Masterstudiums an der Rome Business School, wie dringend ein System fehlt, das Therapie einfacher, persönlicher und digitaler denkt. Für ihr Konzept wurde sie mit dem Pitch Day Award ausgezeichnet – für Innovation, Social Impact und Zukunftspotenzial.',
+    'aboutus.team.title': 'Unser Team',
+    'aboutus.team.desc': 'Heute steht hinter Feelora ein interdisziplinäres Team, das Wissenschaft, Design und Technologie vereint, um mentale Gesundheit neu zu denken:',
+    'aboutus.team.aylin.role': 'Gründerin',
+    'aboutus.team.aylin.desc': 'Entwickelte die Vision von Feelora während ihres Masterstudiums an der Rome Business School. Ausgezeichnet mit dem Pitch Day Award für Innovation, Social Impact und Zukunftspotenzial.',
+    'aboutus.team.michele.role': 'CTO & AI Engineer',
+    'aboutus.team.michele.desc': 'Entwickelt KI-Systeme, die fühlen lernen. Erfahrung: AWS Business Group bei Accenture & AI Engineer bei Data Reply.',
+    'aboutus.team.victoria.role': 'UX/UI Designerin',
+    'aboutus.team.victoria.desc': 'Bringt Expertise aus ihrem Medical Informatics Master und UX Research ein, um digitale Räume zu schaffen, die Vertrauen auslösen.',
+    'aboutus.team.carolin.role': 'Psychologin (B.Sc.)',
+    'aboutus.team.carolin.desc': 'Sorgt für wissenschaftliche Tiefe und psychologische Genauigkeit in allen Matching- und Mood-Modulen.',
+    'aboutus.team.delphine.role': 'Brand Strategist & Communications Lead',
+    'aboutus.team.delphine.desc': 'Verbindet globale Perspektiven mit Empathie und Klarheit in der Kommunikation.',
+    'aboutus.goal.title': 'Unser Ziel',
+    'aboutus.goal.desc': 'Therapie einfacher, menschlicher und nachhaltiger zu gestalten.',
+    'aboutus.goal.subtitle': 'Weil mentale Gesundheit kein Luxus ist – sondern Lebensqualität.',
+    'aboutus.cta': 'zurück',
+
+
+    // Footer
+    'footer.stayConnected': 'Stay Connected',
+    'footer.users': 'Unsere User:Innen',
+    'footer.users.join': 'Werde Mitglied',
+    'footer.users.resources': 'Resourcen',
+    'footer.users.support': 'Support',
+    'footer.legal': 'Legal',
+    'footer.legal.privacy': 'Privacy Policy',
+    'footer.legal.terms': 'Terms & Condition',
+    'footer.legal.cookies': 'Cookie Policy',
+    'footer.about': 'About Us',
+    'footer.about.story': 'Unsere Geschichte',
+    'footer.about.join': 'Mitmachen',
+    'footer.about.contact': 'Kontakt',
+    'footer.rights': 'All rights reserved.',
+  },
+  en: {
+    // Navbar
+    'nav.forPatients': 'For Patients',
+    'nav.forTherapists': 'For Therapists',
+    'nav.whyFeelora': 'Why Feelora',
+    'nav.testimonials': 'Testimonials',
+    'nav.login': 'Log in',
+
+    // Hero Section
+    'hero.title.feel': 'FEEL',
+    'hero.title.ora': 'ORA',
+    'hero.subtitle': 'Your Mental Health Journey - Matched with Care.',
+    'hero.description': 'Feelora is a  digital platform that connects individuals seeking mental health support with licensed therapists and psychologists. We make it easier to find the right professional, schedule sessions, and stay connected - all in one place.',
+    'hero.cta.register': 'Register Now',
+    'hero.cta.info': 'More Information',
+    'hero.cta.regsiter.alt':'Get to know us',
+
+    // For Patients Section
+    'patients.title': 'For Patients',
+    'patients.description': 'Take control of your mental health with personalized support tailored to your individual needs.',
+    'patients.feature1.title': 'Personalized Matching',
+    'patients.feature1.desc': 'Answer a short questionnaire, and we will connect you with the therapist best suited to your needs.',
+    'patients.feature2.title': 'Easy Scheduling',
+    'patients.feature2.desc': 'Book sessions online or in-person – directly through our app.',
+    'patients.feature3.title': 'Stay Connected',
+    'patients.feature3.desc': 'Chat or video call your therapist anytime, directly in the app.',
+    'patients.feature4.title': 'Mood Tracker & AI Assistant',
+    'patients.feature4.desc': 'Reflect on your feelings with a digital diary that learns from you. With your consent, your therapist can use these insights to provide better care.',
+    'patients.cta': 'Get Started',
+
+    // For Therapists Section
+    'therapists.title': 'For Therapists',
+    'therapists.description': 'Join our network of licensed professionals and expand your practice with new tools and support.',
+    'therapists.feature1.title': 'Smart Matching',
+    'therapists.feature1.desc': 'Get connected with patients whose needs align with your expertise.',
+    'therapists.feature2.title': 'Grow your Practice',
+    'therapists.feature2.desc': 'Reach individuals actively seeking support and begin sessions in person or online.',
+    'therapists.feature3.title': 'Everything in One Place',
+    'therapists.feature3.desc': 'Manage appointments, chat, and video sessions all in one secure platform.',
+    'therapists.feature4.title': 'Patient Insights',
+    'therapists.feature4.desc': 'With permission, access mood tracker conversations to better tailor your care.',
+    'therapists.cta': 'Join Us',
+
+    // Why Feelora Section
+    'why.title': 'Why Feelora',
+    'why.description': 'We are committed to making mental healthcare accessible, personalized, and effective for everyone. Our idea won the RBS Pitch Day and was recognized for innovation in mental health tech.',
+    'why.stat1.label': 'Preregistrations',
+    'why.stat1.desc': 'More than 50 pre-registrations from interested parties were collected even before the launch.',
+    'why.stat2.label': 'Show great Interest',
+    'why.stat2.desc': 'Our survey showed that 71% are very interested in Feelora.',
+    'why.stat3.label': 'Data-Driven & Secure',
+    'why.stat3.desc': 'We protect your privacy and are DSGVO compliant',
+
+    // Evidence Based Section
+    'evidence.title': 'Health supported by evidence-based technology',
+    'evidence.description': 'Our approach combines the latest technology with proven therapeutic methods to achieve measurable results.',
+    'evidence.digital.title': 'Digitalized Mental Health',
+    'evidence.digital.desc': 'We make mental health support more accessible - for everyone, anytime. Digital support strengthens the relationship between patient & therapist.',
+    'evidence.digital.point1': 'Accessible and Flexible',
+    'evidence.digital.point2': 'Better Results',
+    'evidence.digital.point3': '24/7 Access',
+    'evidence.based.title': 'Evidence-Based & Effective',
+    'evidence.based.desc': 'Digital tools can demonstrably support therapy and improve outcomes. Our methods are based on the latest studies – tested and validated.',
+    'evidence.based.point1': 'Scientifically founded methods',
+    'evidence.based.point2': 'Proven effectiveness',
+    'evidence.based.point3': 'Continuous outcome monitoring',
+    'evidence.effectiveness': 'RBS Pitch Day Winners',
+    'evidence.effectiveness.desc': 'The Feelora concept took first place at the RBS Pitch Day for innovation in mental health technology.',
+
+    // Testimonials Section
+    'testimonials.title': 'What Our Users Say',
+    'testimonials.description': 'Real stories from people who found the right support.',
+    'testimonials.review1':'Feelora helped me find the perfect therapist who truly understands my needs. The platform is easy to use, and the support has changed my life.',
+    'testimonials.review2':'As a therapist, Feelora has helped me grow my practice and connect with clients who are a good fit for me. The tools are intuitive and save me a lot of time.',
+    'testimonials.review3':'I was skeptical about online therapy, but Feelora has made it so comfortable and accessible. My therapist is fantastic, and I can schedule sessions around my busy schedule.',
+    'testimonials.review4':'The mood tracker function was incredibly helpful in understanding my patterns. Combined with regular therapy sessions, I feel more in control than ever before.',
+
+    // About Us
+    'aboutus.title': 'Our Story',
+    'aboutus.title.subtitle': 'We believe mental health deserves more than waiting lists and chances.',
+    'aboutus.title.desc': 'That is why we founded Feelora - a platform that does not just connect people and therapists, but truly matches them. With smart technology that understands empathy. With a mood tracker that makes everyday life between sessions visible. And with a design that feels as easy as taking the first step toward greater balance.',
+    'aboutus.title2': 'The idea arose from real experience',
+    'aboutus.title2.desc': 'During her masters degree at the Rome Business School, our founder Aylin Schatz recognized how urgently a system was needed that made therapy easier, more personal, and more digital. She recieved the Pitch Day Award for her concept — for innovation, social impact, and future potential.',
+    'aboutus.team.title': 'Our Team',
+    'aboutus.team.desc': 'Today, Feelora is backed by an interdisciplinary team that combines science, design, and technology to rethink mental health:',
+    'aboutus.team.aylin.role': 'Founder',
+    'aboutus.team.aylin.desc': 'Developed the vision for Feelora during her masters degree at the Rome Business School. Recieved the Pitch Day Award for innovation, social impact, and future potential.',
+    'aboutus.team.michele.role': 'CTO & AI Engineer',
+    'aboutus.team.michele.desc': 'Develops AI systems that learn to feel. Experience: AWS Business Group at Accenture & AI Engineer at Data Reply.',
+    'aboutus.team.victoria.role': 'UX/UI Designerin',
+    'aboutus.team.victoria.desc': 'Contributes expertise from her Masters degree in Medical Informatics and UX Research to create digital spaces that inspire trust.',
+    'aboutus.team.carolin.role': 'Psychologist (B.Sc.)',
+    'aboutus.team.carolin.desc': 'Ensures scientific depth and psychological accuracy in all matching and mood modules.',
+    'aboutus.team.delphine.role': 'Brand Strategist & Communications Lead',
+    'aboutus.team.delphine.desc': 'Combines global perspectives with empathy and clarity in communication.',
+    'aboutus.goal.title': 'Our Goal',
+    'aboutus.goal.desc': 'Making therapy simpler, more personal, and more sustainable.',
+    'aboutus.goal.subtitle': 'Because mental health is not a luxury — it is quality of life.',
+    'aboutus.cta': 'back',
+
+    // Footer
+    'footer.stayConnected': 'Stay Connected',
+    'footer.users': 'Our Users',
+    'footer.users.join': 'Become a Member',
+    'footer.users.resources': 'Resources',
+    'footer.users.support': 'Support',
+    'footer.legal': 'Legal',
+    'footer.legal.privacy': 'Privacy Policy',
+    'footer.legal.terms': 'Terms & Conditions',
+    'footer.legal.cookies': 'Cookie Policy',
+    'footer.about': 'About Us',
+    'footer.about.story': 'Our Story',
+    'footer.about.join': 'Join Us',
+    'footer.about.contact': 'Contact',
+    'footer.rights': 'All rights reserved.',
+  },
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('de');
+
+  const t = (key: string): string => {
+    return translations[language][key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (context === null) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}

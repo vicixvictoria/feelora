@@ -3,8 +3,11 @@ import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
 import { SmartphoneIcon, FileCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import evidenceImg from '@/assets/evidenceBasedImg.png';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function EvidenceBasedSection() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -48,10 +51,10 @@ export function EvidenceBasedSection() {
           className="text-center mb-20"
         >
           <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-            Evidenzbasiert & Wirksam
+            {t('evidence.title')}
           </h2>
           <p className="text-body-large text-gray-600 max-w-3xl mx-auto leading-body">
-            Unser Ansatz kombiniert neuste Technologie mit bewährten therapeutischen Methoden, um messbare Ergebnisse zu erzielen.
+            {t('evidence.description')}
           </p>
         </motion.div>
 
@@ -66,23 +69,23 @@ export function EvidenceBasedSection() {
                 <SmartphoneIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-6">
-                Digitalisierte mentale Gesundheit
+                {t('evidence.digital.title')}
               </h3>
               <p className="text-body text-gray-600 leading-body mb-6">
-                Wir machen mentale Unetrstützung einfacher erreichbar - für alle jederzit. Denn eine digitale Begleitung stärkt die Beziehung zwischen Patient:in & Therapeut:in nachweislich wirksam.
+                {t('evidence.digital.desc')}
               </p>
               <ul className="space-y-4 text-body text-gray-600">
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                  <span>Zugänglich und Flexibel</span>
+                  <span>{t('evidence.digital.point1')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                  <span>Bessere Resultate</span>
+                  <span>{t('evidence.digital.point2')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                  <span>24/7 Zugriff</span>
+                  <span>{t('evidence.digital.point3')}</span>
                 </li>
               </ul>
             </Card>
@@ -98,23 +101,23 @@ export function EvidenceBasedSection() {
                 <FileCheckIcon className="w-8 h-8 text-secondary" strokeWidth={1.5} />
               </div>
               <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-6">
-                Evidencebasiert & Wirksam
+                {t('evidence.based.title')}
               </h3>
               <p className="text-body text-gray-600 leading-body mb-6">
-                Digitale Tools können die Therapie nachweislich unterstützen und Ergebnisse verbessern. Unsere Methoden basieren auf neuesten Studien – geprüft und validiert.
+                {t('evidence.based.desc')}
               </p>
               <ul className="space-y-4 text-body text-gray-600">
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary mt-2 flex-shrink-0" />
-                  <span>Wissenschaftlich fundierte Methoden</span>
+                  <span>{t('evidence.based.point1')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary mt-2 flex-shrink-0" />
-                  <span>Nachgewiesene Wirksamkeit</span>
+                  <span>{t('evidence.based.point2')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary mt-2 flex-shrink-0" />
-                  <span>kontinuierliche Ergebnisüberwachung </span>
+                  <span>{t('evidence.based.point3')}</span>
                 </li>
               </ul>
             </Card>
@@ -133,7 +136,7 @@ export function EvidenceBasedSection() {
             className="rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto"
           >
             <img
-              src="https://c.animaapp.com/mhahgsoyNVf0kG/img/ai_4.png"
+              src={evidenceImg}
               alt="evidence support visualization"
               className="w-full h-auto object-cover"
               loading="lazy"
@@ -146,10 +149,10 @@ export function EvidenceBasedSection() {
                   {effectiveness}st
                 </div>
                 <p className="text-h4 font-headline font-semibold text-gray-800 mb-3">
-                  RBS Pitch Day Gewinner
+                  {t('evidence.effectiveness')}
                 </p>
                 <p className="text-body text-gray-600 leading-body">
-                  Das Konzept von Feelora hat den ersten Platz beim RBS-Pitch Day geholt
+                  {t('evidence.effectiveness.desc')}
                 </p>
               </div>
             </Card>

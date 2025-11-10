@@ -2,8 +2,10 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { AnimatedWaves } from './AnimatedWaves';
 import { TitleFrame } from './TitleFrame';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function HeroSection() {
+  const { t } = useLanguage();
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -39,7 +41,7 @@ export function HeroSection() {
             onClick={() => scrollToSection('for-patients')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
-            Jetzt Regsitrieren 
+            {t('hero.cta.regsiter.alt')} 
           </Button>
           <Button
             size="lg"
@@ -47,7 +49,7 @@ export function HeroSection() {
             onClick={() => scrollToSection('for-therapists')}
             className="bg-white/80 backdrop-blur-sm text-gray-800 border-gray-300 hover:bg-white hover:border-gray-400 font-normal text-base px-8 py-6"
           >
-            Mehr Information
+            {t('hero.cta.info')}
           </Button>
         </motion.div>
       </div>

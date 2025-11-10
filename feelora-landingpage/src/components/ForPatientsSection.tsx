@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import forPatientsImg from '@/assets/for_patients.png';
 import moodTrackerDemo from '@/assets/MoodTrackerDemo.png';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function ForPatientsSection() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -25,26 +27,26 @@ export function ForPatientsSection() {
   const features = [
     {
       icon: HeartIcon,
-      title: 'Personalisierte Vermittlung',
-      description: 'Beantworte ein paar Fragen – wir finden den oder die passende Therapeut:in für dich.',
+      title: t('patients.feature1.title'),
+      description:  t('patients.feature1.desc'),
       hasMiniature: false,
     },
     {
       icon: CalendarIcon,
-      title: 'Einfache Terminplanung',
-      description: 'Buche Sitzungen online oder persönlich – direkt über unsere App.',
+      title: t('patients.feature2.title'),
+      description: t('patients.feature2.desc'),
       hasMiniature: false,
     },
     {
       icon: GlobeIcon,
-      title: 'Immer verbunden',
-      description: 'Chatte oder telefoniere mit deiner Therapeutin direkt in der App – wann immer du es brauchst.',
+      title: t('patients.feature3.title'),
+      description: t('patients.feature3.desc'),
       hasMiniature: false,
     },
     {
       icon: BrainIcon,
-      title: 'Mood Tracker & AI Assistant',
-      description: 'Reflektiere dein Wohlbefinden mit einem intelligenten Stimmungs-Tagebuch. Deine Therapeutin kann – nur mit deinem Einverständnis – daraus wertvolle Einblicke für deine Behandlung gewinnen.',
+      title: t('patients.feature4.title'),
+      description: t('patients.feature4.desc'),
       hasMiniature: true,
     },
   ];
@@ -61,11 +63,11 @@ export function ForPatientsSection() {
         >
           <div>
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              Für Patient:Innen
+              {t('patients.title')} 
             </h2>
             <p className="text-body-large mb-12 leading-body" style={{ color: '#2F3E46' }}>
-              Übernimm die Kontrolle über deine mentale Gesundheit mit personalisierter Unterstützung, die auf deine individuellen Bedürfnisse zugeschnitten ist.
-            </p>
+              {t('patients.description')}
+              </p>
 
             <div className="space-y-8 mb-12">
               {features.map((feature, index) => (
@@ -135,8 +137,7 @@ export function ForPatientsSection() {
               onClick={() => scrollToSection('hero')}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
-              Jetzt Starten
-            </Button>
+            {t('patients.cta')}
             */}
           </div>
 
@@ -154,7 +155,7 @@ export function ForPatientsSection() {
               <img
                 src={forPatientsImg}
                 alt="patient digital therapy concept"
-                className="w-full h-auto object-cover"
+                className="w-full h-full object-cover"
                 loading="lazy"
               />
             </motion.div>

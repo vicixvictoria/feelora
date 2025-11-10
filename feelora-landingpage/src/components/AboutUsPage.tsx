@@ -3,8 +3,11 @@ import { useInView } from 'react-intersection-observer';
 import { ArrowLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import pitchDay from '@/assets/RBSPitchDay.jpg';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function AboutUsPage() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -13,28 +16,28 @@ export function AboutUsPage() {
   const teamMembers = [
     {
       name: 'Aylin Schatz',
-      role: 'Gründerin',
-      description: 'Entwickelte die Vision von Feelora während ihres Masterstudiums an der Rome Business School. Ausgezeichnet mit dem Pitch Day Award für Innovation, Social Impact und Zukunftspotenzial.',
+      role: t('aboutus.team.aylin.role'),
+      description: t('aboutus.team.aylin.desc'),
     },
     {
       name: 'Michele Mussacchio',
-      role: 'CTO & AI Engineer',
-      description: 'Entwickelt KI-Systeme, die fühlen lernen. Erfahrung: AWS Business Group bei Accenture & AI Engineer bei Data Reply.',
+      role: t('aboutus.team.michele.role'),
+      description: t('aboutus.team.michele.desc'),
     },
     {
       name: 'Victoria Zeillinger',
-      role: 'UX/UI Designerin',
-      description: 'Bringt ihre Expertise aus Medical Informatics und UX Research ein, um digitale Räume zu schaffen, die Vertrauen auslösen.',
+      role: t('aboutus.team.victoria.role'),
+      description: t('aboutus.team.victoria.desc'),
     },
     {
       name: 'Carolin Böcker',
-      role: 'Psychologin (B.Sc.)',
-      description: 'Sorgt für wissenschaftliche Tiefe und psychologische Genauigkeit in allen Matching- und Mood-Modulen.',
+      role: t('aboutus.team.carolin.role'),
+      description: t('aboutus.team.carolin.desc'),
     },
     {
       name: 'Delphine N\'Diaye',
-      role: 'Brand Strategist & Communications Lead',
-      description: 'Verbindet globale Perspektiven mit Empathie und Klarheit in der Kommunikation.',
+      role: t('aboutus.team.delphine.role'),
+      description: t('aboutus.team.delphine.desc'),
     },
   ];
 
@@ -53,30 +56,30 @@ export function AboutUsPage() {
               className="mb-8 text-gray-700 hover:text-primary"
             >
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Zurück
+              {t('aboutus.cta')}
             </Button>
 
             <h1 className="text-h1 font-headline font-bold text-[#4f378b] tracking-headline leading-headline mb-8">
-              Unsere Geschichte
+              {t('aboutus.title')}
             </h1>
 
             <div className="space-y-8 text-body-large leading-body" style={{ color: '#2F3E46' }}>
-              <p className="text-h3 font-semibold text-gray-800">
-                Wir glauben, mentale Gesundheit verdient mehr als Wartelisten und Zufall.
-              </p>
+              <h3 className="text-h3 font-headline font-semibold text-tertiary-foreground mb-6">
+                {t('aboutus.title.subtitle')}
+              </h3>
 
               <p>
-                Darum haben wir Feelora gegründet – eine Plattform, die Menschen und Therapeut:innen nicht einfach verbindet, sondern wirklich matcht. Mit smarter Technologie, die Empathie versteht. Mit einem Mood Tracker, der den Alltag zwischen den Sitzungen sichtbar macht. Und mit einem Design, das sich so leicht anfühlt, wie der erste Schritt zu mehr Balance.
+                {t('aboutus.title.desc')}
               </p>
 
               <div className="grid md:grid-cols-2 gap-12 items-center mt-12">
                 <div>
-                  <h2 className="text-h2 font-headline font-semibold text-tertiary-foreground mb-6">
-                    Die Idee entstand aus echter Erfahrung.
-                  </h2>
+                  <h3 className="text-h3 font-headline font-semibold text-tertiary-foreground mb-6">
+                    {t('aboutus.title2')}
+                  </h3>
 
                   <p>
-                    Unsere Gründerin <strong>Aylin Schatz</strong> erkannte während ihres Masterstudiums an der Rome Business School, wie dringend ein System fehlt, das Therapie einfacher, persönlicher und digitaler denkt. Für ihr Konzept wurde sie mit dem <strong>Pitch Day Award</strong> ausgezeichnet – für Innovation, Social Impact und Zukunftspotenzial.
+                    {t('aboutus.title2.desc')}
                   </p>
                 </div>
 
@@ -88,7 +91,7 @@ export function AboutUsPage() {
                 >
                   <div className="rounded-2xl overflow-hidden shadow-2xl">
                     <img
-                      src="https://c.animaapp.com/mhahgsoyNVf0kG/img/pitch-day-award.jpg"
+                      src={pitchDay}
                       alt="Pitch Day Award Gewinn"
                       className="w-full h-auto object-cover"
                       loading="lazy"
@@ -110,10 +113,10 @@ export function AboutUsPage() {
             className="text-center mb-16"
           >
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              Unser Team
+              {t('aboutus.team.title')}
             </h2>
             <p className="text-body-large leading-body max-w-3xl mx-auto" style={{ color: '#2F3E46' }}>
-              Heute steht hinter Feelora ein interdisziplinäres Team, das Wissenschaft, Design und Technologie vereint, um mentale Gesundheit neu zu denken:
+              {t('aboutus.team.desc')}
             </p>
           </motion.div>
 
@@ -161,13 +164,13 @@ export function AboutUsPage() {
           >
             <Card className="p-12 bg-gradient-to-br from-tertiary/30 to-background border-border">
               <h2 className="text-h2 font-headline font-semibold text-[#4f378b] mb-6">
-                Unser Ziel
+                {t('aboutus.goal.title')}
               </h2>
               <p className="text-body-large leading-body mb-4" style={{ color: '#2F3E46' }}>
-                Therapie einfacher, menschlicher und nachhaltiger zu gestalten.
+                {t('aboutus.goal.desc')}
               </p>
               <p className="text-h3 font-semibold text-tertiary-foreground">
-                Weil mentale Gesundheit kein Luxus ist – sondern Lebensqualität.
+                {t('aboutus.goal.subtitle')}
               </p>
             </Card>
           </motion.div>

@@ -1,9 +1,11 @@
 import { FacebookIcon, TwitterIcon, InstagramIcon, LinkedinIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== '/') {
@@ -28,7 +30,7 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
             <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
-              Stay Connected
+              {t('footer.stayConnected')}
             </h3>
             <div className="flex gap-4">
               <a
@@ -72,7 +74,7 @@ export function Footer() {
 
           <div>
             <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
-              Unsere User:Innen
+              {t('footer.users')}
             </h3>
             <ul className="space-y-3">
               <li>
@@ -80,17 +82,17 @@ export function Footer() {
                   onClick={() => scrollToSection('for-therapists')}
                   className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
                 >
-                  Werde Mitglied
+                  {t('footer.users.join')}
                 </button>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Resourcen
+                  {t('footer.users.resources')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Support
+                  {t('footer.users.support')}
                 </a>
               </li>
             </ul>
@@ -98,22 +100,22 @@ export function Footer() {
 
           <div>
             <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
-              Legal
+              {t('footer.legal')}
             </h3>
             <ul className="space-y-3">
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Privacy Policy
+                  {t('footer.legal.privacy')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Terms & Condition
+                  {t('footer.legal.terms')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Cookie Policy
+                  {t('footer.legal.cookies')}
                 </a>
               </li>
             </ul>
@@ -121,7 +123,7 @@ export function Footer() {
 
           <div>
             <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
-              About Us
+              {t('footer.about')}
             </h3>
             <ul className="space-y-3">
               <li>
@@ -129,7 +131,7 @@ export function Footer() {
                   onClick={() => navigate('/about')}
                   className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
                 >
-                  Unsere Geschichte
+                  {t('footer.about.story')}
                 </button>
               </li>
               <li>
@@ -137,12 +139,12 @@ export function Footer() {
                   onClick={() => scrollToSection('for-therapists')}
                   className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
                 >
-                  Mitmachen
+                  {t('footer.about.join')}
                 </button>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  Kontakt
+                  {t('footer.about.contact')}
                 </a>
               </li>
             </ul>
@@ -151,7 +153,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-gray-200 text-center">
           <p className="text-body text-gray-600">
-            © {new Date().getFullYear()} Feelora. All rights reserved.
+            © {new Date().getFullYear()} {t('footer.rights')}
           </p>
         </div>
       </div>

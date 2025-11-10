@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function TestimonialsSection() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -17,22 +19,22 @@ export function TestimonialsSection() {
     {
       name: 'Sarah M.',
       rating: 5,
-      text: 'Feelora hat mir geholfen, den perfekten Therapeuten zu finden, der meine Bedürfnisse wirklich versteht. Die Plattform ist einfach zu bedienen und die Unterstützung hat mein Leben verändert.',
+      text: t('testimonials.review1'),
     },
     {
       name: 'Michael T.',
       rating: 5,
-      text: 'Als Therapeut hat mir Feelora geholfen, meine Praxis auszubauen und mit Klienten in Kontakt zu treten, die zu mir passen. Die Tools sind intuitiv und sparen mir viel Zeit.',
+      text: t('testimonials.review2'),
     },
     {
       name: 'Emily R.',
       rating: 5,
-      text: 'Ich war skeptisch gegenüber der Online-Therapie, aber Feelora hat sie so angenehm und zugänglich gemacht. Mein Therapeut ist fantastisch und ich kann die Sitzungen in meinen vollen Terminkalender einplanen.',
+      text: t('testimonials.review3'),
     },
     {
       name: 'David L.',
       rating: 5,
-      text: 'Die Stimmungsverfolgungsfunktion war unglaublich hilfreich, um meine Muster zu verstehen. In Kombination mit regelmäßigen Therapiesitzungen habe ich das Gefühl, mehr Kontrolle zu haben als je zuvor.',
+      text: t('testimonials.review4'),
     },
   ];
 
@@ -63,10 +65,10 @@ export function TestimonialsSection() {
           className="text-center mb-16"
         >
           <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-           Was unsere User sagen
+           {t('testimonials.title')}
           </h2>
           <p className="text-body-large text-gray-600 leading-body">
-            Wahre Geschichten von Menschen welche die passende Unterstützung gefunden haben.
+            {t('testimonials.description')}
           </p>
         </motion.div>
 

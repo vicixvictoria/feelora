@@ -3,8 +3,10 @@ import { useInView } from 'react-intersection-observer';
 import { useEffect, useRef, useState } from 'react';
 import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function WhyFeeloraSection() {
+  const { t } = useLanguage();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -15,22 +17,22 @@ export function WhyFeeloraSection() {
       icon: UsersIcon,
       value: 50,
       suffix: '+',
-      label: 'Vorregistrierung',
-      description: 'Es wurden schon vor dem Launch mehr als 50 Vorregistrierung von Interessenten gesammelt',
+      label: t('why.stat1.label'),
+      description: t('why.stat1.desc'),
     },
     {
       icon: AwardIcon,
       value: 71,
       suffix: '%',
-      label: 'Zeigen großes Interesse',
-      description: 'Unsere Befragung hat gezeigt, dass 71% großes Interesse an Feelora haben',
+      label: t('why.stat2.label'),
+      description: t('why.stat2.desc'),
     },
     {
       icon: ShieldIcon,
       value: 100,
       suffix: '%',
-      label: 'Datenbasiert & Sicher',
-      description: 'Wir schützen deine Privatsphäre und sind DSGVO konform',
+      label: t('why.stat3.label'),
+      description: t('why.stat2.desc'),
     },
   ];
 
@@ -45,10 +47,10 @@ export function WhyFeeloraSection() {
           className="text-center mb-20"
         >
           <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-            Warum Feelora
+            {t('why.title')}
           </h2>
           <p className="text-body-large text-gray-600 max-w-3xl mx-auto leading-body">
-            Wir setzen uns dafür ein, dass die psychische Gesundheitsversorgung für alle zugänglich, individuell und wirksam ist. Unsere Idee war Gewinner des RBS Pitch Day und wurde ausgezeichnt für Innovation im Mental-Health-Tech-Bereich. 
+            {t('why.description')}
           </p>
         </motion.div>
 
