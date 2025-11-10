@@ -20,7 +20,7 @@ export function AboutUsPage() {
       description: t('aboutus.team.aylin.desc'),
     },
     {
-      name: 'Michele Mussacchio',
+      name: 'Michele Musacchio',
       role: t('aboutus.team.michele.role'),
       description: t('aboutus.team.michele.desc'),
     },
