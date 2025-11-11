@@ -94,7 +94,7 @@ export function ForPatientsSection() {
                             <img
                               src={moodTrackerDemo}
                               alt="Mood Tracker Preview"
-                              className="w-full h-auto rounded-xl shadow-md border-2 border-tertiary/30"
+                              className="w-full h-auto rounded-xl border-tertiary/30"
                             />
                           </div>
                         )}
