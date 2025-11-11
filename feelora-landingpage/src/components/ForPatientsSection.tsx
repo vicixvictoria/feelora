@@ -89,9 +89,18 @@ export function ForPatientsSection() {
                         <p className="text-body leading-body" style={{ color: '#2F3E46' }}>
                           {feature.description}
                         </p>
+                        {feature.hasMiniature && (
+                          <div className="mt-4 block md:hidden">
+                            <img
+                              src={moodTrackerDemo}
+                              alt="Mood Tracker Preview"
+                              className="w-full h-auto rounded-xl shadow-md border-2 border-tertiary/30"
+                            />
+                          </div>
+                        )}
                       </div>
                       {feature.hasMiniature && (
-                        <div className="relative flex-shrink-0">
+                        <div className="relative flex-shrink-0 hidden md:block">
                           <motion.div
                             className="w-20 h-20 rounded-lg overflow-hidden shadow-md cursor-pointer border-2 border-tertiary/30 hover:border-tertiary transition-all"
                             whileHover={{ scale: 1.05 }}
@@ -104,7 +113,7 @@ export function ForPatientsSection() {
                               className="w-full h-full object-cover"
                             />
                           </motion.div>
-                          
+                                              
                           <AnimatePresence>
                             {isHovered && (
                               <motion.div
