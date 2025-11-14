@@ -3,19 +3,19 @@ import { MenuIcon, XIcon, GlobeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import logoFeelora from '@/assets/logo_feelora.png';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleLanguage = () => {
     setLanguage(language === 'de' ? 'en' : 'de');
@@ -31,11 +31,28 @@ export function Navbar() {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setIsMobileMenuOpen(false);
+    // If not on home page, navigate to home first
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Wait for navigation then scroll
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -103,14 +120,12 @@ export function Navbar() {
               <span className="text-sm font-medium">{language.toUpperCase()}</span>
             </button>
 
-            {/*
             <Button
-              onClick={() => scrollToSection('hero')}
+              onClick={handleLoginClick}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
               {t('nav.login')}
             </Button>
-            */}
           </div>
 
           <button
@@ -160,14 +175,12 @@ export function Navbar() {
               <span className="font-medium">{language === 'de' ? 'Deutsch' : 'English'}</span>
             </button>
 
-            {/*
             <Button
-              onClick={() => scrollToSection('hero')}
+              onClick={handleLoginClick}
               className="w-full bg-primary text-primary-foreground hover:bg-secondary font-normal"
             >
               {t('nav.login')}
             </Button>
-            */}
           </div>
         </div>
       )}
