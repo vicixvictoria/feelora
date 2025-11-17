@@ -45,16 +45,15 @@ function getRedirectUris(): string[] {
   // For local development
   if (!amplifyUrl || amplifyUrl.includes('localhost')) {
     return [
-      'http://localhost:5173',
       'http://localhost:5173/',
     ];
   }
 
   // For deployed environments (dev/prod)
   return [
-    `https://${amplifyUrl}`,
+    //`https://${amplifyUrl}`, 
     `https://${amplifyUrl}/`,
-    `https://www.${amplifyUrl}`,
+    //`https://www.${amplifyUrl}`,
     `https://www.${amplifyUrl}/`,
   ];
 }
