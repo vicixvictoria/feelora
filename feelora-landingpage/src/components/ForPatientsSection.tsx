@@ -7,9 +7,12 @@ import { Card } from '@/components/ui/card';
 import forPatientsImg from '@/assets/for_patients.png';
 import moodTrackerDemo from '@/assets/MoodTrackerDemo.png';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function ForPatientsSection() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -23,6 +26,12 @@ export function ForPatientsSection() {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+    setIsMobileMenuOpen(false);
+  };
+  
 
   const features = [
     {
@@ -141,13 +150,13 @@ export function ForPatientsSection() {
               ))}
             </div>
 
-            {/* <Button
+            <Button
               size="lg"
-              onClick={() => scrollToSection('hero')}
+              onClick={handleLoginClick}
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
             {t('patients.cta')}
-            */}
+            </Button>
           </div>
 
           <motion.div

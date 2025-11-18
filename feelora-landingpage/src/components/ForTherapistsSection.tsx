@@ -1,23 +1,34 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { useState } from 'react';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import forTherapistsImg from '@/assets/for_therapists.png';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function ForTherapistsSection() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
   });
+
+  const [isHovered, setIsHovered] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+    setIsMobileMenuOpen(false);
   };
 
   const features = [
@@ -110,12 +121,12 @@ export function ForTherapistsSection() {
 
             {/*<Button
               size="lg"
-              onClick={() => scrollToSection('hero')}
+              onClick={handleLoginClick}
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen
-            </Button>
-            */}
+            </Button>*/}
+            
           </div>
         </motion.div>
       </div>
