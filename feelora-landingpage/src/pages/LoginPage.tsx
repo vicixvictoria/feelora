@@ -5,6 +5,8 @@ import '@aws-amplify/ui-react/styles.css';
 import { CheckboxField } from '@aws-amplify/ui-react';
 import { amplifyConfig } from '../config/amplify';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 Amplify.configure(amplifyConfig);
 
@@ -42,77 +44,87 @@ const components = {
   },
 };
 
-const formFields = {
+
+interface LoginPageProps {
+  initialState?: 'signIn' | 'signUp';
+}
+
+function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+
+  //Moved to use langauge hook - but rerendering is missing with useMemo hook
+  const formFields = {
   signIn: {
     username: {
-      label: 'Email',
-      placeholder: 'Enter your email',
+      label: t('login.email'),
+      placeholder: t('login.email.placeholder'),
       isRequired: true,
     },
     password: {
-      label: 'Password',
-      placeholder: 'Enter your password',
+      label: t('login.password'),
+      placeholder: t('login.password.placeholder'),
       isRequired: false,
     },
   },
   signUp: {
     name: {
-      label: 'Name',
-      placeholder: 'Enter your name',
+      label: t('login.name'),
+      placeholder: t('login.name.placeholder'),
       isRequired: true,
       order: 1,
     },
     family_name: {
-      label: 'Surname',
-      placeholder: 'Enter your surname',
+      label: t('login.surname'),
+      placeholder: t('login.surname.placeholder'),
       isRequired: true,
       order: 2,
     },
     email: {
-      label: 'Email',
-      placeholder: 'Enter your email',
+      label: t('login.email'),
+      placeholder: t('login.email.placeholder'),
       isRequired: true,
       order: 3,
     },
     password: {
-      label: 'Password',
-      placeholder: 'Enter your password',
+      label: t('login.password'),
+      placeholder: t('login.password.placeholder'),
       isRequired: false,
       order: 4,
     },
     confirm_password: {
-      label: 'Confirm Password',
-      placeholder: 'Confirm your password',
+      label: t('login.password.confirm'),
+      placeholder: t('login.password.confirm.placeholder'),
       order: 5,
     },
   },
   forceNewPassword: {
     password: {
-      label: 'New Password',
-      placeholder: 'Enter your new password',
+      label: t('login.newpassword'),
+      placeholder: t('login.newpassword.placeholder'),
     },
   },
   forgotPassword: {
     username: {
-      label: 'Email',
-      placeholder: 'Enter your email',
+      label: t('login.email'),
+      placeholder: t('login.email.placeholder'),
       isRequired: true,
     },
   },
   confirmResetPassword: {
     confirmation_code: {
-      label: 'Confirmation Code',
-      placeholder: 'Enter your confirmation code',
+      label: t('login.confirmation'),
+      placeholder:  t('login.confirmation.placeholder'),
       isRequired: false,
     },
     password: {
-      label: 'New Password',
-      placeholder: 'Enter your new password',
+      label: t('login.newpassword'),
+      placeholder: t('login.newpassword.placeholder'),
       isRequired: true,
     },
     confirm_password: {
-      label: 'Confirm Password',
-      placeholder: 'Confirm your password',
+      label: t('login.password.confirm'),
+      placeholder: t('login.password.confirm.placeholder'),
       isRequired: true,
     },
   },
@@ -122,46 +134,54 @@ const formFields = {
       totpUsername: 'feelora_user',
     },
     confirmation_code: {
-      label: 'Confirmation Code',
-      placeholder: 'Enter your confirmation code',
+      label: t('login.confirmation'),
+      placeholder: t('login.confirmation.placeholder'),
       isRequired: false,
     },
   },
   confirmSignIn: {
     confirmation_code: {
-      label: 'Confirmation Code',
-      placeholder: 'Enter your confirmation code',
+      label: t('login.confirmation'),
+      placeholder: t('login.confirmation.placeholder'),
       isRequired: false,
     },
   },
   setupEmail: {
     email: {
-      label: 'Email',
-      placeholder: 'Enter your email',
+      label: t('login.email'),
+      placeholder: t('login.email.placeholder'),
     },
   },
 };
 
-interface LoginPageProps {
-  initialState?: 'signIn' | 'signUp';
-}
-
-function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
-  const navigate = useNavigate();
+  // Function for redirecting via Button
+  const handleOutsideRedirect = () => {
+    navigate('/'); 
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4 py-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {initialState === 'signIn' ? 'Welcome Back' : 'Join Feelora'}
+            {initialState === 'signIn' ? t('login.title') : 'Join Feelora'}
           </h1>
           <p className="text-gray-600">
             {initialState === 'signIn'
-              ? 'Sign in to access your account'
+              ? t('login.subtitle')
               : 'Create your account to get started'}
           </p>
         </div>
+
+        <div className="flex justify-center mb-6">
+          {/* Button to redirect user if they are a therapist*/}
+           <Button
+              onClick={handleOutsideRedirect}
+              className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
+            >
+              {t('login.redeirectButton')}
+            </Button>
+          </div>
 
         <React.StrictMode>
           <Authenticator
@@ -180,7 +200,7 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
                       Welcome, {user.signInDetails?.loginId}!
                     </h2>
-                    <p className="text-gray-600">You're successfully logged in.</p>
+                    <p className="text-gray-600">{t('login.redeirectButton')}</p>
                   </div>
 
                   <div className="space-y-4">

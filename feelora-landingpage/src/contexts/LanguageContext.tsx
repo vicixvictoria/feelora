@@ -125,6 +125,29 @@ const translations = {
     'footer.about.join': 'Mitmachen',
     'footer.about.contact': 'Kontakt',
     'footer.rights': 'All rights reserved.',
+
+    // LoginPage
+    'login.title': 'Willkommen',
+    'login.subtitle': 'Anmelden oder neuen Account erstellen',
+    'login.redeirectButton': 'Wenn du ein/e Therapeut:in bist, klicke hier!',
+    'login.loggedin.subtitle': 'Du hast dich erfolgreich angemeldet!',
+    'login.newpassword': 'Neues Passwort',
+    'login.newpassword.placeholder': 'Neues Passwort eingeben',
+    'login.password': 'Passwort',
+    'login.password.placeholder': 'Passwort',
+    'login.password.confirm': 'Passwort bestätigen',
+    'login.password.confirm.placeholder': 'Passwort bestätigen',
+    'login.name': 'Vorname',
+    'login.name.placeholder': 'Gib deinen Vornamen ein',
+    'login.surname': 'Nachname',
+    'login.surname.placeholder': 'Gib deinen Nachnamen ein',
+    'login.email': 'Email',
+    'login.email.placeholder': 'Gib deine Email ein',
+    'login.confirmation': 'Bestätigungscode',
+    'login.confirmation.placeholder': 'Gib den Bestätigungscode ein',
+
+
+
   },
   en: {
     // Navbar
@@ -241,6 +264,26 @@ const translations = {
     'footer.about.join': 'Join Us',
     'footer.about.contact': 'Contact',
     'footer.rights': 'All rights reserved.',
+
+    // LoginPage
+    'login.title': 'Welcome',
+    'login.subtitle': 'Sign in or create a new account',
+    'login.redeirectButton': 'If you are a Therapist click here to create an account!',
+    'login.loggedin.subtitle': 'You are successfully logged in.',
+    'login.newpassword': 'New password',
+    'login.newpassword.placeholder': 'Enter your new password',
+    'login.password': 'Password',
+    'login.password.placeholder': 'Enter your password',
+    'login.password.confirm': 'Confirm password',
+    'login.password.confirm.placeholder': 'Confirm your password',
+    'login.name': 'Name',
+    'login.name.placeholder': 'Enter your name',
+    'login.surname': 'Surname',
+    'login.surname.placeholder': 'Enter your Surname',
+    'login.email': 'Email',
+    'login.email.placeholder': 'Enter your Email',
+    'login.confirmation': 'Confirmation Code',
+    'login.confirmation.placeholder': 'Enter your confirmation code',
   },
 };
 
