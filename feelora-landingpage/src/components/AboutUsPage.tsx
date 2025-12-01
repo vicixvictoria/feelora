@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import pitchDay from '@/assets/RBSPitchDay.jpg';
 import { useLanguage } from '@/contexts/LanguageContext';
+import aylinFoto from '@/assets/Aylin-Foto.png';
+import victoriaFoto from '@/assets/Victoria-Foto.jpeg';
+import carolinFoto from '@/assets/Carolin-Foto.JPG';
+
 
 export function AboutUsPage() {
   const { t } = useLanguage();
@@ -18,26 +22,31 @@ export function AboutUsPage() {
       name: 'Aylin Schatz',
       role: t('aboutus.team.aylin.role'),
       description: t('aboutus.team.aylin.desc'),
+      pic: aylinFoto,
     },
     {
       name: 'Michele Musacchio',
       role: t('aboutus.team.michele.role'),
       description: t('aboutus.team.michele.desc'),
+      pic: 'https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&size=96&background=4F378B&color=fff&bold=true',
     },
     {
       name: 'Victoria Zeillinger',
       role: t('aboutus.team.victoria.role'),
       description: t('aboutus.team.victoria.desc'),
+      pic: victoriaFoto,
     },
     {
       name: 'Carolin Böcker',
       role: t('aboutus.team.carolin.role'),
       description: t('aboutus.team.carolin.desc'),
+      pic: carolinFoto,
     },
     {
       name: 'Delphine N\'Diaye',
       role: t('aboutus.team.delphine.role'),
       description: t('aboutus.team.delphine.desc'),
+      pic:'https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&size=96&background=4F378B&color=fff&bold=true',
     },
   ];
 
@@ -91,7 +100,7 @@ export function AboutUsPage() {
                 >
                   <div className="rounded-2xl overflow-hidden shadow-2xl">
                     <img
-                      src={pitchDay}
+                      src= {pitchDay}
                       alt="Pitch Day Award Gewinn"
                       className="w-full h-auto object-cover"
                       loading="lazy"
@@ -144,8 +153,7 @@ export function AboutUsPage() {
                     <div className="flex-shrink-0">
                       <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-tertiary/50 to-primary/30 flex items-center justify-center shadow-lg">
                         <img
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&size=96&background=4F378B&color=fff&bold=true`}
-                          alt={member.name}
+                          src={member.pic}
                           className="w-full h-full object-cover"
                         />
                       </div>

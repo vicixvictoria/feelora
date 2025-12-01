@@ -10,6 +10,8 @@ import { EvidenceBasedSection } from './components/EvidenceBasedSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { Footer } from './components/Footer';
 import { AboutUsPage } from './components/AboutUsPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { SupportPage } from './components/SupportPage';
 import LoginPage from './pages/LoginPage';
 
 function HomePage() {
@@ -67,6 +69,8 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutUsPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/support" element={<SupportPage />} />
               {/*<Route path="/legal" element={<LegalPage />} />*/}
             </Routes>
           </main>

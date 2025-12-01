@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { AnimatedWaves } from './AnimatedWaves';
 import { TitleFrame } from './TitleFrame';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function HeroSection() {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -38,7 +40,7 @@ export function HeroSection() {
         >
           <Button
             size="lg"
-            onClick={() => scrollToSection('for-patients')}
+            onClick={() => navigate('/login')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
             {t('hero.cta.regsiter.alt')} 
@@ -46,7 +48,7 @@ export function HeroSection() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => scrollToSection('for-therapists')}
+            onClick={() => scrollToSection('for-patients')}
             className="bg-white/80 backdrop-blur-sm text-gray-800 border-gray-300 hover:bg-white hover:border-gray-400 font-normal text-base px-8 py-6"
           >
             {t('hero.cta.info')}

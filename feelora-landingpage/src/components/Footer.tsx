@@ -34,25 +34,7 @@ export function Footer() {
             </h3>
             <div className="flex gap-4">
               <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Facebook"
-              >
-                <FacebookIcon className="w-5 h-5" strokeWidth={1.5} />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Twitter"
-              >
-                <TwitterIcon className="w-5 h-5" strokeWidth={1.5} />
-              </a>
-              <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/feelora.at/?hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -61,7 +43,7 @@ export function Footer() {
                 <InstagramIcon className="w-5 h-5" strokeWidth={1.5} />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/feelora/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -79,7 +61,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <button
-                  onClick={() => scrollToSection('for-therapists')}
+                  onClick={() => navigate('/login')}
                   className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
                 >
                   {t('footer.users.join')}
@@ -91,9 +73,11 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                <button
+                onClick={() => navigate('/support')}
+                className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.users.support')}
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -104,19 +88,26 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                <button
+                onClick={() => navigate('/privacy')}
+                className="text-gray-600 hover:text-primary transition-colors"
+                >
                   {t('footer.legal.privacy')}
-                </a>
+                  </button>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                <button
+                onClick={() => navigate('/privacy')}
+                className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.legal.terms')}
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                 <button
+                onClick={() => navigate('/privacy')}
+                className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.legal.cookies')}
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -136,7 +127,7 @@ export function Footer() {
               </li>
               <li>
                 <button
-                  onClick={() => scrollToSection('for-therapists')}
+                  onClick={() => navigate('/login')}
                   className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
                 >
                   {t('footer.about.join')}

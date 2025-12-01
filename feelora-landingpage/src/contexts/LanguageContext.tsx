@@ -23,8 +23,8 @@ const translations = {
     'hero.subtitle': 'Therapie, die mit dir mitfühlt.',
     'hero.description': 'Feelora verknüpft persönliche Begleitung mit smarter Technologie: Finde den/die passenden Therapeut:in – und erhalte tägliche Unterstützung durch unseren Mood Tracker, der zwischen den Sitzungen für dich da ist.',
     'hero.cta.register': 'Jetzt Registrieren',
-    'hero.cta.info': 'Mehr Information',
-    'hero.cta.regsiter.alt':'Lerne uns kennen',
+    'hero.cta.info': 'Lerne uns kennen',
+    'hero.cta.regsiter.alt':'Starte deine Reise',
 
     // For Patients Section
     'patients.title': 'Für Patient:Innen',
@@ -123,7 +123,7 @@ const translations = {
     'footer.about': 'About Us',
     'footer.about.story': 'Unsere Geschichte',
     'footer.about.join': 'Mitmachen',
-    'footer.about.contact': 'Kontakt',
+    'footer.about.contact': 'Kontakt: info@feelora.com',
     'footer.rights': 'All rights reserved.',
 
     // LoginPage
@@ -163,8 +163,8 @@ const translations = {
     'hero.subtitle': 'Your Mental Health Journey - Matched with Care.',
     'hero.description': 'Feelora is a  digital platform that connects individuals seeking mental health support with licensed therapists and psychologists. We make it easier to find the right professional, schedule sessions, and stay connected - all in one place.',
     'hero.cta.register': 'Register Now',
-    'hero.cta.info': 'More Information',
-    'hero.cta.regsiter.alt':'Get to know us',
+    'hero.cta.info': 'Get to know us',
+    'hero.cta.regsiter.alt':'Start your Journey',
 
     // For Patients Section
     'patients.title': 'For Patients',
@@ -262,7 +262,7 @@ const translations = {
     'footer.about': 'About Us',
     'footer.about.story': 'Our Story',
     'footer.about.join': 'Join Us',
-    'footer.about.contact': 'Contact',
+    'footer.about.contact': 'Contact: info@feelora.com',
     'footer.rights': 'All rights reserved.',
 
     // LoginPage
