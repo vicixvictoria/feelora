@@ -7,10 +7,6 @@ import { therapistAmplifyConfig } from '../config/amplify';import { useNavigate 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 
-
-// 1. CONFIGURE AMPLIFY WITH THE THERAPIST POOL CLIENT ID
-Amplify.configure(therapistAmplifyConfig);
-
 // You can re-use the components and formFields logic, 
 // or define a therapist-specific one if the fields differ.
 
@@ -35,6 +31,11 @@ const therapistComponents = {
 function TherapistLoginPage() { // Renamed the function
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  React.useEffect(() => {
+    Amplify.configure(therapistAmplifyConfig);
+  }, []);
+  
   // Assume formFields is copied/imported from the main file for simplicity
   const formFields = { /* ... your formFields object for labels/placeholders ... */ };
 

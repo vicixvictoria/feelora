@@ -8,8 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-Amplify.configure(amplifyConfig);
-
 const components = {
   SignUp: {
     FormFields() {
@@ -53,6 +51,10 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
+  React.useEffect(() => {
+    Amplify.configure(amplifyConfig);
+  }, []);
+  
   //Moved to use langauge hook - but rerendering is missing with useMemo hook
   const formFields = {
   signIn: {
