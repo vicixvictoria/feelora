@@ -80,7 +80,7 @@ const translations = {
 
     // Testimonials Section
     'testimonials.title': 'Was unsere User sagen',
-    'testimonials.description': 'Wahre Geschichten von Menschen welche die passende Unterstützung gefunden haben.',
+    'testimonials.description': 'Wahre Geschichten von Menschen, welche die passende Unterstützung gefunden haben.',
     'testimonials.review1':'Feelora hat mir geholfen, den perfekten Therapeuten zu finden, der meine Bedürfnisse wirklich versteht. Die Plattform ist einfach zu bedienen und die Unterstützung hat mein Leben verändert.',
     'testimonials.review2':'Als Therapeut hat mir Feelora geholfen, meine Praxis auszubauen und mit Klienten in Kontakt zu treten, die zu mir passen. Die Tools sind intuitiv und sparen mir viel Zeit.',
     'testimonials.review3':'Ich war skeptisch gegenüber der Online-Therapie, aber Feelora hat sie so angenehm und zugänglich gemacht. Mein Therapeut ist fantastisch und ich kann die Sitzungen in meinen vollen Terminkalender einplanen.',
@@ -130,6 +130,7 @@ const translations = {
     'login.title': 'Willkommen',
     'login.subtitle': 'Anmelden oder neuen Account erstellen',
     'login.redeirectButton': 'Wenn du ein/e Therapeut:in bist, klicke hier!',
+    'login.redeirectButton.therapist': 'Wenn du ein/e Patient:in bist, klicke hier!',
     'login.loggedin.subtitle': 'Du hast dich erfolgreich angemeldet!',
     'login.newpassword': 'Neues Passwort',
     'login.newpassword.placeholder': 'Neues Passwort eingeben',
@@ -145,6 +146,12 @@ const translations = {
     'login.email.placeholder': 'Gib deine Email ein',
     'login.confirmation': 'Bestätigungscode',
     'login.confirmation.placeholder': 'Gib den Bestätigungscode ein',
+
+    // Support
+    'support.title': 'Support',
+    'support.subtitle': 'Hier bieten wir nur technischen oder informativen Support an, keinen therapeutischen Support! Falls du Fragen oder sonstige Anregungen hast, schreibe uns einfach eine Mail an:',
+    'support.message': 'Wir freuen uns auf deine Nachricht und melden uns so schnell wie möglich bei dir!',
+    'support.back': 'zurück',
 
 
 
@@ -269,6 +276,7 @@ const translations = {
     'login.title': 'Welcome',
     'login.subtitle': 'Sign in or create a new account',
     'login.redeirectButton': 'If you are a Therapist click here to create an account!',
+    'login.redeirectButton.therapist': 'If you are a Patient click here to create an account!',
     'login.loggedin.subtitle': 'You are successfully logged in.',
     'login.newpassword': 'New password',
     'login.newpassword.placeholder': 'Enter your new password',
@@ -284,6 +292,13 @@ const translations = {
     'login.email.placeholder': 'Enter your Email',
     'login.confirmation': 'Confirmation Code',
     'login.confirmation.placeholder': 'Enter your confirmation code',
+
+    // Support
+    'support.title': 'Support',
+    'support.subtitle': 'Here, we only offer technical or informational support, not therapeutic support! If you have any questions or suggestions, simply send us an email to',
+    'support.message': 'We look forward to your message and will get back to you as soon as possible!',
+    'support.back': 'back',
+
   },
 };
 

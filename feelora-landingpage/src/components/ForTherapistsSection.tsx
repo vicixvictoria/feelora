@@ -31,6 +31,11 @@ export function ForTherapistsSection() {
     setIsMobileMenuOpen(false);
   };
 
+  const handleLoginClickTherapist = () => {
+    navigate('/loginTherapist');
+    setIsMobileMenuOpen(false);
+  };
+
   const features = [
     {
       icon: UsersIcon,
@@ -119,13 +124,13 @@ export function ForTherapistsSection() {
               ))}
             </div>
 
-            {/*<Button
+            <Button
               size="lg"
-              onClick={handleLoginClick}
+              onClick={handleLoginClickTherapist}
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen
-            </Button>*/}
+            </Button>
             
           </div>
         </motion.div>

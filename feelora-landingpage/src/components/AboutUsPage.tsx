@@ -8,6 +8,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import aylinFoto from '@/assets/Aylin-Foto.png';
 import victoriaFoto from '@/assets/Victoria-Foto.jpeg';
 import carolinFoto from '@/assets/Carolin-Foto.JPG';
+import delphineFoto from '@/assets/Delphine-Foto.jpg';
+import micheleFoto from '@/assets/Michele-Foto.JPG';
+
 
 
 export function AboutUsPage() {
@@ -28,7 +31,7 @@ export function AboutUsPage() {
       name: 'Michele Musacchio',
       role: t('aboutus.team.michele.role'),
       description: t('aboutus.team.michele.desc'),
-      pic: 'https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&size=96&background=4F378B&color=fff&bold=true',
+      pic: micheleFoto,
     },
     {
       name: 'Victoria Zeillinger',
@@ -46,7 +49,7 @@ export function AboutUsPage() {
       name: 'Delphine N\'Diaye',
       role: t('aboutus.team.delphine.role'),
       description: t('aboutus.team.delphine.desc'),
-      pic:'https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&size=96&background=4F378B&color=fff&bold=true',
+      pic: delphineFoto,
     },
   ];
 

@@ -2,8 +2,12 @@ import { motion } from 'framer-motion';
 import { ArrowLeftIcon, MailIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export function SupportPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-background">
       <section className="py-24 px-8 bg-gradient-to-br from-tertiary/30 to-background">
@@ -19,11 +23,11 @@ export function SupportPage() {
               className="mb-8 text-gray-700 hover:text-primary"
             >
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Zurück
+              {t('support.back')}
             </Button>
 
             <h1 className="text-h1 font-headline font-bold text-[#4f378b] tracking-headline leading-headline mb-8">
-              Support
+              {t('support.title')}
             </h1>
 
             <Card className="p-12 bg-card border-border text-center">
@@ -32,7 +36,7 @@ export function SupportPage() {
               </div>
 
               <p className="text-body-large leading-body mb-8" style={{ color: '#2F3E46' }}>
-                Falls du Fragen oder sonstige Anregungen hast, schreibe uns einfach eine Mail an
+                {t('support.subtitle')}
               </p>
 
               <a
@@ -45,7 +49,7 @@ export function SupportPage() {
 
               <div className="mt-12 pt-8 border-t border-border">
                 <p className="text-body text-gray-600 leading-body">
-                  Wir freuen uns auf deine Nachricht und melden uns so schnell wie möglich bei dir!
+                  {t('support.message')}
                 </p>
               </div>
             </Card>

@@ -156,7 +156,7 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
 
   // Function for redirecting via Button
   const handleOutsideRedirect = () => {
-    navigate('/'); 
+    navigate('/loginTherapist'); 
   };
 
   return (

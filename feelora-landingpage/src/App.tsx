@@ -13,6 +13,8 @@ import { AboutUsPage } from './components/AboutUsPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { SupportPage } from './components/SupportPage';
 import LoginPage from './pages/LoginPage';
+import LoginPageTherapist from './pages/LoginPageTherapist';
+
 
 function HomePage() {
   return (
@@ -69,6 +71,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutUsPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/loginTherapist" element={<LoginPageTherapist />} />
               <Route path="/privacy" element={<PrivacyPolicyPage />} />
               <Route path="/support" element={<SupportPage />} />
               {/*<Route path="/legal" element={<LegalPage />} />*/}
