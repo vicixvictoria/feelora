@@ -1,29 +1,12 @@
-import { useEffect, useState } from 'react';
-import { getCurrentUser } from 'aws-amplify/auth';
-import type { AuthUser } from 'aws-amplify/auth';
-
 /**
- * Custom hook to check authentication status
- * Returns the current user or null if not authenticated
+ * Re-export useAuth from AuthContext for backwards compatibility
+ * 
+ * This file now simply re-exports the useAuth hook from the AuthContext.
+ * The new auth flow uses:
+ * - Backend API for OAuth token exchange
+ * - HttpOnly cookies for refresh tokens
+ * - In-memory storage for access tokens
  */
-export function useAuth() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  async function checkAuth() {
-    try {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return { user, loading, isAuthenticated: !!user };
-}
+export { useAuth, useAccessToken, useHasGroup } from '@/contexts/AuthContext';
+export type { } from '@/contexts/AuthContext';
