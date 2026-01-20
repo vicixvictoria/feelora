@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-// Auth API base URL
-const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com/';
+// Auth API base URL (remove trailing slash to avoid double slashes)
+const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
 
 // Token refresh interval (55 minutes - refresh before 60 min expiry)
 const TOKEN_REFRESH_INTERVAL = 55 * 60 * 1000;
