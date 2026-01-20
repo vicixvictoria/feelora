@@ -120,7 +120,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${AUTH_API_URL}/refresh`, {
+      const response = await fetch(`${AUTH_API_URL}/auth/refresh`, {
         method: 'POST',
         credentials: 'include', // Send HttpOnly cookies
         headers: {
@@ -165,8 +165,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const exchangeSessionForTokens = useCallback(async (sessionId: string): Promise<boolean> => {
     try {
-      console.log('[Auth] Calling exchange API:', `${AUTH_API_URL}/exchange`);
-      const response = await fetch(`${AUTH_API_URL}/exchange`, {
+      console.log('[Auth] Calling exchange API:', `${AUTH_API_URL}/auth/exchange`);
+      const response = await fetch(`${AUTH_API_URL}/auth/exchange`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -262,7 +262,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
     const currentPath = redirectPath || window.location.pathname;
-    const loginUrl = `${AUTH_API_URL}/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
+    const loginUrl = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
     window.location.href = loginUrl;
   }, []);
 
@@ -271,7 +271,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const logout = useCallback(async () => {
     try {
-      await fetch(`${AUTH_API_URL}/logout`, {
+      await fetch(`${AUTH_API_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: {
