@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, MailIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/buttonLanding';
+import { Card } from '@/components/ui/cardLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 

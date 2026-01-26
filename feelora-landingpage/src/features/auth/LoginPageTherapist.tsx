@@ -5,7 +5,7 @@ import '@aws-amplify/ui-react/styles.css';
 import { CheckboxField } from '@aws-amplify/ui-react';
 import { therapistAmplifyConfig } from '../config/amplify';import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/buttonLanding';
 
 // You can re-use the components and formFields logic, 
 // or define a therapist-specific one if the fields differ.

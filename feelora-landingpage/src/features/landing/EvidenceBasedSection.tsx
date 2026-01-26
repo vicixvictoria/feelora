@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
 import { SmartphoneIcon, FileCheckIcon } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/cardLanding';
 import evidenceImg from '@/assets/evidenceBasedImg.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 

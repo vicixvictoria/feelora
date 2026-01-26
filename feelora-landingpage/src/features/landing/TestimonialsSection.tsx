@@ -2,8 +2,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/buttonLanding';
+import { Card } from '@/components/ui/cardLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function TestimonialsSection() {
