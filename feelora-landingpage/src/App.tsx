@@ -2,19 +2,19 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
-import { Navbar } from './components/Navbar';
-import { HeroSection } from './components/HeroSection';
-import { ForPatientsSection } from './components/ForPatientsSection';
-import { ForTherapistsSection } from './components/ForTherapistsSection';
-import { WhyFeeloraSection } from './components/WhyFeeloraSection';
-import { EvidenceBasedSection } from './components/EvidenceBasedSection';
-import { TestimonialsSection } from './components/TestimonialsSection';
-import { Footer } from './components/Footer';
-import { AboutUsPage } from './components/AboutUsPage';
-import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { SupportPage } from './components/SupportPage';
-import LoginPage from './pages/LoginPageNew';
-import AuthCallback from './pages/AuthCallback';
+import { Navbar } from './features/landing/Navbar';
+import { HeroSection } from './features/landing/HeroSection';
+import { ForPatientsSection } from './features/landing/ForPatientsSection';
+import { ForTherapistsSection } from './features/landing/ForTherapistsSection';
+import { WhyFeeloraSection } from './features/landing/WhyFeeloraSection';
+import { EvidenceBasedSection } from './features/landing/EvidenceBasedSection';
+import { TestimonialsSection } from './features/landing/TestimonialsSection';
+import { Footer } from './features/landing/Footer';
+import { AboutUsPage } from './features/landing/AboutUsPage';
+import { PrivacyPolicyPage } from './features/landing/PrivacyPolicyPage';
+import { SupportPage } from './features/landing/SupportPage';
+import LoginPage from './features/auth/LoginPageNew';
+import AuthCallback from './features/auth/AuthCallback';
 
 
 function HomePage() {

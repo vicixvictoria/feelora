@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 
 interface LoginPageProps {
-  /** User type: 'user' or 'therapist' */
+  /** User type: 'user' or 'therapist ' */
   userType?: 'user' | 'therapist';
 }
 
