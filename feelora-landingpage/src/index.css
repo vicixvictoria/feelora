@@ -6,13 +6,16 @@
 
 @layer base {
   :root {
+    /* ------------------------------------------------------------------ */
+    /* ORIGINAL LANDING PAGE COLORS                                       */
+    /* ------------------------------------------------------------------ */
     --background: 0 0% 98%;
     --foreground: 192 19% 22%;
 
     --primary: 170 60% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 170 55% 35%;
+    --secondary: 170 55% 35%; /* Dark Teal */
     --secondary-foreground: 0 0% 100%;
 
     --tertiary: 260 50% 90%;
@@ -24,6 +27,7 @@
     --success: 145 58% 45%;
     --warning: 38 90% 52%;
 
+    /* Gray Scale */
     --gray-50: 0 0% 98%;
     --gray-100: 240 24% 94%;
     --gray-200: 250 20% 90%;
@@ -56,6 +60,7 @@
 
     --radius: 0.75rem;
 
+    /* Custom Variables */
     --blueprimary: rgba(47, 62, 70, 1);
     --heading-sora-1-font-family: "Sora", Helvetica;
     --heading-sora-1-font-size: 36px;
@@ -77,6 +82,66 @@
     --inter-body-2xl-line-height: 32px;
     --tealprimary: rgba(75, 170, 148, 1);
     --purpleprimary: rgba(79, 55, 139, 1);
+
+    /* ------------------------------------------------------------------ */
+    /* Dashboard Variables (Colors and fonts)                             */
+    /* ------------------------------------------------------------------ */
+    
+    /* Sidebar Specifics  */
+    --sidebar-bg: 248 35% 82%;
+    --sidebar-active: 264 35% 88%;
+    --sidebar-text: 201 20% 23%;
+    --sidebar-text-muted: 264 15% 55%;
+    
+    /* Dashboard Specific Colors */
+    --teal: 164 52% 48%;
+    --teal-light: 164 52% 58%;
+    --teal-dark: 164 52% 38%;
+    
+    --purple: 257 43% 38%;
+    --purple-light: 264 80% 65%;
+    
+    --badge-red: 0 72% 51%;
+    --badge-green: 164 52% 48%;
+  }
+
+  /* 3. DARK MODE (AI generated - Adds support without breaking Light Mode) */
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 220 14% 96%;
+
+    --card: 220 20% 14%;
+    --card-foreground: 220 14% 96%;
+
+    --popover: 220 20% 14%;
+    --popover-foreground: 220 14% 96%;
+
+    --primary: 164 52% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 264 25% 20%;
+    --secondary-foreground: 264 20% 85%;
+
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 264 30% 25%;
+    --accent-foreground: 264 20% 90%;
+
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 164 52% 48%;
+
+    --sidebar-bg: 264 25% 15%;
+    --sidebar-active: 264 30% 20%;
+    --sidebar-text: 264 15% 75%;
+    --sidebar-text-muted: 264 10% 55%;
+
+    --tertiary: 166 39% 30%;
+    --tertiary-foreground: 0 0% 100%;
   }
 
   * {
@@ -90,5 +155,63 @@
 
   body {
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Kept your original setting */
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Dashboard COMPONENT CLASSES                                        */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .feelora-card {
+    @apply bg-card rounded-xl border border-border shadow-sm p-6;
+  }
+  
+  .feelora-btn-primary {
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-full font-medium 
+           hover:opacity-90 transition-all duration-200 flex items-center gap-2;
+  }
+  
+  .feelora-btn-outline {
+    @apply border border-primary text-primary px-4 py-2 rounded-full font-medium 
+           hover:bg-primary/10 transition-all duration-200 flex items-center gap-2;
+  }
+  
+  .feelora-badge {
+    @apply absolute -top-2 -right-2 w-5 h-5 rounded-full bg-destructive text-white 
+           text-xs flex items-center justify-center font-medium;
+  }
+  
+  .sidebar-item {
+    @apply flex items-start gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer;
+  }
+  
+  .sidebar-item-active {
+    @apply bg-accent;
+  }
+  
+  .sidebar-item:hover:not(.sidebar-item-active) {
+    @apply bg-accent/50;
+  }
+  
+  .mood-chip {
+    @apply flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card 
+           cursor-pointer hover:border-primary transition-all duration-200;
+  }
+  
+  .mood-chip-selected {
+    @apply border-primary bg-primary/10;
+  }
+  
+  .chat-bubble {
+    @apply max-w-md px-4 py-3 rounded-2xl;
+  }
+  
+  .chat-bubble-received {
+    @apply bg-primary text-white rounded-bl-sm;
+  }
+  
+  .chat-bubble-sent {
+    @apply bg-muted text-foreground rounded-br-sm;
   }
 }

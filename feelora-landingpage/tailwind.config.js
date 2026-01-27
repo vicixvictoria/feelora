@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -5,6 +6,14 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    //  Container settings (Critical for dashboard layout)
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -24,6 +33,7 @@ module.exports = {
           DEFAULT: "hsl(var(--tertiary))",
           foreground: "hsl(var(--tertiary-foreground))",
         },
+        //  -- Custom Colors -- 
         neutral: {
           DEFAULT: "hsl(var(--neutral))",
           foreground: "hsl(var(--neutral-foreground))",
@@ -42,6 +52,8 @@ module.exports = {
           800: "hsl(var(--gray-800))",
           900: "hsl(var(--gray-900))",
         },
+        // --- End Custom Colors ---
+
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -62,9 +74,26 @@ module.exports = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+
+        // Dashboard Specific Colors
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-bg))",
+          active: "hsl(var(--sidebar-active))",
+          text: "hsl(var(--sidebar-text))",
+          muted: "hsl(var(--sidebar-text-muted))",
+        },
+        teal: {
+          DEFAULT: "hsl(var(--teal))",
+          light: "hsl(var(--teal-light))",
+          dark: "hsl(var(--teal-dark))",
+        },
+        purple: {
+          DEFAULT: "hsl(var(--purple))",
+          light: "hsl(var(--purple-light))",
+        },
       },
       fontFamily: {
-        sans: ['"Nunito Sans"', 'sans-serif'],
+        sans: ['"Nunito Sans"', 'sans-serif'], // Landing page branding
         headline: ['Poppins', 'sans-serif'],
         'heading-sora-1': ['Sora', 'Helvetica', 'sans-serif'],
         'heading-sorabold-5': ['Sora', 'Helvetica', 'sans-serif'],
@@ -110,10 +139,22 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        // AI generated Animations
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-in-left": {
+          from: { opacity: "0", transform: "translateX(-20px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        // AI generated Animation Utilities
+        "fade-in": "fade-in 0.3s ease-out",
+        "slide-in-left": "slide-in-left 0.3s ease-out",
       },
     },
   },
