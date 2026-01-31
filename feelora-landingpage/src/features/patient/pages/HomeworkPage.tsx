@@ -1,5 +1,5 @@
 import { Check, FileText, RefreshCw } from "lucide-react";
-import avatar from "@/assets/avatar-placeholder.png";
+import avatar from "@/assets/avatar-Placeholder.png";
 
 interface Task {
   id: number;

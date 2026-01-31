@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Send, Info, ChevronRight } from "lucide-react";
 import feeloraLogo from "@/assets/logo.png";
-import avatar from "@/assets/avatar-placeholder.png";
+import avatar from "@/assets/avatar-Placeholder.png";
 
 const chatList = [
   {

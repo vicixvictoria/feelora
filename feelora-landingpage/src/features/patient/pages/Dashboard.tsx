@@ -1,5 +1,5 @@
 import { Calendar, Send, Smile, BookOpen, ChevronRight } from "lucide-react";
-import avatar from "@/assets/avatar-placeholder.png";
+import avatar from "@/assets/avatar-Placeholder.png";
 import { useNavigate } from "react-router-dom";
 
 const notificationCards = [
