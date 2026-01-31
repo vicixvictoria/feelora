@@ -3,40 +3,16 @@ import { NavLink } from "react-router-dom";
 
 const menuItems = [
   {
-    title: "Kalender",
-    description: "Zeitplan verwalten",
-    icon: Calendar,
-    path: "/patient/calendar",
-  },
-  {
-    title: "Profil",
-    description: "Profil und Therapeut einsehen",
-    icon: User,
-    path: "/patient/profile",
-  },
-  {
     title: "Chat",
     description: "Nachrichten ansehen und schreiben",
     icon: Send,
-    path: "/patient/",
+    path: "/therapist/",
   },
   {
     title: "Mood Tracker",
     description: "Erfasse deine heutigen Emotionen und Gefühle",
     icon: Smile,
-    path: "/patient/mood-tracker",
-  },
-  {
-    title: "Homework",
-    description: "Erledige deine Aufgaben",
-    icon: BookOpen,
-    path: "/patient/homework",
-  },
-  {
-    title: "Dashboard",
-    description: "Einsicht in deine wichtigsten Informationen",
-    icon: LayoutDashboard,
-    path: "/patient/dashboard",
+    path: "/therapist/mood-tracker",
   },
 ];
 

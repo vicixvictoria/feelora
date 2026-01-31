@@ -8,7 +8,7 @@ const notificationCards = [
     iconColor: "text-purple",
     title: "Kalender",
     lines: ["2 anstehende Termine", "1 Terminanfrage"],
-    badge: 3,
+    //badge: 3,
     path: "/calendar",
   },
   {
@@ -16,7 +16,7 @@ const notificationCards = [
     iconColor: "text-purple",
     title: "Chat",
     lines: ["1 ungelesene Nachricht"],
-    badge: 1,
+    //badge: 1,
     path: "/chat",
   },
   {
@@ -24,7 +24,7 @@ const notificationCards = [
     iconColor: "text-purple",
     title: "Mood Tracker",
     lines: ["täglicher Reminder"],
-    badge: 1,
+    //badge: 1,
     path: "/mood-tracker",
   },
   {
@@ -32,7 +32,7 @@ const notificationCards = [
     iconColor: "text-purple",
     title: "Aufgaben",
     lines: ["2 Aufgaben warten auf dich"],
-    badge: 2,
+    //badge: 2,
     path: "/homework",
   },
 ];
@@ -43,21 +43,21 @@ const moodDiary = [
     status: "neu",
     mood: "😊",
     outdoor: "🌳",
-    physical: "🍌",
+    physical: "💪",
   },
   {
     date: "13.09.25, 13:00",
     status: "gesehen",
     mood: "😊",
     outdoor: "🌳",
-    physical: "🍌",
+    physical: "💪",
   },
   {
     date: "06.09.25, 13:00",
     status: "gesehen",
     mood: "😊",
     outdoor: "🌳",
-    physical: "🍌",
+    physical: "💪",
   },
 ];
 

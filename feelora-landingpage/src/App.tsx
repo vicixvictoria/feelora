@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { TooltipProvider } from "@/components/ui/tooltip"; // Dashboard requirement
+import { RequireAuth } from "@/components/auth/RequireAuth"; // Patients and Therapists require Auth
 
 // --- Global UI ---
 import { Toaster } from "@/components/ui/toaster"; // Dashboard Toasts
@@ -35,6 +36,11 @@ import ChatPage from './features/patient/pages/ChatPage';
 import MoodTrackerPage from './features/patient/pages/MoodTrackerPage';
 import HomeworkPage from './features/patient/pages/HomeworkPage';
 import NotFound from './features/patient/pages/NotFound';
+
+// --- THERAPIST Imports Dummy Dashboard ---
+import TherapistLayout from './features/therapist/layout/TherapistLayout'; 
+import TherapistChat from './features/therapist/pages/TherapistChat';
+import TherapistMoodTrackerPage from './features/therapist/pages/TherapistMoodTrackerPage';
 
 // 1. Initialize Query Client
 const queryClient = new QueryClient();
@@ -88,6 +94,10 @@ const PatientLayoutWrapper = () => {
   );
 };
 
+const TherapistLayoutWrapper = () => (
+  <TherapistLayout><Outlet /></TherapistLayout>
+);
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -109,21 +119,39 @@ function App() {
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/privacy" element={<PrivacyPolicyPage />} />
                   <Route path="/support" element={<SupportPage />} />
-                  {/* <Route path="/legal" element={<LegalPage />} /> */}
                 </Route>
 
-                {/* === GROUP 2: Patient Dashboard === */}
+                {/* === GROUP 2: Patient Dashboard (Protected)=== */}
+                {/* Only Patient Users. Therapists are BLOCKED. */}
+                {/* Wrap patient dashboard with RequireAuth */}
+                <Route element={<RequireAuth allowedType="user" />}>
+
                 {/* All routes here are prefixed with /patient 
                     Example: /patient (dashboard), /patient/calendar 
                 */}
                 <Route path="/patient" element={<PatientLayoutWrapper />}>
-                  <Route index element={<PatientDashboard />} />
+                  <Route index element={<ChatPage />} />
                   <Route path="calendar" element={<CalendarPage />} />
                   <Route path="profile" element={<ProfilePage />} />
-                  <Route path="chat" element={<ChatPage />} />
+                  <Route path="dashboard" element={<PatientDashboard />} />
                   <Route path="mood-tracker" element={<MoodTrackerPage />} />
                   <Route path="homework" element={<HomeworkPage />} />
                 </Route>
+
+                </Route> 
+
+                {/* === GROUP 3: THERAPIST DASHBOARD (Protected) === */}
+                {/* Only Therapists. Patients are BLOCKED. */}
+                {/* Wrap therapist dashboard with RequireAuth */}
+                
+                <Route element={<RequireAuth allowedType="therapist" />}>
+                  <Route path="/therapist" element={<TherapistLayoutWrapper />}>
+                    <Route index element={<TherapistChat />} />
+                    <Route path="mood-tracker" element={<TherapistMoodTrackerPage />} />
+                    {/* More Therapist Routes here */}
+                  </Route>
+                </Route>
+
 
                 {/* Fallback for 404 */}
                 <Route path="*" element={<NotFound />} />

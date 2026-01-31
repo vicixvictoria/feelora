@@ -31,6 +31,11 @@ export function ForPatientsSection() {
     navigate('/login');
     setIsMobileMenuOpen(false);
   };
+
+  const patientDashboardNav = () => {
+    navigate('/patient');
+    setIsMobileMenuOpen(false);
+  };
   
 
   const features = [

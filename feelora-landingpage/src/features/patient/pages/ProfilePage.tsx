@@ -1,5 +1,5 @@
 import { ExternalLink, Search, Send } from "lucide-react";
-import avatar from "@/assets/avatar-placeholder.png";
+import avatar from "@/assets/avatar-Placeholder.png";
 
 const ProfilePage = () => {
   return (

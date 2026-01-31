@@ -91,6 +91,10 @@ module.exports = {
           DEFAULT: "hsl(var(--purple))",
           light: "hsl(var(--purple-light))",
         },
+        navbar: {
+          bg: "hsl(var(--navbar-bg))",
+          text: "hsl(var(--navbar-text))",
+        },
       },
       fontFamily: {
         sans: ['"Nunito Sans"', 'sans-serif'], // Landing page branding

@@ -92,6 +92,10 @@
     --sidebar-active: 264 35% 88%;
     --sidebar-text: 201 20% 23%;
     --sidebar-text-muted: 264 15% 55%;
+
+    /* Navbar Specifics */
+    --navbar-bg: 256, 38%, 92%;
+    --navbar-text: 220 20% 20%;
     
     /* Dashboard Specific Colors */
     --teal: 164 52% 48%;

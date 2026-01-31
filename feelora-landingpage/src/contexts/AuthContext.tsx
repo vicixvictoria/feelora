@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-// Auth API base URL (remove trailing slash to avoid double slashes)
+// --- CONFIGURATION ---
+// Must Point to backend URL
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
 
-// Token refresh interval (55 minutes - refresh before 60 min expiry)
+// Refresh token before it expires (e.g., at 55 minutes of a 60 min token)
 const TOKEN_REFRESH_INTERVAL = 55 * 60 * 1000;
 
 interface DecodedToken {
@@ -28,15 +30,11 @@ interface User {
 }
 
 interface AuthContextType {
-  // State
   user: User | null;
   accessToken: string | null;
-  idToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
-  // Actions
   login: (type: 'user' | 'therapist', redirectPath?: string) => void;
   logout: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
@@ -45,9 +43,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/**
- * Parse user info from JWT token
- */
 function parseUserFromToken(token: string): User | null {
   try {
     const decoded = jwtDecode<DecodedToken>(token);
@@ -59,78 +54,86 @@ function parseUserFromToken(token: string): User | null {
       username: decoded['cognito:username'],
       groups: decoded['cognito:groups'],
     };
-  } catch {
-    console.error('Failed to decode token');
+  } catch (e) {
+    console.error('Failed to decode token', e);
     return null;
   }
 }
 
-/**
- * Check if token is expired (with 1 minute buffer)
- */
-function isTokenExpired(token: string): boolean {
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    const expiryTime = decoded.exp * 1000; // Convert to milliseconds
-    return Date.now() >= expiryTime - 60000; // 1 minute buffer
-  } catch {
-    return true;
-  }
-}
-
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [idToken, setIdToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const initRef = useRef(false); // Prevent double initialization
+  const initRef = useRef(false);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  /**
-   * Clear all auth state
-   */
+  // --- ACTIONS ---
+
   const clearAuthState = useCallback(() => {
     setUser(null);
     setAccessToken(null);
-    setIdToken(null);
     if (refreshTimerRef.current) {
       clearInterval(refreshTimerRef.current);
       refreshTimerRef.current = null;
     }
   }, []);
 
-  /**
-   * Set auth state from tokens
-   */
-  const setAuthState = useCallback((access: string, id: string) => {
+  const setAuthState = useCallback((access: string, idToken: string) => {
     setAccessToken(access);
-    setIdToken(id);
-    const parsedUser = parseUserFromToken(id);
+    const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
     setUser(parsedUser);
   }, []);
 
-  /**
-   * Refresh the access token using the HttpOnly refresh cookie
-   */
-  const refreshToken = useCallback(async (): Promise<boolean> => {
+  // 1. LOGIN: Redirects browser to Backend -> Cognito
+  const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
+    const currentPath = redirectPath || window.location.pathname;
+    // Redirect to backend login endpoint
+    window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
+  }, []);
+
+  // 2. EXCHANGE: Swaps Session ID (from URL) for Tokens
+  const exchangeSessionForTokens = useCallback(async (sessionId: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${AUTH_API_URL}/auth/refresh`, {
+      const response = await fetch(`${AUTH_API_URL}/auth/exchange`, {
         method: 'POST',
-        credentials: 'include', // Send HttpOnly cookies
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        credentials: 'include', // Crucial: Sends cookies if any 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
       });
 
       if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Session exchange failed');
+      }
+
+      const data = await response.json();
+      setAuthState(data.accessToken, data.idToken);
+      return true;
+    } catch (err) {
+      console.error('[Auth] Exchange error:', err);
+      setError(err instanceof Error ? err.message : 'Authentication failed');
+      return false;
+    }
+  }, [setAuthState]);
+
+  // 3. REFRESH: Use HttpOnly cookie to get new Access Token
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    try {
+      // Browser automatically attaches the HttpOnly 'refreshToken' cookie 
+      const response = await fetch(`${AUTH_API_URL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include', 
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        // If 401, cookie is invalid/expired -> User is logged out
         if (response.status === 401) {
-          // Refresh token expired, clear state
           clearAuthState();
           return false;
         }
@@ -141,80 +144,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAuthState(data.accessToken, data.idToken);
       return true;
     } catch (err) {
-      console.error('Token refresh error:', err);
+      console.error('[Auth] Refresh error:', err);
       clearAuthState();
       return false;
     }
   }, [clearAuthState, setAuthState]);
 
-  /**
-   * Start the token refresh timer
-   */
+  // Timer to silently refresh token before it expires
   const startRefreshTimer = useCallback(() => {
-    if (refreshTimerRef.current) {
-      clearInterval(refreshTimerRef.current);
-    }
-    
+    if (refreshTimerRef.current) clearInterval(refreshTimerRef.current);
     refreshTimerRef.current = setInterval(() => {
       refreshToken();
     }, TOKEN_REFRESH_INTERVAL);
   }, [refreshToken]);
 
-  /**
-   * Exchange session ID for tokens (called after OAuth callback)
-   */
-  const exchangeSessionForTokens = useCallback(async (sessionId: string): Promise<boolean> => {
+  // 4. LOGOUT
+  const logout = useCallback(async () => {
     try {
-      console.log('[Auth] Calling exchange API:', `${AUTH_API_URL}/auth/exchange`);
-      const response = await fetch(`${AUTH_API_URL}/auth/exchange`, {
+      await fetch(`${AUTH_API_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId: sessionId }),
+        headers: { 'Content-Type': 'application/json' },
       });
-
-      console.log('[Auth] Exchange response status:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('[Auth] Exchange error:', errorData);
-        throw new Error(errorData.error || 'Session exchange failed');
-      }
-
-      const data = await response.json();
-      console.log('[Auth] Exchange success, got tokens');
-      setAuthState(data.accessToken, data.idToken);
-      startRefreshTimer();
-      return true;
     } catch (err) {
-      console.error('[Auth] Session exchange error:', err);
-      setError(err instanceof Error ? err.message : 'Authentication failed');
-      return false;
+      console.error('Logout error:', err);
+    } finally {
+      clearAuthState();
+      navigate('/'); // Redirect to home
     }
-  }, [setAuthState, startRefreshTimer]);
+  }, [clearAuthState, navigate]);
 
-  /**
-   * Initialize auth state on mount
-   * Try to refresh token using existing HttpOnly cookie
-   */
+  const clearError = useCallback(() => setError(null), []);
+
+  // --- INITIALIZATION (The "Engine") ---
   useEffect(() => {
-    // Prevent double initialization in React StrictMode
     if (initRef.current) return;
     initRef.current = true;
 
     async function initAuth() {
       setIsLoading(true);
-      console.log('[Auth] Initializing auth...');
-      
-      // Check for session in URL (OAuth callback)
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session');
-      const authError = urlParams.get('error');
-      
-      console.log('[Auth] URL params - session:', sessionId?.substring(0, 8), 'error:', authError);
-      
+
+      // Check URL for session (Callback from Cognito)
+      const searchParams = new URLSearchParams(window.location.search);
+      const sessionId = searchParams.get('session');
+      const authError = searchParams.get('error');
+
       if (authError) {
         setError(decodeURIComponent(authError));
         // Clean URL
@@ -222,26 +196,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
         return;
       }
-      
+
+      // #A: Returning from Login (Exchange Session)
       if (sessionId) {
-        console.log('[Auth] Exchanging session for tokens...');
-        // Exchange session ID for tokens
         const success = await exchangeSessionForTokens(sessionId);
-        console.log('[Auth] Exchange result:', success);
-        // Clean URL regardless of result
+        
+        // Clean URL: Remove session ID so it can't be reused/seen
         window.history.replaceState({}, '', window.location.pathname);
+        
         if (success) {
-          setIsLoading(false);
-          return;
+          startRefreshTimer();
         }
-      }
-      
-      // Try to refresh using existing cookie
-      console.log('[Auth] Trying to refresh with cookie...');
-      const success = await refreshToken();
-      console.log('[Auth] Refresh result:', success);
-      if (success) {
-        startRefreshTimer();
+      } 
+      // #B: Page Reload: Try Refresh Cookie
+      else {
+        const success = await refreshToken();
+        if (success) {
+          startRefreshTimer();
+        }
       }
       
       setIsLoading(false);
@@ -249,54 +221,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     initAuth();
 
-    // Cleanup timer on unmount
     return () => {
-      if (refreshTimerRef.current) {
-        clearInterval(refreshTimerRef.current);
-      }
+      if (refreshTimerRef.current) clearInterval(refreshTimerRef.current);
     };
   }, [exchangeSessionForTokens, refreshToken, startRefreshTimer]);
 
-  /**
-   * Redirect to login
-   */
-  const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
-    const currentPath = redirectPath || window.location.pathname;
-    const loginUrl = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
-    window.location.href = loginUrl;
-  }, []);
-
-  /**
-   * Logout - clear cookies and state
-   */
-  const logout = useCallback(async () => {
-    try {
-      await fetch(`${AUTH_API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      clearAuthState();
-    }
-  }, [clearAuthState]);
-
-  /**
-   * Clear error
-   */
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const value: AuthContextType = {
+  const value = {
     user,
     accessToken,
-    idToken,
-    isAuthenticated: !!accessToken && !!user,
+    isAuthenticated: !!user, // Simple boolean check
     isLoading,
     error,
     login,
@@ -308,29 +241,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/**
- * Hook to access auth context
- */
-export function useAuth(): AuthContextType {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
-}
-
-/**
- * Hook to get just the access token (for API calls)
- */
-export function useAccessToken(): string | null {
-  const { accessToken } = useAuth();
-  return accessToken;
-}
-
-/**
- * Hook to check if user is in a specific group
- */
-export function useHasGroup(group: string): boolean {
-  const { user } = useAuth();
-  return user?.groups?.includes(group) ?? false;
 }
