@@ -161,16 +161,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 4. LOGOUT
   const logout = useCallback(async () => {
     try {
+      // 1. Call Backend to clear the 'refreshToken' cookie
       await fetch(`${AUTH_API_URL}/auth/logout`, {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // Sends the cookie to be deleted
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (err) {
-      console.error('Logout error:', err);
+      console.error('Logout failed error:', err);
+      // Continue to clear state anyway so the user isn't stuck
     } finally {
-      clearAuthState();
-      navigate('/'); // Redirect to home
+      clearAuthState(); // 2. CLear frotnend State (memory)
+      navigate('/'); // Redirect to home (landing page)
     }
   }, [clearAuthState, navigate]);
 
