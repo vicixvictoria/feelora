@@ -36,7 +36,7 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   login: (type: 'user' | 'therapist', redirectPath?: string) => void;
-  logout: () => Promise<void>;
+  logout: (type: 'user' | 'therapist') => Promise<void>;
   refreshToken: () => Promise<boolean>;
   clearError: () => void;
 }
@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshToken]);
 
   // 4. LOGOUT
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (type: 'user' | 'therapist') => {
     try {
       // 1. Call Backend to clear the 'refreshToken' cookie
       await fetch(`${AUTH_API_URL}/auth/logout`, {
@@ -169,12 +169,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       console.error('Logout failed error:', err);
-      // Continue to clear state anyway so the user isn't stuck
+      // Continue to redirect anyway so the user isn't stuck
     } finally {
-      clearAuthState(); // 2. CLear frotnend State (memory)
-      navigate('/'); // Redirect to home (landing page)
+      clearAuthState(); // 2. Clear frontend State (memory)
+      
+      // 3. Redirect to Cognito logout endpoint
+      const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN;
+      const clientId = type === 'therapist' 
+        ? import.meta.env.VITE_THERAPIST_POOL_CLIENT_ID 
+        : import.meta.env.VITE_USER_POOL_CLIENT_ID;
+      const logoutUri = import.meta.env.VITE_AMPLIFY_URL || window.location.origin;
+      
+      const cognitoLogoutUrl = `https://${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+      window.location.href = cognitoLogoutUrl;
     }
-  }, [clearAuthState, navigate]);
+  }, [clearAuthState]);
 
   const clearError = useCallback(() => setError(null), []);
 

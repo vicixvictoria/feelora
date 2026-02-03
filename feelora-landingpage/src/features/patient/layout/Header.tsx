@@ -19,7 +19,7 @@ const Header = () => {
  // Create async handler with await - backend fetch call to clear the cookie before user leaves
   const handleLogout = async () => {
     setIsMobileMenuOpen(false); // Close menu if open
-    await logout(); // Calls Backend + Clears State + Redirects to '/'
+    await logout('user'); // Calls Backend + Clears State + Redirects to Cognito logout
   };
  
   const landingPageNav = () => {
