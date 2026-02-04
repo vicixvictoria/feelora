@@ -31,6 +31,12 @@ export function ForTherapistsSection() {
     setIsMobileMenuOpen(false);
   };
 
+{/* 🚧 TEST ONLY: Temporary route to questionnaire 🚧 */}
+const questionNav = () => {
+    navigate('/test-therapist');
+    setIsMobileMenuOpen(false);
+  };
+
   const handleLoginClickTherapist = () => {
     navigate('/loginTherapist');
     setIsMobileMenuOpen(false);
@@ -126,7 +132,8 @@ export function ForTherapistsSection() {
 
             <Button
               size="lg"
-              onClick={handleLoginClickTherapist}
+              onClick={handleLoginClickTherapist} 
+              //onClick={questionNav} // --> only use for testing questionnaire UI //
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen

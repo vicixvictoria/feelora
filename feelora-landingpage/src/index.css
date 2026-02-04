@@ -107,7 +107,17 @@
     
     --badge-red: 0 72% 51%;
     --badge-green: 164 52% 48%;
+
+    /* ------------------------------------------------------------------ */
+    /* Questionnaire Colors                                              */
+    /* ------------------------------------------------------------------ */
+
+    /* Sidebar Specifics  */
+    --question-bg: 140 12% 95%;
+  
   }
+
+
 
   /* 3. DARK MODE (AI generated - Adds support without breaking Light Mode) */
   .dark {

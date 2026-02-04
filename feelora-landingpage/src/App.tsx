@@ -36,11 +36,13 @@ import ChatPage from './features/patient/pages/ChatPage';
 import MoodTrackerPage from './features/patient/pages/MoodTrackerPage';
 import HomeworkPage from './features/patient/pages/HomeworkPage';
 import NotFound from './features/patient/pages/NotFound';
+import PatientQuestionnaire from './features/patient/pages/PatientQuestionnaire';
 
 // --- THERAPIST Imports Dummy Dashboard ---
 import TherapistLayout from './features/therapist/layout/TherapistLayout'; 
 import TherapistChat from './features/therapist/pages/TherapistChat';
 import TherapistMoodTrackerPage from './features/therapist/pages/TherapistMoodTrackerPage';
+import TherapistQuestionnaire from './features/therapist/pages/TherapistQuestionnaire';
 
 // 1. Initialize Query Client
 const queryClient = new QueryClient();
@@ -120,6 +122,10 @@ function App() {
                   <Route path="/privacy" element={<PrivacyPolicyPage />} />
                   <Route path="/support" element={<SupportPage />} />
                 </Route>
+
+                {/* 🚧 TEST ONLY: Temporary access to test UI without login 🚧 */}
+                 <Route path="/test-therapist" element={<TherapistQuestionnaire />} />
+                 <Route path="/test-patient" element={<PatientQuestionnaire />} />
 
                 {/* === GROUP 2: Patient Dashboard (Protected)=== */}
                 {/* Only Patient Users. Therapists are BLOCKED. */}

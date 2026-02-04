@@ -95,6 +95,10 @@ module.exports = {
           bg: "hsl(var(--navbar-bg))",
           text: "hsl(var(--navbar-text))",
         },
+        //Questionnaire Sepcific Colors
+        question: {
+          bg: "hsl(var(--question-bg))"
+        }
       },
       fontFamily: {
         sans: ['"Nunito Sans"', 'sans-serif'], // Landing page branding

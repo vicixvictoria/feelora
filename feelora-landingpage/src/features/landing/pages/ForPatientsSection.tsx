@@ -20,6 +20,12 @@ export function ForPatientsSection() {
 
   const [isHovered, setIsHovered] = useState(false);
 
+  {/* 🚧 TEST ONLY: Temporary route to questionnaire 🚧 */}
+  const questionNav = () => {
+    navigate('/test-patient');
+    setIsMobileMenuOpen(false);
+  };
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -158,6 +164,7 @@ export function ForPatientsSection() {
             <Button
               size="lg"
               onClick={handleLoginClick}
+              //onClick={questionNav} // --> only use for testing questionnaire UI //
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
             {t('patients.cta')}
