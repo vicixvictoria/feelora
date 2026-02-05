@@ -3,6 +3,12 @@ import FeeloraLogo from "@/assets/logo_feelora.png";
 import ProgressBar from "@/components/questionnaire/ProgressBar";
 import WelcomeStep from "../components/questionnaire/steps/Step1_TWelcome.tsx";
 import PersonalDataStep from "../components/questionnaire/steps/Step2_TPersonalData";
+import ContactInfoStep from "../components/questionnaire/steps/Step3_TContactInfo";
+import QualificationsStep from "../components/questionnaire/steps/Step4_TQualifications";
+import ExperienceStep from "../components/questionnaire/steps/Step5_TExperience";
+import SpecialtiesStep from "../components/questionnaire/steps/Step6_TSpecialties";
+import LanguagesStep from "../components/questionnaire/steps/Step7_TLanguages";
+
 
 
 interface QuestionnaireData {
@@ -45,7 +51,8 @@ const initialData: QuestionnaireData = {
 
 const TherapistQuestionnaire = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [data, setData] = useState<QuestionnaireData>(initialData);
+  // Data is stored in react-state, after refresh all data is lost
+  const [data, setData] = useState<QuestionnaireData>(initialData); //Temporary answers are saved here as a QuestionnaireData-Object with all fields. 
 
   const totalSteps = 18; // Welcome + 17 questions
 
@@ -83,7 +90,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => setData({ ...data, personalData: newData })}
           />
         );
-      /*case 2:  || --> when other pages are implemented, add it to the stepper
+      case 2:  
         return (
           <ContactInfoStep
             onNext={goNext}
@@ -128,7 +135,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => setData({ ...data, languages: newData })}
           />
         );
-      case 7:
+      /*case 7:
         return (
           <TherapySchoolStep
             onNext={goNext}

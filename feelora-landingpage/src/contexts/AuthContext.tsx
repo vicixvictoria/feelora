@@ -26,7 +26,7 @@ interface User {
   name?: string;
   familyName?: string;
   username?: string;
-  groups?: string[];
+  groups?: string[]; //remove ? for better RBAC
 }
 
 interface AuthContextType {
