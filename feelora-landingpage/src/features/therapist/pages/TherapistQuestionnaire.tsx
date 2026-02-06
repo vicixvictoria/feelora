@@ -1,6 +1,7 @@
 import { useState } from "react";
 import FeeloraLogo from "@/assets/logo_feelora.png";
 import ProgressBar from "@/components/questionnaire/ProgressBar";
+import { usePersistedQuestionnaire } from "@/hooks/usePersistedQuestionnaire";
 import WelcomeStep from "../components/questionnaire/steps/Step1_TWelcome.tsx";
 import PersonalDataStep from "../components/questionnaire/steps/Step2_TPersonalData";
 import ContactInfoStep from "../components/questionnaire/steps/Step3_TContactInfo";
@@ -23,6 +24,7 @@ import CompletionStep from "../components/questionnaire/steps/Step19_TCompletion
 
 
 
+
 interface QuestionnaireData {
   personalData: Record<string, string>;
   contactInfo: Record<string, string>;
@@ -42,6 +44,7 @@ interface QuestionnaireData {
   availability: string[];
 }
 
+// Initial empty data structure for the questionnaire
 const initialData: QuestionnaireData = {
   personalData: {},
   contactInfo: {},
@@ -61,34 +64,69 @@ const initialData: QuestionnaireData = {
   availability: [],
 };
 
+
 const TherapistQuestionnaire = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  /*const [currentStep, setCurrentStep] = useState(0);
   // Data is stored in react-state, after refresh all data is lost
-  const [data, setData] = useState<QuestionnaireData>(initialData); //Temporary answers are saved here as a QuestionnaireData-Object with all fields. 
+  const [data, setData] = useState<QuestionnaireData>(initialData);*/ //Temporary answers are saved here as a QuestionnaireData-Object with all fields. 
+
+  // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
+  const { 
+    data, 
+    currentStep, 
+    setCurrentStep, 
+    updateField, 
+    clearProgress 
+  } = usePersistedQuestionnaire<QuestionnaireData>("feelora_therapist_v1", initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
 
   const totalSteps = 18; // Welcome + 17 questions
 
+  // Allow going to the next step
   const goNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
 
+  // Allow going back to the previous step
   const goBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
+  // Allow jumping to a specific step (used for editing from summary)
   const goToStep = (step: number) => {
     setCurrentStep(step);
   };
 
   const restart = () => {
+    clearProgress(); // Clear local storage AND state
     setCurrentStep(0);
-    setData(initialData);
+    // Since state is tied to localStorage, reload to reset everything
+    window.location.reload();
   };
 
+  // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
+  const handleSubmit = async () => {
+    try {
+      // 1. Send data to backend
+      // await api.post('/therapist/register-details', data);
+      
+      console.log("Final Submission successful!", data);
+
+      // 2. Clear the local storage, that data is safe in DB
+      clearProgress();
+
+      // 3. Move to the completion step
+      goNext(); 
+    } catch (error) {
+      console.error("Submission failed", error);
+      // Optional for later--> Show a toast or error message to the user
+    }
+  };
+
+  // Render the current step based on currentStep state
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -99,7 +137,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.personalData}
-            onDataChange={(newData) => setData({ ...data, personalData: newData })}
+            onDataChange={(newData) => updateField("personalData", newData)}
           />
         );
       case 2:  
@@ -108,7 +146,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.contactInfo}
-            onDataChange={(newData) => setData({ ...data, contactInfo: newData })}
+            onDataChange={(newData) => updateField("contactInfo", newData)}
           />
         );
       case 3:
@@ -117,7 +155,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.qualifications}
-            onDataChange={(newData) => setData({ ...data, qualifications: newData })}
+            onDataChange={(newData) => updateField("qualifications", newData)}
           />
         );
       case 4:
@@ -126,7 +164,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.experience}
-            onDataChange={(newData) => setData({ ...data, experience: newData })}
+            onDataChange={(newData) => updateField("experience", newData)}
           />
         );
       case 5:
@@ -135,7 +173,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.specialties}
-            onDataChange={(newData) => setData({ ...data, specialties: newData })}
+            onDataChange={(newData) => updateField("specialties", newData)}
           />
         );
       case 6:
@@ -144,7 +182,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.languages}
-            onDataChange={(newData) => setData({ ...data, languages: newData })}
+            onDataChange={(newData) => updateField("languages", newData)}
           />
         );
       case 7:
@@ -153,7 +191,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.therapySchool}
-            onDataChange={(newData) => setData({ ...data, therapySchool: newData })}
+            onDataChange={(newData) => updateField("therapySchool", newData)}
           />
         );
       case 8:
@@ -162,7 +200,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.therapyMethods}
-            onDataChange={(newData) => setData({ ...data, therapyMethods: newData })}
+            onDataChange={(newData) => updateField("therapyMethods", newData)}
           />
         );
       case 9:
@@ -171,7 +209,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.therapySetting}
-            onDataChange={(newData) => setData({ ...data, therapySetting: newData })}
+            onDataChange={(newData) => updateField("therapySetting", newData)}
           />
         );
       case 10:
@@ -180,7 +218,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.therapyFormat}
-            onDataChange={(newData) => setData({ ...data, therapyFormat: newData })}
+            onDataChange={(newData) => updateField("therapyFormat", newData)}
           />
         );
       case 11:
@@ -189,7 +227,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.therapyDuration}
-            onDataChange={(newData) => setData({ ...data, therapyDuration: newData })}
+            onDataChange={(newData) => updateField("therapyDuration", newData)}
           />
         );
       case 12:
@@ -198,7 +236,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.sessionFrequency}
-            onDataChange={(newData) => setData({ ...data, sessionFrequency: newData })}
+            onDataChange={(newData) => updateField("sessionFrequency", newData)}
           />
         );
       case 13:
@@ -207,7 +245,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.patientGender}
-            onDataChange={(newData) => setData({ ...data, patientGender: newData })}
+            onDataChange={(newData) => updateField("patientGender", newData)}
           />
         );
       case 14:
@@ -216,7 +254,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.valuesPreferences}
-            onDataChange={(newData) => setData({ ...data, valuesPreferences: newData })}
+            onDataChange={(newData) => updateField("valuesPreferences", newData)}
           />
         );
       case 15:
@@ -225,7 +263,7 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.additionalInfo}
-            onDataChange={(newData) => setData({ ...data, additionalInfo: newData })}
+            onDataChange={(newData) => updateField("additionalInfo", newData)}
           />
         );
       case 16:
@@ -234,13 +272,13 @@ const TherapistQuestionnaire = () => {
             onNext={goNext}
             onBack={goBack}
             data={data.availability}
-            onDataChange={(newData) => setData({ ...data, availability: newData })}
+            onDataChange={(newData) => updateField("availability", newData)}
           />
         );
       case 17:
         return (
           <SummaryStep
-            onNext={goNext}
+            onNext={handleSubmit} // This will handle the final submission of the questionnaire
             onBack={goBack}
             onEdit={goToStep}
             data={data}
