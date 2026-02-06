@@ -8,6 +8,18 @@ import QualificationsStep from "../components/questionnaire/steps/Step4_TQualifi
 import ExperienceStep from "../components/questionnaire/steps/Step5_TExperience";
 import SpecialtiesStep from "../components/questionnaire/steps/Step6_TSpecialties";
 import LanguagesStep from "../components/questionnaire/steps/Step7_TLanguages";
+import TherapySchoolStep from "../components/questionnaire/steps/Step8_TTherapySchool";
+import TherapyMethodsStep from "../components/questionnaire/steps/Step9_TTherapyMethods";
+import TherapySettingStep from "../components/questionnaire/steps/Step10_TTherapySetting";
+import TherapyFormatStep from "../components/questionnaire/steps/Step11_TTherapyFormat";
+import TherapyDurationStep from "../components/questionnaire/steps/Step12_TTherapyDuration";
+import SessionFrequencyStep from "../components/questionnaire/steps/Step13_TSessionFrequency";
+import PatientGenderStep from "../components/questionnaire/steps/Step14_TPatientGender";
+import ValuesPreferencesStep from "../components/questionnaire/steps/Step15_TValuesPreferences";
+import AdditionalInfoStep from "../components/questionnaire/steps/Step16_TAdditionalInfo";
+import AvailabilityStep from "../components/questionnaire/steps/Step17_TAvailability";
+import SummaryStep from "../components/questionnaire/steps/Step18_TSummary";
+import CompletionStep from "../components/questionnaire/steps/Step19_TCompletion";
 
 
 
@@ -135,7 +147,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => setData({ ...data, languages: newData })}
           />
         );
-      /*case 7:
+      case 7:
         return (
           <TherapySchoolStep
             onNext={goNext}
@@ -237,7 +249,7 @@ const TherapistQuestionnaire = () => {
       case 18:
         return <CompletionStep onRestart={restart} />;
       default:
-        return null; */
+        return null; 
     }
   };
 
