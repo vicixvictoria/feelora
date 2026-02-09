@@ -34,6 +34,12 @@ interface AmplifyConfig {
     };
     unauthenticated_identities_enabled: boolean;
   };
+  Storage?: { // storage configuration for S3
+    S3: {
+      bucket: string;
+      region: string;
+    }
+  };
   version: string;
 }
 
@@ -67,6 +73,7 @@ export function buildAmplifyConfig(poolType: 'user' | 'therapist' = 'user'): Amp
   
   let userPoolId: string;
   let userPoolClientId: string;
+  const s3Bucket = import.meta.env.VITE_S3_BUCKET_NAME; // Get the bucket name from environment variables
 
   // Common required variables
   const region = import.meta.env.VITE_REGION;
@@ -136,6 +143,12 @@ export function buildAmplifyConfig(poolType: 'user' | 'therapist' = 'user'): Amp
         domain: cognitoDomain,
       },
       unauthenticated_identities_enabled: true,
+    },
+    Storage: {
+      S3: {
+        bucket: s3Bucket,
+        region: region
+      }
     },
     version: '1.4',
   };

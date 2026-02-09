@@ -6,7 +6,7 @@ interface AdditionalInfoStepProps {
   data: string;
   onDataChange: (data: string) => void;
 }
-const Step16_TAdditionalInfo = ({ onNext, onBack, data, onDataChange }: AdditionalInfoStepProps) => {
+const Step15_PAdditionalInfo = ({ onNext, onBack, data, onDataChange }: AdditionalInfoStepProps) => {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
@@ -21,7 +21,7 @@ const Step16_TAdditionalInfo = ({ onNext, onBack, data, onDataChange }: Addition
       {/* Form Card */}
       <div className="feelora-card">
         <p className="text-foreground/80 mb-4">
-          Möchtest du uns noch etwas über deine Arbeitsweise/Ihre Herangehensweise mitteilen?
+          Möchtest du uns noch etwas weiteres über deine bevorstehende Therapie oder besondere Anforderungen oder Präferenzen bezüglich deines/r Therapeut:in mitteilen?
         </p>
         <Textarea
           placeholder="hier tippen..."
@@ -35,4 +35,4 @@ const Step16_TAdditionalInfo = ({ onNext, onBack, data, onDataChange }: Addition
     </div>
   );
 };
-export default Step16_TAdditionalInfo;
+export default Step15_PAdditionalInfo;

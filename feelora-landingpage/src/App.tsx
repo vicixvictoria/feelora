@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Amplify } from 'aws-amplify';
+import { amplifyConfig } from './config/amplify'; // Default to standard user
 
 // --- Contexts ---
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -43,6 +45,10 @@ import TherapistLayout from './features/therapist/layout/TherapistLayout';
 import TherapistChat from './features/therapist/pages/TherapistChat';
 import TherapistMoodTrackerPage from './features/therapist/pages/TherapistMoodTrackerPage';
 import TherapistQuestionnaire from './features/therapist/pages/TherapistQuestionnaire';
+
+
+// --- Amplify Configuration ---
+Amplify.configure(amplifyConfig); // Use the default configuration (standard user pool) for the entire app. 
 
 // 1. Initialize Query Client
 const queryClient = new QueryClient();
@@ -134,6 +140,7 @@ function App() {
 
                 {/* All routes here are prefixed with /patient 
                     Example: /patient (dashboard), /patient/calendar 
+                    QU
                 */}
                 <Route path="/patient" element={<PatientLayoutWrapper />}>
                   <Route index element={<ChatPage />} />
