@@ -133,10 +133,15 @@ function App() {
                  <Route path="/test-therapist" element={<TherapistQuestionnaire />} />
                  <Route path="/test-patient" element={<PatientQuestionnaire />} />
 
+                
+
                 {/* === GROUP 2: Patient Dashboard (Protected)=== */}
                 {/* Only Patient Users. Therapists are BLOCKED. */}
-                {/* Wrap patient dashboard with RequireAuth */}
+                {/* Wrap patient dashboard and screening with RequireAuth */}
                 <Route element={<RequireAuth allowedType="user" />}>
+
+                {/* Questionnaire Pages (Protected) */}
+                <Route path="/patient/questionnaire" element={<PatientQuestionnaire />} />
 
                 {/* All routes here are prefixed with /patient 
                     Example: /patient (dashboard), /patient/calendar 
@@ -153,11 +158,20 @@ function App() {
 
                 </Route> 
 
+
                 {/* === GROUP 3: THERAPIST DASHBOARD (Protected) === */}
                 {/* Only Therapists. Patients are BLOCKED. */}
-                {/* Wrap therapist dashboard with RequireAuth */}
-                
+                {/* Wrap therapist dashboard and screening with RequireAuth */}
+  
                 <Route element={<RequireAuth allowedType="therapist" />}>
+                
+                {/* Questionnaire Pages (Protected) */}
+                  <Route path="/therapist/questionnaire" element={<TherapistQuestionnaire />} />
+                    
+                    {/* All routes here are prefixed with /patient 
+                    Example: /patient (dashboard), /patient/calendar 
+                    QU
+                */}
                   <Route path="/therapist" element={<TherapistLayoutWrapper />}>
                     <Route index element={<TherapistChat />} />
                     <Route path="mood-tracker" element={<TherapistMoodTrackerPage />} />
