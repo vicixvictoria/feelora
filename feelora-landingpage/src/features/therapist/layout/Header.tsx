@@ -1,5 +1,5 @@
 import { ChevronDown, LogOut } from "lucide-react";
-import { S3_LOGO as feeloraLogo } from "@/config/s3Assets";
+import feeloraLogo from "@/assets/logo.png";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';

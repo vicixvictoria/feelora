@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { S3_LOGO_FEELORA as FeeloraLogo } from "@/config/s3Assets";
+import FeeloraLogo from "@/assets/logo_feelora.png";
 import ProgressBar from "@/components/questionnaire/ProgressBar";
 import WelcomeStep from "../components/questionnaire/steps/Step1_PWelcome.tsx";
 import PersonalDataStep from "../components/questionnaire/steps/Step2_PPersonalData";
