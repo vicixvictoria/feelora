@@ -6,7 +6,7 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from '@/components/ui/navigation-menuLanding';
-import logoFeelora from '@/assets/logo_feelora.png';
+import { S3_LOGO_FEELORA as logoFeelora } from '@/config/s3Assets';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 

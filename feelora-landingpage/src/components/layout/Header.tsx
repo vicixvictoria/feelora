@@ -1,5 +1,5 @@
 import { ChevronDown, LogOut } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
+import { S3_LOGO as feeloraLogo } from "@/config/s3Assets";
 import {
   DropdownMenu,
   DropdownMenuContent,

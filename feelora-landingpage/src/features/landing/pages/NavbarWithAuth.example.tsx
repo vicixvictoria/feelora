@@ -9,7 +9,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/use-auth';
 import { signOut } from 'aws-amplify/auth';
-import logoFeelora from '@/assets/logo_feelora.png';
+import { S3_LOGO_FEELORA as logoFeelora } from '@/config/s3Assets';
 
 export function NavbarWithAuth() {
   const [isScrolled, setIsScrolled] = useState(false);

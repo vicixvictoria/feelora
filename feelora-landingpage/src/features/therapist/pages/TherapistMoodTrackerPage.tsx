@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
+import { S3_LOGO as feeloraLogo } from "@/config/s3Assets";
 
 interface MoodOption {
   emoji: string;
