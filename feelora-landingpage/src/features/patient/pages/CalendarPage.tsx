@@ -68,6 +68,15 @@ const CalendarPage = () => {
   return (
     <div className="animate-fade-in">
       <div className="flex gap-8">
+        {/* Coming Soon Watermark */}
+      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+        <p
+          className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+          style={{ transform: "rotate(-25deg)" }}
+        >
+          Coming Soon
+        </p>
+      </div>
         {/* Left Column - Calendar */}
         <div className="flex-1">
           {/* Calendar */}

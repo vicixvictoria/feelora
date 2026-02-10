@@ -48,6 +48,7 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === "/patient/"}
             className={({ isActive }) =>
               `sidebar-item ${isActive ? "sidebar-item-active" : ""}`
             }

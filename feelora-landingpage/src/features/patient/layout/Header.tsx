@@ -42,7 +42,7 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Emergency
+            Notfall
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>Notfall Nummern</DropdownMenuItem>
@@ -50,16 +50,6 @@ const Header = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
-            <ChevronDown className="w-4 h-4" />
-            Insights
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Mood Statistiken</DropdownMenuItem>
-            <DropdownMenuItem>Fortschritt</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
@@ -68,18 +58,18 @@ const Header = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>Benachrichtigungen</DropdownMenuItem>
-            <DropdownMenuItem>Datenschutz</DropdownMenuItem>
+            <DropdownMenuItem>Privatsphäre & Datenschutz</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Personal Data
+            Sprachen
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Meine Daten</DropdownMenuItem>
-            <DropdownMenuItem>Daten exportieren</DropdownMenuItem>
+            <DropdownMenuItem>Deutsch</DropdownMenuItem>
+            <DropdownMenuItem>English</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

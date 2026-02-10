@@ -42,6 +42,11 @@ const questionNav = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const therapistDashboardNav = () => {
+    navigate('/therapist');
+    setIsMobileMenuOpen(false);
+  };
+
   const features = [
     {
       icon: UsersIcon,
@@ -134,6 +139,7 @@ const questionNav = () => {
               size="lg"
               onClick={handleLoginClickTherapist} 
               //onClick={questionNav} // --> only use for testing questionnaire UI //
+              //onClick={therapistDashboardNav} // --> only use for testing Dashboard UI without Auth
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen

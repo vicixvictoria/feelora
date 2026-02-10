@@ -1,4 +1,4 @@
-import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard } from "lucide-react";
+import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard, Users2 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const menuItems = [
@@ -14,6 +14,30 @@ const menuItems = [
     icon: Smile,
     path: "/therapist/mood-tracker",
   },
+  {
+    title: "Profil",
+    description: "Einsicht in dein Profil und persönliche Informationen",
+    icon: User,
+    path: "/therapist/profile",
+  },
+  {
+    title: "Aufgaben",
+    description: "Einsicht in die Aufgaben deiner Patient*innen",
+    icon: BookOpen,
+    path: "/therapist/homework",
+  },
+  {
+    title: "Patient*innen",
+    description: "Einsicht in deine Patient*innen und neue Matches",
+    icon: Users2,
+    path: "/therapist/patients",
+  },
+  {
+    title: "Kalender",
+    description: "Einsicht in deine Termine und Verfügbarkeit",
+    icon: Calendar,
+    path: "/therapist/calendar",
+  },
 ];
 
 const Sidebar = () => {
@@ -24,6 +48,7 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === "/therapist/"}
             className={({ isActive }) =>
               `sidebar-item ${isActive ? "sidebar-item-active" : ""}`
             }

@@ -36,6 +36,15 @@ const completedTasks: Task[] = [
 const HomeworkPage = () => {
   return (
     <div className="max-w-4xl animate-fade-in">
+      {/* Coming Soon Watermark */}
+      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+        <p
+          className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+          style={{ transform: "rotate(-25deg)" }}
+        >
+          Coming Soon
+        </p>
+      </div>
       {/* New Tasks */}
       <h1 className="text-2xl font-bold text-purple mb-6">Neue Aufgaben</h1>
       <div className="space-y-4 mb-10">

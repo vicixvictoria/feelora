@@ -61,6 +61,20 @@ function parseUserFromToken(token: string): User | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  
+  {/*Mock-User for testing without login flow. Remove this and uncomment the real state for production.*/}
+  /*const [user, setUser] = useState<User | null>({
+    id: 'test-123',
+    email: 'test@example.com',
+    name: 'Test',
+    familyName: 'User',
+    groups: ['patient'] // Use 'therapist' here if you want to test the therapist side
+  });
+  const [accessToken, setAccessToken] = useState<string | null>('fake-token');
+  const [isLoading, setIsLoading] = useState(false); 
+  const [error, setError] = useState<string | null>(null); */
+
+  //comment out for testing to not use real authentication flow
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -189,6 +203,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // --- INITIALIZATION (The "Engine") ---
   useEffect(() => {
+    //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow. 
+
     if (initRef.current) return;
     initRef.current = true;
 
@@ -240,6 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     accessToken,
+    //isAuthenticated: true,  // For testing purposes, set this to true. In production, it should be !!user or a more robust check.
     isAuthenticated: !!user, // Simple boolean check
     isLoading,
     error,

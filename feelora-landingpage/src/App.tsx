@@ -45,6 +45,10 @@ import TherapistLayout from './features/therapist/layout/TherapistLayout';
 import TherapistChat from './features/therapist/pages/TherapistChat';
 import TherapistMoodTrackerPage from './features/therapist/pages/TherapistMoodTrackerPage';
 import TherapistQuestionnaire from './features/therapist/pages/TherapistQuestionnaire';
+import TherapistProfilePage from './features/therapist/pages/TherapistProfilePage';
+import TherapistHomeworkPage from './features/therapist/pages/TherapistHomeworkPage';
+import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsPage';
+import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
 
 
 // --- Amplify Configuration ---
@@ -129,11 +133,13 @@ function App() {
                   <Route path="/support" element={<SupportPage />} />
                 </Route>
 
+
+
                 {/* 🚧 TEST ONLY: Temporary access to test UI without login 🚧 */}
                  <Route path="/test-therapist" element={<TherapistQuestionnaire />} />
                  <Route path="/test-patient" element={<PatientQuestionnaire />} />
-
                 
+              
 
                 {/* === GROUP 2: Patient Dashboard (Protected)=== */}
                 {/* Only Patient Users. Therapists are BLOCKED. */}
@@ -155,8 +161,7 @@ function App() {
                   <Route path="mood-tracker" element={<MoodTrackerPage />} />
                   <Route path="homework" element={<HomeworkPage />} />
                 </Route>
-
-                </Route> 
+                </Route> {/* End of Patient Protected Routes*/}
 
 
                 {/* === GROUP 3: THERAPIST DASHBOARD (Protected) === */}
@@ -175,7 +180,10 @@ function App() {
                   <Route path="/therapist" element={<TherapistLayoutWrapper />}>
                     <Route index element={<TherapistChat />} />
                     <Route path="mood-tracker" element={<TherapistMoodTrackerPage />} />
-                    {/* More Therapist Routes here */}
+                    <Route path="profile" element={<TherapistProfilePage />} />
+                    <Route path="homework" element={<TherapistHomeworkPage />} />
+                    <Route path="patients" element={<TherapistPatientsPage />} />
+                    <Route path="calendar" element={<TherapistCalendarPage />} />
                   </Route>
                 </Route>
 

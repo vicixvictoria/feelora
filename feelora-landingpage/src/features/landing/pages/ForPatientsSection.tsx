@@ -164,7 +164,8 @@ export function ForPatientsSection() {
             <Button
               size="lg"
               onClick={handleLoginClick}
-              //onClick={questionNav} // --> only use for testing questionnaire UI //
+              //onClick={questionNav} // --> only use for testing questionnaire UI
+              //onClick={patientDashboardNav} // --> only use for testing Dashboard UI without Auth//
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
             {t('patients.cta')}
