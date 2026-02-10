@@ -5,8 +5,8 @@ import NavigationButtons from "@/components/questionnaire/NavigationButton";
 interface PreviousTherapyStepProps {
   onNext: () => void;
   onBack: () => void;
-  data: { selected: string[]; other: string; neverHadTherapy: boolean };
-  onDataChange: (data: { selected: string[]; other: string; neverHadTherapy: boolean }) => void;
+  data: { selected: string[]; other?: string; neverHadTherapy: boolean };
+  onDataChange: (data: { selected: string[]; other?: string; neverHadTherapy: boolean }) => void;
 }
 const therapyOptions = [
   "Kognitive Verhaltenstherapie (KVT)",

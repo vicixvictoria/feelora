@@ -5,8 +5,8 @@ import NavigationButtons from "@/components/questionnaire/NavigationButton";
 interface ValuesPreferencesStepProps {
   onNext: () => void;
   onBack: () => void;
-  data: { selected: string[]; other: string };
-  onDataChange: (data: { selected: string[]; other: string }) => void;
+  data: { selected: string[]; other?: string };
+  onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
 // List of values/preferences options - add more if needed

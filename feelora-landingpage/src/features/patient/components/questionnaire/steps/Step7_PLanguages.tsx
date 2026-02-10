@@ -11,8 +11,8 @@ import NavigationButtons from "@/components/questionnaire/NavigationButton";
 interface LanguagesStepProps {
   onNext: () => void;
   onBack: () => void;
-  data: { selected: string[]; other: string };
-  onDataChange: (data: { selected: string[]; other: string }) => void;
+  data: { selected: string[]; other?: string };
+  onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
 const languageOptions = [

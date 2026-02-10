@@ -5,8 +5,8 @@ import NavigationButtons from "@/components/questionnaire/NavigationButton";
 interface SpecialtiesStepProps {
   onNext: () => void;
   onBack: () => void;
-  data: { selected: string[]; other: string };
-  onDataChange: (data: { selected: string[]; other: string }) => void;
+  data: { selected: string[]; other?: string };
+  onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
 const specialtyOptions = [

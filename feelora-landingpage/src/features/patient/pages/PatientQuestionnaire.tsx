@@ -21,9 +21,12 @@ import AvailabilityStep from "../components/questionnaire/steps/Step16_PAvailabi
 import SummaryStep from "../components/questionnaire/steps/Step17_PSummary.tsx";
 import CompletionStep from "../components/questionnaire/steps/Step18_PCompletion.tsx";
 
+import { patientService } from '../api/patientService';
+import { QuestionnaireData } from '../types/questionnaire';
 
 
-interface QuestionnaireData {
+
+/*interface QuestionnaireData {
   personalData: Record<string, string>;
   contactInfo: Record<string, string>;
   mentalHealth: { selected: string[]; other: string };
@@ -40,7 +43,7 @@ interface QuestionnaireData {
   valuesPreferences: { selected: string[]; other: string };
   additionalInfo: string;
   availability: string[];
-}
+}*/
 
 const initialData: QuestionnaireData = {
   personalData: {},
@@ -64,6 +67,8 @@ const initialData: QuestionnaireData = {
 const PatientQuestionnaire = () => {
   /*const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<QuestionnaireData>(initialData);*/
+
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading State
 
 // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { 
@@ -102,10 +107,14 @@ const PatientQuestionnaire = () => {
 
   // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
   const handleSubmit = async () => {
+    if (isSubmitting) return; // Prevent double clicks
+
+    setIsSubmitting(true);
     try {
       // 1. Send data to backend
-      // await api.post('/therapist/register-details', data);
-      
+      console.log("Submitting data:", data);
+      // 1. Call the API
+      await patientService.submitQuestionnaire(data);
       console.log("Final Submission successful!", data);
 
       // 2. Clear the local storage, that data is safe in DB
@@ -115,7 +124,9 @@ const PatientQuestionnaire = () => {
       goNext(); 
     } catch (error) {
       console.error("Submission failed", error);
-      // Optional for later--> Show a toast or error message to the user
+      alert("Failed to save your answers. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

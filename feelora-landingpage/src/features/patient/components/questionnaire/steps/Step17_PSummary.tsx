@@ -1,5 +1,6 @@
 import { Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { QuestionnaireData } from "@/features/patient/types/questionnaire";
 
 // --- Steps ---
 interface SummaryStepProps {
@@ -7,7 +8,7 @@ interface SummaryStepProps {
   onBack: () => void;
   onEdit: (step: number) => void;
   // All collected data from previous steps stored in a single object for easy access
-  data: {
+  /*data: {
     personalData: Record<string, string>;
     contactInfo: Record<string, string>;
     mentalHealth: { selected: string[]; other: string };
@@ -23,7 +24,8 @@ interface SummaryStepProps {
     valuesPreferences: { selected: string[]; other: string };
     additionalInfo: string;
     availability: string[];
-  };
+  };*/
+  data: QuestionnaireData;
 }
 
 // Define a type for each section in the summary
