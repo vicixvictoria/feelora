@@ -111,22 +111,38 @@ const PatientQuestionnaire = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. Send data to backend
       console.log("Submitting data:", data);
       // 1. Call the API
-      await patientService.submitQuestionnaire(data);
-      console.log("Final Submission successful!", data);
+      // The wrapper handleGraphQL has already checked for network/GraphQL errors
+      const result = await patientService.submitQuestionnaire(data);
+      console.log("Final Submission successful!", result);
 
-      // 2. Clear the local storage, that data is safe in DB
-      clearProgress();
+      // 2. Check the business logic success (the boolean from your backend)
+      if (result.success) {
+        console.log("Submission successful:", result.message);
 
-      // 3. Move to the completion step
+        // 3. Clear the local storage since data is safe in DB
+        clearProgress();
+
+      // 4. Move to the completion step
       goNext(); 
-    } catch (error) {
-      console.error("Submission failed", error);
-      alert("Failed to save your answers. Please try again.");
+      } else {
+        // Handle cases where the request worked but the backend rejected the data logic
+        alert(`Issue with submission: ${result.message}`);
+      }
+
+    } catch (err: unknown) {
+    // 1. Narrow the type to an Error object
+      if (err instanceof Error) {
+        console.error("Submission failed:", err.message);
+        alert(err.message); // Now you can access .message
+      } else {
+      // 2. Fallback for unexpected non-error objects
+      console.error("An unexpected error occurred:", err);
+      alert("An unexpected error occurred. Please try again.");
+      }
     } finally {
-      setIsSubmitting(false);
+    setIsSubmitting(false);
     }
   };
 
@@ -276,6 +292,7 @@ const PatientQuestionnaire = () => {
             onBack={goBack}
             onEdit={goToStep}
             data={data}
+            isLoading={isSubmitting} // Pass the loading state down
           />
         );
       case 17:

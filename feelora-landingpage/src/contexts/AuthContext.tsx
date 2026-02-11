@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Amplify } from 'aws-amplify';
+import { amplifyConfig, therapistAmplifyConfig } from '@/config/amplify';
 
 // --- CONFIGURATION ---
 // Must Point to backend URL
@@ -101,10 +103,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(access);
     const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
     setUser(parsedUser);
+
+    // --- NEW: DYNAMIC AMPLIFY ONFIGURATION ---
+    // Check if the decoded token contains the 'Therapists' group
+    if (parsedUser?.groups?.includes('Therapists')) {
+      Amplify.configure(therapistAmplifyConfig);
+      console.log('[Amplify] Configured for Therapist Pool');
+    } else {
+      Amplify.configure(amplifyConfig);
+      console.log('[Amplify] Configured for Standard User Pool');
+    }
+
   }, []);
 
   // 1. LOGIN: Redirects browser to Backend -> Cognito
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
+    // Pre-configure ammplify so that the logout/login flow matches the intended client 
+    Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig); // Ensure correct Amplify config is set before login
+
     const currentPath = redirectPath || window.location.pathname;
     // Redirect to backend login endpoint
     window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;

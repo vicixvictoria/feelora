@@ -40,6 +40,13 @@ interface AmplifyConfig {
       region: string;
     }
   };
+  API?: {
+    GraphQL: {
+      endpoint: string;
+      region: string;
+      defaultAuthMode: 'userPool' | 'apiKey' | 'iam';
+    }
+  };
   version: string;
 }
 
@@ -150,6 +157,13 @@ export function buildAmplifyConfig(poolType: 'user' | 'therapist' = 'user'): Amp
         region: region
       }
     },
+    API: {
+    GraphQL: {
+      endpoint: import.meta.env.VITE_GRAPHQL_API_URL,
+      region: region,
+      defaultAuthMode: 'userPool',
+    }
+  },
     version: '1.4',
   };
 

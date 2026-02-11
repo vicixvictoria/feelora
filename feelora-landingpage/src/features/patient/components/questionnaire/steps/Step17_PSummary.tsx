@@ -7,25 +7,8 @@ interface SummaryStepProps {
   onNext: () => void;
   onBack: () => void;
   onEdit: (step: number) => void;
-  // All collected data from previous steps stored in a single object for easy access
-  /*data: {
-    personalData: Record<string, string>;
-    contactInfo: Record<string, string>;
-    mentalHealth: { selected: string[]; other: string };
-    timeframe: string[];
-    previousTherapy: { selected: string[]; other: string; neverHadTherapy: boolean };
-    languages: { selected: string[]; other: string };
-    therapySchool: { selected: string[]; other: string };
-    therapySetting: string[];
-    therapyFormat: string[];
-    therapyDuration: string;
-    sessionFrequency: string[];
-    therapistGender: string[];
-    valuesPreferences: { selected: string[]; other: string };
-    additionalInfo: string;
-    availability: string[];
-  };*/
   data: QuestionnaireData;
+  isLoading?: boolean;
 }
 
 // Define a type for each section in the summary
@@ -36,7 +19,7 @@ interface SummarySection {
 }
 
 // Step Component for final summary and review of all answers before submission           
-const Step17_PSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => {
+const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummaryStepProps) => {
   const formatArray = (arr: string[] | undefined, fallback = "—") => {
     if (!arr || arr.length === 0) return fallback;
     return arr.join(", ");
@@ -195,12 +178,21 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
       </div>
       {/* Navigation */}
       <div className="flex justify-between mt-8">
-        <Button variant="outline" onClick={onBack} className="feelora-btn-outline">
+        <Button variant="outline" onClick={onBack} className="feelora-btn-outline" disabled={isLoading}> 
           ← zurück
         </Button>
-        <Button onClick={onNext} className="feelora-btn-primary">
+        <Button onClick={onNext} className="feelora-btn-primary" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              Wird gesendet...
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            </>
+          ) : (
+            <>
           Absenden
           <Check className="w-4 h-4" />
+          </>
+          )}
         </Button>
       </div>
     </div>
