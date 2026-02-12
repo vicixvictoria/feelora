@@ -30,3 +30,23 @@ export interface QuestionnaireData {
   additionalInfo: string;
   availability: string[];
 }
+
+export interface Match {
+  Id: string;
+  filters?: string; // AWSJSON from schema
+  description?: string; // AWSJSON from schema
+}
+
+export interface MatchingAlgorithmResponse {
+  matchingAlgorithm: Match[];
+}
+
+// If you eventually fetch the full therapist details
+export interface MatchedTherapist {
+  Id: string;
+  Email?: string;
+  Name?: string;
+  Gender?: string;
+  City?: string;
+  LicenseVerified?: string;
+}

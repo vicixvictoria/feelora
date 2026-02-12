@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: 'test@example.com',
     name: 'Test',
     familyName: 'User',
-    groups: ['patient'] // Use 'therapist' here if you want to test the therapist side
+    groups: ['type:U'] // Matches the schema's requirement for matchingAlgorithm
   });
   const [accessToken, setAccessToken] = useState<string | null>('fake-token');
   const [isLoading, setIsLoading] = useState(false); 
@@ -105,15 +105,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(parsedUser);
 
     // --- NEW: DYNAMIC AMPLIFY ONFIGURATION ---
-    // Check if the decoded token contains the 'Therapists' group
-    if (parsedUser?.groups?.includes('Therapists')) {
+    // The backend schema uses "type:T" for therapists and "type:U" for patients/users, so we can check the user's groups to determine which Amplify config to use. This ensures that when the user logs in, Amplify is configured with the correct User Pool and Client ID for their role, allowing them to interact with AWS resources as intended.
+    const isTherapist = parsedUser?.groups?.includes('type:T');
+    if (isTherapist) {
       Amplify.configure(therapistAmplifyConfig);
-      console.log('[Amplify] Configured for Therapist Pool');
+      console.log('[Amplify] Configured for Therapist Pool (type:T)');
     } else {
+      // Default to standard config for patients (type:U or type:P)
       Amplify.configure(amplifyConfig);
       console.log('[Amplify] Configured for Standard User Pool');
     }
-
   }, []);
 
   // 1. LOGIN: Redirects browser to Backend -> Cognito
@@ -219,7 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // --- INITIALIZATION (The "Engine") ---
   useEffect(() => {
-    //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow. 
+  //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow. 
 
     if (initRef.current) return;
     initRef.current = true;

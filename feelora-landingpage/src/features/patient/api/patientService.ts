@@ -1,55 +1,31 @@
-import { generateClient, GraphQLResult } from 'aws-amplify/api'; // Add GraphQLResult
+import { generateClient } from 'aws-amplify/api';
 import { handleGraphQL } from '@/lib/api-wrapper'; 
-import { QuestionnaireData } from '../types/questionnaire';
+import {MatchingAlgorithmResponse, QuestionnaireData, Match} from '../types/questionnaire';
 
-// 1. Generate the GraphQL client
 const client = generateClient();
 
-export interface MatchingInput {
-  Questionnaire: string; // AWSJSON is sent as a stringified object
-  filters?: string;      // AWSJSON is sent as a stringified object
-}
+// --- GraphQL Definitions (Aligned with Schema) --- //
 
-// --- 2. define the expected response structure from the backend for the matching mutation -- //
-export interface QuestionnaireResponse { // Define the expected response structure from the backend
-  submiQuestionnaireData: {
-    success: boolean;
-    message: string;
-    patientId?: string;
-  };
-}
-
-export interface PatientProfile {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  // Add other fields from your GraphQL schema here
-}
-
-export interface GetProfileResponse {
-  getPatientProfile: PatientProfile;
-}
-
-
-// --- GraphQL Definitions --- //
-// The mutation string matching the backend dev's input type - ceck with backend dev if the actual mutation name in the schema is that
-const createMatching = /* GraphQL */ `
-  mutation SubmitQuestionnaire($input: MatchingInput!) {
-    submitQuestionnaire(input: $input) {
-      success
-      message
+// Matching Algorithm Mutation -- Accepts 'MatchingInput' and returns a list of 'Match'
+const matchingAlgorithmMutation = /* GraphQL */ `
+  mutation MatchingAlgorithm($input: MatchingInput!) {
+    matchingAlgorithm(input: $input) {
+      Id
+      filters
+      description
     }
   }
 `;
 
-const getProfileQuery = /* GraphQL */ `
-  query GetProfile {
-    getPatientProfile {
-      id
-      email
-      firstName
-      lastName //add other fields depening on backend
+const getOwnUserProfileQuery = /* GraphQL */ `
+  query GetOwnUserProfile {
+    getOwnUserProfile {
+      Id
+      Email
+      Name
+      Gender
+      City
+      MoodTracker
     }
   }
 `;
@@ -57,12 +33,11 @@ const getProfileQuery = /* GraphQL */ `
 // --- Service Object --- //
 export const patientService = {
  
-  // --- Submit Questionnaire API call--- //
-  submitQuestionnaire: async (data: QuestionnaireData): Promise<QuestionnaireResponse['submiQuestionnaireData']> => {
-    // 1. Prepare your input as before
-    const input: MatchingInput = {
+  submitQuestionnaire: async (data: QuestionnaireData): Promise<any> => {
+    // 1. Prepare Input (Matches 'MatchingInput' in schema)
+    const input = {
       Questionnaire: JSON.stringify(data),
-      filters: JSON.stringify({ //add more specific filters if needed
+      filters: JSON.stringify({
         languages: data.languages.selected,
         gender: data.therapistGender,
         setting: data.therapySetting,
@@ -70,28 +45,30 @@ export const patientService = {
       })
     };
 
-    // 2. Use the wrapper to handle the request and validation
-    // handleGraphQL will throw an error automatically if data is missing or if errors exist
-    const responseData = await handleGraphQL<QuestionnaireResponse>(
+    // 2. Call the mutation
+    // Note: The schema says this returns a list of [Match]!
+    const responseData = await handleGraphQL<MatchingAlgorithmResponse>(
       client.graphql({
-        query: createMatching,
+        query: matchingAlgorithmMutation,
         variables: { input }
       }) 
     );
 
-    // 3. Return the specific property defined in your Promise
-    return responseData.submiQuestionnaireData;
+    // Return the matches to the component
+    return {
+      success: true,
+      // responseData will contain a property named 'matchingAlgorithm', because that is the name of the mutation in the schema
+      matches: responseData.matchingAlgorithm
+    };
   },
 
-  // --- Get Profile Data API call--- //
-  getProfile: async (): Promise<PatientProfile> => {
-    // No casting needed, the wrapper handles the TypeScript complexity
-    const responseData = await handleGraphQL<GetProfileResponse>(
+  //
+  getProfile: async (): Promise<any> => {
+    const responseData = await handleGraphQL<any>(
       client.graphql({
-        query: getProfileQuery
+        query: getOwnUserProfileQuery
       })
     );
-    
-    return responseData.getPatientProfile;
+    return responseData.getOwnUserProfile;
   }
 };
