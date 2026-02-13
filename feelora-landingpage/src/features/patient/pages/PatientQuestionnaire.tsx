@@ -135,8 +135,8 @@ const PatientQuestionnaire = () => {
     setIsIntermediateLoading(true);
     try{
       const payload = {
-        Name: data.personalData.firstname,
-        Surname: data.personalData.lastname,
+        Name: data.personalData.firstName,
+        Surname: data.personalData.lastName,
         BirthDate: data.personalData.bday,
         Gender: data.personalData.gender,
         City: data.contactInfo.city,

@@ -76,6 +76,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
               ) : (
               <Input
                 id={field}
+                name={field}
                 type={field === "bday" ? "date" : "text"}
                 value={data[field] || ""}
                 onChange={(e) => handleChange(field, e.target.value)}

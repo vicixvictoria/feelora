@@ -77,8 +77,8 @@ export const patientService = {
   createPatientProfile: async (data: Partial<QuestionnaireData>): Promise<any> => {
     //Prepare Payload according to the UserProfileInput type in the schema
     const input = {
-      Name: data.personalData?.firstname,
-      Surname: data.personalData?.lastname,
+      Name: data.personalData?.firstName,
+      Surname: data.personalData?.lastName,
       BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000
         : null,
       Gender: data.personalData?.gender,
