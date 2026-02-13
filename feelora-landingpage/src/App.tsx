@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from './lib/apolloClient';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig } from './config/amplify'; // Default to standard user
 
@@ -112,6 +114,7 @@ const TherapistLayoutWrapper = () => (
 
 function App() {
   return (
+    <ApolloProvider client={apolloClient}>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <TooltipProvider>
@@ -196,6 +199,7 @@ function App() {
         </TooltipProvider>
       </LanguageProvider>
     </QueryClientProvider>
+    </ApolloProvider>
   );
 }
 

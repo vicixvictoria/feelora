@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig, therapistAmplifyConfig } from '@/config/amplify';
+import { setApolloAccessToken } from '@/lib/apolloClient';
 
 // --- CONFIGURATION ---
 // Must Point to backend URL
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearAuthState = useCallback(() => {
     setUser(null);
     setAccessToken(null);
+    setApolloAccessToken(null); // Clear Apollo token
     if (refreshTimerRef.current) {
       clearInterval(refreshTimerRef.current);
       refreshTimerRef.current = null;
@@ -103,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Helper function to set auth state from tokens
   const setAuthState = useCallback((access: string, idToken: string) => {
     setAccessToken(access);
+    setApolloAccessToken(access); // Sync token to Apollo Client
     const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
     setUser(parsedUser);
 

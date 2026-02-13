@@ -9,6 +9,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@apollo/client": "^3.14.0",
     "@aws-amplify/ui-react": "^6.13.1",
     "@radix-ui/react-accordion": "1.2.1",
     "@radix-ui/react-alert-dialog": "1.1.2",
