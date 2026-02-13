@@ -31,6 +31,7 @@ const fieldLabels: Record<string, string> = {
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
   const handleChange = (field: string, value: string) => {
+    
     onDataChange({ ...data, [field]: value });
   };
 

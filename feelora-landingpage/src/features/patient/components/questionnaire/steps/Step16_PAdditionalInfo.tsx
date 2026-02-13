@@ -6,7 +6,7 @@ interface AdditionalInfoStepProps {
   data: string;
   onDataChange: (data: string) => void;
 }
-const Step15_PAdditionalInfo = ({ onNext, onBack, data, onDataChange }: AdditionalInfoStepProps) => {
+const Step16_PAdditionalInfo = ({ onNext, onBack, data, onDataChange }: AdditionalInfoStepProps) => {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
@@ -35,4 +35,4 @@ const Step15_PAdditionalInfo = ({ onNext, onBack, data, onDataChange }: Addition
     </div>
   );
 };
-export default Step15_PAdditionalInfo;
+export default Step16_PAdditionalInfo;

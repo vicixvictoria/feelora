@@ -4,6 +4,7 @@ interface AvailabilityStepProps {
   onBack: () => void;
   data: string[];
   onDataChange: (data: string[]) => void;
+  isLoading?: boolean;
 }
 
 // List of days of the week
@@ -18,7 +19,7 @@ const days = [
 ];
 
 // Step Component
-const Step16_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
+const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
   const safeData = data || [];
   const handleToggle = (dayId: string) => {
     if (safeData.includes(dayId)) {
@@ -64,4 +65,4 @@ const Step16_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
     </div>
   );
 };
-export default Step16_PAvailability;
+export default Step15_PAvailability;

@@ -5,6 +5,7 @@ interface RequireAuthProps {
   allowedType: 'user' | 'therapist';
 }
 
+// This component protects routes based on authentication status and user type (patient vs therapist).
 export function RequireAuth({ allowedType }: RequireAuthProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const location = useLocation();

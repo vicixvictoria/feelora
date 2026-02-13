@@ -16,14 +16,14 @@ import TherapyDurationStep from "../components/questionnaire/steps/Step11_PThera
 import SessionFrequencyStep from "../components/questionnaire/steps/Step12_PSessionFrequency.tsx";
 import PatientGenderStep from "../components/questionnaire/steps/Step13_PTherapistGender.tsx";
 import ValuesPreferencesStep from "../components/questionnaire/steps/Step14_PValuesPreferences.tsx";
-import AdditionalInfoStep from "../components/questionnaire/steps/Step15_PAdditionalInfo.tsx";
-import AvailabilityStep from "../components/questionnaire/steps/Step16_PAvailability.tsx";
+import AdditionalInfoStep from "../components/questionnaire/steps/Step16_PAdditionalInfo.tsx";
+import AvailabilityStep from "../components/questionnaire/steps/Step15_PAvailability.tsx";
 import SummaryStep from "../components/questionnaire/steps/Step17_PSummary.tsx";
 import CompletionStep from "../components/questionnaire/steps/Step18_PCompletion.tsx";
 
 import { patientService } from '../api/patientService';
 import { QuestionnaireData } from '../types/questionnaire';
-
+import { da } from "date-fns/locale";
 
 
 /*interface QuestionnaireData {
@@ -69,6 +69,7 @@ const PatientQuestionnaire = () => {
   const [data, setData] = useState<QuestionnaireData>(initialData);*/
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading State
+  const [isIntermediateLoading, setIsIntermediateLoading] = useState(false); // For steps that require async operations (e.g., fetching therapist details after matches)
 
 // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { 
@@ -129,6 +130,32 @@ const PatientQuestionnaire = () => {
     setIsSubmitting(false);
   }
   };
+
+  const handleCreatePatientProfile = async () => {
+    setIsIntermediateLoading(true);
+    try{
+      const payload = {
+        Name: data.personalData.firstname,
+        Surname: data.personalData.lastname,
+        BirthDate: data.personalData.bday,
+        Gender: data.personalData.gender,
+        City: data.contactInfo.city,
+        Languages: data.languages,
+        Availability: data.availability,
+      };
+      console.log("Creating patient profile with payload:", payload);
+      // Call your API to create the patient profile and get the patient ID
+      const response = await patientService.createPatientProfile(data); // Maybe better to pass full data object and then extract in the service?
+      console.log("Patient profile created successfully!", response);
+      // You can store the patient ID in state or context if needed for future API calls
+      goNext();
+    } catch (error){
+      console.error("Error creating patient profile:", error);
+    } finally {
+      setIsIntermediateLoading(false);
+    }
+    };
+
 
   const renderStep = () => {
     switch (currentStep) {
@@ -253,20 +280,20 @@ const PatientQuestionnaire = () => {
         );
         case 14:
         return (
+          <AvailabilityStep
+            onNext={handleCreatePatientProfile}
+            onBack={goBack}
+            data={data.availability}
+            onDataChange={(newData) => updateField("availability", newData)}
+          />
+        );
+        case 15:
+          return (
           <AdditionalInfoStep
             onNext={goNext}
             onBack={goBack}
             data={data.additionalInfo}
             onDataChange={(newData) => updateField("additionalInfo", newData)}
-          />
-        );
-        case 15:
-        return (
-          <AvailabilityStep
-            onNext={goNext}
-            onBack={goBack}
-            data={data.availability}
-            onDataChange={(newData) => updateField("availability", newData)}
           />
         );
       case 16:

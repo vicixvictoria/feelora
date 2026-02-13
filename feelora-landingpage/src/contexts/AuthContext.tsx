@@ -99,6 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+
+  // Helper function to set auth state from tokens
   const setAuthState = useCallback((access: string, idToken: string) => {
     setAccessToken(access);
     const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
@@ -117,15 +119,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+
   // 1. LOGIN: Redirects browser to Backend -> Cognito
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
     // Pre-configure ammplify so that the logout/login flow matches the intended client 
     Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig); // Ensure correct Amplify config is set before login
 
     const currentPath = redirectPath || window.location.pathname;
-    // Redirect to backend login endpoint
+
+    // Redirect to backend login endpoint - for testing use fullRedirectUrl, otheriwse use currentPath
     window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
   }, []);
+
 
   // 2. EXCHANGE: Swaps Session ID (from URL) for Tokens
   const exchangeSessionForTokens = useCallback(async (sessionId: string): Promise<boolean> => {
@@ -151,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
   }, [setAuthState]);
+
 
   // 3. REFRESH: Use HttpOnly cookie to get new Access Token
   const refreshToken = useCallback(async (): Promise<boolean> => {
