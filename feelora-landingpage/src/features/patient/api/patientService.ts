@@ -47,33 +47,47 @@ const SAVE_USER_PROFILE_MUTATION = gql`
 // --- Service Object --- //
 export const patientService = {
 
+
+  // -- API call to submit the questionnaire and get matches based on the input data --
   submitQuestionnaire: async (data: QuestionnaireData): Promise<any> => {
     // 1. Prepare Input (Matches 'MatchingInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
       filters: JSON.stringify({
-        languages: data.languages.selected,
+        languages: data.languages?.selected || [],
         gender: data.therapistGender,
         setting: data.therapySetting,
-        availability: data.availability,
+        availability: data.availability || [],
       })
     };
 
-    // 2. Call the mutation
+   try {
     const { data: responseData } = await apolloClient.mutate({
       mutation: MATCHING_ALGORITHM_MUTATION,
       variables: { input },
     });
 
-    // Return the matches to the component
+    // The backend returns [Match]!, so responseData.matchingAlgorithm is an array
     return {
       success: true,
-      matches: responseData.matchingAlgorithm,
+      matches: responseData.matchingAlgorithm, 
     };
-  },
+  } catch (error: unknown) {
+    console.error("Matching Error:", error);
+    const errorMessage = error instanceof Error 
+    ? error.message 
+    : "An error during the matching algorithm occurred";
+    
+    return {
+      success: false,
+      matches: [],
+      error: errorMessage
+    };
+  }
+},
 
 
-  //Create User Profile API call
+  //-- Create User Profile API call --
   createPatientProfile: async (data: Partial<QuestionnaireData>): Promise<any> => {
     //Prepare Payload according to the UserProfileInput type in the schema
     const input = {

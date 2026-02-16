@@ -28,7 +28,13 @@ import CompletionStep from "../components/questionnaire/steps/Step19_TCompletion
 interface QuestionnaireData {
   personalData: Record<string, string>;
   contactInfo: Record<string, string>;
-  qualifications: Record<string, string>;
+  qualifications: {
+    degree: string;
+    institution: string;
+    licenseNumber: string; // New field
+    idUpload: string | null; // New field (URL as string)
+    [key: string]: any; // Keeps it flexible for other fields
+  };
   experience: string[];
   specialties: { selected: string[]; other: string };
   languages: { selected: string[]; other: string };
@@ -48,7 +54,12 @@ interface QuestionnaireData {
 const initialData: QuestionnaireData = {
   personalData: {},
   contactInfo: {},
-  qualifications: {},
+  qualifications: {
+    degree: "",
+    institution: "",
+    licenseNumber: "",
+    idUpload: null,
+  },
   experience: [],
   specialties: { selected: [], other: "" },
   languages: { selected: [], other: "" },
