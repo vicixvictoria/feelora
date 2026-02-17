@@ -1,4 +1,6 @@
 # frontend
+Comprehensive Documentation about the Frontend: steup, useage, architecture etc, you find in **[README_DOCS.md]**
+
 # Feelora Authentication Setup Guide
 
 This guide explains the Cognito authentication implementation that has been integrated into your Feelora landing page.
