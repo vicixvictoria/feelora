@@ -122,7 +122,7 @@ const TherapistQuestionnaire = () => {
   const handleSubmit = async () => {
     try {
       // 1. Send data to backend
-      // await api.post('/therapist/register-details', data);
+      // API call through Service needs to be implemented, this is just a placeholder for now
       
       console.log("Final Submission successful!", data);
 
@@ -136,6 +136,7 @@ const TherapistQuestionnaire = () => {
       // Optional for later--> Show a toast or error message to the user
     }
   };
+  
 
   // Render the current step based on currentStep state
   const renderStep = () => {
