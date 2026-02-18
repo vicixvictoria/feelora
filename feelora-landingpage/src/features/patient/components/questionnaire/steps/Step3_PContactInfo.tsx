@@ -1,6 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface ContactInfoStepProps {
   onNext: () => void;
@@ -12,14 +14,36 @@ interface ContactInfoStepProps {
 const fieldLabels: Record<string, string> = {
   phone: "Handy/Mobil",
   email: "E-Mail",
-  city: "Stadt",
+  city: "Stadt*",
   address: "Adresse",
   postalCode: "Postleitzahl",
-  country: "Land",
+  country: "Land*",
 };
 
+// Validation Schema 
+const step3Schema = z.object({
+  city: z.string().min(1, "Required"),
+  country: z.string().min(1, "Required"),
+  
+  // Phone, adress and postalcode is completely optional
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  postalCode: z.string().optional(),
+  // Email is optional, BUT if filled, must be valid
+  // z.literal("") allows an empty string to pass validation
+  email: z.union([z.literal(""), z.string().email("Ungültiges E-Mail-Format")]),
+});
+
 const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
+
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step3Schema,
+    onNext,
+  });
+
   const handleChange = (field: string, value: string) => {
+    clearError(field);
     onDataChange({ ...data, [field]: value });
   };
 
@@ -31,14 +55,9 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
           Kontaktinformationen
         </h1>
         <p className="text-muted-foreground mb-2">
-          Gib deine Kontaktdaten an, damit deine Patient:Innen dich erreichen können.
-          Füge auch die Adresse deiner Praxis hinzu.
-        </p>
-        <p className="text-muted-foreground mb-2">
-          Diese Informationen werden öffentlich in deinem Profil angezeigt.
-        </p>
-        <p className="text-muted-foreground text-sm">
-          Du kannst diese Angaben jederzeit ändern.
+          Gib deine Kontaktdaten an, damit deine Patient:Innen dich erreichen können. Wenn du noch eine weitere E-Mail, neben der email mit der du dich angemeldet hast, oder deine Telefonnummer 
+          angeben möchtest gib sie hier ein (optional). Wir können diese Daten nicht validieren oder auf Richtigkeit prüfen!
+          Füge butte auch die Adresse deiner Praxis hinzu falls du eine hast. Wenn du nur online Therapis anbietest, gib bitte die Stadt und das Land an, in der du dich befindest.
         </p>
       </div>
 
@@ -49,23 +68,30 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => (
             <div key={field} className="space-y-2">
-              <Label htmlFor={field} className="text-foreground">
-                {fieldLabels[field]}
+              <Label 
+                htmlFor={field} 
+                className={errors[field] ? "text-destructive" : "text-foreground"}
+              >
+                {/* Add asterisk only for non-optional fields */}
+                {fieldLabels[field]} {(field !== 'phone' && field !== 'email' && field !== 'address' && field !== 'postalCode') && errors[field] && "*"}
               </Label>
               <Input
                 id={field}
                 type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
                 value={data[field] || ""}
                 onChange={(e) => handleChange(field, e.target.value)}
-                className="bg-background"
+                className={`bg-background ${errors[field] ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
+              {/* Only show error message for invalid Email format */}
+              {errors[field] && field === 'email' && (
+                <p className="text-[0.8rem] text-destructive">Ungültiges E-Mail-Format</p>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };

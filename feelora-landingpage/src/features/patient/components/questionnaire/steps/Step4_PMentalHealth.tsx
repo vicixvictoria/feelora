@@ -1,10 +1,13 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface SpecialtiesStepProps {
   onNext: () => void;
   onBack: () => void;
+  // Note: Data structure is specific here
   data: { selected: string[]; other?: string };
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
@@ -23,26 +26,64 @@ const specialtyOptions = [
   "Essverhalten",
 ];
 
+// Define Validation Schema with Conditional Logic
+const step4Schema = z.object({
+  selected: z.array(z.string()).min(1, "Bitte wähle mindestens eine Option"),
+  other: z.string().optional(),
+}).refine((data) => {
+  // Logic: If "Andere" is in the array, 'other' string cannot be empty
+  if (data.selected.includes("Andere")) {
+    return data.other && data.other.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Bitte spezifizieren",
+  path: ["other"], // Attaches error to the 'other' field
+});
+
 const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: SpecialtiesStepProps) => {
+  
+  //Initialize Validation Hook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step4Schema,
+    onNext,
+  });
+
   const handleToggle = (specialty: string) => {
+    clearError("selected"); // Clear main error when user interacts
+    
+    // Create new array based on toggle
+    let newSelected: string[];
     if (data.selected.includes(specialty)) {
-      onDataChange({ ...data, selected: data.selected.filter((s) => s !== specialty) });
+      newSelected = data.selected.filter((s) => s !== specialty);
     } else {
-      onDataChange({ ...data, selected: [...data.selected, specialty] });
+      newSelected = [...data.selected, specialty];
     }
+    
+    // Update data
+    onDataChange({ ...data, selected: newSelected });
   };
 
   const handleOtherToggle = () => {
+    clearError("selected"); 
+    clearError("other"); // Clear specific error
+
     if (data.selected.includes("Andere")) {
-      onDataChange({ ...data, selected: data.selected.filter((s) => s !== "Andere"), other: "" });
+      // Uncheck "Andere" -> remove it and clear text
+      onDataChange({ 
+        ...data, 
+        selected: data.selected.filter((s) => s !== "Andere"), 
+        other: "" 
+      });
     } else {
+      // Check "Andere"
       onDataChange({ ...data, selected: [...data.selected, "Andere"] });
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">
           Mentale Gesundheit
@@ -50,12 +91,15 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
         <p className="text-muted-foreground mb-2">
           Was sind die Hauptprobleme, für die du Hilfe suchst?
         </p>
-        <p className="text-sm text-muted-foreground">Mehrere auswählbar</p>
+        <p className={`text-sm ${errors.selected ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+          {errors.selected ? "Bitte wähle mindestens eine Option aus" : "Mehrere auswählbar"}
+        </p>
       </div>
 
-      {/* Form Card */}
       <div className="feelora-card">
-        <div className="grid grid-cols-2 gap-3">
+        {/* Add visual feedback if no selection is made */}
+        <div className={`grid grid-cols-2 gap-3 p-1 rounded-xl ${errors.selected ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+          
           {specialtyOptions.map((specialty) => (
             <label
               key={specialty}
@@ -78,21 +122,30 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
               />
               <span className="text-foreground">Andere</span>
             </label>
+            
+            {/* Conditional Input with validation style */}
             {data.selected.includes("Andere") && (
-              <Input
-                type="text"
-                placeholder="Bitte angeben..."
-                value={data.other}
-                onChange={(e) => onDataChange({ ...data, other: e.target.value })}
-                className="bg-background"
-              />
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <Input
+                  type="text"
+                  placeholder="Bitte angeben..."
+                  value={data.other || ""}
+                  onChange={(e) => {
+                    clearError("other");
+                    onDataChange({ ...data, other: e.target.value });
+                  }}
+                  className={`bg-background ${errors.other ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                />
+                {errors.other && (
+                   <span className="text-xs text-destructive ml-1">Bitte gib Details an</span>
+                )}
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };
