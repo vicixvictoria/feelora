@@ -37,7 +37,7 @@ interface QuestionnaireData {
   };
   experience: string[];
   specialties: { selected: string[]; other: string };
-  languages: { selected: string[]; other: string };
+  languages: { selected: string[]; other: string[] };
   therapySchool: { selected: string[]; other: string };
   therapyMethods: string;
   therapySetting: string[];
@@ -62,7 +62,7 @@ const initialData: QuestionnaireData = {
   },
   experience: [],
   specialties: { selected: [], other: "" },
-  languages: { selected: [], other: "" },
+  languages: { selected: [], other: [] },
   therapySchool: { selected: [], other: "" },
   therapyMethods: "",
   therapySetting: [],
@@ -136,7 +136,7 @@ const TherapistQuestionnaire = () => {
       // Optional for later--> Show a toast or error message to the user
     }
   };
-  
+
 
   // Render the current step based on currentStep state
   const renderStep = () => {

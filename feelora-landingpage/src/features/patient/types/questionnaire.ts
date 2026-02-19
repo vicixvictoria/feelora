@@ -4,6 +4,12 @@ export interface SelectionWithOther {
   other?: string;
 }
 
+// for Languages: Helper type for "Selected + Other (Array)" pattern (Used in Step 7)
+export interface SelectionWithMultipleOther {
+  selected: string[];
+  other?: string[]; 
+}
+
 // 2. The Main Data Structure
 export interface QuestionnaireData {
   // Use specific types if known (e.g., string instead of any)
@@ -17,7 +23,7 @@ export interface QuestionnaireData {
     neverHadTherapy: boolean 
   };
   
-  languages: SelectionWithOther;
+  languages: SelectionWithMultipleOther; // <-- Updated to use the new type with array for "other"
   therapySchool: SelectionWithOther;
   
   therapySetting: string[];
@@ -41,7 +47,7 @@ export interface MatchingAlgorithmResponse {
   matchingAlgorithm: Match[];
 }
 
-// If you eventually fetch the full therapist details
+// If we eventually fetch the full therapist details
 export interface MatchedTherapist {
   Id: string;
   Email?: string;

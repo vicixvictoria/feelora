@@ -24,9 +24,10 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     if (!arr || arr.length === 0) return fallback;
     return arr.join(", ");
   };
-  const formatArrayWithOther = (selected: string[] | undefined, other: string | undefined) => {
+  const formatArrayWithOther = (selected: string[] | undefined, other?: string | string[]) => {
     const items = selected || [];
-    const combined = other ? [...items, other] : items;
+    const otherItems = Array.isArray(other) ? other : other ? [other] : [];
+    const combined = [...items, ...otherItems];
     return combined.length > 0 ? combined.join(", ") : "—";
   };
   const sections: SummarySection[] = [

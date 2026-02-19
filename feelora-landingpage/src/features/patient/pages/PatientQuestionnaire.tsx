@@ -51,7 +51,7 @@ const initialData: QuestionnaireData = {
   mentalHealth: { selected: [], other: "" },
   timeframe: [],
   previousTherapy: { selected: [], other: "", neverHadTherapy: false },
-  languages: { selected: [], other: "" },
+  languages: { selected: [], other: [] },
   therapySchool: { selected: [], other: "" },
   //therapyMethods: "",
   therapySetting: [],

@@ -4,6 +4,12 @@ export interface SelectionWithOther {
   other?: string;
 }
 
+// for Languages: Helper type for "Selected + Other (Array)" pattern (Used in Step 7)
+export interface SelectionWithMultipleOther {
+  selected: string[];
+  other?: string[]; 
+}
+
 export interface TherapistPersonalData {
   firstName: string;
   lastName: string;
@@ -35,7 +41,7 @@ export interface TherapistQuestionnaireData {
   
   experience: string[];
   specialties: SelectionWithOther;
-  languages: SelectionWithOther;
+  languages: SelectionWithMultipleOther; // <-- Updated to use the new type with array for "other"
   
   therapySchool: SelectionWithOther;
   therapyMethods: string;

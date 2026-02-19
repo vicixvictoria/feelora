@@ -1,10 +1,12 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface ExperienceStepProps {
   onNext: () => void;
   onBack: () => void;
-  data: string[]; // Still an array to match your interface
+  data: string[]; // An array to match the interface
   onDataChange: (data: string[]) => void;
 }
 
@@ -27,12 +29,25 @@ const experienceOptions = [
   },
 ];
 
+// Define validation schema expecting an object with a "selection" array
+const step5Schema = z.object({
+  selection: z.array(z.string()).min(1, "Required"),
+});
+
 const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
   // Take the first item of the array as the current value for the RadioGroup
   const currentValue = data[0] || "";
 
+  // Initialize validation hook, wrapping the array `data` inside an object key called "selection"
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data: { selection: data }, 
+    schema: step5Schema,
+    onNext,
+  });
+
   const handleValueChange = (value: string) => {
     // Wrap the single string back into an array for your parent state
+    clearError("selection"); // Clear error when user interacts
     onDataChange([value]);
   };
 
@@ -45,7 +60,7 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
         </p>
       </div>
 
-      <div className="feelora-card">
+      <div className={`feelora-card transition-colors ${errors.selection ? "border-destructive/50 bg-destructive/5" : ""}`}>
         {/* value and onValueChange handle the state automatically */}
         <RadioGroup value={currentValue} onValueChange={handleValueChange} className="space-y-4">
           {experienceOptions.map((option) => (
@@ -65,9 +80,15 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
             </label>
           ))}
         </RadioGroup>
+        {/* Optional: text message if error */}
+        {errors.selection && (
+          <p className="text-sm text-destructive mt-4 text-center font-medium">
+            Bitte wähle einen Zeitraum aus.
+          </p>
+        )}
       </div>
 
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };
