@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
 import { MatchingAlgorithmResponse, QuestionnaireData } from '../types/questionnaire';
+import { PatientProfile, MatchedTherapist } from '../types/profiles';
 
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
@@ -16,14 +17,21 @@ const MATCHING_ALGORITHM_MUTATION = gql`
   }
 `;
 
+// Get Logged-In Patient Profile
 const GET_OWN_USER_PROFILE_QUERY = gql`
   query GetOwnUserProfile {
     getOwnUserProfile {
       Id
       Email
       Name
+      Surname
       Gender
+      BirthDate
       City
+      Languages
+      Availability
+      Matches
+      Plan
       MoodTracker
     }
   }
@@ -39,6 +47,28 @@ const SAVE_USER_PROFILE_MUTATION = gql`
       City
       Languages
       Availability
+    }
+  }
+`;
+
+// Get Matched Therapists (For Patients)
+const GET_MATCHED_THERAPISTS_QUERY = gql`
+  query GetMatchedTherapists($ids: [ID]) {
+    getMatchedTherapists(TherapistsIds: $ids) {
+      items {
+       Id
+       Email
+       Name
+       Surname
+       Gender
+       BirthDate
+       City
+       Address
+       LicenseVerified
+       Languages
+       Availability
+       Specialties
+      }
     }
   }
 `;
@@ -110,12 +140,23 @@ export const patientService = {
   },
 
 
-  //Get profile API call
-  getProfile: async (): Promise<any> => {
+  //Get patient profile API call
+  getProfile: async (): Promise<PatientProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_USER_PROFILE_QUERY,
+      fetchPolicy: 'network-only' // Ensure to get fresh data
     });
-
     return responseData.getOwnUserProfile;
-  }
+  },
+
+  // Fetch matched therapist(s)
+  getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
+   const { data: responseData } = await apolloClient.query({
+     query: GET_MATCHED_THERAPISTS_QUERY,
+     variables: { therapistsIds: therapistIds },
+   });
+
+   return responseData.getMatchedTherapists.items;
+ }
+
 };
