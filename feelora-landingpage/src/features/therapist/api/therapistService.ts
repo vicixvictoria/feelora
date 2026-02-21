@@ -2,41 +2,49 @@ import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
 import { TherapistQuestionnaireData } from '../types/questionnaireT';
 
-// --- GraphQL Definitions (Reusing the same mutations as Patient) --- //
+// --- GraphQL Definitions --- //
 
-const MATCHING_ALGORITHM_MUTATION = gql`
-  mutation MatchingAlgorithm($input: MatchingInput!) {
-    matchingAlgorithm(input: $input) {
+// Using the insert questionnaire mutation for therapist submission, as it accepts the full questionnaire data and has the 'Discoverable' flag
+const INSERT_QUESTIONNAIRE_MUTATION = gql`
+  mutation InsertQuestionnaire($input: QuestionnaireInput!) {
+    insertQuestionnaire(input: $input) {
       Id
-      filters
-      description
+      Type
+      Questionnaire
     }
   }
 `;
 
-const GET_OWN_USER_PROFILE_QUERY = gql`
-  query GetOwnUserProfile {
-    getOwnUserProfile {
+// to match the Therapist Query
+const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
+  query GetOwnTherapistProfile {
+    getOwnTherapistProfile {
       Id
       Email
-      Name
-      Gender
-      City
-      MoodTracker
-    }
-  }
-`;
-
-const SAVE_USER_PROFILE_MUTATION = gql`
-  mutation saveUserProfile($input: CreateUserProfileInput!) {
-    saveUserProfile(input: $input) {
       Name
       Surname
       Gender
       BirthDate
       City
+      Address
       Languages
       Availability
+      Specialties
+      LicenseData
+      LicenseVerified
+    }
+  }
+`;
+
+// to use the correct Therapist Mutation and Input Type
+const SAVE_THERAPIST_PROFILE_MUTATION = gql`
+  mutation SaveTherapistProfile($input: CreateTherapistProfileInput!) {
+    saveTherapistProfile(input: $input) {
+      Id
+      Name
+      Surname
+      Address
+      LicenseVerified
     }
   }
 `;
@@ -46,73 +54,83 @@ export const therapistService = {
 
   // -- API call to submit the full questionnaire --
   submitQuestionnaire: async (data: TherapistQuestionnaireData): Promise<any> => {
-    // 1. Prepare Input
-    // Map the therapist's specific data to the generic 'MatchingInput' structure
+    // 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
-      filters: JSON.stringify({
-        languages: data.languages?.selected || [],
-        gender: data.personalData?.gender,
-        specialties: data.specialties?.selected || [],
-        setting: data.therapySetting || [],
-        availability: data.availability || [],
-      })
+      Discoverable: true // Crucial: Makes the therapist visible to the patient matching algorithm
     };
 
     try {
       const { data: responseData } = await apolloClient.mutate({
-        mutation: MATCHING_ALGORITHM_MUTATION,
+        mutation: INSERT_QUESTIONNAIRE_MUTATION,
         variables: { input },
       });
 
       return {
         success: true,
-        matches: responseData.matchingAlgorithm, 
+        savedData: responseData.insertQuestionnaire,
       };
     } catch (error: unknown) {
       console.error("Therapist Submission Error:", error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "An error during the therapist submission occurred";
       
       return {
         success: false,
-        matches: [],
         error: errorMessage
       };
     }
   },
 
   // -- Create User Profile API call --
-  // Maps the Therapist Questionnaire fields to the User Profile Schema
+  // (Triggered earlier in the flow on the Availability step)
   createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
+
+    // Format the address nicely by combining street, zip, and city
+    // .filter(Boolean) removes any undefined/empty values so you don't get weird commas
+    const formattedAddress = [
+      data.contactInfo?.street, 
+      data.contactInfo?.zip, 
+      data.contactInfo?.city
+    ].filter(Boolean).join(', ');
+
+    // Structure the LicenseData object as the backend requested
+    const licenseDataObj = {
+      licenseId: data.qualifications?.licenseNumber || '',
+      pathToLicenseDocument: data.qualifications?.idUpload || ''
+    };
+
     const input = {
       Name: data.personalData?.firstName,
       Surname: data.personalData?.lastName,
-      // Convert ISO string to Unix timestamp (seconds) if bday exists
-      BirthDate: data.personalData?.bday 
-        ? new Date(data.personalData.bday).getTime() / 1000 
+      BirthDate: data.personalData?.bday
+        ? new Date(data.personalData.bday).getTime() / 1000
         : null,
       Gender: data.personalData?.gender,
       City: data.contactInfo?.city,
       Languages: data.languages?.selected || [],
+      Address: formattedAddress || null, // Will be null if no address was provided
       Availability: data.availability || [],
+      LicenseData: JSON.stringify(licenseDataObj), // Convert to AWSJSON!
+      Specialties: data.specialties?.selected || []
     };
 
     const { data: responseData } = await apolloClient.mutate({
-      mutation: SAVE_USER_PROFILE_MUTATION,
+      mutation: SAVE_THERAPIST_PROFILE_MUTATION,
       variables: { input },
     });
 
-    return responseData.saveUserProfile;
+    return responseData.saveTherapistProfile;
   },
 
   // -- Get profile API call --
   getProfile: async (): Promise<any> => {
     const { data: responseData } = await apolloClient.query({
-      query: GET_OWN_USER_PROFILE_QUERY,
+      query: GET_OWN_THERAPIST_PROFILE_QUERY,
+      fetchPolicy: 'network-only' // Ensure fresh data
     });
 
-    return responseData.getOwnUserProfile;
+    return responseData.getOwnTherapistProfile;
   }
 };

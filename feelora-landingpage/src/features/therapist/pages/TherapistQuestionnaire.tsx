@@ -22,36 +22,12 @@ import AvailabilityStep from "../components/questionnaire/steps/Step17_TAvailabi
 import SummaryStep from "../components/questionnaire/steps/Step18_TSummary";
 import CompletionStep from "../components/questionnaire/steps/Step19_TCompletion";
 
+import { therapistService } from '../api/therapistService';
+import { TherapistQuestionnaireData } from '../types/questionnaireT';
 
-
-
-interface QuestionnaireData {
-  personalData: Record<string, string>;
-  contactInfo: Record<string, string>;
-  qualifications: {
-    degree: string;
-    institution: string;
-    licenseNumber: string; // New field
-    idUpload: string | null; // New field (URL as string)
-    [key: string]: any; // Keeps it flexible for other fields
-  };
-  experience: string[];
-  specialties: { selected: string[]; other: string };
-  languages: { selected: string[]; other: string[] };
-  therapySchool: { selected: string[]; other: string };
-  therapyMethods: string;
-  therapySetting: string[];
-  therapyFormat: string[];
-  therapyDuration: string;
-  sessionFrequency: string[];
-  patientGender: string[];
-  valuesPreferences: { selected: string[]; other: string };
-  additionalInfo: string;
-  availability: string[];
-}
 
 // Initial empty data structure for the questionnaire
-const initialData: QuestionnaireData = {
+const initialData: TherapistQuestionnaireData = {
   personalData: {},
   contactInfo: {},
   qualifications: {
@@ -77,9 +53,8 @@ const initialData: QuestionnaireData = {
 
 
 const TherapistQuestionnaire = () => {
-  /*const [currentStep, setCurrentStep] = useState(0);
-  // Data is stored in react-state, after refresh all data is lost
-  const [data, setData] = useState<QuestionnaireData>(initialData);*/ //Temporary answers are saved here as a QuestionnaireData-Object with all fields. 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
 
   // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { 
@@ -88,7 +63,7 @@ const TherapistQuestionnaire = () => {
     setCurrentStep, 
     updateField, 
     clearProgress 
-  } = usePersistedQuestionnaire<QuestionnaireData>("feelora_therapist_v1", initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
+  } = usePersistedQuestionnaire<TherapistQuestionnaireData>("feelora_therapist_v1", initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
 
   const totalSteps = 18; // Welcome + 17 questions
 
@@ -118,24 +93,48 @@ const TherapistQuestionnaire = () => {
     window.location.reload();
   };
 
-  // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
-  const handleSubmit = async () => {
-    try {
-      // 1. Send data to backend
-      // API call through Service needs to be implemented, this is just a placeholder for now
-      
-      console.log("Final Submission successful!", data);
+  // Final Submission Logic
+ const handleSubmit = async () => {
+   if (isSubmitting) return;
 
-      // 2. Clear the local storage, that data is safe in DB
-      clearProgress();
+   setIsSubmitting(true);
+   try {
+     console.log("Submitting therapist data:", data);
+     
+     const result = await therapistService.submitQuestionnaire(data);
+     
+     if (!result.success) {
+         throw new Error(result.error);
+     }
 
-      // 3. Move to the completion step
-      goNext(); 
-    } catch (error) {
-      console.error("Submission failed", error);
-      // Optional for later--> Show a toast or error message to the user
-    }
-  };
+     console.log("Final Submission successful!", result.savedData);
+
+     clearProgress();
+     goNext();
+   } catch (error: unknown) {
+     if (error instanceof Error) {
+       alert(error.message);
+     }
+   } finally {
+     setIsSubmitting(false);
+   }
+ };
+
+ // Intermediate Profile Creation Logic
+ const handleCreateTherapistProfile = async () => {
+   setIsIntermediateLoading(true);
+   try {
+     console.log("Creating therapist profile...");
+     const response = await therapistService.createTherapistProfile(data);
+     console.log("Therapist profile created successfully!", response);
+     
+     goNext();
+   } catch (error) {
+     console.error("Error creating therapist profile:", error);
+   } finally {
+     setIsIntermediateLoading(false);
+   }
+ };
 
 
   // Render the current step based on currentStep state
@@ -281,7 +280,7 @@ const TherapistQuestionnaire = () => {
       case 16:
         return (
           <AvailabilityStep
-            onNext={goNext}
+            onNext={handleCreateTherapistProfile} // Intermediate submission to create profile before final questionnaire submission
             onBack={goBack}
             data={data.availability}
             onDataChange={(newData) => updateField("availability", newData)}
@@ -294,6 +293,7 @@ const TherapistQuestionnaire = () => {
             onBack={goBack}
             onEdit={goToStep}
             data={data}
+            isLoading={isSubmitting} // Passes loading state to UI
           />
         );
       case 18:

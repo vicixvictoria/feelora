@@ -24,7 +24,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
           Titel und Qualifikationen
         </h1>
         <p className="text-muted-foreground">
-          Gib deine (professionellen) Titel an und wo du diese erworben hast,
+          Gib deine (professionellen) Titel an und wo du diese erworben hast, deine offizielle Lizenznummer,
           sowie weitere relevante Qualifikationen.
         </p>
       </div>

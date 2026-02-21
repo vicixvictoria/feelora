@@ -1,35 +1,38 @@
 // Helper type for "Selected + Other" pattern
 export interface SelectionWithOther {
   selected: string[];
-  other?: string;
+  other: string;
 }
 
 // for Languages: Helper type for "Selected + Other (Array)" pattern (Used in Step 7)
 export interface SelectionWithMultipleOther {
   selected: string[];
-  other?: string[]; 
+  other: string[]; 
 }
 
 export interface TherapistPersonalData {
-  firstName: string;
-  lastName: string;
-  gender: string;
-  bday: string; // ISO date string
+  // Made optional so `personalData: {}` in initialData doesn't throw errors
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  bday?: string; // ISO date string
   phone?: string;
+  // This allows the object to be treated as Record<string, string> by your React components
+  [key: string]: any; 
 }
 
 export interface TherapistContactInfo {
-  city: string;
+  city?: string;
   street?: string;
   zip?: string;
   [key: string]: any;
 }
 
 export interface Qualifications {
-  degree: string;
-  institution: string;
-  licenseNumber: string;
-  idUpload: string | null;
+  degree?: string;
+  institution?: string;
+  licenseNumber?: string;
+  idUpload?: string | null;
   [key: string]: any;
 }
 
@@ -41,7 +44,7 @@ export interface TherapistQuestionnaireData {
   
   experience: string[];
   specialties: SelectionWithOther;
-  languages: SelectionWithMultipleOther; // <-- Updated to use the new type with array for "other"
+  languages: SelectionWithMultipleOther;
   
   therapySchool: SelectionWithOther;
   therapyMethods: string;

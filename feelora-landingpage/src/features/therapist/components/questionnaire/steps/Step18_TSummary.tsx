@@ -6,6 +6,7 @@ interface SummaryStepProps {
   onNext: () => void;
   onBack: () => void;
   onEdit: (step: number) => void;
+  isLoading?: boolean; // <-- Add this line right here!
   // All collected data from previous steps stored in a single object for easy access
   data: {
     personalData: Record<string, string>;
