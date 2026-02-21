@@ -50,15 +50,15 @@ export interface TherapistProfile {
 
 export interface MatchedTherapist {
   Id: string;
-  Email?: string | null;
-  Name?: string | null;
-  Surname?: string | null;
-  Gender?: string | null;
-  BirthDate?: number | null; 
-  City?: string | null;
-  Address?: string | null;
-  LicenseVerified?: string | null;
-  Languages?: string[] | null;
-  Availability?: string[] | null;
-  Specialties?: string[] | null;
+  Email?: string;
+  Name?: string;
+  Surname?: string;
+  Gender?: string;
+  BirthDate?: number; // Schema uses Float
+  City?: string;
+  Address?: string;
+  LicenseVerified?: string;
+  Languages?: string[];
+  Availability?: string[];
+  Specialties?: string[];
 }

@@ -20,6 +20,9 @@ import AdditionalInfoStep from "../components/questionnaire/steps/Step16_PAdditi
 import AvailabilityStep from "../components/questionnaire/steps/Step15_PAvailability.tsx";
 import SummaryStep from "../components/questionnaire/steps/Step17_PSummary.tsx";
 import CompletionStep from "../components/questionnaire/steps/Step18_PCompletion.tsx";
+import TherapistMatchStep from "../components/questionnaire/steps/Step18_TherapistMatch";
+import { MatchedTherapist } from '../types/profiles';
+import { useNavigate } from 'react-router-dom';
 
 import { patientService } from '../api/patientService';
 import { QuestionnaireData } from '../types/questionnaire';
@@ -70,6 +73,9 @@ const PatientQuestionnaire = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading State
   const [isIntermediateLoading, setIsIntermediateLoading] = useState(false); // For steps that require async operations (e.g., fetching therapist details after matches)
+  const [matchedProfiles, setMatchedProfiles] = useState<MatchedTherapist[]>([]); // Store matched therapist profiles returned from the backend
+
+  const navigate = useNavigate(); // For navigating to dashboard after completeion --> lets see if backend does it after acceptin?
 
 // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { 
@@ -118,18 +124,58 @@ const PatientQuestionnaire = () => {
       const result = await patientService.submitQuestionnaire(data);
       console.log("Final Submission successful!", result.matches);
 
+      if (result.success && result.matches.length > 0) {
+        // 1.2 Extract the IDs from the matched response. The backend usually returns them sorted by ranking.
+        const matchedIds = result.matches.map((m: any) => m.Id);
+        
+        // 1.3. Fetch the full profiles for those IDs
+        const profiles = await patientService.getMatchedTherapists(matchedIds);
+        
+        // 1.4 Ensure the fetched profiles remain in the correct ranking order provided by the algorithm
+        const sortedProfiles = matchedIds
+            .map((id: string) => profiles.find((p) => p.Id === id))
+            .filter(Boolean) as MatchedTherapist[];
+
+        setMatchedProfiles(sortedProfiles);
+
       // 2. Clear the local storage since data is safe in DB
       clearProgress();
       // 3. Move to the completion step
       goNext(); 
-    } catch (error: unknown) {
-    if (error instanceof Error) {
-      alert(error.message);
+    } else {
+        throw new Error("No matches found or algorithm failed.");
+     }
+   } catch (error: unknown) {
+     if (error instanceof Error) {
+       alert(error.message);
+     }
+   } finally {
+     setIsSubmitting(false);
+   }
+ };
+
+  // This function will be called when the user accepts a therapist match. 
+  const handleAcceptTherapist = async (therapistId: string) => {
+    try {
+      console.log("Accepting Therapist ID:", therapistId);
+      
+      // 1. Call the backend to save the match
+      const isSuccess = await patientService.saveMatch(therapistId);
+      
+      if (isSuccess) {
+        // 2. Data is safely stored and match is created! 
+        // Now you can safely clear the local storage
+        clearProgress(); 
+        
+        // 3. Navigate the user to the dashboard
+        navigate('/dashboard'); // Depends if the backend routes that or if you want to do it on the frontend after receiving a success response
+      } else {
+        alert("Etwas ist schiefgelaufen. Bitte versuche es noch einmal.");
+      }
+    } catch (error) {
+      alert("Es gab einen Fehler beim Speichern des Matches.");
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-  };
+ };
 
   const handleCreatePatientProfile = async () => {
     setIsIntermediateLoading(true);
@@ -307,10 +353,14 @@ const PatientQuestionnaire = () => {
           />
         );
       case 17:
-        return <CompletionStep onRestart={restart} />;
-      default:
-        return null; 
-    }
+       return (
+          <TherapistMatchStep 
+             therapists={matchedProfiles}
+             onAccept={handleAcceptTherapist}
+             onBack={goBack} // Or navigate to a specific step
+          />
+        );
+      };
   };
 
   return (

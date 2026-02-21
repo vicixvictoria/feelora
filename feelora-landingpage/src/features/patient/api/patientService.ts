@@ -73,6 +73,12 @@ const GET_MATCHED_THERAPISTS_QUERY = gql`
   }
 `;
 
+const SAVE_MATCH_MUTATION = gql`
+  mutation SaveMatch($match: ID!) {
+    saveMatch(match: $match)
+  }
+`;
+
 
 // --- Service Object --- //
 export const patientService = {
@@ -157,6 +163,20 @@ export const patientService = {
    });
 
    return responseData.getMatchedTherapists.items;
- }
+ },
+
+ // -- API call to accept and save a therapist match --
+  saveMatch: async (therapistId: string): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: SAVE_MATCH_MUTATION,
+        variables: { match: therapistId },
+      });
+      return data.saveMatch; // returns true or false
+    } catch (error) {
+      console.error("Error saving match:", error);
+      throw error;
+    }
+  },
 
 };
