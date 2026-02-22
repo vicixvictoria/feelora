@@ -1,6 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface ValuesPreferencesStepProps {
   onNext: () => void;
@@ -9,40 +11,88 @@ interface ValuesPreferencesStepProps {
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
+// Extract the exclusive option
+const NO_PREFERENCE = "keine Präferenz";
+
 // List of values/preferences options - add more if needed
 const valueOptions = [
-  "LGBTQ+ affirmative practice",
-  "Culturally informed therapy",
-  "Trauma-informed approach",
-  "Working with high-performing individuals / executives",
-  "Focus on self-development and identity formation",
-  "Informal / Friendship base",
-  "Evidence-based / scientific orientation",
-  "Support for major life transitions (career, relocation, etc.)",
-  "Openness to spiritual or existential topics",
-  "Integrative or holistic approach",
-  "Specialization in relationships / couples / family dynamics",
-  "Experience addressing workplace conflicts or bullying",
-  "Support for expats and international populations",
-  "Feminist or gender-aware perspective",
-  "Hypnosis",
-  "Mind body connection (physiology)",
+  "LGBTQ+ freundlich / affirmativ",
+  "Kulturell sensibel",
+  "Erfahrung mit leistungsorientierten Personen / Führungskräften",
+  "Expertise in Beziehungs- oder Familienthemen",
+  "Expertise bei Konflikten am Arbeitsplatz oder Mobbing",
+  "Erfahrung mit Expatriates oder internationalen Klient:innen",
+  "Geschlechtersensibler oder feministischer Ansatz",
+  "Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)",
+  "Jemand Älteres mit mehr Erfahrung",
+  "Jemand Jüngeres",
+  "Ich bin offen für eine/n Therapeut:in in Supervision",
 ];
 
+// 2. Define validation schema with complex conditional logic
+const step14Schema = z.object({
+  selected: z.array(z.string()).min(1, "Bitte wähle mindestens eine Option aus"),
+  other: z.string().optional(),
+}).refine((data) => {
+  // If "Andere" is checked, the input cannot be empty
+  if (data.selected.includes("Andere")) {
+    return data.other && data.other.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Bitte spezifizieren",
+  path: ["other"],
+});
+
 const Step14_PValuesPreferences = ({ onNext, onBack, data, onDataChange }: ValuesPreferencesStepProps) => {
+  
+  // Initialize validationhook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step14Schema,
+    onNext,
+  });
+
+  const hasNoPreference = data.selected.includes(NO_PREFERENCE);
+
   const handleToggle = (value: string) => {
-    if (data.selected.includes(value)) {
-      onDataChange({ ...data, selected: data.selected.filter((v) => v !== value) });
+    clearError("selected");
+
+    // Remove "keine Präferenz" if a specific value is clicked
+    let currentSelection = data.selected.filter((v) => v !== NO_PREFERENCE);
+
+    if (currentSelection.includes(value)) {
+      currentSelection = currentSelection.filter((v) => v !== value);
     } else {
-      onDataChange({ ...data, selected: [...data.selected, value] });
+      currentSelection = [...currentSelection, value];
     }
+    
+    onDataChange({ ...data, selected: currentSelection });
   };
 
   const handleOtherToggle = () => {
-    if (data.selected.includes("Other")) {
-      onDataChange({ ...data, selected: data.selected.filter((v) => v !== "Other"), other: "" });
+    clearError("selected");
+    clearError("other");
+
+    let currentSelection = data.selected.filter((v) => v !== NO_PREFERENCE);
+
+    if (currentSelection.includes("Andere")) {
+      onDataChange({ ...data, selected: currentSelection.filter((v) => v !== "Andere"), other: "" });
     } else {
-      onDataChange({ ...data, selected: [...data.selected, "Other"] });
+      onDataChange({ ...data, selected: [...currentSelection, "Andere"] });
+    }
+  };
+
+  const handleNoPreferenceToggle = () => {
+    clearError("selected");
+    clearError("other");
+
+    if (hasNoPreference) {
+      // Uncheck it
+      onDataChange({ ...data, selected: [] });
+    } else {
+      // Check it -> wipe out all other selections AND the 'other' text
+      onDataChange({ ...data, selected: [NO_PREFERENCE], other: "" });
     }
   };
 
@@ -54,23 +104,30 @@ const Step14_PValuesPreferences = ({ onNext, onBack, data, onDataChange }: Value
           Werte und Präferenzen
         </h1>
         <p className="text-muted-foreground mb-2">
-          Welche Werte, Ansätze oder Therapeut:Innen-profile beschreiben deine
-          bevorzugten Arbeit bzw. deine Werte am besten?
+           Welche Eigenschaften, Werte oder Fachgebiete sind dir bei einer Therapeutin oder einem Therapeuten besonders wichtig?
         </p>
-        <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
+        <p className={`text-sm ${errors.selected ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+          {errors.selected ? "Bitte wähle mindestens eine Option aus." : "Mehrfachauswahl möglich"}
+        </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <div className="grid grid-cols-1 gap-3">
+        {/* Visual error wrapper */}
+        <div className={`grid grid-cols-1 gap-3 p-1 rounded-xl ${errors.selected ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+          
+          {/* Standard Options */}
           {valueOptions.map((value) => (
             <label
               key={value}
-              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+              className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
+                hasNoPreference ? "opacity-50 bg-muted/30" : ""
+              }`}
             >
               <Checkbox
                 checked={data.selected.includes(value)}
                 onCheckedChange={() => handleToggle(value)}
+                disabled={hasNoPreference}
               />
               <span className="text-foreground">{value}</span>
             </label>
@@ -78,28 +135,53 @@ const Step14_PValuesPreferences = ({ onNext, onBack, data, onDataChange }: Value
 
           {/* Other option */}
           <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+            <label className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
+              hasNoPreference ? "opacity-50 bg-muted/30" : ""
+            }`}>
               <Checkbox
-                checked={data.selected.includes("Other")}
+                checked={data.selected.includes("Andere")}
                 onCheckedChange={handleOtherToggle}
+                disabled={hasNoPreference}
               />
-              <span className="text-foreground">Other</span>
+              <span className="text-foreground">Andere</span>
             </label>
-            {data.selected.includes("Other") && (
-              <Input
-                type="text"
-                placeholder="Bitte angeben..."
-                value={data.other}
-                onChange={(e) => onDataChange({ ...data, other: e.target.value })}
-                className="bg-background"
-              />
+            
+            {/* Conditional Input */}
+            {data.selected.includes("Andere") && !hasNoPreference && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <Input
+                  type="text"
+                  placeholder="Bitte angeben..."
+                  value={data.other || ""}
+                  onChange={(e) => {
+                    clearError("other");
+                    onDataChange({ ...data, other: e.target.value });
+                  }}
+                  className={`bg-background ${errors.other ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                />
+                {errors.other && (
+                   <span className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</span>
+                )}
+              </div>
             )}
           </div>
+
+          <div className="my-2 border-t border-border"></div>
+
+          {/* Exclusive Option: Keine Präferenz */}
+          <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+            <Checkbox
+              checked={hasNoPreference}
+              onCheckedChange={handleNoPreferenceToggle}
+            />
+            <span className="text-foreground font-medium">{NO_PREFERENCE}</span>
+          </label>
+          
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      {/* Use validateAndNext */}
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };

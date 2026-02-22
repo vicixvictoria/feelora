@@ -21,7 +21,7 @@ const Step16_PAdditionalInfo = ({ onNext, onBack, data, onDataChange }: Addition
       {/* Form Card */}
       <div className="feelora-card">
         <p className="text-foreground/80 mb-4">
-          Möchtest du uns noch etwas weiteres über deine bevorstehende Therapie oder besondere Anforderungen oder Präferenzen bezüglich deines/r Therapeut:in mitteilen?
+          Möchtest du uns noch etwas weiteres über deine bevorstehende Therapie oder besondere Anforderungen oder Präferenzen bezüglich deines/r Therapeut:in mitteilen? (Optional)
         </p>
         <Textarea
           placeholder="hier tippen..."
