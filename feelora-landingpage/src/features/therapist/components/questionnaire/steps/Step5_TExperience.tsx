@@ -1,6 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface ExperienceStepProps {
   onNext: () => void;
@@ -27,12 +29,24 @@ const experienceOptions = [
   },
 ];
 
+// Define validation schema expecting an object with a "selection" array
+const step5Schema = z.object({
+  selection: z.array(z.string()).min(1, "Bitte wähle eine Option aus"),
+});
+
 const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
-  // Take the first item of the array as the current value for the RadioGroup
-  const currentValue = data[0] || "";
+  const safeData = data || [];
+  const currentValue = safeData[0] || "";
+
+  // Initialize validation  hook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data: { selection: safeData },
+    schema: step5Schema,
+    onNext,
+  });
 
   const handleValueChange = (value: string) => {
-    // Wrap the single string back into an array for your parent state
+    clearError("selection"); // Clear error on selection
     onDataChange([value]);
   };
 
@@ -43,34 +57,49 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
         <p className="text-muted-foreground">
           Erzähle uns von deiner Erfahrung als Therapeut:In.
         </p>
+        {/* Error message in header */}
+        {errors.selection && (
+          <p className="text-sm text-destructive font-semibold mt-2">
+            Bitte wähle eine Option aus.
+          </p>
+        )}
       </div>
 
       <div className="feelora-card">
-        {/* value and onValueChange handle the state automatically */}
-        <RadioGroup value={currentValue} onValueChange={handleValueChange} className="space-y-4">
-          {experienceOptions.map((option) => (
-            <label
-              key={option.id}
-              htmlFor={option.id}
-              className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
-                currentValue === option.id 
-                  ? "border-purple bg-purple/5" 
-                  : "border-border hover:bg-muted/50"
-              }`}
-            >
-              <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
-              <div className="flex flex-col">
-                <span className="text-foreground font-medium">{option.label}</span>
-                {option.description && (
-                  <span className="text-muted-foreground text-sm">{option.description}</span>
-                )}
-              </div>
-            </label>
-          ))}
-        </RadioGroup>
+        {/* Visual error wrapper around the RadioGroup */}
+        <div className={`p-1 rounded-xl ${errors.selection ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+          <RadioGroup value={currentValue} onValueChange={handleValueChange} className="space-y-4">
+            {experienceOptions.map((option) => {
+              const isSelected = currentValue === option.id;
+
+              return (
+                <label
+                  key={option.id}
+                  htmlFor={option.id}
+                  className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                    isSelected 
+                      ? "border-purple bg-purple/5" 
+                      : errors.selection
+                        ? "border-destructive/50 hover:bg-destructive/10"
+                        : "border-border hover:bg-muted/50"
+                  }`}
+                >
+                  <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                  <div className="flex flex-col">
+                    <span className="text-foreground font-medium">{option.label}</span>
+                    {option.description && (
+                      <span className="text-muted-foreground text-sm">{option.description}</span>
+                    )}
+                  </div>
+                </label>
+              );
+            })}
+          </RadioGroup>
+        </div>
       </div>
 
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      {/* Use validateAndNext */}
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };

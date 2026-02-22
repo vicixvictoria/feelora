@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface QualificationsStepProps {
   onNext: () => void;
@@ -11,8 +13,55 @@ interface QualificationsStepProps {
   onDataChange: (data: Record<string, string>) => void;
 }
 
+// Define Vaidation Schema
+const step4Schema = z.object({
+  titlePrefix: z.string().optional(),
+  titleSuffix: z.string().optional(),
+  titleFromPrefix: z.string().optional(),
+  titleFromSuffix: z.string().optional(),
+  
+  // Mandatory fields
+  licenseNumber: z.string().min(1, "Lizenznummer erforderlich"),
+  idFileName: z.string().min(1, "Ausweis erforderlich"),
+  
+  // Optional field
+  qualifications: z.string().optional(),
+}).superRefine((data, ctx) => {
+  // Custom Logic: At least one title must be filled out
+  const hasPrefix = data.titlePrefix && data.titlePrefix.trim().length > 0;
+  const hasSuffix = data.titleSuffix && data.titleSuffix.trim().length > 0;
+
+  if (!hasPrefix && !hasSuffix) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Mindestens ein Titel erforderlich",
+      path: ["titlePrefix"],
+    });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Mindestens ein Titel erforderlich",
+      path: ["titleSuffix"],
+    });
+  }
+});
+
 const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: QualificationsStepProps) => {
+ // Initialize Validation Hook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step4Schema,
+    onNext,
+  });
+
   const handleChange = (field: string, value: string) => {
+    // If user types in either title, clear errors for BOTH titles since the condition is met
+    if (field === "titlePrefix" || field === "titleSuffix") {
+      clearError("titlePrefix");
+      clearError("titleSuffix");
+    } else {
+      clearError(field);
+    }
+    
     onDataChange({ ...data, [field]: value });
   };
 
@@ -35,28 +84,31 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
-            <Label htmlFor="titlePrefix" className="text-foreground">
-              Titel vorgestellt
+            <Label htmlFor="titlePrefix" className={errors.titlePrefix ? "text-destructive" : "text-foreground"}>
+              Titel vorgestellt {errors.titlePrefix && "*"}
             </Label>
             <Input
               id="titlePrefix"
               type="text"
               value={data.titlePrefix || ""}
               onChange={(e) => handleChange("titlePrefix", e.target.value)}
-              className="bg-background"
+              className={`bg-background ${errors.titlePrefix ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
+            {errors.titlePrefix && (
+               <p className="text-xs text-destructive">Bitte fülle mind. einen Titel aus</p>
+            )}
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="titleSuffix" className="text-foreground">
-              Titel nachgestellt <span className="text-muted-foreground">(optional)</span>
+            <Label htmlFor="titleSuffix" className={errors.titleSuffix ? "text-destructive" : "text-foreground"}>
+              Titel nachgestellt <span className={errors.titleSuffix ? "text-destructive" : "text-muted-foreground"}>(optional)</span>
             </Label>
             <Input
               id="titleSuffix"
               type="text"
               value={data.titleSuffix || ""}
               onChange={(e) => handleChange("titleSuffix", e.target.value)}
-              className="bg-background"
+              className={`bg-background ${errors.titleSuffix ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
           </div>
           
@@ -87,9 +139,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
           </div>
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="licenseNumber" className="text-foreground">
-            Lizenznummer
+        <div className="space-y-2 mb-6">
+          <Label htmlFor="licenseNumber" className={errors.licenseNumber ? "text-destructive" : "text-foreground"}>
+            Lizenznummer {errors.licenseNumber && "*"}
           </Label>
           <Input
             id="licenseNumber"
@@ -97,11 +149,14 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
             value={data.licenseNumber || ""}
             onChange={(e) => handleChange("licenseNumber", e.target.value)}
             placeholder="z.B. PSY-12345"
-            className="bg-background"
+            className={`bg-background ${errors.licenseNumber ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {errors.licenseNumber && (
+            <p className="text-xs text-destructive">Lizenznummer ist erforderlich</p>
+          )}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
           <Label htmlFor="qualifications" className="text-foreground">
             Qualifikationen <span className="text-muted-foreground">(optional)</span>
           </Label>
@@ -114,13 +169,21 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="idUpload" className="text-foreground">
-            Ausweis hochladen (wird benötigt, um die Identität und Lizenznummer zu verifizieren)
+          <Label htmlFor="idUpload" className={errors.idFileName ? "text-destructive font-medium" : "text-foreground"}>
+            Ausweis hochladen {errors.idFileName && "*"} <br/>
+            <span className="text-muted-foreground text-sm font-normal">
+              (wird benötigt, um die Identität und Lizenznummer zu verifizieren)
+            </span>
           </Label>
           <div className="flex items-center gap-4">
             <label
               htmlFor="idUpload"
-              className="flex items-center justify-center w-full h-32 border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-background"
+              // Added dynamic error styling to the dropzone border
+              className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors bg-background ${
+                errors.idFileName 
+                  ? "border-destructive/50 hover:border-destructive bg-destructive/5" 
+                  : "border-muted-foreground/30 hover:border-primary/50"
+              }`}
             >
               {data.idFileName ? (
                 <div className="flex flex-col items-center gap-1 text-foreground/80">
@@ -129,7 +192,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                   <span className="text-xs text-muted-foreground">Klicke um zu ändern</span>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                <div className={`flex flex-col items-center gap-1 ${errors.idFileName ? "text-destructive" : "text-muted-foreground"}`}>
                   <Upload className="w-6 h-6" />
                   <span className="text-sm">Bild auswählen</span>
                   <span className="text-xs">JPG, PNG oder PDF</span>
@@ -140,21 +203,24 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                 type="file"
                 accept="image/*,.pdf"
                 className="hidden"
-                // Update state with file name for display purposes (actual file handling with S3 when we implement it)
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    handleChange("idFileName", file.name); //
+                    clearError("idFileName"); // Clear error when file is uploaded
+                    handleChange("idFileName", file.name); 
                   }
                 }}
               />
             </label>
           </div>
+          {errors.idFileName && (
+            <p className="text-xs text-destructive">Bitte lade ein Dokument zur Verifizierung hoch</p>
+          )}
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      {/* Use validateAndNext */}
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };

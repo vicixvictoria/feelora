@@ -11,22 +11,17 @@ interface ValuesPreferencesStepProps {
 
 // List of values/preferences options - add more if needed
 const valueOptions = [
-  "LGBTQ+ affirmative practice",
-  "Culturally informed therapy",
-  "Trauma-informed approach",
-  "Working with high-performing individuals / executives",
-  "Focus on self-development and identity formation",
-  "Informal / Friendship base",
-  "Evidence-based / scientific orientation",
-  "Support for major life transitions (career, relocation, etc.)",
-  "Openness to spiritual or existential topics",
-  "Integrative or holistic approach",
-  "Specialization in relationships / couples / family dynamics",
-  "Experience addressing workplace conflicts or bullying",
-  "Support for expats and international populations",
-  "Feminist or gender-aware perspective",
-  "Hypnosis",
-  "Mind body connection (physiology)",
+  "LGBTQ+ affirmative Praxis",
+  "Kulturell informierte Therapie",
+  "Arbeit mit leistungsorientierten Personen / Führungskräften",
+  "Spezialisierung auf Beziehungen / Paare / Familiendynamiken",
+  "Erfahrung mit Konflikten am Arbeitsplatz oder Mobbing",
+  "Unterstützung von Expats und internationalen Klient:innen",
+  "Feministische oder geschlechtersensible Perspektive",
+  "Begleitung bei wichtigen Lebensveränderungen (Karriere, Umzug usw.)",
+  "Jahre an Erfahrung (+10)",
+  "ich befinde mich unter supervision",
+  "keine weiteren Angaben",
 ];
 
 const Step15_TValuesPreferences = ({ onNext, onBack, data, onDataChange }: ValuesPreferencesStepProps) => {

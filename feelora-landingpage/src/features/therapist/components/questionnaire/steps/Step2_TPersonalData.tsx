@@ -8,6 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -28,11 +30,34 @@ const fieldLabels: Record<string, string> = {
   bday: "Geburtstag",
   gender: "Geschlecht",
   job: "Berufsbezeichnung",
-  title: "Titel",
+  title: "Titel (wird vor dem Namen angezeigt)", //maybe we use this to show the title in the profile, optional
 };
 
+// Define which fields are optional
+const optionalFields = ["title"];
+
+// Define the Validation Schema
+const step2Schema = z.object({
+  firstName: z.string().min(1, "Required"),
+  lastName: z.string().min(1, "Required"),
+  bday: z.string().min(1, "Required"),
+  gender: z.string().min(1, "Required"),
+  job: z.string().min(1, "Required"),
+  // Title is explicitly optional (no .min(1) required)
+  title: z.string().optional(),
+});
+
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
+ 
+  //  Initialize the validation hook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step2Schema,
+    onNext,
+  });
+
   const handleChange = (field: string, value: string) => {
+    clearError(field); // Clear the error when typing/selecting
     onDataChange({ ...data, [field]: value });
   };
 
@@ -53,43 +78,59 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
         <h2 className="text-lg font-semibold text-foreground mb-6">Deine Information</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.keys(fieldLabels).map((field) => (
-            <div key={field} className="space-y-2">
-              <Label htmlFor={field} className="text-foreground">
-                {fieldLabels[field]}
-              </Label>
-                {field === "gender" ? (
-                <Select
-                  value={data[field] || ""}
-                  onValueChange={(value) => handleChange(field, value)}
+          {Object.keys(fieldLabels).map((field) => {
+            const isOptional = optionalFields.includes(field);
+
+            return (
+              <div key={field} className="space-y-2">
+                {/* Dynamic Label with Error Styling and Optional tag */}
+                <Label 
+                  htmlFor={field} 
+                  className={errors[field] ? "text-destructive" : "text-foreground"}
                 >
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="Bitte wählen" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    {genderOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-              <Input
-                id={field}
-                type={field === "bday" ? "date" : "text"}
-                value={data[field] || ""}
-                onChange={(e) => handleChange(field, e.target.value)}
-                className="bg-background"
-               />
-              )}
-            </div>
-          ))}
+                  {fieldLabels[field]} {!isOptional && errors[field] && "*"}
+                  {isOptional && <span className="text-muted-foreground font-normal text-xs ml-1">(optional)</span>}
+                </Label>
+
+                {field === "gender" ? (
+                  <Select
+                    value={data[field] || ""}
+                    onValueChange={(value) => handleChange(field, value)}
+                  >
+                    <SelectTrigger className={`bg-background ${errors[field] ? "border-destructive ring-destructive" : ""}`}>
+                      <SelectValue placeholder="Bitte wählen" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      {genderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={field}
+                    type={field === "bday" ? "date" : "text"}
+                    value={data[field] || ""}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    placeholder={field === "title" ? "z.B. Dr. med." : ""}
+                    className={`bg-background ${errors[field] ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  />
+                )}
+                
+                {/* Error message for mandatory fields */}
+                {errors[field] && !isOptional && (
+                  <p className="text-xs text-destructive font-medium">Dieses Feld ist erforderlich</p>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      {/* Use validateAndNext */}
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };
