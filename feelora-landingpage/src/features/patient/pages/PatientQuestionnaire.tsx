@@ -90,6 +90,13 @@ const PatientQuestionnaire = () => {
   const totalSteps = 18; // Welcome + 17 questions
 
   const goNext = () => {
+   // 1. Fire the ping quietly in the background when transitioning from Step 14 or 15
+    // This gives the Lambda a few seconds to warm up while the user reads the Summary step
+    if (currentStep === 14) {
+      patientService.pingMatchingAlgorithm(); // No 'await', it runs in the background
+    }
+
+    // 2. Proceed to the next step as normal
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -105,6 +112,7 @@ const PatientQuestionnaire = () => {
     setCurrentStep(step);
   };
 
+  //restart button needs to be implemented, maybe in the summary step
   const restart = () => {
     clearProgress(); // Clear local storage AND state
     setCurrentStep(0);

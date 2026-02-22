@@ -79,6 +79,13 @@ const SAVE_MATCH_MUTATION = gql`
   }
 `;
 
+// For pinging algorithm 
+const PING_LAMBDA_QUERY = gql`
+  query PingLambda {
+    pingLambda
+  }
+`;
+
 
 // --- Service Object --- //
 export const patientService = {
@@ -177,6 +184,19 @@ export const patientService = {
       console.error("Error saving match:", error);
       throw error;
     }
+  },
+
+  // -- Wake up the matching algorithm Lambda --
+  pingMatchingAlgorithm: () => {
+    // no "await" here! It's a "fire-and-forget" call.
+    apolloClient.query({
+      query: PING_LAMBDA_QUERY,
+      fetchPolicy: 'network-only'
+    }).catch(error => {
+      // We catch the error silently. If the ping fails, we don't want to 
+      // alert the user or stop them from continuing the questionnaire.
+      console.debug("Ping Lambda failed (ignored):", error);
+    });
   },
 
 };
