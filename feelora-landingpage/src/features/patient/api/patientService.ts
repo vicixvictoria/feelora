@@ -53,8 +53,8 @@ const SAVE_USER_PROFILE_MUTATION = gql`
 
 // Get Matched Therapists (For Patients)
 const GET_MATCHED_THERAPISTS_QUERY = gql`
-  query GetMatchedTherapists($ids: [ID]) {
-    getMatchedTherapists(TherapistsIds: $ids) {
+  query GetMatchedTherapists($TherapistsIds: [ID]) {
+    getMatchedTherapists(TherapistsIds: $TherapistsIds) {
       items {
         Id
         Email
@@ -170,9 +170,17 @@ export const patientService = {
 
   // Fetch matched therapist(s)
   getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
+    // Log to understand return
+    console.log("Sending IDs to backend:", therapistIds);
+    console.log("Is it an array?", Array.isArray(therapistIds));
+
+    // Safety net
+    if (!therapistIds || therapistIds.length === 0) {
+      return [];
+    }
    const { data: responseData } = await apolloClient.query({
      query: GET_MATCHED_THERAPISTS_QUERY,
-     variables: { ids: therapistIds },
+     variables: { TherapistsIds: therapistIds },
    });
 
    return responseData.getMatchedTherapists.items || [];
