@@ -62,3 +62,20 @@ export interface MatchedTherapist {
   Availability?: string[];
   Specialties?: string[];
 }
+
+export interface AlgorithmMatch {
+  Id: string;
+  Email: string;
+  Name: string;
+  Surname: string;
+  Gender: string;
+  BirthDate: number;
+  City: string;
+  Languages: string[];
+  Availability: string[];
+  Specialties: string[];
+  Address?: string;
+  Title?: string;
+  JobTitle: string;
+  Ranking?: number;
+}

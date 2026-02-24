@@ -11,8 +11,19 @@ const MATCHING_ALGORITHM_MUTATION = gql`
   mutation MatchingAlgorithm($input: MatchingInput!) {
     matchingAlgorithm(input: $input) {
       Id
-      filters
-      description
+      Email
+      Name
+      Surname
+      Gender
+      BirthDate
+      City
+      Languages
+      Availability
+      Specialties
+      Address
+      Title
+      JobTitle
+      Ranking
     }
   }
 `;
@@ -51,7 +62,7 @@ const SAVE_USER_PROFILE_MUTATION = gql`
   }
 `;
 
-// Get Matched Therapists (For Patients)
+// Maybe we need that later (not for matching algorithm)
 const GET_MATCHED_THERAPISTS_QUERY = gql`
   query GetMatchedTherapists($TherapistsIds: [ID]) {
     getMatchedTherapists(TherapistsIds: $TherapistsIds) {

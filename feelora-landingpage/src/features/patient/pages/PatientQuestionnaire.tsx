@@ -21,7 +21,7 @@ import AvailabilityStep from "../components/questionnaire/steps/Step15_PAvailabi
 import SummaryStep from "../components/questionnaire/steps/Step17_PSummary.tsx";
 import CompletionStep from "../components/questionnaire/steps/Step18_PCompletion.tsx";
 import TherapistMatchStep from "../components/questionnaire/steps/Step18_TherapistMatch";
-import { MatchedTherapist } from '../types/profiles';
+import { AlgorithmMatch, MatchedTherapist } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
 
 import { patientService } from '../api/patientService';
@@ -73,7 +73,7 @@ const PatientQuestionnaire = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading State
   const [isIntermediateLoading, setIsIntermediateLoading] = useState(false); // For steps that require async operations (e.g., fetching therapist details after matches)
-  const [matchedProfiles, setMatchedProfiles] = useState<MatchedTherapist[]>([]); // Store matched therapist profiles returned from the backend
+  const [matchedProfiles, setMatchedProfiles] = useState<AlgorithmMatch[]>([]); // Store matched therapist profiles returned from the backend
 
   const navigate = useNavigate(); // For navigating to dashboard after completeion --> lets see if backend does it after acceptin?
 
@@ -122,36 +122,27 @@ const PatientQuestionnaire = () => {
 
   // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
   const handleSubmit = async () => {
-    if (isSubmitting) return; // Prevent double clicks
+   if (isSubmitting) return;
 
-    setIsSubmitting(true);
-    try {
-      console.log("Submitting data:", data);
-      // 1. Call the API
-      // The wrapper handleGraphQL has already checked for network/GraphQL errors
-      const result = await patientService.submitQuestionnaire(data);
-      console.log("Final Submission successful!", result.matches);
-
-      if (result.success && result.matches.length > 0) {
-        // 1.2 Extract the IDs from the matched response. The backend usually returns them sorted by ranking.
-        const matchedIds = result.matches.map((m: any) => m.Id);
+   setIsSubmitting(true);
+   try {
+     console.log("Submitting data:", data);
+     
+     // Run the Matching Algorithm (which now returns FULL profiles)
+     const result = await patientService.submitQuestionnaire(data);
+     
+     if (result.success && result.matches && result.matches.length > 0) {
+        console.log("Algorithm returned full profiles:", result.matches);
         
-        // 1.3. Fetch the full profiles for those IDs
-        const profiles = await patientService.getMatchedTherapists(matchedIds);
-        
-        // 1.4 Ensure the fetched profiles remain in the correct ranking order provided by the algorithm
-        const sortedProfiles = matchedIds
-            .map((id: string) => profiles.find((p) => p.Id === id))
-            .filter(Boolean) as MatchedTherapist[];
+        // Directly save the matches to state! No secondary fetch needed.
+        setMatchedProfiles(result.matches);
 
-        setMatchedProfiles(sortedProfiles);
-
-      // 2. Clear the local storage since data is safe in DB
-      clearProgress();
-      // 3. Move to the completion step
-      goNext(); 
-    } else {
-        throw new Error("No matches found or algorithm failed.");
+        // Clear storage and move to the Match step
+        clearProgress();
+        goNext();
+     } else {
+        // Fallback if the algorithm successfully ran but found 0 matches
+        throw new Error("Leider wurden keine passenden Therapeut*innen gefunden.");
      }
    } catch (error: unknown) {
      if (error instanceof Error) {
@@ -161,6 +152,7 @@ const PatientQuestionnaire = () => {
      setIsSubmitting(false);
    }
  };
+ 
 
   // This function will be called when the user accepts a therapist match. 
   const handleAcceptTherapist = async (therapistId: string) => {

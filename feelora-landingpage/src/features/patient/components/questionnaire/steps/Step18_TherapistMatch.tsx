@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Check, ChevronLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import therapistAvatar from "@/assets/avatar-Placeholder.png"; // Placeholder
-import { MatchedTherapist } from '../../../types/profiles';
+import { AlgorithmMatch, MatchedTherapist } from '../../../types/profiles';
 
 interface TherapistMatchStepProps {
-  therapists: MatchedTherapist[];
+  therapists: AlgorithmMatch[];
   onAccept: (therapistId: string) => void;
   onBack: () => void;
 }
@@ -27,7 +27,7 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
   const alternativeMatches = therapists.slice(1); // The remaining matches (usually 3)
 
   // Reusable component for a Therapist Card
-  const TherapistCard = ({ therapist, isBestMatch }: { therapist: MatchedTherapist, isBestMatch?: boolean }) => {
+ const TherapistCard = ({ therapist, isBestMatch }: { therapist: AlgorithmMatch, isBestMatch?: boolean }) => {
     // Calculate age from BirthDate float (assuming Unix timestamp)
     const age = therapist.BirthDate ? Math.floor((Date.now() - (therapist.BirthDate * 1000)) / 31557600000) : 'k.A.';
 
@@ -37,8 +37,14 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
           <div className="flex justify-between items-start gap-4">
             <div className="flex-1 space-y-3">
               <div>
-                <h2 className="text-lg font-bold text-purple">{therapist.Name} {therapist.Surname}</h2>
-                <p className="text-purple text-sm">{therapist.Gender}, {age} Jahre</p>
+                {/* ADD therapist.Title (if they have one, like "Dr.") */}
+                <h2 className="text-lg font-bold text-purple">
+                  {therapist.Title ? `${therapist.Title} ` : ""}{therapist.Name} {therapist.Surname}
+                </h2>
+                {/* ADD therapist.JobTitle before Gender and Age */}
+                <p className="text-purple text-sm">
+                  {therapist.JobTitle} • {therapist.Gender}, {age} Jahre
+                </p>
               </div>
               <p className="text-foreground text-sm">
                 <span className="text-muted-foreground">Stadt:</span> {therapist.City}

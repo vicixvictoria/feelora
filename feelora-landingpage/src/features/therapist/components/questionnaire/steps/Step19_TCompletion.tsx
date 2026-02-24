@@ -19,11 +19,12 @@ const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
       {/* Description */}
       <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
         Dein Therapeutenprofil wurde erfolgreich erstellt.
-        Wir werden dich benachrichtigen, sobald passende Patient:Innen verfügbar sind.
+        Wir überprüfen nun deine Lizenznummer und bereiten dein Profil für die Vermittlung vor.
+        Wir werden dich per Mail benachrichtigen, sobald du als Therapeut:In in unserem System aktiv bist und auf dein Dashboard zugreifen kannst. Das kann 1-3 Werktage dauern.
       </p>
       {/* Restart Button */}
       <Button onClick={onRestart} className="feelora-btn-outline">
-        Fragebogen erneut starten
+        Fragebogen erneut starten falls du etwas ändern möchtest
       </Button>
     </div>
   );

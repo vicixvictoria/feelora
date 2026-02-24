@@ -1,6 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { z } from "zod";
+import { useStepValidation } from "@/hooks/useStepValidation";
 
 interface TherapySchoolStepProps {
   onNext: () => void;
@@ -17,9 +19,32 @@ const therapySchoolOptions = [
   "Systemische Orientierung",
 ];
 
+//  Define validation schema with conditional validation for the "Andere" option
+const step8Schema = z.object({
+  selected: z.array(z.string()).min(1, "Bitte wähle mindestens einen Ansatz aus"),
+  other: z.string().optional(),
+}).refine((data) => {
+  // If "Andere" is selected, the text input cannot be empty
+  if (data.selected.includes("Andere")) {
+    return data.other && data.other.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Bitte spezifizieren",
+  path: ["other"],
+});
+
 // Step Component
 const Step8_TTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySchoolStepProps) => {
+// Initialize the validation hook
+  const { errors, validateAndNext, clearError } = useStepValidation({
+    data,
+    schema: step8Schema,
+    onNext,
+  });
+
   const handleToggle = (school: string) => {
+    clearError("selected"); // Clear main error when user interacts
     if (data.selected.includes(school)) {
       onDataChange({ ...data, selected: data.selected.filter((s) => s !== school) });
     } else {
@@ -29,6 +54,9 @@ const Step8_TTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
 
   // Handle toggle for "Other" option
   const handleOtherToggle = () => {
+    clearError("selected");
+    clearError("other"); // Clear specific error
+
     if (data.selected.includes("Andere")) {
       onDataChange({ ...data, selected: data.selected.filter((s) => s !== "Andere"), other: "" });
     } else {
@@ -47,12 +75,16 @@ const Step8_TTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
         <p className="text-muted-foreground mb-2">
           Bitte wähle den therapeutischen Ansatz, den du während der Therapie verfolgen wirst.
         </p>
-        <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
+        <p className={`text-sm ${errors.selected ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+          {errors.selected ? "Bitte wähle mindestens einen Ansatz aus." : "Mehrfachauswahl möglich"}
+        </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <div className="grid grid-cols-1 gap-3">
+        {/* Visual error feedback wrapper */}
+        <div className={`grid grid-cols-1 gap-3 p-1 rounded-xl ${errors.selected ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+          
           {therapySchoolOptions.map((school) => (
             <label
               key={school}
@@ -75,21 +107,31 @@ const Step8_TTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
               />
               <span className="text-foreground">Andere</span>
             </label>
+            
+            {/* Conditional Input with validation styling */}
             {data.selected.includes("Andere") && (
-              <Input
-                type="text"
-                placeholder="Bitte angeben..."
-                value={data.other}
-                onChange={(e) => onDataChange({ ...data, other: e.target.value })}
-                className="bg-background"
-              />
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <Input
+                  type="text"
+                  placeholder="Bitte angeben..."
+                  value={data.other || ""}
+                  onChange={(e) => {
+                    clearError("other");
+                    onDataChange({ ...data, other: e.target.value });
+                  }}
+                  className={`bg-background ${errors.other ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                />
+                {errors.other && (
+                   <span className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</span>
+                )}
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={onNext} onBack={onBack} />
+      {/* use validateAndNext */}
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };
