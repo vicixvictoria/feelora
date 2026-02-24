@@ -56,18 +56,18 @@ const GET_MATCHED_THERAPISTS_QUERY = gql`
   query GetMatchedTherapists($ids: [ID]) {
     getMatchedTherapists(TherapistsIds: $ids) {
       items {
-       Id
-       Email
-       Name
-       Surname
-       Gender
-       BirthDate
-       City
-       Address
-       LicenseVerified
-       Languages
-       Availability
-       Specialties
+        Id
+        Email
+        Name
+        Surname
+        Gender
+        BirthDate
+        City
+        Address
+        LicenseVerified
+        Languages
+        Availability
+        Specialties
       }
     }
   }
@@ -86,6 +86,11 @@ const PING_LAMBDA_QUERY = gql`
   }
 `;
 
+// Helper function to guarantee an array
+const ensureArray = (val: any) => {
+  if (!val) return [];
+  return Array.isArray(val) ? val : [val];
+};
 
 // --- Service Object --- //
 export const patientService = {
@@ -93,6 +98,7 @@ export const patientService = {
 
   // -- API call to submit the questionnaire and get matches based on the input data --
   submitQuestionnaire: async (data: QuestionnaireData): Promise<any> => {
+    
     // 1. Prepare Input (Matches 'MatchingInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
@@ -166,10 +172,10 @@ export const patientService = {
   getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
    const { data: responseData } = await apolloClient.query({
      query: GET_MATCHED_THERAPISTS_QUERY,
-     variables: { therapistsIds: therapistIds },
+     variables: { ids: therapistIds },
    });
 
-   return responseData.getMatchedTherapists.items;
+   return responseData.getMatchedTherapists.items || [];
  },
 
  // -- API call to accept and save a therapist match --
