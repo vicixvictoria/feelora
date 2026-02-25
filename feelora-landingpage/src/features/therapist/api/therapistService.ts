@@ -85,44 +85,44 @@ export const therapistService = {
 
   // -- Create User Profile API call --
   // (Triggered earlier in the flow on the Availability step)
-  createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
+ createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
 
-    // Format the address nicely by combining street, zip, and city
-    // .filter(Boolean) removes any undefined/empty values so you don't get weird commas
-    const formattedAddress = [
-      data.contactInfo?.street, 
-      data.contactInfo?.zip, 
-      data.contactInfo?.city
-    ].filter(Boolean).join(', ');
+   const formattedAddress = [
+     data.contactInfo?.street,
+     data.contactInfo?.zip,
+     data.contactInfo?.city
+   ].filter(Boolean).join(', ');
 
-    // Structure the LicenseData object as the backend requested
-    const licenseDataObj = {
-      licenseId: data.qualifications?.licenseNumber || '',
-      pathToLicenseDocument: data.qualifications?.idUpload || ''
-    };
+   const licenseDataObj = {
+     licenseId: data.qualifications?.licenseNumber || '',
+     pathToLicenseDocument: data.qualifications?.idUpload || ''
+   };
 
-    const input = {
-      Name: data.personalData?.firstName,
-      Surname: data.personalData?.lastName,
-      BirthDate: data.personalData?.bday
-        ? new Date(data.personalData.bday).getTime() / 1000
-        : null,
-      Gender: data.personalData?.gender,
-      City: data.contactInfo?.city,
-      Languages: data.languages?.selected || [],
-      Address: formattedAddress || null, // Will be null if no address was provided
-      Availability: data.availability || [],
-      LicenseData: JSON.stringify(licenseDataObj), // Convert to AWSJSON!
-      Specialties: data.specialties?.selected || []
-    };
+   // Fallback value safety net: Add || "" to all strictly required String! fields
+   // Add || 0 to BirthDate since it is a required Float
+   const input = {
+     Name: data.personalData?.firstName || "", 
+     Surname: data.personalData?.lastName || "",
+     BirthDate: data.personalData?.bday 
+       ? new Date(data.personalData.bday).getTime() / 1000 
+       : 0, // Fallback to 0 if date is missing
+     Gender: data.personalData?.gender || "",
+     City: data.contactInfo?.city || "",
+     Languages: data.languages?.selected || [],
+     Address: formattedAddress || null, // Null is allowed here because Address is not required
+     Availability: data.availability || [],
+     LicenseData: JSON.stringify(licenseDataObj), 
+     Specialties: data.specialties?.selected || []
+   };
+   console.log("2. Formatted GraphQL Payload (input):", input);
 
-    const { data: responseData } = await apolloClient.mutate({
-      mutation: SAVE_THERAPIST_PROFILE_MUTATION,
-      variables: { input },
-    });
+   const { data: responseData } = await apolloClient.mutate({
+     mutation: SAVE_THERAPIST_PROFILE_MUTATION,
+     variables: { input },
+   });
 
-    return responseData.saveTherapistProfile;
-  },
+   return responseData.saveTherapistProfile;
+ },
 
   // -- Get profile API call --
   getProfile: async (): Promise<any> => {
