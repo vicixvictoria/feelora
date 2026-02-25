@@ -109,14 +109,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
     setUser(parsedUser);
 
-    // --- NEW: DYNAMIC AMPLIFY ONFIGURATION ---
-    // The backend schema uses "type:T" for therapists and "type:U" for patients/users, so we can check the user's groups to determine which Amplify config to use. This ensures that when the user logs in, Amplify is configured with the correct User Pool and Client ID for their role, allowing them to interact with AWS resources as intended.
-    const isTherapist = parsedUser?.groups?.includes('type:T');
+    // --- UPDATED: Treat BOTH 'type:T' and 'type:P' as therapists ---
+    // Check if the user is a confirmed therapist (type:T) OR a pending therapist (type:P)
+    const isTherapist = parsedUser?.groups?.includes('type:T') || parsedUser?.groups?.includes('type:P');
+    
     if (isTherapist) {
+      // Both confirmed and pending therapists belong to the Therapist User Pool
       Amplify.configure(therapistAmplifyConfig);
-      console.log('[Amplify] Configured for Therapist Pool (type:T)');
+      console.log('[Amplify] Configured for Therapist Pool (type:T or type:P)');
     } else {
-      // Default to standard config for patients (type:U or type:P)
+      // Default to standard config for patients (type:U)
       Amplify.configure(amplifyConfig);
       console.log('[Amplify] Configured for Standard User Pool');
     }

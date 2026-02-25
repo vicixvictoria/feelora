@@ -24,24 +24,52 @@ export function RequireAuth({ allowedType }: RequireAuthProps) {
     return <Navigate to={loginTarget} state={{ from: location }} replace />;
   }
 
-  // Helper: Check if user is a therapist
-  // Checks against AWS Cognito group name, case-insensitive --> ensure your AWS Cognito group name matches exactly
-  const isTherapistUser = user.groups?.some(g => 
-    g.toLowerCase() === 'therapists' || g.toLowerCase() === 'therapist'
-  );
+  // 2. Parse the exact AWS Cognito groups based on the backend schema
+  const groups = user.groups || [];
+  const isPatient = groups.includes('type:U');
+  const isConfirmedTherapist = groups.includes('type:T');
+  const isPendingTherapist = groups.includes('type:P');
 
-  // 2. BLOCK PATIENTS from Therapist Routes
-  if (allowedType === 'therapist' && !isTherapistUser) {
-    // Patients go back to patient dashboard
-    return <Navigate to="/patient" replace />;
+  // 3. THERAPIST ROUTES LOGIC
+  if (allowedType === 'therapist') {
+    // Block Patients
+    if (isPatient) {
+      return <Navigate to="/patient" replace />;
+    }
+
+    // Handle Pending Therapists (type:P)
+    if (isPendingTherapist) {
+      // If they are on the questionnaire page, let them access it
+      if (location.pathname === '/therapist/questionnaire') {
+        return <Outlet />;
+      }
+      // If they try to type in /therapist/dashboard, trap them in the questionnaire
+      return <Navigate to="/therapist/questionnaire" replace />;
+    }
+
+    // Handle Confirmed Therapists (type:T)
+    if (isConfirmedTherapist) {
+      // They have full access to all /therapist routes
+      return <Outlet />;
+    }
   }
 
-  // 3. BLOCK THERAPISTS from Patient Routes 
-  if (allowedType === 'user' && isTherapistUser) {
-    // Therapists go back to therapist dashboard
-    return <Navigate to="/therapist" replace />;
+  // 4. PATIENT ROUTES LOGIC
+  if (allowedType === 'user') {
+    // Block Therapists (Both confirmed and pending)
+    if (isConfirmedTherapist) {
+      return <Navigate to="/therapist" replace />;
+    }
+    if (isPendingTherapist) {
+      return <Navigate to="/therapist/questionnaire" replace />;
+    }
+
+    // Handle Patients (type:U)
+    if (isPatient) {
+      return <Outlet />;
+    }
   }
 
-  // 4. Access Granted
-  return <Outlet />;
+  // 5. Fallback for users with missing or unassigned groups
+  return <Navigate to="/" replace />;
 }
