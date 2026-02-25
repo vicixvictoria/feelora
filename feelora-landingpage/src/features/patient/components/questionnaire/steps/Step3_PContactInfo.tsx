@@ -31,7 +31,10 @@ const step3Schema = z.object({
   postalCode: z.string().optional(),
   // Email is optional, BUT if filled, must be valid
   // z.literal("") allows an empty string to pass validation
-  email: z.union([z.literal(""), z.string().email("Ungültiges E-Mail-Format")]),
+  email: z.union([
+  z.literal(""), 
+  z.string().email("Ungültiges E-Mail-Format")
+]).optional(), // .optional() so that the email can be empty
 });
 
 const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
