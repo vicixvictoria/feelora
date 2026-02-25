@@ -1,4 +1,4 @@
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -11,22 +11,16 @@ const Step1_PWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
       <h1 className="text-2xl font-semibold text-purple mb-6">
         Vielen Dank für deine Teilnahme an Feelora!
       </h1>
-      
+
       <p className="text-foreground text-body-large mb-8">
-        Bevor du beginnen kannst, erstellen wir ein Patient*innenprofil für dich. 
-        Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen" durchgehen, 
-        um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.
-      </p>
-      
-      <p className="text-foreground text-body-large mb-12">
-        Dieser Fragebogen umfasst 16 Fragen.
+        Bevor du beginnen kannst, erstellen wir ein Patient*innenprofil für dich. Dafür werden wir
+        gemeinsam unseren Patienten-Screening-Fragebogen" durchgehen, um ein optimales Profil zu
+        erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.
       </p>
 
-      <NavigationButtons 
-        onBack={onBack} 
-        onNext={onNext} 
-        isFirstStep={true}
-      />
+      <p className="text-foreground text-body-large mb-12">Dieser Fragebogen umfasst 16 Fragen.</p>
+
+      <NavigationButtons onBack={onBack} onNext={onNext} isFirstStep={true} />
     </div>
   );
 };

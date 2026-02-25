@@ -11,8 +11,6 @@ import carolinFoto from '@/assets/Carolin-Foto.JPG';
 import delphineFoto from '@/assets/Delphine-Foto.jpg';
 import micheleFoto from '@/assets/Michele-Foto.JPG';
 
-
-
 export function AboutUsPage() {
   const { t } = useLanguage();
   const [ref, inView] = useInView({
@@ -46,7 +44,7 @@ export function AboutUsPage() {
       pic: carolinFoto,
     },
     {
-      name: 'Delphine N\'Diaye',
+      name: "Delphine N'Diaye",
       role: t('aboutus.team.delphine.role'),
       description: t('aboutus.team.delphine.desc'),
       pic: delphineFoto,
@@ -80,9 +78,7 @@ export function AboutUsPage() {
                 {t('aboutus.title.subtitle')}
               </h3>
 
-              <p>
-                {t('aboutus.title.desc')}
-              </p>
+              <p>{t('aboutus.title.desc')}</p>
 
               <div className="grid md:grid-cols-2 gap-12 items-center mt-12">
                 <div>
@@ -90,9 +86,7 @@ export function AboutUsPage() {
                     {t('aboutus.title2')}
                   </h3>
 
-                  <p>
-                    {t('aboutus.title2.desc')}
-                  </p>
+                  <p>{t('aboutus.title2.desc')}</p>
                 </div>
 
                 <motion.div
@@ -103,7 +97,7 @@ export function AboutUsPage() {
                 >
                   <div className="rounded-2xl overflow-hidden shadow-2xl">
                     <img
-                      src= {pitchDay}
+                      src={pitchDay}
                       alt="Pitch Day Award Gewinn"
                       className="w-full h-auto object-cover"
                       loading="lazy"
@@ -127,7 +121,10 @@ export function AboutUsPage() {
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
               {t('aboutus.team.title')}
             </h2>
-            <p className="text-body-large leading-body max-w-3xl mx-auto" style={{ color: '#2F3E46' }}>
+            <p
+              className="text-body-large leading-body max-w-3xl mx-auto"
+              style={{ color: '#2F3E46' }}
+            >
               {t('aboutus.team.desc')}
             </p>
           </motion.div>
@@ -146,9 +143,7 @@ export function AboutUsPage() {
                       <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-2">
                         {member.name}
                       </h3>
-                      <p className="text-body font-semibold text-primary mb-4">
-                        {member.role}
-                      </p>
+                      <p className="text-body font-semibold text-primary mb-4">{member.role}</p>
                       <p className="text-body leading-body" style={{ color: '#2F3E46' }}>
                         {member.description}
                       </p>
@@ -157,6 +152,7 @@ export function AboutUsPage() {
                       <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-tertiary/50 to-primary/30 flex items-center justify-center shadow-lg">
                         <img
                           src={member.pic}
+                          alt={member.name}
                           className="w-full h-full object-cover"
                         />
                       </div>

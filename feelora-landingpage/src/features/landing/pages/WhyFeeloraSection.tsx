@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
 import { Card } from '@/components/ui/cardLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -77,9 +77,7 @@ export function WhyFeeloraSection() {
                 <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-4">
                   {stat.label}
                 </h3>
-                <p className="text-body text-gray-600 leading-body">
-                  {stat.description}
-                </p>
+                <p className="text-body text-gray-600 leading-body">{stat.description}</p>
               </Card>
             </motion.div>
           ))}
@@ -101,7 +99,6 @@ function AnimatedCounter({
   delay: number;
 }) {
   const [count, setCount] = useState(0);
-  const countRef = useRef(0);
 
   useEffect(() => {
     if (!inView) return;

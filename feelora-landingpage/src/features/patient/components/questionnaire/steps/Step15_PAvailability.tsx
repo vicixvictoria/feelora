@@ -1,6 +1,6 @@
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
-import { z } from "zod";
-import { useStepValidation } from "@/hooks/useStepValidation";
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { z } from 'zod';
+import { useStepValidation } from '@/hooks/useStepValidation';
 
 interface AvailabilityStepProps {
   onNext: () => void;
@@ -12,26 +12,25 @@ interface AvailabilityStepProps {
 
 // List of days of the week
 const days = [
-  { id: "mo", label: "Mo" },
-  { id: "di", label: "Di" },
-  { id: "mi", label: "Mi" },
-  { id: "do", label: "Do" },
-  { id: "fr", label: "Fr" },
-  { id: "sa", label: "Sa" },
-  { id: "so", label: "So" },
+  { id: 'mo', label: 'Mo' },
+  { id: 'di', label: 'Di' },
+  { id: 'mi', label: 'Mi' },
+  { id: 'do', label: 'Do' },
+  { id: 'fr', label: 'Fr' },
+  { id: 'sa', label: 'Sa' },
+  { id: 'so', label: 'So' },
 ];
 
 // Define validation schema expecting an object with a "selection" array
 const step15Schema = z.object({
-  selection: z.array(z.string()).min(1, "Bitte wähle mindestens einen Tag aus"),
+  selection: z.array(z.string()).min(1, 'Bitte wähle mindestens einen Tag aus'),
 });
 
 // Step Component
 const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
-  
   const safeData = data || [];
 
- // Initialize validation hook
+  // Initialize validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { selection: safeData },
     schema: step15Schema,
@@ -39,7 +38,7 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
   });
 
   const handleToggle = (dayId: string) => {
-    clearError("selection"); // Clear error on interaction
+    clearError('selection'); // Clear error on interaction
 
     if (safeData.includes(dayId)) {
       onDataChange(safeData.filter((d) => d !== dayId));
@@ -52,26 +51,28 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Verfügbarkeit
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Verfügbarkeit</h1>
         <p className="text-muted-foreground mb-2">
-          Bitte teile uns mit, an welchen Tagen pro Woche du für Therapiesitzungen
-          zur Verfügung stehen wirst. Du kannst deine Verfügbarkeit später immer anpassen.
+          Bitte teile uns mit, an welchen Tagen pro Woche du für Therapiesitzungen zur Verfügung
+          stehen wirst. Du kannst deine Verfügbarkeit später immer anpassen.
         </p>
         {/* Dynamic error message in header */}
-        <p className={`text-sm ${errors.selection ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
-          {errors.selection ? "Bitte wähle mindestens einen Tag aus." : "Mehrfachauswahl möglich"}
+        <p
+          className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
+        >
+          {errors.selection ? 'Bitte wähle mindestens einen Tag aus.' : 'Mehrfachauswahl möglich'}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
         {/* Visual error wrapper */}
-        <div className={`flex flex-wrap justify-center gap-3 p-4 rounded-xl transition-colors ${errors.selection ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+        <div
+          className={`flex flex-wrap justify-center gap-3 p-4 rounded-xl transition-colors ${errors.selection ? 'border border-destructive/50 bg-destructive/5' : ''}`}
+        >
           {days.map((day) => {
             const isSelected = safeData.includes(day.id);
-            
+
             return (
               <button
                 key={day.id}
@@ -79,10 +80,10 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
                 onClick={() => handleToggle(day.id)}
                 className={`w-16 h-16 rounded-xl text-lg font-medium transition-all duration-200 ${
                   isSelected
-                    ? "bg-accent/90 text-purple border-2 border-accent/90"
+                    ? 'bg-accent/90 text-purple border-2 border-accent/90'
                     : errors.selection
-                      ? "bg-muted/90 text-destructive border-2 border-destructive/30 hover:bg-destructive/10" // Red styling for unselected buttons on error
-                      : "bg-muted/90 text-muted-foreground border-2 border-transparent hover:bg-muted"
+                      ? 'bg-muted/90 text-destructive border-2 border-destructive/30 hover:bg-destructive/10' // Red styling for unselected buttons on error
+                      : 'bg-muted/90 text-muted-foreground border-2 border-transparent hover:bg-muted'
                 }`}
               >
                 {day.label}

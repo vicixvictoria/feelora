@@ -1,42 +1,42 @@
-import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 const menuItems = [
   {
-    title: "Kalender",
-    description: "Zeitplan verwalten",
+    title: 'Kalender',
+    description: 'Zeitplan verwalten',
     icon: Calendar,
-    path: "/calendar",
+    path: '/calendar',
   },
   {
-    title: "Profil",
-    description: "Profil und Therapeut einsehen",
+    title: 'Profil',
+    description: 'Profil und Therapeut einsehen',
     icon: User,
-    path: "/profile",
+    path: '/profile',
   },
   {
-    title: "Chat",
-    description: "Nachrichten ansehen und schreiben",
+    title: 'Chat',
+    description: 'Nachrichten ansehen und schreiben',
     icon: Send,
-    path: "/chat",
+    path: '/chat',
   },
   {
-    title: "Mood Tracker",
-    description: "Erfasse deine heutigen Emotionen und Gefühle",
+    title: 'Mood Tracker',
+    description: 'Erfasse deine heutigen Emotionen und Gefühle',
     icon: Smile,
-    path: "/mood-tracker",
+    path: '/mood-tracker',
   },
   {
-    title: "Homework",
-    description: "Erledige deine Aufgaben",
+    title: 'Homework',
+    description: 'Erledige deine Aufgaben',
     icon: BookOpen,
-    path: "/homework",
+    path: '/homework',
   },
   {
-    title: "Dashboard",
-    description: "Einsicht in deine wichtigsten Informationen",
+    title: 'Dashboard',
+    description: 'Einsicht in deine wichtigsten Informationen',
     icon: LayoutDashboard,
-    path: "/",
+    path: '/',
   },
 ];
 
@@ -48,18 +48,12 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) =>
-              `sidebar-item ${isActive ? "sidebar-item-active" : ""}`
-            }
+            className={({ isActive }) => `sidebar-item ${isActive ? 'sidebar-item-active' : ''}`}
           >
             <item.icon className="w-5 h-5 text-sidebar-text mt-0.5" />
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-sidebar-text">
-                {item.title}
-              </span>
-              <span className="text-xs text-sidebar-muted leading-tight">
-                {item.description}
-              </span>
+              <span className="text-sm font-medium text-sidebar-text">{item.title}</span>
+              <span className="text-xs text-sidebar-muted leading-tight">{item.description}</span>
             </div>
           </NavLink>
         ))}

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { ExternalLink, Loader2 } from "lucide-react";
-import therapistAvatar from "@/assets/avatar-Placeholder.png";
-import { therapistService } from "../api/therapistService"; // Adjust path if needed
-import { TherapistProfile } from "../types/profiles"; // Import TherapistProfile type
+import { useEffect, useState } from 'react';
+import { ExternalLink, Loader2 } from 'lucide-react';
+import therapistAvatar from '@/assets/avatar-Placeholder.png';
+import { therapistService } from '../api/therapistService'; // Adjust path if needed
+import { TherapistProfile } from '../types/profiles'; // Import TherapistProfile type
 
 const TherapistProfilePage = () => {
   const [profile, setProfile] = useState<TherapistProfile | null>(null);
@@ -18,8 +18,8 @@ const TherapistProfilePage = () => {
         const data = await therapistService.getProfile();
         setProfile(data);
       } catch (err) {
-        console.error("Failed to load profile", err);
-        setError("Profil konnte nicht geladen werden.");
+        console.error('Failed to load profile', err);
+        setError('Profil konnte nicht geladen werden.');
       } finally {
         setIsLoading(false);
       }
@@ -37,17 +37,13 @@ const TherapistProfilePage = () => {
   }
 
   if (error || !profile) {
-    return (
-      <div className="text-center text-red-500 mt-10">
-        {error || "Kein Profil gefunden."}
-      </div>
-    );
+    return <div className="text-center text-red-500 mt-10">{error || 'Kein Profil gefunden.'}</div>;
   }
 
   // Calculate age from Unix timestamp (BirthDate float)
   // Fallback to 'k.A.' (keine Angabe / no data) if missing
-  const age = profile.BirthDate 
-    ? Math.floor((Date.now() - (profile.BirthDate * 1000)) / 31557600000) 
+  const age = profile.BirthDate
+    ? Math.floor((Date.now() - profile.BirthDate * 1000) / 31557600000)
     : 'k.A.';
 
   return (
@@ -76,9 +72,15 @@ const TherapistProfilePage = () => {
 
         <div className="space-y-4 text-foreground">
           <div>
-            <p><span className="font-semibold">Spezialisiert in:</span> {profile.Specialties?.join(', ') || 'Keine Angabe'}</p>
-            <p><span className="font-semibold">Sprachen:</span> {profile.Languages?.join(', ') || 'Keine Angabe'}</p>
-            {/* Note: Methodik & Information are not saved in your TherapistProfile GraphQL schema, so they are omitted here. 
+            <p>
+              <span className="font-semibold">Spezialisiert in:</span>{' '}
+              {profile.Specialties?.join(', ') || 'Keine Angabe'}
+            </p>
+            <p>
+              <span className="font-semibold">Sprachen:</span>{' '}
+              {profile.Languages?.join(', ') || 'Keine Angabe'}
+            </p>
+            {/* Note: Methodik & Information are not saved in your TherapistProfile GraphQL schema, so they are omitted here.
                 If you need them, they must be fetched from the full Questionnaire JSON. */}
           </div>
 

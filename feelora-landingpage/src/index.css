@@ -62,19 +62,19 @@
 
     /* Custom Variables */
     --blueprimary: rgba(47, 62, 70, 1);
-    --heading-sora-1-font-family: "Sora", Helvetica;
+    --heading-sora-1-font-family: 'Sora', Helvetica;
     --heading-sora-1-font-size: 36px;
     --heading-sora-1-font-style: normal;
     --heading-sora-1-font-weight: 400;
     --heading-sora-1-letter-spacing: 0px;
     --heading-sora-1-line-height: 40px;
-    --heading-sorabold-5-font-family: "Sora", Helvetica;
+    --heading-sorabold-5-font-family: 'Sora', Helvetica;
     --heading-sorabold-5-font-size: 72px;
     --heading-sorabold-5-font-style: normal;
     --heading-sorabold-5-font-weight: 600;
     --heading-sorabold-5-letter-spacing: 0px;
     --heading-sorabold-5-line-height: 72px;
-    --inter-body-2xl-font-family: "Inter", Helvetica;
+    --inter-body-2xl-font-family: 'Inter', Helvetica;
     --inter-body-2xl-font-size: 28px;
     --inter-body-2xl-font-style: normal;
     --inter-body-2xl-font-weight: 400;
@@ -86,7 +86,7 @@
     /* ------------------------------------------------------------------ */
     /* Dashboard Variables (Colors and fonts)                             */
     /* ------------------------------------------------------------------ */
-    
+
     /* Sidebar Specifics  */
     --sidebar-bg: 248 35% 82%;
     --sidebar-active: 264 35% 88%;
@@ -96,15 +96,15 @@
     /* Navbar Specifics */
     --navbar-bg: 256, 38%, 92%;
     --navbar-text: 220 20% 20%;
-    
+
     /* Dashboard Specific Colors */
     --teal: 164 52% 48%;
     --teal-light: 164 52% 58%;
     --teal-dark: 164 52% 38%;
-    
+
     --purple: 257 43% 38%;
     --purple-light: 264 80% 65%;
-    
+
     --badge-red: 0 72% 51%;
     --badge-green: 164 52% 48%;
 
@@ -114,10 +114,7 @@
 
     /* Sidebar Specifics  */
     --question-bg: 140 12% 95%;
-  
   }
-
-
 
   /* 3. DARK MODE (AI generated - Adds support without breaking Light Mode) */
   .dark {
@@ -168,7 +165,9 @@
   }
 
   body {
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
     /* Kept your original setting */
   }
 }
@@ -180,51 +179,51 @@
   .feelora-card {
     @apply bg-card rounded-xl border border-border shadow-sm p-6;
   }
-  
+
   .feelora-btn-primary {
     @apply bg-primary text-primary-foreground px-4 py-2 rounded-full font-medium 
            hover:opacity-90 transition-all duration-200 flex items-center gap-2;
   }
-  
+
   .feelora-btn-outline {
     @apply border border-primary text-primary px-4 py-2 rounded-full font-medium 
            hover:bg-primary/10 transition-all duration-200 flex items-center gap-2;
   }
-  
+
   .feelora-badge {
     @apply absolute -top-2 -right-2 w-5 h-5 rounded-full bg-destructive text-white 
            text-xs flex items-center justify-center font-medium;
   }
-  
+
   .sidebar-item {
     @apply flex items-start gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer;
   }
-  
+
   .sidebar-item-active {
     @apply bg-accent;
   }
-  
+
   .sidebar-item:hover:not(.sidebar-item-active) {
     @apply bg-accent/50;
   }
-  
+
   .mood-chip {
     @apply flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card 
            cursor-pointer hover:border-primary transition-all duration-200;
   }
-  
+
   .mood-chip-selected {
     @apply border-primary bg-primary/10;
   }
-  
+
   .chat-bubble {
     @apply max-w-md px-4 py-3 rounded-2xl;
   }
-  
+
   .chat-bubble-received {
     @apply bg-primary text-white rounded-bl-sm;
   }
-  
+
   .chat-bubble-sent {
     @apply bg-muted text-foreground rounded-br-sm;
   }

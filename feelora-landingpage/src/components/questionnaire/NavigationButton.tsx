@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/questionnaire/button";
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/questionnaire/button';
 
 interface NavigationButtonsProps {
   onBack: () => void;
@@ -14,8 +14,8 @@ const NavigationButtons = ({
   onBack,
   onNext,
   showBack = true,
-  nextLabel = "nächste",
-  backLabel = "zurück",
+  nextLabel = 'nächste',
+  backLabel = 'zurück',
   isFirstStep = false,
 }: NavigationButtonsProps) => {
   return (

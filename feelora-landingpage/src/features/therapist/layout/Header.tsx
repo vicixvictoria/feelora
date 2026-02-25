@@ -1,30 +1,18 @@
-import { ChevronDown, LogOut } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { ChevronDown, LogOut } from 'lucide-react';
+import feeloraLogo from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
+  const { logout } = useAuth();
 
-  const { logout } = useAuth(); // Get the logout function 
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Create async handler with await - backend fetch call to clear the cookie before user leaves
   const handleLogout = async () => {
-    setIsMobileMenuOpen(false); // Close menu if open
-    await logout('therapist'); // Calls Backend + Clears State + Redirects to Cognito logout
-  };
-
- const landingPageNav = () => {
-    navigate('/');
-    setIsMobileMenuOpen(false);
+    await logout('therapist');
   };
 
   return (
@@ -72,9 +60,10 @@ const Header = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button 
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+        >
           <LogOut className="w-4 h-4" />
           Log Out
         </button>

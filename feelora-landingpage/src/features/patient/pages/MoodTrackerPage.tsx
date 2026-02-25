@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
+import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
+import feeloraLogo from '@/assets/logo.png';
 
 interface MoodOption {
   emoji: string;
@@ -14,105 +14,105 @@ interface MoodCategory {
 
 const moodCategories: MoodCategory[] = [
   {
-    question: "Wie fühlst du dich heute?",
+    question: 'Wie fühlst du dich heute?',
     options: [
-      { emoji: "😊", label: "Glücklich" },
-      { emoji: "😌", label: "Zufrieden" },
-      { emoji: "😐", label: "Neutral" },
-      { emoji: "😢", label: "Traurig" },
-      { emoji: "😰", label: "Ängstlich" },
-      { emoji: "😤", label: "Gestresst" },
-      { emoji: "😴", label: "Müde" },
-      { emoji: "😠", label: "Wütend" },
-      { emoji: "😕", label: "Verwirrt" },
-      { emoji: "🥰", label: "Verliebt" },
+      { emoji: '😊', label: 'Glücklich' },
+      { emoji: '😌', label: 'Zufrieden' },
+      { emoji: '😐', label: 'Neutral' },
+      { emoji: '😢', label: 'Traurig' },
+      { emoji: '😰', label: 'Ängstlich' },
+      { emoji: '😤', label: 'Gestresst' },
+      { emoji: '😴', label: 'Müde' },
+      { emoji: '😠', label: 'Wütend' },
+      { emoji: '😕', label: 'Verwirrt' },
+      { emoji: '🥰', label: 'Verliebt' },
     ],
   },
   {
-    question: "Hast du genug geschlafen?",
+    question: 'Hast du genug geschlafen?',
     options: [
-      { emoji: "😊", label: "Ausgeschlafen" },
-      { emoji: "😴", label: "Etwas müde" },
-      { emoji: "💤", label: "Unruhig geschlafen" },
-      { emoji: "😩", label: "Kaum geschlafen" },
-      { emoji: "😵", label: "Zu viel geschlafen" },
+      { emoji: '😊', label: 'Ausgeschlafen' },
+      { emoji: '😴', label: 'Etwas müde' },
+      { emoji: '💤', label: 'Unruhig geschlafen' },
+      { emoji: '😩', label: 'Kaum geschlafen' },
+      { emoji: '😵', label: 'Zu viel geschlafen' },
     ],
   },
   {
-    question: "Hast du gegessen?",
+    question: 'Hast du gegessen?',
     options: [
-      { emoji: "🍽️", label: "Regelmäßig gegessen" },
-      { emoji: "🥗", label: "Etwas Kleines gegessen" },
-      { emoji: "🍿", label: "Nur gesnackt" },
-      { emoji: "❌", label: "Mahlzeit ausgelassen" },
-      { emoji: "🤢", label: "Zu viel gegessen, fühle mich unwohl" },
+      { emoji: '🍽️', label: 'Regelmäßig gegessen' },
+      { emoji: '🥗', label: 'Etwas Kleines gegessen' },
+      { emoji: '🍿', label: 'Nur gesnackt' },
+      { emoji: '❌', label: 'Mahlzeit ausgelassen' },
+      { emoji: '🤢', label: 'Zu viel gegessen, fühle mich unwohl' },
     ],
   },
   {
-    question: "Hast du dich bewegt / warst du draußen?",
+    question: 'Hast du dich bewegt / warst du draußen?',
     options: [
-      { emoji: "🌳", label: "Viel bewegt & draußen gewesen" },
-      { emoji: "🚶", label: "Kurz draußen gewesen" },
-      { emoji: "🏠", label: "Drinnen geblieben" },
-      { emoji: "💪", label: "Sport gemacht" },
-      { emoji: "🧘", label: "Leichte Bewegung / Stretching" },
-      { emoji: "💤", label: "Keine Bewegung" },
+      { emoji: '🌳', label: 'Viel bewegt & draußen gewesen' },
+      { emoji: '🚶', label: 'Kurz draußen gewesen' },
+      { emoji: '🏠', label: 'Drinnen geblieben' },
+      { emoji: '💪', label: 'Sport gemacht' },
+      { emoji: '🧘', label: 'Leichte Bewegung / Stretching' },
+      { emoji: '💤', label: 'Keine Bewegung' },
     ],
   },
   {
-    question: "Wie fühlst du dich körperlich?",
+    question: 'Wie fühlst du dich körperlich?',
     options: [
-      { emoji: "💚", label: "Energetisch" },
-      { emoji: "😌", label: "Entspannt" },
-      { emoji: "😩", label: "Erschöpft" },
-      { emoji: "😣", label: "Schmerzen" },
-      { emoji: "🤒", label: "Krank" },
-      { emoji: "😫", label: "Schwach" },
+      { emoji: '💚', label: 'Energetisch' },
+      { emoji: '😌', label: 'Entspannt' },
+      { emoji: '😩', label: 'Erschöpft' },
+      { emoji: '😣', label: 'Schmerzen' },
+      { emoji: '🤒', label: 'Krank' },
+      { emoji: '😫', label: 'Schwach' },
     ],
   },
   {
-    question: "Stresslevel",
+    question: 'Stresslevel',
     options: [
-      { emoji: "😌", label: "Entspannt" },
-      { emoji: "😐", label: "Etwas angespannt" },
-      { emoji: "😤", label: "Gestresst" },
-      { emoji: "🤯", label: "Überfordert" },
+      { emoji: '😌', label: 'Entspannt' },
+      { emoji: '😐', label: 'Etwas angespannt' },
+      { emoji: '😤', label: 'Gestresst' },
+      { emoji: '🤯', label: 'Überfordert' },
     ],
   },
   {
-    question: "Fokus & Produktivität",
+    question: 'Fokus & Produktivität',
     options: [
-      { emoji: "🎯", label: "Sehr fokussiert" },
-      { emoji: "😊", label: "Produktiv" },
-      { emoji: "😐", label: "Abgelenkt" },
-      { emoji: "😞", label: "Unmotiviert" },
+      { emoji: '🎯', label: 'Sehr fokussiert' },
+      { emoji: '😊', label: 'Produktiv' },
+      { emoji: '😐', label: 'Abgelenkt' },
+      { emoji: '😞', label: 'Unmotiviert' },
     ],
   },
   {
-    question: "Soziale Verbindung heute",
+    question: 'Soziale Verbindung heute',
     options: [
-      { emoji: "❤️", label: "Zeit mit anderen verbracht" },
-      { emoji: "💬", label: "Mit jemandem gesprochen" },
-      { emoji: "😔", label: "Einsam gefühlt" },
-      { emoji: "🚫", label: "Allein sein wollen" },
+      { emoji: '❤️', label: 'Zeit mit anderen verbracht' },
+      { emoji: '💬', label: 'Mit jemandem gesprochen' },
+      { emoji: '😔', label: 'Einsam gefühlt' },
+      { emoji: '🚫', label: 'Allein sein wollen' },
     ],
   },
   {
-    question: "Selbstfürsorge",
+    question: 'Selbstfürsorge',
     options: [
-      { emoji: "💚", label: "Etwas für mich getan" },
-      { emoji: "🎨", label: "Etwas Schönes gemacht" },
-      { emoji: "🧘", label: "Entspannt / meditiert" },
-      { emoji: "🚫", label: "Keine Selbstfürsorge" },
+      { emoji: '💚', label: 'Etwas für mich getan' },
+      { emoji: '🎨', label: 'Etwas Schönes gemacht' },
+      { emoji: '🧘', label: 'Entspannt / meditiert' },
+      { emoji: '🚫', label: 'Keine Selbstfürsorge' },
     ],
   },
   {
-    question: "Dankbarkeit / Highlight des Tages",
+    question: 'Dankbarkeit / Highlight des Tages',
     options: [
-      { emoji: "🌟", label: "Etwas Gutes ist passiert" },
-      { emoji: "❤️", label: "Dankbar" },
-      { emoji: "😔", label: "Schwieriger Tag" },
-      { emoji: "❌", label: "Nichts Positives heute" },
+      { emoji: '🌟', label: 'Etwas Gutes ist passiert' },
+      { emoji: '❤️', label: 'Dankbar' },
+      { emoji: '😔', label: 'Schwieriger Tag' },
+      { emoji: '❌', label: 'Nichts Positives heute' },
     ],
   },
 ];
@@ -149,8 +149,8 @@ const MoodTrackerPage = () => {
         <img src={feeloraLogo} alt="Feelora" className="w-10 h-10" />
         <div className="bg-tertiary rounded-2xl rounded-bl-sm px-4 py-3 max-w-md">
           <p className="text-foreground">
-            Hey Nina! Möchtest du mir etwas über deine aktuelle Stimmung erzählen? 
-            Wie fühlst du dich heute?
+            Hey Nina! Möchtest du mir etwas über deine aktuelle Stimmung erzählen? Wie fühlst du
+            dich heute?
           </p>
         </div>
       </div>
@@ -159,16 +159,14 @@ const MoodTrackerPage = () => {
       <div className="space-y-8">
         {moodCategories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="feelora-card">
-            <h3 className="font-semibold text-foreground mb-4">
-              {category.question}
-            </h3>
+            <h3 className="font-semibold text-foreground mb-4">{category.question}</h3>
             <div className="flex flex-wrap gap-2">
               {category.options.map((option, optionIndex) => (
                 <button
                   key={optionIndex}
                   onClick={() => toggleMood(categoryIndex, option.label)}
                   className={`mood-chip ${
-                    isMoodSelected(categoryIndex, option.label) ? "mood-chip-selected" : ""
+                    isMoodSelected(categoryIndex, option.label) ? 'mood-chip-selected' : ''
                   }`}
                 >
                   <span className="text-lg">{option.emoji}</span>

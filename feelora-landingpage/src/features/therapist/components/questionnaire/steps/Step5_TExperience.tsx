@@ -1,8 +1,7 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
-import { z } from "zod";
-import { useStepValidation } from "@/hooks/useStepValidation";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { z } from 'zod';
+import { useStepValidation } from '@/hooks/useStepValidation';
 
 interface ExperienceStepProps {
   onNext: () => void;
@@ -13,30 +12,30 @@ interface ExperienceStepProps {
 
 const experienceOptions = [
   {
-    id: "supervision",
-    label: "Unter Supervision",
-    description: "Frisch/e Absolvent:Innen und Therapeut:Innen unter Supervision",
+    id: 'supervision',
+    label: 'Unter Supervision',
+    description: 'Frisch/e Absolvent:Innen und Therapeut:Innen unter Supervision',
   },
   {
-    id: "1-3years",
-    label: "1-3 Jahre Erfahung",
-    description: "Solo Therapeut:In",
+    id: '1-3years',
+    label: '1-3 Jahre Erfahung',
+    description: 'Solo Therapeut:In',
   },
   {
-    id: "3+years",
-    label: "3+ Jahre",
-    description: "",
+    id: '3+years',
+    label: '3+ Jahre',
+    description: '',
   },
 ];
 
 // Define validation schema expecting an object with a "selection" array
 const step5Schema = z.object({
-  selection: z.array(z.string()).min(1, "Bitte wähle eine Option aus"),
+  selection: z.array(z.string()).min(1, 'Bitte wähle eine Option aus'),
 });
 
 const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
   const safeData = data || [];
-  const currentValue = safeData[0] || "";
+  const currentValue = safeData[0] || '';
 
   // Initialize validation  hook
   const { errors, validateAndNext, clearError } = useStepValidation({
@@ -46,7 +45,7 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
   });
 
   const handleValueChange = (value: string) => {
-    clearError("selection"); // Clear error on selection
+    clearError('selection'); // Clear error on selection
     onDataChange([value]);
   };
 
@@ -54,9 +53,7 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">Erfahrung seit</h1>
-        <p className="text-muted-foreground">
-          Erzähle uns von deiner Erfahrung als Therapeut:In.
-        </p>
+        <p className="text-muted-foreground">Erzähle uns von deiner Erfahrung als Therapeut:In.</p>
         {/* Error message in header */}
         {errors.selection && (
           <p className="text-sm text-destructive font-semibold mt-2">
@@ -67,7 +64,9 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
 
       <div className="feelora-card">
         {/* Visual error wrapper around the RadioGroup */}
-        <div className={`p-1 rounded-xl ${errors.selection ? "border border-destructive/50 bg-destructive/5" : ""}`}>
+        <div
+          className={`p-1 rounded-xl ${errors.selection ? 'border border-destructive/50 bg-destructive/5' : ''}`}
+        >
           <RadioGroup value={currentValue} onValueChange={handleValueChange} className="space-y-4">
             {experienceOptions.map((option) => {
               const isSelected = currentValue === option.id;
@@ -77,11 +76,11 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
                   key={option.id}
                   htmlFor={option.id}
                   className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
-                    isSelected 
-                      ? "border-purple bg-purple/5" 
+                    isSelected
+                      ? 'border-purple bg-purple/5'
                       : errors.selection
-                        ? "border-destructive/50 hover:bg-destructive/10"
-                        : "border-border hover:bg-muted/50"
+                        ? 'border-destructive/50 hover:bg-destructive/10'
+                        : 'border-border hover:bg-muted/50'
                   }`}
                 >
                   <RadioGroupItem value={option.id} id={option.id} className="mt-1" />

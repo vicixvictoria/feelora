@@ -1,15 +1,15 @@
-import { Input } from "@/components/ui/questionnaire/input";
-import { Label } from "@/components/ui/label";
-import { useStepValidation } from "@/hooks/useStepValidation";
-import { z } from "zod"; 
+import { Input } from '@/components/ui/questionnaire/input';
+import { Label } from '@/components/ui/label';
+import { useStepValidation } from '@/hooks/useStepValidation';
+import { z } from 'zod';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+} from '@/components/ui/select';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -19,35 +19,34 @@ interface PersonalDataStepProps {
 }
 
 const genderOptions = [
-  { value: "male", label: "Männlich" },
-  { value: "female", label: "Weiblich" },
-  { value: "diverse", label: "Divers" },
+  { value: 'male', label: 'Männlich' },
+  { value: 'female', label: 'Weiblich' },
+  { value: 'diverse', label: 'Divers' },
 ];
 
 const fieldLabels: Record<string, string> = {
-  firstName: "Vorname",
-  lastName: "Nachname",
-  bday: "Geburtstag",
-  gender: "Geschlecht",
+  firstName: 'Vorname',
+  lastName: 'Nachname',
+  bday: 'Geburtstag',
+  gender: 'Geschlecht',
 };
 
 // Define Rules specifically for THIS step
 const step2Schema = z.object({
-  firstName: z.string().min(1, "Required"),
-  lastName: z.string().min(1, "Required"),
-  bday: z.string().min(1, "Required"),
-  gender: z.string().min(1, "Required"),
+  firstName: z.string().min(1, 'Required'),
+  lastName: z.string().min(1, 'Required'),
+  bday: z.string().min(1, 'Required'),
+  gender: z.string().min(1, 'Required'),
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
-  
   // Use the hook (One line of logic!)
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step2Schema,
     onNext,
   });
-  
+
   const handleChange = (field: string, value: string) => {
     clearError(field); // Clears red border from error immediately
     onDataChange({ ...data, [field]: value });
@@ -57,9 +56,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Persönliche Daten
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Persönliche Daten</h1>
         <p className="text-muted-foreground">
           Bitte teile uns deine persönlichen Daten für dein Profil mit.
         </p>
@@ -68,19 +65,24 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
       {/* Form Card */}
       <div className="feelora-card">
         <h2 className="text-lg font-semibold text-foreground mb-6">Deine Information</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => (
             <div key={field} className="space-y-2">
-              <Label htmlFor={field} className={errors[field] ? "text-destructive" : "text-foreground"}>
+              <Label
+                htmlFor={field}
+                className={errors[field] ? 'text-destructive' : 'text-foreground'}
+              >
                 {fieldLabels[field]}
               </Label>
-                {field === "gender" ? (
+              {field === 'gender' ? (
                 <Select
-                  value={data[field] || ""}
+                  value={data[field] || ''}
                   onValueChange={(value) => handleChange(field, value)}
                 >
-                  <SelectTrigger className={`bg-background ${errors[field] ? "border-destructive ring-destructive" : ""}`}>
+                  <SelectTrigger
+                    className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                  >
                     <SelectValue placeholder="Bitte wählen" />
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
@@ -92,14 +94,14 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                   </SelectContent>
                 </Select>
               ) : (
-              <Input
-                id={field}
-                name={field}
-                type={field === "bday" ? "date" : "text"}
-                value={data[field] || ""}
-                onChange={(e) => handleChange(field, e.target.value)}
-                className={`bg-background ${errors[field] ? "border-destructive focus-visible:ring-destructive" : ""}`}
-               />
+                <Input
+                  id={field}
+                  name={field}
+                  type={field === 'bday' ? 'date' : 'text'}
+                  value={data[field] || ''}
+                  onChange={(e) => handleChange(field, e.target.value)}
+                  className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                />
               )}
             </div>
           ))}

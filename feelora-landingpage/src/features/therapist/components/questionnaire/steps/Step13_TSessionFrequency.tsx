@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { Checkbox } from '@/components/ui/checkbox';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 
 // Props Interface
 interface SessionFrequencyStepProps {
@@ -11,14 +11,23 @@ interface SessionFrequencyStepProps {
 
 // List of session frequency options - add more if needed
 const frequencyOptions = [
-  { id: "flexibel", label: "Flexibel", description: "Ganz nach Patient:Innen Wunsch" },
-  { id: "woechentlich", label: "Wöchentlich", description: "Wöchentlich wiederholende Termine" },
-  { id: "zweiwoechentlich", label: "Zweiwöchentlich", description: "Termine wiederholen alle zwei Wochen" },
-  { id: "keine-praeferenz", label: "Keine Präferenz", description: "" },
+  { id: 'flexibel', label: 'Flexibel', description: 'Ganz nach Patient:Innen Wunsch' },
+  { id: 'woechentlich', label: 'Wöchentlich', description: 'Wöchentlich wiederholende Termine' },
+  {
+    id: 'zweiwoechentlich',
+    label: 'Zweiwöchentlich',
+    description: 'Termine wiederholen alle zwei Wochen',
+  },
+  { id: 'keine-praeferenz', label: 'Keine Präferenz', description: '' },
 ];
 
 // Step Component
-const Step13_TSessionFrequency = ({ onNext, onBack, data = [], onDataChange }: SessionFrequencyStepProps) => {
+const Step13_TSessionFrequency = ({
+  onNext,
+  onBack,
+  data = [],
+  onDataChange,
+}: SessionFrequencyStepProps) => {
   const safeData = data || [];
   const handleToggle = (id: string) => {
     if (safeData.includes(id)) {
@@ -31,9 +40,7 @@ const Step13_TSessionFrequency = ({ onNext, onBack, data = [], onDataChange }: S
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Sitzungsfrequenz
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Sitzungsfrequenz</h1>
         <p className="text-muted-foreground mb-2">
           Erzähle uns von deiner bevorzugten Sitzungsfrequenz.
         </p>

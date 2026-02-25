@@ -7,12 +7,11 @@ import { Card } from '@/components/ui/cardLanding';
 import forPatientsImg from '@/assets/for_patients.png';
 import moodTrackerDemo from '@/assets/MoodTrackerDemo.png';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function ForPatientsSection() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -20,35 +19,15 @@ export function ForPatientsSection() {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  {/* 🚧 TEST ONLY: Temporary route to questionnaire 🚧 */}
-  const questionNav = () => {
-    navigate('/test-patient');
-    setIsMobileMenuOpen(false);
-  };
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   const handleLoginClick = () => {
     navigate('/login');
-    setIsMobileMenuOpen(false);
   };
-
-  const patientDashboardNav = () => {
-    navigate('/patient');
-    setIsMobileMenuOpen(false);
-  };
-  
 
   const features = [
     {
       icon: HeartIcon,
       title: t('patients.feature1.title'),
-      description:  t('patients.feature1.desc'),
+      description: t('patients.feature1.desc'),
       hasMiniature: false,
     },
     {
@@ -83,11 +62,11 @@ export function ForPatientsSection() {
         >
           <div>
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              {t('patients.title')} 
+              {t('patients.title')}
             </h2>
             <p className="text-body-large mb-12 leading-body" style={{ color: '#2F3E46' }}>
               {t('patients.description')}
-              </p>
+            </p>
 
             <div className="space-y-8 mb-12">
               {features.map((feature, index) => (
@@ -100,7 +79,10 @@ export function ForPatientsSection() {
                   <Card className="p-8 bg-card border-border hover:shadow-lg transition-shadow">
                     <div className="flex items-start gap-6">
                       <div className="flex-shrink-0 w-14 h-14 rounded-full bg-tertiary flex items-center justify-center">
-                        <feature.icon className="w-7 h-7 text-tertiary-foreground" strokeWidth={1.5} />
+                        <feature.icon
+                          className="w-7 h-7 text-tertiary-foreground"
+                          strokeWidth={1.5}
+                        />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-3">
@@ -133,7 +115,7 @@ export function ForPatientsSection() {
                               className="w-full h-full object-cover"
                             />
                           </motion.div>
-                                              
+
                           <AnimatePresence>
                             {isHovered && (
                               <motion.div
@@ -168,7 +150,7 @@ export function ForPatientsSection() {
               //onClick={patientDashboardNav} // --> only use for testing Dashboard UI without Auth//
               className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8"
             >
-            {t('patients.cta')}
+              {t('patients.cta')}
             </Button>
           </div>
 

@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import { ReactNode } from 'react';
+import Header from './Header';
+import Sidebar from './Sidebar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -12,9 +12,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <Header />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-8 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-8 overflow-auto">{children}</main>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // 3. (Optional) Add a "Response Interceptor" for global error handling
@@ -38,11 +38,11 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid - redirect to login
-      console.warn("Unauthorized! Redirecting to login...");
-       window.location.href = '/login'; 
+      console.warn('Unauthorized! Redirecting to login...');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

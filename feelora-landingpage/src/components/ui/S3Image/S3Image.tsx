@@ -26,22 +26,22 @@ export function S3Image({ imagePath, className, alt, ...props }: S3ImageProps) {
 
     // 3. Type Narrowing: Create a local constant.
     // TypeScript now knows 'validatedPath' is strictly a string.
-    const validatedPath = imagePath; 
+    const validatedPath = imagePath;
     let isMounted = true; //cleanup flag to prevent state updates on unmounted component
 
     // 4. Async function to fetch the signed URL from S3 using Amplify's getUrl method.
     async function fetchImage() {
       try {
         setIsLoading(true);
-        
+
         // This now matches Overload 1 (GetUrlWithPathInput)
         const result = await getUrl({
-          path: validatedPath, 
-          options: { 
-            validateObjectExistence: true // makes the call faile if the file doesn't exist
-          }
+          path: validatedPath,
+          options: {
+            validateObjectExistence: true, // makes the call faile if the file doesn't exist
+          },
         });
-        
+
         if (isMounted) setSrc(result.url.toString()); //Converts the AWS URL object into a string for the <img src="...">
       } catch (err) {
         console.error(`Failed to load image:`, err);
@@ -53,11 +53,14 @@ export function S3Image({ imagePath, className, alt, ...props }: S3ImageProps) {
 
     fetchImage();
 
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [imagePath]);
 
   // UI States - Conditional Rendering based on loading and error states
-  if (isLoading) {  // 1. Show a loading spinner while the image is being fetched from S3
+  if (isLoading) {
+    // 1. Show a loading spinner while the image is being fetched from S3
     return (
       <div className={`bg-gray-100 flex items-center justify-center ${className}`}>
         <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
@@ -65,7 +68,8 @@ export function S3Image({ imagePath, className, alt, ...props }: S3ImageProps) {
     );
   }
 
-  if (error || !src) {  // 2. If there was an error fetching the image (e.g., file doesn't exist, network issue), show a placeholder with an "image off" icon.
+  if (error || !src) {
+    // 2. If there was an error fetching the image (e.g., file doesn't exist, network issue), show a placeholder with an "image off" icon.
     return (
       <div className={`bg-gray-100 flex items-center justify-center ${className}`}>
         <ImageOff className="w-6 h-6 text-gray-400" />

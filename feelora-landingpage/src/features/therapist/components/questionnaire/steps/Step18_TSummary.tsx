@@ -1,5 +1,5 @@
-import { Pencil, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Pencil, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // --- Steps ---
 interface SummaryStepProps {
@@ -35,27 +35,27 @@ interface SummarySection {
   content: React.ReactNode;
 }
 
-// Step Component for final summary and review of all answers before submission           
-const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => {
-  const formatArray = (arr: string[] | undefined, fallback = "—") => {
-    if (!arr || arr.length === 0) return fallback;
-    return arr.join(", ");
-  };
-  
-  const formatArrayWithOther = (selected: string[] | undefined, other?: string | string[]) => {
-    const items = selected || [];
-    const otherItems = Array.isArray(other) ? other : other ? [other] : [];
-    const combined = [...items, ...otherItems];
-    return combined.length > 0 ? combined.join(", ") : "—";
-  };
+const formatArray = (arr: string[] | undefined, fallback = '—') => {
+  if (!arr || arr.length === 0) return fallback;
+  return arr.join(', ');
+};
 
+const formatArrayWithOther = (selected: string[] | undefined, other?: string | string[]) => {
+  const items = selected || [];
+  const otherItems = Array.isArray(other) ? other : other ? [other] : [];
+  const combined = [...items, ...otherItems];
+  return combined.length > 0 ? combined.join(', ') : '—';
+};
+
+// Step Component for final summary and review of all answers before submission
+const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => {
   const sections: SummarySection[] = [
     {
       step: 1,
-      title: "Persönliche Daten",
+      title: 'Persönliche Daten',
       content: (
         <p className="text-foreground/80">
-          {data.personalData?.firstName || "—"} {data.personalData?.lastName || ""}
+          {data.personalData?.firstName || '—'} {data.personalData?.lastName || ''}
           {data.personalData?.title && ` (${data.personalData.title})`}
           {data.personalData?.age && `, ${data.personalData.age} Jahre`}
           {data.personalData?.profession && `, ${data.personalData.profession}`}
@@ -64,45 +64,49 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 2,
-      title: "Kontaktinformationen",
+      title: 'Kontaktinformationen',
       content: (
         <>
           <p className="text-foreground/80">
-            Mobil: {data.contactInfo?.phone || "—"}
-            {" · "}Mail: {data.contactInfo?.email || "—"}
+            Mobil: {data.contactInfo?.phone || '—'}
+            {' · '}Mail: {data.contactInfo?.email || '—'}
           </p>
           <p className="text-foreground/80">
-            {data.contactInfo?.address || "—"}, {data.contactInfo?.postalCode || ""}{" "}
-            {data.contactInfo?.city || ""}, {data.contactInfo?.country || "—"}
+            {data.contactInfo?.address || '—'}, {data.contactInfo?.postalCode || ''}{' '}
+            {data.contactInfo?.city || ''}, {data.contactInfo?.country || '—'}
           </p>
         </>
       ),
     },
     {
       step: 3,
-      title: "Titel und Qualifikationen",
+      title: 'Titel und Qualifikationen',
       content: (
         <>
           <p className="text-foreground/80">
-            Titel: {data.qualifications?.titlePrefix || "—"}
-            {data.qualifications?.titleFromPrefix && ` (von ${data.qualifications.titleFromPrefix})`}
+            Titel: {data.qualifications?.titlePrefix || '—'}
+            {data.qualifications?.titleFromPrefix &&
+              ` (von ${data.qualifications.titleFromPrefix})`}
             {data.qualifications?.titleSuffix && `, ${data.qualifications.titleSuffix}`}
-            {data.qualifications?.titleFromSuffix && ` (von ${data.qualifications.titleFromSuffix})`}
+            {data.qualifications?.titleFromSuffix &&
+              ` (von ${data.qualifications.titleFromSuffix})`}
           </p>
           {data.qualifications?.qualifications && (
-            <p className="text-foreground/80">Qualifikationen: {data.qualifications.qualifications}</p>
+            <p className="text-foreground/80">
+              Qualifikationen: {data.qualifications.qualifications}
+            </p>
           )}
         </>
       ),
     },
     {
       step: 4,
-      title: "Erfahrung seit",
+      title: 'Erfahrung seit',
       content: <p className="text-foreground/80">{formatArray(data.experience)}</p>,
     },
     {
       step: 5,
-      title: "Fachgebiete",
+      title: 'Fachgebiete',
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.specialties?.selected, data.specialties?.other)}
@@ -111,7 +115,7 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 6,
-      title: "Sprachen",
+      title: 'Sprachen',
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.languages?.selected, data.languages?.other)}
@@ -120,7 +124,7 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 7,
-      title: "Therapieschule",
+      title: 'Therapieschule',
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other)}
@@ -129,37 +133,37 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 8,
-      title: "Genaue Therapiemethode(n)",
-      content: <p className="text-foreground/80">{data.therapyMethods || "—"}</p>,
+      title: 'Genaue Therapiemethode(n)',
+      content: <p className="text-foreground/80">{data.therapyMethods || '—'}</p>,
     },
     {
       step: 9,
-      title: "Bevorzugtes Therapie Setting Modus",
+      title: 'Bevorzugtes Therapie Setting Modus',
       content: <p className="text-foreground/80">{formatArray(data.therapySetting)}</p>,
     },
     {
       step: 10,
-      title: "Bevorzugtes Therapie Setting Format",
+      title: 'Bevorzugtes Therapie Setting Format',
       content: <p className="text-foreground/80">{formatArray(data.therapyFormat)}</p>,
     },
     {
       step: 11,
-      title: "Therapiedauer",
-      content: <p className="text-foreground/80">{data.therapyDuration || "—"}</p>,
+      title: 'Therapiedauer',
+      content: <p className="text-foreground/80">{data.therapyDuration || '—'}</p>,
     },
     {
       step: 12,
-      title: "Sitzungsfrequenz",
+      title: 'Sitzungsfrequenz',
       content: <p className="text-foreground/80">{formatArray(data.sessionFrequency)}</p>,
     },
     {
       step: 13,
-      title: "Patient:Innen Geschlecht",
+      title: 'Patient:Innen Geschlecht',
       content: <p className="text-foreground/80">{formatArray(data.patientGender)}</p>,
     },
     {
       step: 14,
-      title: "Werte und Präferenzen",
+      title: 'Werte und Präferenzen',
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.valuesPreferences?.selected, data.valuesPreferences?.other)}
@@ -168,12 +172,12 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 15,
-      title: "Zusätzliche Information",
-      content: <p className="text-foreground/80">{data.additionalInfo || "—"}</p>,
+      title: 'Zusätzliche Information',
+      content: <p className="text-foreground/80">{data.additionalInfo || '—'}</p>,
     },
     {
       step: 16,
-      title: "Verfügbarkeit",
+      title: 'Verfügbarkeit',
       content: (
         <p className="text-foreground/80">
           {formatArray(data.availability?.map((d) => d.toUpperCase()))}
@@ -187,16 +191,14 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">Zusammenfassung</h1>
         <p className="text-muted-foreground">
-          Bitte überprüfe alle Daten und deine Antworten, bevor du den Screening-Fragebogen absendest.
+          Bitte überprüfe alle Daten und deine Antworten, bevor du den Screening-Fragebogen
+          absendest.
         </p>
       </div>
       {/* Summary Sections */}
       <div className="space-y-4">
         {sections.map((section) => (
-          <div
-            key={section.step}
-            className="feelora-card relative"
-          >
+          <div key={section.step} className="feelora-card relative">
             <button
               onClick={() => onEdit(section.step)}
               className="absolute top-4 right-4 p-2 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-colors"

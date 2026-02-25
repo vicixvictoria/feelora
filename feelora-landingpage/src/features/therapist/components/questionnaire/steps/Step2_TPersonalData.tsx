@@ -1,15 +1,15 @@
-import { Input } from "@/components/ui/questionnaire/input";
-import { Label } from "@/components/ui/label";
+import { Input } from '@/components/ui/questionnaire/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
-import { z } from "zod";
-import { useStepValidation } from "@/hooks/useStepValidation";
+} from '@/components/ui/select';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { z } from 'zod';
+import { useStepValidation } from '@/hooks/useStepValidation';
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -19,36 +19,35 @@ interface PersonalDataStepProps {
 }
 
 const genderOptions = [
-  { value: "male", label: "Männlich" },
-  { value: "female", label: "Weiblich" },
-  { value: "diverse", label: "Divers" },
+  { value: 'male', label: 'Männlich' },
+  { value: 'female', label: 'Weiblich' },
+  { value: 'diverse', label: 'Divers' },
 ];
 
 const fieldLabels: Record<string, string> = {
-  firstName: "Vorname",
-  lastName: "Nachname",
-  bday: "Geburtstag",
-  gender: "Geschlecht",
-  job: "Berufsbezeichnung",
-  title: "Titel (wird vor dem Namen angezeigt)", //maybe we use this to show the title in the profile, optional
+  firstName: 'Vorname',
+  lastName: 'Nachname',
+  bday: 'Geburtstag',
+  gender: 'Geschlecht',
+  job: 'Berufsbezeichnung',
+  title: 'Titel (wird vor dem Namen angezeigt)', //maybe we use this to show the title in the profile, optional
 };
 
 // Define which fields are optional
-const optionalFields = ["title"];
+const optionalFields = ['title'];
 
 // Define the Validation Schema
 const step2Schema = z.object({
-  firstName: z.string().min(1, "Required"),
-  lastName: z.string().min(1, "Required"),
-  bday: z.string().min(1, "Required"),
-  gender: z.string().min(1, "Required"),
-  job: z.string().min(1, "Required"),
+  firstName: z.string().min(1, 'Required'),
+  lastName: z.string().min(1, 'Required'),
+  bday: z.string().min(1, 'Required'),
+  gender: z.string().min(1, 'Required'),
+  job: z.string().min(1, 'Required'),
   // Title is explicitly optional (no .min(1) required)
   title: z.string().optional(),
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
- 
   //  Initialize the validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -65,9 +64,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Persönliche Daten
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Persönliche Daten</h1>
         <p className="text-muted-foreground">
           Bitte teile uns deine persönlichen Daten für dein Profil mit.
         </p>
@@ -76,7 +73,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
       {/* Form Card */}
       <div className="feelora-card">
         <h2 className="text-lg font-semibold text-foreground mb-6">Deine Information</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
             const isOptional = optionalFields.includes(field);
@@ -84,20 +81,26 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
             return (
               <div key={field} className="space-y-2">
                 {/* Dynamic Label with Error Styling and Optional tag */}
-                <Label 
-                  htmlFor={field} 
-                  className={errors[field] ? "text-destructive" : "text-foreground"}
+                <Label
+                  htmlFor={field}
+                  className={errors[field] ? 'text-destructive' : 'text-foreground'}
                 >
-                  {fieldLabels[field]} {!isOptional && errors[field] && "*"}
-                  {isOptional && <span className="text-muted-foreground font-normal text-xs ml-1">(optional)</span>}
+                  {fieldLabels[field]} {!isOptional && errors[field] && '*'}
+                  {isOptional && (
+                    <span className="text-muted-foreground font-normal text-xs ml-1">
+                      (optional)
+                    </span>
+                  )}
                 </Label>
 
-                {field === "gender" ? (
+                {field === 'gender' ? (
                   <Select
-                    value={data[field] || ""}
+                    value={data[field] || ''}
                     onValueChange={(value) => handleChange(field, value)}
                   >
-                    <SelectTrigger className={`bg-background ${errors[field] ? "border-destructive ring-destructive" : ""}`}>
+                    <SelectTrigger
+                      className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                    >
                       <SelectValue placeholder="Bitte wählen" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
@@ -111,17 +114,19 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                 ) : (
                   <Input
                     id={field}
-                    type={field === "bday" ? "date" : "text"}
-                    value={data[field] || ""}
+                    type={field === 'bday' ? 'date' : 'text'}
+                    value={data[field] || ''}
                     onChange={(e) => handleChange(field, e.target.value)}
-                    placeholder={field === "title" ? "z.B. Dr. med." : ""}
-                    className={`bg-background ${errors[field] ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    placeholder={field === 'title' ? 'z.B. Dr. med.' : ''}
+                    className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                 )}
-                
+
                 {/* Error message for mandatory fields */}
                 {errors[field] && !isOptional && (
-                  <p className="text-xs text-destructive font-medium">Dieses Feld ist erforderlich</p>
+                  <p className="text-xs text-destructive font-medium">
+                    Dieses Feld ist erforderlich
+                  </p>
                 )}
               </div>
             );

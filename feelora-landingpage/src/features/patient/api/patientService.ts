@@ -1,8 +1,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
-import { MatchingAlgorithmResponse, QuestionnaireData } from '../types/questionnaire';
+import { QuestionnaireData } from '../types/questionnaire';
 import { PatientProfile, MatchedTherapist } from '../types/profiles';
-
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
 
@@ -90,26 +89,17 @@ const SAVE_MATCH_MUTATION = gql`
   }
 `;
 
-// For pinging algorithm 
+// For pinging algorithm
 const PING_LAMBDA_QUERY = gql`
   query PingLambda {
     pingLambda
   }
 `;
 
-// Helper function to guarantee an array
-const ensureArray = (val: any) => {
-  if (!val) return [];
-  return Array.isArray(val) ? val : [val];
-};
-
 // --- Service Object --- //
 export const patientService = {
-
-
   // -- API call to submit the questionnaire and get matches based on the input data --
   submitQuestionnaire: async (data: QuestionnaireData): Promise<any> => {
-    
     // 1. Prepare Input (Matches 'MatchingInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
@@ -118,34 +108,32 @@ export const patientService = {
         gender: data.therapistGender,
         setting: data.therapySetting,
         availability: data.availability || [],
-      })
+      }),
     };
 
-   try {
-    const { data: responseData } = await apolloClient.mutate({
-      mutation: MATCHING_ALGORITHM_MUTATION,
-      variables: { input },
-    });
+    try {
+      const { data: responseData } = await apolloClient.mutate({
+        mutation: MATCHING_ALGORITHM_MUTATION,
+        variables: { input },
+      });
 
-    // The backend returns [Match]!, so responseData.matchingAlgorithm is an array
-    return {
-      success: true,
-      matches: responseData.matchingAlgorithm, 
-    };
-  } catch (error: unknown) {
-    console.error("Matching Error:", error);
-    const errorMessage = error instanceof Error 
-    ? error.message 
-    : "An error during the matching algorithm occurred";
-    
-    return {
-      success: false,
-      matches: [],
-      error: errorMessage
-    };
-  }
-},
+      // The backend returns [Match]!, so responseData.matchingAlgorithm is an array
+      return {
+        success: true,
+        matches: responseData.matchingAlgorithm,
+      };
+    } catch (error: unknown) {
+      console.error('Matching Error:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'An error during the matching algorithm occurred';
 
+      return {
+        success: false,
+        matches: [],
+        error: errorMessage,
+      };
+    }
+  },
 
   //-- Create User Profile API call --
   createPatientProfile: async (data: Partial<QuestionnaireData>): Promise<any> => {
@@ -153,8 +141,7 @@ export const patientService = {
     const input = {
       Name: data.personalData?.firstName,
       Surname: data.personalData?.lastName,
-      BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000
-        : null,
+      BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
       Gender: data.personalData?.gender,
       City: data.contactInfo?.city,
       Languages: data.languages?.selected || [],
@@ -169,12 +156,11 @@ export const patientService = {
     return responseData.saveUserProfile;
   },
 
-
   //Get patient profile API call
   getProfile: async (): Promise<PatientProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_USER_PROFILE_QUERY,
-      fetchPolicy: 'network-only' // Ensure to get fresh data
+      fetchPolicy: 'network-only', // Ensure to get fresh data
     });
     return responseData.getOwnUserProfile;
   },
@@ -182,22 +168,22 @@ export const patientService = {
   // Fetch matched therapist(s)
   getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
     // Log to understand return
-    console.log("Sending IDs to backend:", therapistIds);
-    console.log("Is it an array?", Array.isArray(therapistIds));
+    console.log('Sending IDs to backend:', therapistIds);
+    console.log('Is it an array?', Array.isArray(therapistIds));
 
     // Safety net
     if (!therapistIds || therapistIds.length === 0) {
       return [];
     }
-   const { data: responseData } = await apolloClient.query({
-     query: GET_MATCHED_THERAPISTS_QUERY,
-     variables: { TherapistsIds: therapistIds },
-   });
+    const { data: responseData } = await apolloClient.query({
+      query: GET_MATCHED_THERAPISTS_QUERY,
+      variables: { TherapistsIds: therapistIds },
+    });
 
-   return responseData.getMatchedTherapists.items || [];
- },
+    return responseData.getMatchedTherapists.items || [];
+  },
 
- // -- API call to accept and save a therapist match --
+  // -- API call to accept and save a therapist match --
   saveMatch: async (therapistId: string): Promise<boolean> => {
     try {
       const { data } = await apolloClient.mutate({
@@ -206,7 +192,7 @@ export const patientService = {
       });
       return data.saveMatch; // returns true or false
     } catch (error) {
-      console.error("Error saving match:", error);
+      console.error('Error saving match:', error);
       throw error;
     }
   },
@@ -214,14 +200,15 @@ export const patientService = {
   // -- Wake up the matching algorithm Lambda --
   pingMatchingAlgorithm: () => {
     // no "await" here! It's a "fire-and-forget" call.
-    apolloClient.query({
-      query: PING_LAMBDA_QUERY,
-      fetchPolicy: 'network-only'
-    }).catch(error => {
-      // We catch the error silently. If the ping fails, we don't want to 
-      // alert the user or stop them from continuing the questionnaire.
-      console.debug("Ping Lambda failed (ignored):", error);
-    });
+    apolloClient
+      .query({
+        query: PING_LAMBDA_QUERY,
+        fetchPolicy: 'network-only',
+      })
+      .catch((error) => {
+        // We catch the error silently. If the ping fails, we don't want to
+        // alert the user or stop them from continuing the questionnaire.
+        console.debug('Ping Lambda failed (ignored):', error);
+      });
   },
-
 };

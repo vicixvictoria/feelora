@@ -4,16 +4,18 @@ interface ProgressBarProps {
 }
 
 const ProgressBar = ({ currentStep, totalSteps }: ProgressBarProps) => {
-  const progress = ((currentStep) / totalSteps) * 100;
+  const progress = (currentStep / totalSteps) * 100;
 
   return (
     <div className="w-full max-w-2xl mx-auto mb-8">
       <div className="flex justify-between text-sm text-muted-foreground mb-2">
-        <span>Frage {currentStep} von {totalSteps}</span>
+        <span>
+          Frage {currentStep} von {totalSteps}
+        </span>
         <span>{Math.round(progress)}%</span>
       </div>
       <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div 
+        <div
           className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
           style={{ width: `${progress}%` }}
         />

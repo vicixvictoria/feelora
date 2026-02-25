@@ -145,7 +145,10 @@ export function EvidenceBasedSection() {
           <div className="absolute inset-0 flex items-center justify-center">
             <Card className="bg-background/95 backdrop-blur-sm p-10 shadow-2xl max-w-md">
               <div className="text-center">
-                <div className="text-6xl font-headline font-bold text-tertiary-foreground mb-4" aria-live="polite">
+                <div
+                  className="text-6xl font-headline font-bold text-tertiary-foreground mb-4"
+                  aria-live="polite"
+                >
                   {effectiveness}st
                 </div>
                 <p className="text-h4 font-headline font-semibold text-gray-800 mb-3">

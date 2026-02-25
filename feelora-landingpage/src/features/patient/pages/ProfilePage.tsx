@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { ExternalLink, Search, Send, Loader2 } from "lucide-react";
-import avatar from "@/assets/avatar-Placeholder.png";
-import { patientService } from "../api/patientService"; 
-import { PatientProfile, MatchedTherapist } from "../types/profiles"; // Import your new types!
+import { useEffect, useState } from 'react';
+import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
+import avatar from '@/assets/avatar-Placeholder.png';
+import { patientService } from '../api/patientService';
+import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import your new types!
 
 // Helper to convert Unix timestamp (in seconds) to Age
 const calculateAge = (birthDateUnix: number | null | undefined) => {
-  if (!birthDateUnix) return "Unbekannt";
+  if (!birthDateUnix) return 'Unbekannt';
   const birthDate = new Date(birthDateUnix * 1000);
   const ageDifMs = Date.now() - birthDate.getTime();
   const ageDate = new Date(ageDifMs);
@@ -35,8 +35,8 @@ const ProfilePage = () => {
           }
         }
       } catch (err) {
-        console.error("Error fetching profile data:", err);
-        setError("Fehler beim Laden der Profildaten.");
+        console.error('Error fetching profile data:', err);
+        setError('Fehler beim Laden der Profildaten.');
       } finally {
         setLoading(false);
       }
@@ -77,10 +77,10 @@ const ProfilePage = () => {
             </h2>
             <div className="space-y-1 text-foreground">
               <p>Alter: {calculateAge(patient.BirthDate)}</p>
-              <p>Stadt: {patient.City || "Nicht angegeben"}</p>
+              <p>Stadt: {patient.City || 'Nicht angegeben'}</p>
               <p className="mt-3">Rolle: Patient</p>
               <div className="flex items-center gap-4 mt-4">
-                <p>Therapeuten Match: {therapist ? therapist.Name : "Noch kein Match"}</p>
+                <p>Therapeuten Match: {therapist ? therapist.Name : 'Noch kein Match'}</p>
               </div>
             </div>
           </div>
@@ -94,29 +94,34 @@ const ProfilePage = () => {
       </div>
 
       {/* Therapist Section */}
-      <h2 className="text-xl font-bold text-foreground mb-4">
-        Dein/e zugewiesene/r Therapeut:in
-      </h2>
+      <h2 className="text-xl font-bold text-foreground mb-4">Dein/e zugewiesene/r Therapeut:in</h2>
 
       {therapist ? (
         <div className="feelora-card">
           <div className="flex gap-8">
             <img
               src={avatar}
-              alt={therapist.Name || "Therapeut Profilbild"}
+              alt={therapist.Name || 'Therapeut Profilbild'}
               className="w-40 h-40 rounded-lg object-cover"
             />
             <div className="flex-1">
               <h2 className="text-2xl font-semibold text-primary mb-2">
-               {therapist.Name} {therapist.Surname}
+                {therapist.Name} {therapist.Surname}
               </h2>
               <div className="space-y-1 text-foreground">
                 <p>Alter: {calculateAge(therapist.BirthDate)}</p>
-                <p>Stadt: {therapist.City || "Nicht angegeben"}</p>
+                <p>Stadt: {therapist.City || 'Nicht angegeben'}</p>
                 <p className="mt-3">Rolle: Therapeut</p>
-                <p>Spezialisierung: {therapist?.Specialties?.join(", ") || "Keine Spezialisierung angegeben"}</p>
-                <p className="mt-1">Verfügbarkeit: {therapist.Availability?.join(", ") || "Nicht angegeben"}</p>
-                {therapist.Address && <p className="mt-3">Praxis: {therapist.Address || "keine Praxis angegeben"}</p>}
+                <p>
+                  Spezialisierung:{' '}
+                  {therapist?.Specialties?.join(', ') || 'Keine Spezialisierung angegeben'}
+                </p>
+                <p className="mt-1">
+                  Verfügbarkeit: {therapist.Availability?.join(', ') || 'Nicht angegeben'}
+                </p>
+                {therapist.Address && (
+                  <p className="mt-3">Praxis: {therapist.Address || 'keine Praxis angegeben'}</p>
+                )}
                 {/* Note: Languages we need to add later */}
               </div>
             </div>

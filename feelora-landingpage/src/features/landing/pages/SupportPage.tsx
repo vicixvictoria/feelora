@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-
 export function SupportPage() {
   const { t } = useLanguage();
 
@@ -48,9 +47,7 @@ export function SupportPage() {
               </a>
 
               <div className="mt-12 pt-8 border-t border-border">
-                <p className="text-body text-gray-600 leading-body">
-                  {t('support.message')}
-                </p>
+                <p className="text-body text-gray-600 leading-body">{t('support.message')}</p>
               </div>
             </Card>
           </motion.div>

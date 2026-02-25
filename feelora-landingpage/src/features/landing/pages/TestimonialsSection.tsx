@@ -55,7 +55,10 @@ export function TestimonialsSection() {
   };
 
   return (
-    <section id="testimonials" className="py-24 px-8 bg-gradient-to-br from-tertiary/20 to-background">
+    <section
+      id="testimonials"
+      className="py-24 px-8 bg-gradient-to-br from-tertiary/20 to-background"
+    >
       <div className="max-w-5xl mx-auto">
         <motion.div
           ref={ref}
@@ -65,7 +68,7 @@ export function TestimonialsSection() {
           className="text-center mb-16"
         >
           <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-           {t('testimonials.title')}
+            {t('testimonials.title')}
           </h2>
           <p className="text-body-large text-gray-600 leading-body">
             {t('testimonials.description')}
@@ -84,7 +87,11 @@ export function TestimonialsSection() {
               <Card className="p-12 bg-card border-border shadow-xl">
                 <div className="flex justify-center mb-6">
                   {Array.from({ length: testimonials[currentIndex].rating }).map((_, i) => (
-                    <StarIcon key={i} className="w-6 h-6 text-warning fill-warning" strokeWidth={1.5} />
+                    <StarIcon
+                      key={i}
+                      className="w-6 h-6 text-warning fill-warning"
+                      strokeWidth={1.5}
+                    />
                   ))}
                 </div>
                 <p className="text-body-large text-gray-700 leading-body text-center mb-8 italic">
@@ -144,7 +151,7 @@ export function TestimonialsSection() {
             transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             className="rounded-3xl overflow-hidden shadow-2xl max-w-2xl mx-auto"
           >
-						{/*<img
+            {/*<img
               src="https://c.animaapp.com/mhahgsoyNVf0kG/img/ai_5.png"
               alt="user testimonials illustration"
               className="w-full h-auto object-cover"

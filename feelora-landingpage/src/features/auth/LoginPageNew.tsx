@@ -11,7 +11,7 @@ interface LoginPageProps {
 
 /**
  * Login page - redirects to Cognito Hosted UI via backend
- * 
+ *
  * This page provides:
  * - Social login button (Google via Cognito Hosted UI)
  * - Error display if authentication failed
@@ -71,12 +71,8 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {t('login.title')}
-          </h1>
-          <p className="text-gray-600">
-            {t('login.subtitle')}
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
+          <p className="text-gray-600">{t('login.subtitle')}</p>
         </div>
 
         {/* Error Display */}
@@ -85,7 +81,11 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -94,12 +94,13 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
                 </h3>
                 <p className="mt-1 text-sm text-red-700">{displayError}</p>
               </div>
-              <button 
-                onClick={clearError}
-                className="ml-auto text-red-400 hover:text-red-600"
-              >
+              <button onClick={clearError} className="ml-auto text-red-400 hover:text-red-600">
                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </button>
             </div>
@@ -110,15 +111,8 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
         <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Switch User Type Button */}
           <div className="flex justify-center mb-6">
-            <Button
-              onClick={handleSwitchUserType}
-              variant="outline"
-              className="text-sm"
-            >
-              {isTherapist 
-                ? t('login.redeirectButton.therapist')
-                : t('login.redeirectButton')
-              }
+            <Button onClick={handleSwitchUserType} variant="outline" className="text-sm">
+              {isTherapist ? t('login.redeirectButton.therapist') : t('login.redeirectButton')}
             </Button>
           </div>
 
@@ -145,15 +139,16 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
           </Button>
 
           <p className="mt-4 text-center text-xs text-gray-500">
-            {language === 'de' 
+            {language === 'de'
               ? 'Du kannst dich mit Google oder E-Mail & Passwort anmelden'
-              : 'You can sign in with Google or Email & Password'
-            }
+              : 'You can sign in with Google or Email & Password'}
           </p>
 
           {/* Terms */}
           <p className="mt-6 text-center text-xs text-gray-500">
-            {language === 'de' ? 'Mit der Anmeldung akzeptierst du unsere ' : 'By signing in, you agree to our '}
+            {language === 'de'
+              ? 'Mit der Anmeldung akzeptierst du unsere '
+              : 'By signing in, you agree to our '}
             <a href="/privacy" className="text-primary hover:underline">
               {t('footer.legal.privacy')}
             </a>
@@ -167,13 +162,12 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
         {/* Info Text */}
         <p className="mt-6 text-center text-sm text-gray-600">
           {isTherapist
-            ? (language === 'de' 
-                ? 'Zugriff auf dein Therapeuten-Dashboard und verwalte deine Patient:innen.'
-                : 'Access your therapist dashboard and manage your patients.')
-            : (language === 'de'
-                ? 'Finde den/die passenden Therapeut:in und starte deine Wellness-Reise.'
-                : 'Find the right therapist and start your wellness journey.')
-          }
+            ? language === 'de'
+              ? 'Zugriff auf dein Therapeuten-Dashboard und verwalte deine Patient:innen.'
+              : 'Access your therapist dashboard and manage your patients.'
+            : language === 'de'
+              ? 'Finde den/die passenden Therapeut:in und starte deine Wellness-Reise.'
+              : 'Find the right therapist and start your wellness journey.'}
         </p>
       </div>
     </div>

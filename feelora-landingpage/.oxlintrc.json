@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "off"
+  },
+  "plugins": ["react", "typescript", "jsx-a11y", "unicorn"],
+  "rules": {
+    "no-console": "off",
+    "react/react-in-jsx-scope": "off",
+    "jsx-a11y/heading-has-content": "off",
+    "jsx-a11y/anchor-has-content": "off"
+  },
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "settings": {
+    "react": {
+      "version": "18.2.0"
+    }
+  }
+}

@@ -3,20 +3,24 @@ import { Button } from '@/components/ui/buttonLanding';
 import { AnimatedWaves } from './AnimatedWaves';
 import { TitleFrame } from './TitleFrame';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
 
 export function HeroSection() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
   return (
-    <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section
+      id="hero"
+      className="relative h-screen flex items-center justify-center overflow-hidden"
+    >
       <div className="absolute inset-0 z-0">
         <AnimatedWaves />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-purple-900/30" />
@@ -43,7 +47,7 @@ export function HeroSection() {
             onClick={() => navigate('/login')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
-            {t('hero.cta.regsiter.alt')} 
+            {t('hero.cta.regsiter.alt')}
           </Button>
           <Button
             size="lg"
