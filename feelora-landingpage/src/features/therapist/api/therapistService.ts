@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
 import { TherapistQuestionnaireData } from '../types/questionnaireT';
+import { Title } from '@radix-ui/react-toast';
 
 // --- GraphQL Definitions --- //
 
@@ -112,7 +113,9 @@ export const therapistService = {
      Address: formattedAddress || null, // Null is allowed here because Address is not required
      Availability: data.availability || [],
      LicenseData: JSON.stringify(licenseDataObj), 
-     Specialties: data.specialties?.selected || []
+     Specialties: data.specialties?.selected || [],
+     Title: data.personalData?.title || "", // Add Title field with fallback
+     JobTitle: data.personalData?.jobTitle || "" // Add JobTitle field with fallback
    };
    console.log("2. Formatted GraphQL Payload (input):", input);
 
