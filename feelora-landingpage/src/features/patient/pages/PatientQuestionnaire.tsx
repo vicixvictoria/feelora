@@ -168,7 +168,7 @@ const PatientQuestionnaire = () => {
         clearProgress(); 
         
         // 3. Navigate the user to the dashboard
-        navigate('/dashboard'); // Depends if the backend routes that or if you want to do it on the frontend after receiving a success response
+        navigate('/patient'); // Depends if the backend routes that or if you want to do it on the frontend after receiving a success response
       } else {
         alert("Etwas ist schiefgelaufen. Bitte versuche es noch einmal.");
       }
