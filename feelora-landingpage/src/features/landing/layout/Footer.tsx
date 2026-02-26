@@ -1,10 +1,10 @@
 import { InstagramIcon, LinkedinIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function Footer() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-gray-50 text-gray-700 py-16 px-8 border-t border-gray-200">

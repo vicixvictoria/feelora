@@ -1,7 +1,7 @@
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export const TitleFrame = (): JSX.Element => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   return (
     <header className="inline-flex flex-col items-center gap-2.5 relative max-w-7xl mx-auto px-8">
       <div className="relative w-full">

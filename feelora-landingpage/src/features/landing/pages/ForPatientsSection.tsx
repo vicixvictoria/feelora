@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import forPatientsImg from '@/assets/for_patients.png';
 import moodTrackerDemo from '@/assets/MoodTrackerDemo.png';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export function ForPatientsSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [ref, inView] = useInView({
     triggerOnce: true,

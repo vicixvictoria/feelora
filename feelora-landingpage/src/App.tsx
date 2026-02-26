@@ -7,7 +7,7 @@ import { Amplify } from 'aws-amplify';
 import { amplifyConfig } from './config/amplify'; // Default to standard user
 
 // --- Contexts ---
-import { LanguageProvider } from './contexts/LanguageContext';
+
 import { AuthProvider } from './contexts/AuthContext';
 import { TooltipProvider } from '@/components/ui/tooltip'; // Dashboard requirement
 import { RequireAuth } from '@/components/auth/RequireAuth'; // Patients and Therapists require Auth
@@ -117,8 +117,7 @@ function App() {
   return (
     <ApolloProvider client={apolloClient}>
       <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <TooltipProvider>
+        <TooltipProvider>
             <Router>
               <AuthProvider>
                 <ScrollToTop />
@@ -186,7 +185,6 @@ function App() {
               </AuthProvider>
             </Router>
           </TooltipProvider>
-        </LanguageProvider>
       </QueryClientProvider>
     </ApolloProvider>
   );

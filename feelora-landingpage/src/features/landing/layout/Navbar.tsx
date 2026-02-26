@@ -7,18 +7,18 @@ import {
   NavigationMenuList,
 } from '@/components/ui/navigation-menuLanding';
 import logoFeelora from '@/assets/logo_feelora.png';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
   const toggleLanguage = () => {
-    setLanguage(language === 'de' ? 'en' : 'de');
+    i18n.changeLanguage(i18n.language === 'de' ? 'en' : 'de');
   };
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export function Navbar() {
               aria-label="Switch language"
             >
               <GlobeIcon className="w-4 h-4" />
-              <span className="text-sm font-medium">{language.toUpperCase()}</span>
+              <span className="text-sm font-medium">{i18n.language.toUpperCase()}</span>
             </button>
 
             <Button
@@ -169,7 +169,7 @@ export function Navbar() {
               aria-label="Switch language"
             >
               <GlobeIcon className="w-5 h-5" />
-              <span className="font-medium">{language === 'de' ? 'Deutsch' : 'English'}</span>
+              <span className="font-medium">{t('lang.name')}</span>
             </button>
 
             <Button

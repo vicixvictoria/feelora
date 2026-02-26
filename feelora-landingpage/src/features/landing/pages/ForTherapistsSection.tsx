@@ -4,11 +4,11 @@ import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-r
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import forTherapistsImg from '@/assets/for_therapists.png';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export function ForTherapistsSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [ref, inView] = useInView({
     triggerOnce: true,

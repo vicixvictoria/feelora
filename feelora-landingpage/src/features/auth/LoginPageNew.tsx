@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/buttonLanding';
 
 interface LoginPageProps {
@@ -21,7 +21,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, isLoading, error, login, clearError } = useAuth();
-  const { t, language } = useLanguage();
+  const { t } = useTranslation();
 
   // Get redirect path from URL params
   const redirectPath = searchParams.get('redirect') || '/';
@@ -56,7 +56,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-700">
-            {language === 'de' ? 'Sitzung wird geprüft...' : 'Checking session...'}
+            {t('login.loading')}
           </h2>
         </div>
       </div>
@@ -90,7 +90,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">
-                  {language === 'de' ? 'Authentifizierungsfehler' : 'Authentication Error'}
+                  {t('login.error.title')}
                 </h3>
                 <p className="mt-1 text-sm text-red-700">{displayError}</p>
               </div>
@@ -123,7 +123,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                {language === 'de' ? 'Anmelden' : 'Sign in'}
+                {t('login.signIn')}
               </span>
             </div>
           </div>
@@ -134,25 +134,21 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             className="w-full flex items-center justify-center gap-3 bg-primary text-white hover:bg-primary/90 py-6"
           >
             <span className="font-medium">
-              {language === 'de' ? 'Weiter zur Anmeldung' : 'Continue to Sign In'}
+              {t('login.continueSignIn')}
             </span>
           </Button>
 
           <p className="mt-4 text-center text-xs text-gray-500">
-            {language === 'de'
-              ? 'Du kannst dich mit Google oder E-Mail & Passwort anmelden'
-              : 'You can sign in with Google or Email & Password'}
+            {t('login.signInHint')}
           </p>
 
           {/* Terms */}
           <p className="mt-6 text-center text-xs text-gray-500">
-            {language === 'de'
-              ? 'Mit der Anmeldung akzeptierst du unsere '
-              : 'By signing in, you agree to our '}
+            {t('login.termsPrefix')}
             <a href="/privacy" className="text-primary hover:underline">
               {t('footer.legal.privacy')}
             </a>
-            {language === 'de' ? ' und ' : ' and '}
+            {t('login.termsAnd')}
             <a href="/legal" className="text-primary hover:underline">
               {t('footer.legal.terms')}
             </a>
@@ -161,13 +157,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
 
         {/* Info Text */}
         <p className="mt-6 text-center text-sm text-gray-600">
-          {isTherapist
-            ? language === 'de'
-              ? 'Zugriff auf dein Therapeuten-Dashboard und verwalte deine Patient:innen.'
-              : 'Access your therapist dashboard and manage your patients.'
-            : language === 'de'
-              ? 'Finde den/die passenden Therapeut:in und starte deine Wellness-Reise.'
-              : 'Find the right therapist and start your wellness journey.'}
+          {isTherapist ? t('login.info.therapist') : t('login.info.user')}
         </p>
       </div>
     </div>

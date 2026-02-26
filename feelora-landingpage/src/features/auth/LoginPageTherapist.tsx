@@ -4,7 +4,7 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { therapistAmplifyConfig } from '@/config/amplify';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/buttonLanding';
 
 // You can re-use the components and formFields logic,
@@ -31,7 +31,7 @@ const therapistComponents = {
 function TherapistLoginPage() {
   // Renamed the function
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     Amplify.configure(therapistAmplifyConfig);
