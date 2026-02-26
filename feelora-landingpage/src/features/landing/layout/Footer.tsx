@@ -1,28 +1,10 @@
-import { FacebookIcon, TwitterIcon, InstagramIcon, LinkedinIcon } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { InstagramIcon, LinkedinIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Footer() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useLanguage();
-
-  const scrollToSection = (sectionId: string) => {
-    if (location.pathname !== '/') {
-      navigate('/');
-      setTimeout(() => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
-    } else {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-  };
 
   return (
     <footer className="bg-gray-50 text-gray-700 py-16 px-8 border-t border-gray-200">
@@ -68,14 +50,15 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                <button className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.users.resources')}
-                </a>
+                </button>
               </li>
               <li>
                 <button
-                onClick={() => navigate('/support')}
-                className="text-gray-600 hover:text-primary transition-colors">
+                  onClick={() => navigate('/support')}
+                  className="text-gray-600 hover:text-primary transition-colors"
+                >
                   {t('footer.users.support')}
                 </button>
               </li>
@@ -89,23 +72,25 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <button
-                onClick={() => navigate('/privacy')}
-                className="text-gray-600 hover:text-primary transition-colors"
+                  onClick={() => navigate('/privacy')}
+                  className="text-gray-600 hover:text-primary transition-colors"
                 >
                   {t('footer.legal.privacy')}
-                  </button>
+                </button>
               </li>
               <li>
                 <button
-                onClick={() => navigate('/privacy')}
-                className="text-gray-600 hover:text-primary transition-colors">
+                  onClick={() => navigate('/privacy')}
+                  className="text-gray-600 hover:text-primary transition-colors"
+                >
                   {t('footer.legal.terms')}
                 </button>
               </li>
               <li>
-                 <button
-                onClick={() => navigate('/privacy')}
-                className="text-gray-600 hover:text-primary transition-colors">
+                <button
+                  onClick={() => navigate('/privacy')}
+                  className="text-gray-600 hover:text-primary transition-colors"
+                >
                   {t('footer.legal.cookies')}
                 </button>
               </li>
@@ -134,9 +119,9 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                <button className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.about.contact')}
-                </a>
+                </button>
               </li>
             </ul>
           </div>

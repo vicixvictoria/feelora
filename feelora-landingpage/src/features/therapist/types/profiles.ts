@@ -4,7 +4,7 @@ export interface TherapistProfile {
   Name: string;
   Surname: string;
   Gender: string;
-  BirthDate: number; 
+  BirthDate: number;
   City: string;
   Languages: string[];
   Availability: string[];

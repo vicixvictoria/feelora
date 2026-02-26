@@ -7,7 +7,7 @@ export interface SelectionWithOther {
 // for Languages: Helper type for "Selected + Other (Array)" pattern (Used in Step 7)
 export interface SelectionWithMultipleOther {
   selected: string[];
-  other: string[]; 
+  other: string[];
 }
 
 export interface TherapistPersonalData {
@@ -18,7 +18,7 @@ export interface TherapistPersonalData {
   bday?: string; // ISO date string
   phone?: string;
   // This allows the object to be treated as Record<string, string> by your React components
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 export interface TherapistContactInfo {
@@ -41,18 +41,18 @@ export interface TherapistQuestionnaireData {
   personalData: TherapistPersonalData;
   contactInfo: TherapistContactInfo;
   qualifications: Qualifications;
-  
+
   experience: string[];
   specialties: SelectionWithOther;
   languages: SelectionWithMultipleOther;
-  
+
   therapySchool: SelectionWithOther;
   therapyMethods: string;
   therapySetting: string[];
   therapyFormat: string[];
   therapyDuration: string;
   sessionFrequency: string[];
-  
+
   patientGender: string[];
   valuesPreferences: SelectionWithOther;
   additionalInfo: string;

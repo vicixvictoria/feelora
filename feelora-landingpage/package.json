@@ -1,12 +1,18 @@
 {
+  "name": "feelora-web-project",
   "version": "1.0.0",
+  "description": "Feelora Landing page and webb app",
   "source": "./index.html",
   "type": "module",
-  "name": "Feelora Web project",
-  "description": "Feelora Landing page and webb app",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "check": "tsc --noEmit -p tsconfig.app.json && oxlint && oxfmt --check",
+    "build": "tsc --noEmit -p tsconfig.app.json && vite build"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
@@ -40,6 +46,7 @@
     "@radix-ui/react-tooltip": "1.1.3",
     "@tanstack/react-query": "^5.90.20",
     "aws-amplify": "^6.15.8",
+    "axios": "^1.13.5",
     "class-variance-authority": "0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^4.1.0",
@@ -63,8 +70,11 @@
     "@vitejs/plugin-react": "4.3.4",
     "esbuild": "0.25.5",
     "globals": "15.12.0",
+    "oxfmt": "^0.35.0",
+    "oxlint": "^1.50.0",
     "tailwindcss": "3.4.16",
     "tailwindcss-animate": "1.0.7",
+    "typescript": "^5.9.3",
     "vite": "6.3.5"
   },
   "alias": {

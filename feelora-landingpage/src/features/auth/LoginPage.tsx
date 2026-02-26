@@ -3,7 +3,7 @@ import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { CheckboxField } from '@aws-amplify/ui-react';
-import { amplifyConfig } from '../config/amplify';
+import { amplifyConfig } from '@/config/amplify';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/buttonLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,7 +42,6 @@ const components = {
   },
 };
 
-
 interface LoginPageProps {
   initialState?: 'signIn' | 'signUp';
 }
@@ -54,111 +53,111 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
   React.useEffect(() => {
     Amplify.configure(amplifyConfig);
   }, []);
-  
+
   //Moved to use langauge hook - but rerendering is missing with useMemo hook
   const formFields = {
-  signIn: {
-    username: {
-      label: t('login.email'),
-      placeholder: t('login.email.placeholder'),
-      isRequired: true,
+    signIn: {
+      username: {
+        label: t('login.email'),
+        placeholder: t('login.email.placeholder'),
+        isRequired: true,
+      },
+      password: {
+        label: t('login.password'),
+        placeholder: t('login.password.placeholder'),
+        isRequired: false,
+      },
     },
-    password: {
-      label: t('login.password'),
-      placeholder: t('login.password.placeholder'),
-      isRequired: false,
+    signUp: {
+      name: {
+        label: t('login.name'),
+        placeholder: t('login.name.placeholder'),
+        isRequired: true,
+        order: 1,
+      },
+      family_name: {
+        label: t('login.surname'),
+        placeholder: t('login.surname.placeholder'),
+        isRequired: true,
+        order: 2,
+      },
+      email: {
+        label: t('login.email'),
+        placeholder: t('login.email.placeholder'),
+        isRequired: true,
+        order: 3,
+      },
+      password: {
+        label: t('login.password'),
+        placeholder: t('login.password.placeholder'),
+        isRequired: false,
+        order: 4,
+      },
+      confirm_password: {
+        label: t('login.password.confirm'),
+        placeholder: t('login.password.confirm.placeholder'),
+        order: 5,
+      },
     },
-  },
-  signUp: {
-    name: {
-      label: t('login.name'),
-      placeholder: t('login.name.placeholder'),
-      isRequired: true,
-      order: 1,
+    forceNewPassword: {
+      password: {
+        label: t('login.newpassword'),
+        placeholder: t('login.newpassword.placeholder'),
+      },
     },
-    family_name: {
-      label: t('login.surname'),
-      placeholder: t('login.surname.placeholder'),
-      isRequired: true,
-      order: 2,
+    forgotPassword: {
+      username: {
+        label: t('login.email'),
+        placeholder: t('login.email.placeholder'),
+        isRequired: true,
+      },
     },
-    email: {
-      label: t('login.email'),
-      placeholder: t('login.email.placeholder'),
-      isRequired: true,
-      order: 3,
+    confirmResetPassword: {
+      confirmation_code: {
+        label: t('login.confirmation'),
+        placeholder: t('login.confirmation.placeholder'),
+        isRequired: false,
+      },
+      password: {
+        label: t('login.newpassword'),
+        placeholder: t('login.newpassword.placeholder'),
+        isRequired: true,
+      },
+      confirm_password: {
+        label: t('login.password.confirm'),
+        placeholder: t('login.password.confirm.placeholder'),
+        isRequired: true,
+      },
     },
-    password: {
-      label: t('login.password'),
-      placeholder: t('login.password.placeholder'),
-      isRequired: false,
-      order: 4,
+    setupTotp: {
+      QR: {
+        totpIssuer: 'Feelora',
+        totpUsername: 'feelora_user',
+      },
+      confirmation_code: {
+        label: t('login.confirmation'),
+        placeholder: t('login.confirmation.placeholder'),
+        isRequired: false,
+      },
     },
-    confirm_password: {
-      label: t('login.password.confirm'),
-      placeholder: t('login.password.confirm.placeholder'),
-      order: 5,
+    confirmSignIn: {
+      confirmation_code: {
+        label: t('login.confirmation'),
+        placeholder: t('login.confirmation.placeholder'),
+        isRequired: false,
+      },
     },
-  },
-  forceNewPassword: {
-    password: {
-      label: t('login.newpassword'),
-      placeholder: t('login.newpassword.placeholder'),
+    setupEmail: {
+      email: {
+        label: t('login.email'),
+        placeholder: t('login.email.placeholder'),
+      },
     },
-  },
-  forgotPassword: {
-    username: {
-      label: t('login.email'),
-      placeholder: t('login.email.placeholder'),
-      isRequired: true,
-    },
-  },
-  confirmResetPassword: {
-    confirmation_code: {
-      label: t('login.confirmation'),
-      placeholder:  t('login.confirmation.placeholder'),
-      isRequired: false,
-    },
-    password: {
-      label: t('login.newpassword'),
-      placeholder: t('login.newpassword.placeholder'),
-      isRequired: true,
-    },
-    confirm_password: {
-      label: t('login.password.confirm'),
-      placeholder: t('login.password.confirm.placeholder'),
-      isRequired: true,
-    },
-  },
-  setupTotp: {
-    QR: {
-      totpIssuer: 'Feelora',
-      totpUsername: 'feelora_user',
-    },
-    confirmation_code: {
-      label: t('login.confirmation'),
-      placeholder: t('login.confirmation.placeholder'),
-      isRequired: false,
-    },
-  },
-  confirmSignIn: {
-    confirmation_code: {
-      label: t('login.confirmation'),
-      placeholder: t('login.confirmation.placeholder'),
-      isRequired: false,
-    },
-  },
-  setupEmail: {
-    email: {
-      label: t('login.email'),
-      placeholder: t('login.email.placeholder'),
-    },
-  },
-};
+  };
 
   // Function for redirecting via Button
   const handleOutsideRedirect = () => {
-    navigate('/loginTherapist'); 
+    navigate('/loginTherapist');
   };
 
   return (
@@ -169,21 +168,19 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
             {initialState === 'signIn' ? t('login.title') : 'Join Feelora'}
           </h1>
           <p className="text-gray-600">
-            {initialState === 'signIn'
-              ? t('login.subtitle')
-              : 'Create your account to get started'}
+            {initialState === 'signIn' ? t('login.subtitle') : 'Create your account to get started'}
           </p>
         </div>
 
         <div className="flex justify-center mb-6">
           {/* Button to redirect user if they are a therapist*/}
-           <Button
-              onClick={handleOutsideRedirect}
-              className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
-            >
-              {t('login.redeirectButton')}
-            </Button>
-          </div>
+          <Button
+            onClick={handleOutsideRedirect}
+            className="bg-primary text-primary-foreground hover:bg-secondary font-normal"
+          >
+            {t('login.redeirectButton')}
+          </Button>
+        </div>
 
         <React.StrictMode>
           <Authenticator
@@ -195,7 +192,7 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
           >
             {({ user, signOut }) => {
               if (!user) return null;
-              
+
               return (
                 <div className="bg-white rounded-lg shadow-lg p-8">
                   <div className="text-center mb-6">

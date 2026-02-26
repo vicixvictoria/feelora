@@ -1,5 +1,5 @@
-import { CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 interface CompletionStepProps {
   onRestart: () => void;
 }
@@ -13,13 +13,11 @@ const Step18_PCompletion = ({ onRestart }: CompletionStepProps) => {
         </div>
       </div>
       {/* Title */}
-      <h1 className="text-3xl font-bold text-purple mb-4">
-        Vielen Dank!
-      </h1>
+      <h1 className="text-3xl font-bold text-purple mb-4">Vielen Dank!</h1>
       {/* Description */}
       <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-        Dein Patientenprofil wurde erfolgreich erstellt.
-        Wir werden dich benachrichtigen, sobald passende Therapeut:Innen verfügbar sind.
+        Dein Patientenprofil wurde erfolgreich erstellt. Wir werden dich benachrichtigen, sobald
+        passende Therapeut:Innen verfügbar sind.
       </p>
       {/* Restart Button */}
       <Button onClick={onRestart} className="feelora-btn-outline">

@@ -1,6 +1,6 @@
 /**
  * Re-export useAuth from AuthContext for backwards compatibility
- * 
+ *
  * This file now simply re-exports the useAuth hook from the AuthContext.
  * The new auth flow uses:
  * - Backend API for OAuth token exchange
@@ -8,5 +8,4 @@
  * - In-memory storage for access tokens
  */
 
-export { useAuth, useAccessToken, useHasGroup } from '@/contexts/AuthContext';
-export type { } from '@/contexts/AuthContext';
+export { useAuth } from '@/contexts/AuthContext';

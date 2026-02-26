@@ -1,20 +1,20 @@
-import { useState } from "react";
-import { Send, Info, ChevronRight } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
-import avatar from "@/assets/avatar-Placeholder.png";
+import { useState } from 'react';
+import { Send, Info, ChevronRight } from 'lucide-react';
+import feeloraLogo from '@/assets/logo.png';
+import avatar from '@/assets/avatar-Placeholder.png';
 
 const chatList = [
   {
     id: 1,
-    name: "Dr. Eva Eddison",
-    lastMessage: "Here is the report on our..",
+    name: 'Dr. Eva Eddison',
+    lastMessage: 'Here is the report on our..',
     avatar: avatar,
     isTherapist: true,
   },
   {
     id: 2,
-    name: "Feelora",
-    lastMessage: "Danke, dass du bei uns mit...",
+    name: 'Feelora',
+    lastMessage: 'Danke, dass du bei uns mit...',
     avatar: feeloraLogo,
     isBot: true,
   },
@@ -23,26 +23,26 @@ const chatList = [
 const messages = [
   {
     id: 1,
-    sender: "therapist",
-    text: "Hier ist der Bericht unserer letzten Therapiesitzung. Wir sehen uns nächsten Dienstag um 15 Uhr!",
+    sender: 'therapist',
+    text: 'Hier ist der Bericht unserer letzten Therapiesitzung. Wir sehen uns nächsten Dienstag um 15 Uhr!',
     avatar: avatar,
   },
   {
     id: 2,
-    sender: "user",
-    text: "Danke! Bis nächste Woche!",
+    sender: 'user',
+    text: 'Danke! Bis nächste Woche!',
     avatar: avatar,
   },
 ];
 
 const ChatPage = () => {
   const [selectedChat, setSelectedChat] = useState(chatList[0]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       // In a real app, this would send the message
-      setNewMessage("");
+      setNewMessage('');
     }
   };
 
@@ -57,7 +57,7 @@ const ChatPage = () => {
               key={chat.id}
               onClick={() => setSelectedChat(chat)}
               className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                selectedChat.id === chat.id ? "bg-muted" : "hover:bg-muted/50"
+                selectedChat.id === chat.id ? 'bg-muted' : 'hover:bg-muted/50'
               }`}
             >
               <img
@@ -67,9 +67,7 @@ const ChatPage = () => {
               />
               <div className="flex-1 text-left">
                 <p className="font-medium text-foreground">{chat.name}</p>
-                <p className="text-sm text-muted-foreground truncate">
-                  {chat.lastMessage}
-                </p>
+                <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -84,13 +82,11 @@ const ChatPage = () => {
           <div className="flex items-center gap-4">
             {/* selectedChat.avatar to load other images */}
             <img
-              src={avatar} 
+              src={avatar}
               alt={selectedChat.name}
               className="w-12 h-12 rounded-full object-cover"
             />
-            <h3 className="text-xl font-semibold text-foreground">
-              {selectedChat.name}
-            </h3>
+            <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
           </div>
           <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
             <Info className="w-5 h-5" />
@@ -104,19 +100,13 @@ const ChatPage = () => {
               <div
                 key={message.id}
                 className={`flex items-end gap-3 ${
-                  message.sender === "user" ? "flex-row-reverse" : ""
+                  message.sender === 'user' ? 'flex-row-reverse' : ''
                 }`}
               >
-                <img
-                  src={message.avatar}
-                  alt=""
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <img src={message.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
                 <div
                   className={`chat-bubble ${
-                    message.sender === "user"
-                      ? "chat-bubble-sent"
-                      : "chat-bubble-received"
+                    message.sender === 'user' ? 'chat-bubble-sent' : 'chat-bubble-received'
                   }`}
                 >
                   {message.text}
@@ -133,7 +123,7 @@ const ChatPage = () => {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="tippe hier, um eine Nachricht zu schreiben..."
               className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />

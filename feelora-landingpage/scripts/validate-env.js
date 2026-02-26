@@ -1,9 +1,9 @@
 /**
  * Validate Environment Variables
- * 
+ *
  * This script checks that all required environment variables are set
  * before building the application.
- * 
+ *
  * Run with: npm run validate-env
  */
 
@@ -22,7 +22,7 @@ let hasErrors = false;
 
 requiredEnvVars.forEach((varName) => {
   const value = process.env[varName];
-  
+
   if (!value) {
     console.error(`❌ Missing: ${varName}`);
     hasErrors = true;
@@ -31,9 +31,10 @@ requiredEnvVars.forEach((varName) => {
     hasErrors = true;
   } else {
     // Mask sensitive values
-    const displayValue = varName.includes('CLIENT_ID') || varName.includes('POOL_ID')
-      ? value.substring(0, 10) + '...'
-      : value;
+    const displayValue =
+      varName.includes('CLIENT_ID') || varName.includes('POOL_ID')
+        ? value.substring(0, 10) + '...'
+        : value;
     console.log(`✅ ${varName} = ${displayValue}`);
   }
 });

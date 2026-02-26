@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { Checkbox } from '@/components/ui/checkbox';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 interface PatientGenderStepProps {
   onNext: () => void;
   onBack: () => void;
@@ -8,15 +8,15 @@ interface PatientGenderStepProps {
 }
 
 // List of gender options - add more if needed
-const genderOptions = [
-  "männlich",
-  "weiblich",
-  "non-binary / divers",
-  "keine Präferenz",
-];
+const genderOptions = ['männlich', 'weiblich', 'non-binary / divers', 'keine Präferenz'];
 
 // Step Component
-const Step14_TPatientGender = ({ onNext, onBack, data = [], onDataChange }: PatientGenderStepProps) => {
+const Step14_TPatientGender = ({
+  onNext,
+  onBack,
+  data = [],
+  onDataChange,
+}: PatientGenderStepProps) => {
   const safeData = data || [];
   const handleToggle = (gender: string) => {
     if (safeData.includes(gender)) {
@@ -29,9 +29,7 @@ const Step14_TPatientGender = ({ onNext, onBack, data = [], onDataChange }: Pati
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Patient:Innen Geschlecht
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Patient:Innen Geschlecht</h1>
         <p className="text-muted-foreground">
           Falls relevant, welches Geschlecht bevorzugst du bei deinen Patient:Innen?
         </p>

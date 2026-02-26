@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 /**
  * AuthCallback page - handles the redirect from the OAuth backend
- * 
+ *
  * Flow:
  * 1. Backend redirects here with ?session_id=xxx
  * 2. AuthContext automatically exchanges session_id for tokens
@@ -42,9 +42,7 @@ function AuthCallback() {
         <h2 className="text-xl font-semibold text-gray-700">
           {error ? 'Authentication failed...' : 'Completing sign in...'}
         </h2>
-        {error && (
-          <p className="mt-2 text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-2 text-red-600">{error}</p>}
       </div>
     </div>
   );

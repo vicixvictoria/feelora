@@ -1,6 +1,6 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 
 interface ValuesPreferencesStepProps {
   onNext: () => void;
@@ -11,20 +11,25 @@ interface ValuesPreferencesStepProps {
 
 // List of values/preferences options - add more if needed
 const valueOptions = [
-  "LGBTQ+ affirmative Praxis",
-  "Kulturell informierte Therapie",
-  "Arbeit mit leistungsorientierten Personen / Führungskräften",
-  "Spezialisierung auf Beziehungen / Paare / Familiendynamiken",
-  "Erfahrung mit Konflikten am Arbeitsplatz oder Mobbing",
-  "Unterstützung von Expats und internationalen Klient:innen",
-  "Feministische oder geschlechtersensible Perspektive",
-  "Begleitung bei wichtigen Lebensveränderungen (Karriere, Umzug usw.)",
-  "Jahre an Erfahrung (+10)",
-  "ich befinde mich unter supervision",
-  "keine weiteren Angaben",
+  'LGBTQ+ affirmative Praxis',
+  'Kulturell informierte Therapie',
+  'Arbeit mit leistungsorientierten Personen / Führungskräften',
+  'Spezialisierung auf Beziehungen / Paare / Familiendynamiken',
+  'Erfahrung mit Konflikten am Arbeitsplatz oder Mobbing',
+  'Unterstützung von Expats und internationalen Klient:innen',
+  'Feministische oder geschlechtersensible Perspektive',
+  'Begleitung bei wichtigen Lebensveränderungen (Karriere, Umzug usw.)',
+  'Jahre an Erfahrung (+10)',
+  'ich befinde mich unter supervision',
+  'keine weiteren Angaben',
 ];
 
-const Step15_TValuesPreferences = ({ onNext, onBack, data, onDataChange }: ValuesPreferencesStepProps) => {
+const Step15_TValuesPreferences = ({
+  onNext,
+  onBack,
+  data,
+  onDataChange,
+}: ValuesPreferencesStepProps) => {
   const handleToggle = (value: string) => {
     if (data.selected.includes(value)) {
       onDataChange({ ...data, selected: data.selected.filter((v) => v !== value) });
@@ -34,10 +39,10 @@ const Step15_TValuesPreferences = ({ onNext, onBack, data, onDataChange }: Value
   };
 
   const handleOtherToggle = () => {
-    if (data.selected.includes("Other")) {
-      onDataChange({ ...data, selected: data.selected.filter((v) => v !== "Other"), other: "" });
+    if (data.selected.includes('Other')) {
+      onDataChange({ ...data, selected: data.selected.filter((v) => v !== 'Other'), other: '' });
     } else {
-      onDataChange({ ...data, selected: [...data.selected, "Other"] });
+      onDataChange({ ...data, selected: [...data.selected, 'Other'] });
     }
   };
 
@@ -45,12 +50,10 @@ const Step15_TValuesPreferences = ({ onNext, onBack, data, onDataChange }: Value
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Werte und Präferenzen
-        </h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">Werte und Präferenzen</h1>
         <p className="text-muted-foreground mb-2">
-          Welche Werte, Ansätze oder Patient:Innen-profile beschreiben deine
-          therapeutische Arbeit bzw. deinen Schwerpunkt am besten?
+          Welche Werte, Ansätze oder Patient:Innen-profile beschreiben deine therapeutische Arbeit
+          bzw. deinen Schwerpunkt am besten?
         </p>
         <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
       </div>
@@ -73,14 +76,18 @@ const Step15_TValuesPreferences = ({ onNext, onBack, data, onDataChange }: Value
 
           {/* Other option */}
           <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+            <label
+              htmlFor="t-values-other"
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+            >
               <Checkbox
-                checked={data.selected.includes("Other")}
+                id="t-values-other"
+                checked={data.selected.includes('Other')}
                 onCheckedChange={handleOtherToggle}
               />
               <span className="text-foreground">Other</span>
             </label>
-            {data.selected.includes("Other") && (
+            {data.selected.includes('Other') && (
               <Input
                 type="text"
                 placeholder="Bitte angeben..."

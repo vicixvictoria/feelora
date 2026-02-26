@@ -4,7 +4,7 @@ export function AnimatedWaves() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current!;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
@@ -42,36 +42,37 @@ export function AnimatedWaves() {
         this.phase += this.speed;
       }
 
-      draw(ctx: CanvasRenderingContext2D, time: number) {
-        ctx.save();
-        ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
-        ctx.lineWidth = 1.5;
-        ctx.lineCap = 'round';
+      draw(renderCtx: CanvasRenderingContext2D, time: number) {
+        renderCtx.save();
+        renderCtx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        renderCtx.lineWidth = 1.5;
+        renderCtx.lineCap = 'round';
 
-        ctx.beginPath();
-        
+        renderCtx.beginPath();
+
         for (let x = 0; x <= canvas.width; x += 2) {
           // Create sine wave with varying amplitude
-          const y = this.baseY + 
-                   Math.sin(x * this.frequency + this.phase + time * 0.001) * this.amplitude +
-                   Math.sin(x * this.frequency * 0.5 + this.phase * 1.5) * (this.amplitude * 0.3);
-          
+          const y =
+            this.baseY +
+            Math.sin(x * this.frequency + this.phase + time * 0.001) * this.amplitude +
+            Math.sin(x * this.frequency * 0.5 + this.phase * 1.5) * (this.amplitude * 0.3);
+
           if (x === 0) {
-            ctx.moveTo(x, y);
+            renderCtx.moveTo(x, y);
           } else {
-            ctx.lineTo(x, y);
+            renderCtx.lineTo(x, y);
           }
         }
 
-        ctx.stroke();
-        ctx.restore();
+        renderCtx.stroke();
+        renderCtx.restore();
       }
     }
 
     // Create multiple wave lines
     const waves: WaveLine[] = [];
     const numberOfWaves = 8;
-    
+
     for (let i = 0; i < numberOfWaves; i++) {
       waves.push(new WaveLine(i, numberOfWaves));
     }
@@ -80,7 +81,7 @@ export function AnimatedWaves() {
 
     const animate = () => {
       const currentTime = Date.now() - startTime;
-      
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Create gradient background
@@ -91,7 +92,7 @@ export function AnimatedWaves() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw all waves
-      waves.forEach(wave => {
+      waves.forEach((wave) => {
         wave.update();
         wave.draw(ctx, currentTime);
       });
@@ -108,10 +109,6 @@ export function AnimatedWaves() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-      style={{ opacity: 1 }}
-    />
+    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ opacity: 1 }} />
   );
 }

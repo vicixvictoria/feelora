@@ -7,11 +7,11 @@ export interface PatientProfile {
   Name: string;
   Surname: string;
   Gender: string;
-  BirthDate: number; 
+  BirthDate: number;
   City: string;
   Languages: string[];
   Availability: string[];
-  Matches?: string[] | null; 
+  Matches?: string[] | null;
   Plan: string;
   MoodTracker: boolean;
 }

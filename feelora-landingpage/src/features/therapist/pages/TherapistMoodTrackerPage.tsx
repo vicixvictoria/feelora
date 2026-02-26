@@ -1,5 +1,5 @@
-import { ChevronRight } from "lucide-react";
-import ninaAvatar from "@/assets/avatar-Placeholder.png";
+import { ChevronRight } from 'lucide-react';
+import ninaAvatar from '@/assets/avatar-Placeholder.png';
 
 interface PatientMoodEntry {
   name: string;
@@ -13,40 +13,40 @@ interface PatientMoodEntry {
 
 const patients: PatientMoodEntry[] = [
   {
-    name: "Nina",
+    name: 'Nina',
     avatar: ninaAvatar,
-    date: "18.10.2025, 13:00",
-    mood: "😊",
-    outdoor: "🌳",
-    physical: "💪",
-    nextSession: "21.10.2025\n09:00-10:00",
+    date: '18.10.2025, 13:00',
+    mood: '😊',
+    outdoor: '🌳',
+    physical: '💪',
+    nextSession: '21.10.2025\n09:00-10:00',
   },
   {
-    name: "Tom",
+    name: 'Tom',
     avatar: ninaAvatar,
-    date: "17.10.2025, 10:00",
-    mood: "😊",
-    outdoor: "🌳",
-    physical: "💪",
-    nextSession: "21.10.2025\n11:15-12:15",
+    date: '17.10.2025, 10:00',
+    mood: '😊',
+    outdoor: '🌳',
+    physical: '💪',
+    nextSession: '21.10.2025\n11:15-12:15',
   },
   {
-    name: "Mel",
+    name: 'Mel',
     avatar: ninaAvatar,
-    date: "19.10.2025, 10:00",
-    mood: "😊",
-    outdoor: "🌳",
-    physical: "💪",
-    nextSession: "21.10.2025\n14:00-15:00",
+    date: '19.10.2025, 10:00',
+    mood: '😊',
+    outdoor: '🌳',
+    physical: '💪',
+    nextSession: '21.10.2025\n14:00-15:00',
   },
   {
-    name: "Jon",
+    name: 'Jon',
     avatar: ninaAvatar,
-    date: "19.10.2025, 18:00",
-    mood: "😊",
-    outdoor: "🌳",
-    physical: "💪",
-    nextSession: "21.10.2025\n17:30-18:30",
+    date: '19.10.2025, 18:00',
+    mood: '😊',
+    outdoor: '🌳',
+    physical: '💪',
+    nextSession: '21.10.2025\n17:30-18:30',
   },
 ];
 
@@ -68,10 +68,7 @@ const TherapistMoodTrackerPage = () => {
         {/* Mood entries */}
         <div className="flex-1 flex flex-col gap-4">
           {patients.map((patient, index) => (
-            <div
-              key={index}
-              className="feelora-card flex items-center gap-6"
-            >
+            <div key={index} className="feelora-card flex items-center gap-6">
               <img
                 src={patient.avatar}
                 alt={patient.name}

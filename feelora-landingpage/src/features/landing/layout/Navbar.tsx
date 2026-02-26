@@ -63,15 +63,12 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center cursor-pointer"
-               onClick={() => scrollToSection('hero')}
+          <button
+            className="flex items-center cursor-pointer"
+            onClick={() => scrollToSection('hero')}
           >
-            <img
-              src={logoFeelora}
-              alt="Feelora Logo"
-              className="h-[3rem] w-auto object-contain"
-            />
-          </div>
+            <img src={logoFeelora} alt="Feelora Logo" className="h-[3rem] w-auto object-contain" />
+          </button>
 
           <div className="hidden md:flex items-center space-x-8">
             <NavigationMenu>
@@ -165,7 +162,7 @@ export function Navbar() {
             >
               {t('nav.testimonials')}
             </button>
-            
+
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-2 w-full px-3 py-3 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors font-normal"

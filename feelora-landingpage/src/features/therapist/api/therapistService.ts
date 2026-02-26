@@ -52,13 +52,12 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
 
 // --- Service Object --- //
 export const therapistService = {
-
   // -- API call to submit the full questionnaire --
   submitQuestionnaire: async (data: TherapistQuestionnaireData): Promise<any> => {
     // 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
-      Discoverable: true // Crucial: Makes the therapist visible to the patient matching algorithm
+      Discoverable: true, // Crucial: Makes the therapist visible to the patient matching algorithm
     };
 
     try {
@@ -72,68 +71,68 @@ export const therapistService = {
         savedData: responseData.insertQuestionnaire,
       };
     } catch (error: unknown) {
-      console.error("Therapist Submission Error:", error);
-      const errorMessage = error instanceof Error
-        ? error.message
-        : "An error during the therapist submission occurred";
-      
+      console.error('Therapist Submission Error:', error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An error during the therapist submission occurred';
+
       return {
         success: false,
-        error: errorMessage
+        error: errorMessage,
       };
     }
   },
 
   // -- Create User Profile API call --
   // (Triggered earlier in the flow on the Availability step)
- createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
+  createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
+    const formattedAddress = [
+      data.contactInfo?.street,
+      data.contactInfo?.zip,
+      data.contactInfo?.city,
+    ]
+      .filter(Boolean)
+      .join(', ');
 
-   const formattedAddress = [
-     data.contactInfo?.street,
-     data.contactInfo?.zip,
-     data.contactInfo?.city
-   ].filter(Boolean).join(', ');
+    const licenseDataObj = {
+      licenseId: data.qualifications?.licenseNumber || '',
+      pathToLicenseDocument: data.qualifications?.idUpload || '',
+    };
 
-   const licenseDataObj = {
-     licenseId: data.qualifications?.licenseNumber || '',
-     pathToLicenseDocument: data.qualifications?.idUpload || ''
-   };
+    // Fallback value safety net: Add || "" to all strictly required String! fields
+    // Add || 0 to BirthDate since it is a required Float
+    const input = {
+      Name: data.personalData?.firstName || '',
+      Surname: data.personalData?.lastName || '',
+      BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : 0,
+      Gender: data.personalData?.gender || '',
+      City: data.contactInfo?.city || '',
+      Languages: data.languages?.selected || [],
+      Address: formattedAddress || null,
+      Availability: data.availability || [],
+      LicenseData: JSON.stringify(licenseDataObj),
+      Specialties: data.specialties?.selected || [],
+      Title: data.personalData?.title || '',
+      JobTitle: data.personalData?.jobTitle || '',
+    };
+    console.log('2. Formatted GraphQL Payload (input):', input);
 
-   // Fallback value safety net: Add || "" to all strictly required String! fields
-   // Add || 0 to BirthDate since it is a required Float
-   const input = {
-     Name: data.personalData?.firstName || "", 
-     Surname: data.personalData?.lastName || "",
-     BirthDate: data.personalData?.bday 
-       ? new Date(data.personalData.bday).getTime() / 1000 
-       : 0, // Fallback to 0 if date is missing
-     Gender: data.personalData?.gender || "",
-     City: data.contactInfo?.city || "",
-     Languages: data.languages?.selected || [],
-     Address: formattedAddress || null, // Null is allowed here because Address is not required
-     Availability: data.availability || [],
-     LicenseData: JSON.stringify(licenseDataObj), 
-     Specialties: data.specialties?.selected || [],
-     Title: data.personalData?.title || "", // Add Title field with fallback
-     JobTitle: data.personalData?.jobTitle || "" // Add JobTitle field with fallback
-   };
-   console.log("2. Formatted GraphQL Payload (input):", input);
+    const { data: responseData } = await apolloClient.mutate({
+      mutation: SAVE_THERAPIST_PROFILE_MUTATION,
+      variables: { input },
+    });
 
-   const { data: responseData } = await apolloClient.mutate({
-     mutation: SAVE_THERAPIST_PROFILE_MUTATION,
-     variables: { input },
-   });
-
-   return responseData.saveTherapistProfile;
- },
+    return responseData.saveTherapistProfile;
+  },
 
   // -- Get profile API call --
   getProfile: async (): Promise<any> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_THERAPIST_PROFILE_QUERY,
-      fetchPolicy: 'network-only' // Ensure fresh data
+      fetchPolicy: 'network-only', // Ensure fresh data
     });
 
     return responseData.getOwnTherapistProfile;
-  }
+  },
 };

@@ -1,11 +1,11 @@
-import { ChevronDown, LogOut } from "lucide-react";
-import feeloraLogo from "@/assets/logo.png";
+import { ChevronDown, LogOut } from 'lucide-react';
+import feeloraLogo from '@/assets/logo.png';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   return (

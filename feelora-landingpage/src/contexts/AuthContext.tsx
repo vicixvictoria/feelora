@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig, therapistAmplifyConfig } from '@/config/amplify';
 import { setApolloAccessToken } from '@/lib/apolloClient';
@@ -64,8 +63,9 @@ function parseUserFromToken(token: string): User | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  
-  {/*Mock-User for testing without login flow. Remove this and uncomment the real state for production.*/}
+  {
+    /*Mock-User for testing without login flow. Remove this and uncomment the real state for production.*/
+  }
   /*const [user, setUser] = useState<User | null>({
     id: 'test-123',
     email: 'test@example.com',
@@ -82,12 +82,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const initRef = useRef(false);
-  
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // --- ACTIONS ---
 
@@ -101,7 +98,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-
   // Helper function to set auth state from tokens
   const setAuthState = useCallback((access: string, idToken: string) => {
     setAccessToken(access);
@@ -111,8 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // --- UPDATED: Treat BOTH 'type:T' and 'type:P' as therapists ---
     // Check if the user is a confirmed therapist (type:T) OR a pending therapist (type:P)
-    const isTherapist = parsedUser?.groups?.includes('type:T') || parsedUser?.groups?.includes('type:P');
-    
+    const isTherapist =
+      parsedUser?.groups?.includes('type:T') || parsedUser?.groups?.includes('type:P');
+
     if (isTherapist) {
       // Both confirmed and pending therapists belong to the Therapist User Pool
       Amplify.configure(therapistAmplifyConfig);
@@ -124,10 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-
   // 1. LOGIN: Redirects browser to Backend -> Cognito
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
-    // Pre-configure ammplify so that the logout/login flow matches the intended client 
+    // Pre-configure ammplify so that the logout/login flow matches the intended client
     Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig); // Ensure correct Amplify config is set before login
 
     const currentPath = redirectPath || window.location.pathname;
@@ -136,40 +132,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
   }, []);
 
-
   // 2. EXCHANGE: Swaps Session ID (from URL) for Tokens
-  const exchangeSessionForTokens = useCallback(async (sessionId: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`${AUTH_API_URL}/auth/exchange`, {
-        method: 'POST',
-        credentials: 'include', // Crucial: Sends cookies if any 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      });
+  const exchangeSessionForTokens = useCallback(
+    async (sessionId: string): Promise<boolean> => {
+      try {
+        const response = await fetch(`${AUTH_API_URL}/auth/exchange`, {
+          method: 'POST',
+          credentials: 'include', // Crucial: Sends cookies if any
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || 'Session exchange failed');
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || 'Session exchange failed');
+        }
+
+        const data = await response.json();
+        setAuthState(data.accessToken, data.idToken);
+        return true;
+      } catch (err) {
+        console.error('[Auth] Exchange error:', err);
+        setError(err instanceof Error ? err.message : 'Authentication failed');
+        return false;
       }
-
-      const data = await response.json();
-      setAuthState(data.accessToken, data.idToken);
-      return true;
-    } catch (err) {
-      console.error('[Auth] Exchange error:', err);
-      setError(err instanceof Error ? err.message : 'Authentication failed');
-      return false;
-    }
-  }, [setAuthState]);
-
+    },
+    [setAuthState],
+  );
 
   // 3. REFRESH: Use HttpOnly cookie to get new Access Token
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      // Browser automatically attaches the HttpOnly 'refreshToken' cookie 
+      // Browser automatically attaches the HttpOnly 'refreshToken' cookie
       const response = await fetch(`${AUTH_API_URL}/auth/refresh`, {
         method: 'POST',
-        credentials: 'include', 
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       });
 
@@ -201,37 +198,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshToken]);
 
   // 4. LOGOUT
-  const logout = useCallback(async (type: 'user' | 'therapist') => {
-    try {
-      // 1. Call Backend to clear the 'refreshToken' cookie
-      await fetch(`${AUTH_API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include', // Sends the cookie to be deleted
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } catch (err) {
-      console.error('Logout failed error:', err);
-      // Continue to redirect anyway so the user isn't stuck
-    } finally {
-      clearAuthState(); // 2. Clear frontend State (memory)
-      
-      // 3. Redirect to Cognito logout endpoint
-      const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN;
-      const clientId = type === 'therapist' 
-        ? import.meta.env.VITE_THERAPIST_POOL_CLIENT_ID 
-        : import.meta.env.VITE_USER_POOL_CLIENT_ID;
-      const logoutUri = import.meta.env.VITE_AMPLIFY_URL || window.location.origin;
-      
-      const cognitoLogoutUrl = `https://${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
-      window.location.href = cognitoLogoutUrl;
-    }
-  }, [clearAuthState]);
+  const logout = useCallback(
+    async (type: 'user' | 'therapist') => {
+      try {
+        // 1. Call Backend to clear the 'refreshToken' cookie
+        await fetch(`${AUTH_API_URL}/auth/logout`, {
+          method: 'POST',
+          credentials: 'include', // Sends the cookie to be deleted
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } catch (err) {
+        console.error('Logout failed error:', err);
+        // Continue to redirect anyway so the user isn't stuck
+      } finally {
+        clearAuthState(); // 2. Clear frontend State (memory)
+
+        // 3. Redirect to Cognito logout endpoint
+        const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN;
+        const clientId =
+          type === 'therapist'
+            ? import.meta.env.VITE_THERAPIST_POOL_CLIENT_ID
+            : import.meta.env.VITE_USER_POOL_CLIENT_ID;
+        const logoutUri = import.meta.env.VITE_AMPLIFY_URL || window.location.origin;
+
+        const cognitoLogoutUrl = `https://${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+        window.location.href = cognitoLogoutUrl;
+      }
+    },
+    [clearAuthState],
+  );
 
   const clearError = useCallback(() => setError(null), []);
 
   // --- INITIALIZATION (The "Engine") ---
   useEffect(() => {
-  //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow. 
+    //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow.
 
     if (initRef.current) return;
     initRef.current = true;
@@ -255,14 +256,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // #A: Returning from Login (Exchange Session)
       if (sessionId) {
         const success = await exchangeSessionForTokens(sessionId);
-        
+
         // Clean URL: Remove session ID so it can't be reused/seen
         window.history.replaceState({}, '', window.location.pathname);
-        
+
         if (success) {
           startRefreshTimer();
         }
-      } 
+      }
       // #B: Page Reload: Try Refresh Cookie
       else {
         const success = await refreshToken();
@@ -270,7 +271,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           startRefreshTimer();
         }
       }
-      
+
       setIsLoading(false);
     }
 

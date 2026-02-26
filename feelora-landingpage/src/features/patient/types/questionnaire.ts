@@ -7,31 +7,31 @@ export interface SelectionWithOther {
 // for Languages: Helper type for "Selected + Other (Array)" pattern (Used in Step 7)
 export interface SelectionWithMultipleOther {
   selected: string[];
-  other?: string[]; 
+  other?: string[];
 }
 
 // 2. The Main Data Structure
 export interface QuestionnaireData {
   // Use specific types if known (e.g., string instead of any)
-  personalData: Record<string, any>; 
-  contactInfo: Record<string, any>; 
-  
+  personalData: Record<string, any>;
+  contactInfo: Record<string, any>;
+
   mentalHealth: SelectionWithOther;
-  timeframe: string[]; 
-  
-  previousTherapy: SelectionWithOther & { 
-    neverHadTherapy: boolean 
+  timeframe: string[];
+
+  previousTherapy: SelectionWithOther & {
+    neverHadTherapy: boolean;
   };
-  
+
   languages: SelectionWithMultipleOther; // <-- Updated to use the new type with array for "other"
   therapySchool: SelectionWithOther;
-  
+
   therapySetting: string[];
   therapyFormat: string[];
   therapyDuration: string;
   sessionFrequency: string[];
   therapistGender: string[];
-  
+
   valuesPreferences: SelectionWithOther;
   additionalInfo: string;
   availability: string[];

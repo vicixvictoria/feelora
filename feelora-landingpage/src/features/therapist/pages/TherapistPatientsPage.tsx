@@ -1,5 +1,5 @@
-import { ChevronRight, Search, Send, Check, ChevronLeft } from "lucide-react";
-import avatar from "@/assets/avatar-Placeholder.png";
+import { ChevronRight, Search, Send, Check, ChevronLeft } from 'lucide-react';
+import avatar from '@/assets/avatar-Placeholder.png';
 
 interface Patient {
   name: string;
@@ -17,34 +17,34 @@ interface NewPatient {
 }
 
 const existingPatients: Patient[] = [
-  { name: "Nina Netwon", avatar: avatar },
-  { name: "Tom Turbo", avatar: avatar },
-  { name: "Jon Doe", avatar: avatar },
-  { name: "Nina Netwon", avatar: avatar },
-  { name: "Nina Netwon", avatar: avatar },
-  { name: "Nina Netwon", avatar: avatar },
-  { name: "Nina Netwon", avatar: avatar },
-  { name: "Nina Netwon", avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
+  { name: 'Tom Turbo', avatar: avatar },
+  { name: 'Jon Doe', avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
+  { name: 'Nina Netwon', avatar: avatar },
 ];
 
 const newPatients: NewPatient[] = [
   {
-    name: "Mel Mandela",
+    name: 'Mel Mandela',
     avatar: avatar,
     age: 20,
-    city: "Milano",
-    role: "Patient",
-    therapy: "Depression",
-    request: "Online Therapy",
+    city: 'Milano',
+    role: 'Patient',
+    therapy: 'Depression',
+    request: 'Online Therapy',
   },
   {
-    name: "Tina Tesla",
+    name: 'Tina Tesla',
     avatar: avatar,
     age: 23,
-    city: "Wien",
-    role: "Patient",
-    therapy: "Depression",
-    request: "Online Therapy",
+    city: 'Wien',
+    role: 'Patient',
+    therapy: 'Depression',
+    request: 'Online Therapy',
   },
 ];
 
@@ -55,16 +55,14 @@ const PatientsPage = () => {
       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
         <p
           className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: "rotate(-25deg)" }}
+          style={{ transform: 'rotate(-25deg)' }}
         >
           Coming Soon
         </p>
       </div>
 
       {/* Existing Patients */}
-      <h1 className="text-2xl font-bold text-foreground mb-6">
-        Deine Patient*innen
-      </h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Deine Patient*innen</h1>
 
       <div className="feelora-card mb-10">
         <div className="grid grid-cols-2 gap-4">
@@ -78,9 +76,7 @@ const PatientsPage = () => {
                 alt={patient.name}
                 className="w-10 h-10 rounded-full object-cover"
               />
-              <p className="font-medium text-foreground flex-1">
-                {patient.name}
-              </p>
+              <p className="font-medium text-foreground flex-1">{patient.name}</p>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
           ))}
@@ -89,9 +85,7 @@ const PatientsPage = () => {
 
       {/* New Patients */}
       <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
-          Neue Patient*innen
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground">Neue Patient*innen</h2>
         <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
           new
         </span>
@@ -127,9 +121,7 @@ const PatientsPage = () => {
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground mb-4">
-                Request: {patient.request}
-              </p>
+              <p className="text-sm text-muted-foreground mb-4">Request: {patient.request}</p>
 
               <div className="flex gap-3">
                 <button className="feelora-btn-primary text-sm">

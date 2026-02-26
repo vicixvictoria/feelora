@@ -1,50 +1,22 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { useState } from 'react';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import forTherapistsImg from '@/assets/for_therapists.png';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function ForTherapistsSection() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
   });
 
-  const [isHovered, setIsHovered] = useState(false);
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const handleLoginClick = () => {
-    navigate('/login');
-    setIsMobileMenuOpen(false);
-  };
-
-{/* 🚧 TEST ONLY: Temporary route to questionnaire 🚧 */}
-const questionNav = () => {
-    navigate('/test-therapist');
-    setIsMobileMenuOpen(false);
-  };
-
   const handleLoginClickTherapist = () => {
     navigate('/loginTherapist');
-    setIsMobileMenuOpen(false);
-  };
-
-  const therapistDashboardNav = () => {
-    navigate('/therapist');
-    setIsMobileMenuOpen(false);
   };
 
   const features = [
@@ -55,23 +27,26 @@ const questionNav = () => {
     },
     {
       icon: TrendingUpIcon,
-      title:  t('therapists.feature2.title'),
+      title: t('therapists.feature2.title'),
       description: t('therapists.feature2.desc'),
     },
     {
       icon: BriefcaseIcon,
-      title:  t('therapists.feature3.title'),
+      title: t('therapists.feature3.title'),
       description: t('therapists.feature3.desc'),
     },
     {
       icon: BarChartIcon,
-      title:  t('therapists.feature4.title'),
+      title: t('therapists.feature4.title'),
       description: t('therapists.feature4.desc'),
     },
   ];
 
   return (
-    <section id="for-therapists" className="py-24 px-8 bg-gradient-to-br from-tertiary/50 to-background">
+    <section
+      id="for-therapists"
+      className="py-24 px-8 bg-gradient-to-br from-tertiary/50 to-background"
+    >
       <div className="max-w-7xl mx-auto">
         <motion.div
           ref={ref}
@@ -102,7 +77,7 @@ const questionNav = () => {
 
           <div className="order-1 lg:order-2">
             <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              {t('therapists.title')} 
+              {t('therapists.title')}
             </h2>
             <p className="text-body-large text-gray-600 mb-12 leading-body">
               {t('therapists.description')}
@@ -119,7 +94,10 @@ const questionNav = () => {
                   <Card className="p-8 bg-card border-border hover:shadow-lg transition-shadow">
                     <div className="flex items-start gap-6">
                       <div className="flex-shrink-0 w-14 h-14 rounded-full bg-tertiary flex items-center justify-center">
-                        <feature.icon className="w-7 h-7 text-tertiary-foreground" strokeWidth={1.5} />
+                        <feature.icon
+                          className="w-7 h-7 text-tertiary-foreground"
+                          strokeWidth={1.5}
+                        />
                       </div>
                       <div>
                         <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-3">
@@ -137,14 +115,13 @@ const questionNav = () => {
 
             <Button
               size="lg"
-              onClick={handleLoginClickTherapist} 
+              onClick={handleLoginClickTherapist}
               //onClick={questionNav} // --> only use for testing questionnaire UI //
               //onClick={therapistDashboardNav} // --> only use for testing Dashboard UI without Auth
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
               Mitmachen
             </Button>
-            
           </div>
         </motion.div>
       </div>

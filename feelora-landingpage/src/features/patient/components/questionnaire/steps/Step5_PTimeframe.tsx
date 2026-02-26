@@ -1,7 +1,7 @@
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
-import { z } from "zod";
-import { useStepValidation } from "@/hooks/useStepValidation";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { z } from 'zod';
+import { useStepValidation } from '@/hooks/useStepValidation';
 
 interface ExperienceStepProps {
   onNext: () => void;
@@ -12,42 +12,42 @@ interface ExperienceStepProps {
 
 const experienceOptions = [
   {
-    id: "weniger3months",
-    label: "weniger als 3 Monate",
+    id: 'weniger3months',
+    label: 'weniger als 3 Monate',
   },
   {
-    id: "3-6months",
-    label: "3-6 Monate",
+    id: '3-6months',
+    label: '3-6 Monate',
   },
   {
-    id: "6-12months",
-    label: "6-12 Monate",
+    id: '6-12months',
+    label: '6-12 Monate',
   },
   {
-    id: "12+months",
-    label: "Mehr als 1 Jahr",
+    id: '12+months',
+    label: 'Mehr als 1 Jahr',
   },
 ];
 
 // Define validation schema expecting an object with a "selection" array
 const step5Schema = z.object({
-  selection: z.array(z.string()).min(1, "Required"),
+  selection: z.array(z.string()).min(1, 'Required'),
 });
 
 const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
   // Take the first item of the array as the current value for the RadioGroup
-  const currentValue = data[0] || "";
+  const currentValue = data[0] || '';
 
   // Initialize validation hook, wrapping the array `data` inside an object key called "selection"
   const { errors, validateAndNext, clearError } = useStepValidation({
-    data: { selection: data }, 
+    data: { selection: data },
     schema: step5Schema,
     onNext,
   });
 
   const handleValueChange = (value: string) => {
     // Wrap the single string back into an array for your parent state
-    clearError("selection"); // Clear error when user interacts
+    clearError('selection'); // Clear error when user interacts
     onDataChange([value]);
   };
 
@@ -60,7 +60,9 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
         </p>
       </div>
 
-      <div className={`feelora-card transition-colors ${errors.selection ? "border-destructive/50 bg-destructive/5" : ""}`}>
+      <div
+        className={`feelora-card transition-colors ${errors.selection ? 'border-destructive/50 bg-destructive/5' : ''}`}
+      >
         {/* value and onValueChange handle the state automatically */}
         <RadioGroup value={currentValue} onValueChange={handleValueChange} className="space-y-4">
           {experienceOptions.map((option) => (
@@ -68,9 +70,9 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
               key={option.id}
               htmlFor={option.id}
               className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
-                currentValue === option.id 
-                  ? "border-purple bg-purple/5" 
-                  : "border-border hover:bg-muted/50"
+                currentValue === option.id
+                  ? 'border-purple bg-purple/5'
+                  : 'border-border hover:bg-muted/50'
               }`}
             >
               <RadioGroupItem value={option.id} id={option.id} className="mt-1" />

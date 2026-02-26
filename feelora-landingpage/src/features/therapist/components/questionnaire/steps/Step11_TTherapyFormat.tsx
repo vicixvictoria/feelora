@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import NavigationButtons from "@/components/questionnaire/NavigationButton";
+import { Checkbox } from '@/components/ui/checkbox';
+import NavigationButtons from '@/components/questionnaire/NavigationButton';
 
 interface TherapyFormatStepProps {
   onNext: () => void;
@@ -9,15 +9,20 @@ interface TherapyFormatStepProps {
 }
 // List of therapy format options - add more if needed
 const formatOptions = [
-  { id: "einzel", label: "Einzel", description: "One-on-one Sessions" },
-  { id: "paar", label: "Paar", description: "Paartherapie" },
-  { id: "gruppe", label: "Gruppe", description: "Gruppentherapie Sessions" },
-  { id: "familien", label: "Familien", description: "Therapie mit Familien" },
-  { id: "keine-praeferenz", label: "Keine Präferenz", description: "" },
+  { id: 'einzel', label: 'Einzel', description: 'One-on-one Sessions' },
+  { id: 'paar', label: 'Paar', description: 'Paartherapie' },
+  { id: 'gruppe', label: 'Gruppe', description: 'Gruppentherapie Sessions' },
+  { id: 'familien', label: 'Familien', description: 'Therapie mit Familien' },
+  { id: 'keine-praeferenz', label: 'Keine Präferenz', description: '' },
 ];
 
 // Step Component
-const Step11_TTherapyFormat = ({ onNext, onBack, data = [], onDataChange }: TherapyFormatStepProps) => {
+const Step11_TTherapyFormat = ({
+  onNext,
+  onBack,
+  data = [],
+  onDataChange,
+}: TherapyFormatStepProps) => {
   const safeData = data || [];
 
   const handleToggle = (id: string) => {
@@ -32,12 +37,8 @@ const Step11_TTherapyFormat = ({ onNext, onBack, data = [], onDataChange }: Ther
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">
-          Bevorzugtes Therapie Setting Format
-        </h1>
-        <p className="text-muted-foreground mb-2">
-          Welche Therapieformate bietest du an?
-        </p>
+        <h1 className="text-3xl font-bold text-purple mb-2">Bevorzugtes Therapie Setting Format</h1>
+        <p className="text-muted-foreground mb-2">Welche Therapieformate bietest du an?</p>
         <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
       </div>
 
