@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { SmartphoneIcon, FileCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/cardLanding';
 import evidenceImg from '@/assets/evidenceBasedImg.png';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function EvidenceBasedSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,

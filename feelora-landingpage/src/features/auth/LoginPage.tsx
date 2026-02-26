@@ -6,7 +6,7 @@ import { CheckboxField } from '@aws-amplify/ui-react';
 import { amplifyConfig } from '@/config/amplify';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/buttonLanding';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const components = {
   SignUp: {
@@ -48,7 +48,7 @@ interface LoginPageProps {
 
 function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     Amplify.configure(amplifyConfig);

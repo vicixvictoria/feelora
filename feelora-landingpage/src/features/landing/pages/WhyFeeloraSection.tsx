@@ -3,10 +3,10 @@ import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
 import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
 import { Card } from '@/components/ui/cardLanding';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function WhyFeeloraSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,

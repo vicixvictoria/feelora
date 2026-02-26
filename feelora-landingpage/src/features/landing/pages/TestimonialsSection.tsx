@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function TestimonialsSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,

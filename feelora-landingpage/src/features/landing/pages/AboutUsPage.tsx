@@ -4,7 +4,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import pitchDay from '@/assets/RBSPitchDay.jpg';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import aylinFoto from '@/assets/Aylin-Foto.png';
 import victoriaFoto from '@/assets/Victoria-Foto.jpeg';
 import carolinFoto from '@/assets/Carolin-Foto.JPG';
@@ -12,7 +12,7 @@ import delphineFoto from '@/assets/Delphine-Foto.jpg';
 import micheleFoto from '@/assets/Michele-Foto.JPG';
 
 export function AboutUsPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,

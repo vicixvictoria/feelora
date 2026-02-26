@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { ArrowLeftIcon, MailIcon } from 'lucide-react';
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function SupportPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">

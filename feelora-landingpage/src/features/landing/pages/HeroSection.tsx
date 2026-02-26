@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/buttonLanding';
 import { AnimatedWaves } from './AnimatedWaves';
 import { TitleFrame } from './TitleFrame';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 const scrollToSection = (sectionId: string) => {
@@ -14,7 +14,7 @@ const scrollToSection = (sectionId: string) => {
 
 export function HeroSection() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <section
