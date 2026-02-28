@@ -68,7 +68,7 @@ const TherapistHomeworkPage = () => {
       {/* Coming Soon Watermark */}
       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
         <p
-          className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
           {t('app.therapist.homework.comingSoon')}
@@ -79,7 +79,7 @@ const TherapistHomeworkPage = () => {
         {t('app.therapist.homework.createTasks')}
       </h1>
 
-      <div className="flex gap-6 mb-12">
+      <div className="flex flex-col md:flex-row gap-6 mb-12">
         {/* Patient List */}
         <div className="flex-1 flex flex-col gap-4">
           {patients.map((patient) => (
@@ -100,7 +100,7 @@ const TherapistHomeworkPage = () => {
 
         {/* Task Assignment Panel */}
         {selectedPatient && (
-          <div className="w-80 feelora-card flex flex-col gap-4">
+          <div className="w-full md:w-80 feelora-card flex flex-col gap-4">
             <p className="text-foreground font-medium text-center">
               {t('app.therapist.homework.composeTask', { name: selectedPatient })}
             </p>
@@ -130,16 +130,19 @@ const TherapistHomeworkPage = () => {
       </h2>
       <div className="flex flex-col gap-4">
         {taskStatuses.map((task, index) => (
-          <div key={index} className="feelora-card flex items-center gap-4">
-            <img
-              src={task.avatar}
-              alt={task.patientName}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <p className="font-semibold text-foreground min-w-[140px]">{task.patientName}</p>
+          <div key={index} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={task.avatar}
+                alt={task.patientName}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <p className="font-semibold text-foreground min-w-[140px]">{task.patientName}</p>
+            </div>
             <p className="text-sm text-muted-foreground italic flex-1">
               {t('app.therapist.homework.taskFrom', { date: task.date })}
             </p>
+            <div className="flex items-center gap-4 self-end sm:self-auto">
             <span
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                 task.status === 'Erledigt'
@@ -160,6 +163,7 @@ const TherapistHomeworkPage = () => {
               {t('app.therapist.homework.details')}
               <Search className="w-4 h-4" />
             </button>
+            </div>
           </div>
         ))}
       </div>

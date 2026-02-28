@@ -59,11 +59,11 @@ const TherapistProfilePage = () => {
       </h1>
 
       <div className="feelora-card">
-        <div className="flex gap-8 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mb-6">
           <img
             src={therapistAvatar}
             alt={`${profile.Name} ${profile.Surname}`}
-            className="w-40 h-40 rounded-lg object-cover"
+            className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
           />
           <div className="flex-1">
             <h2 className="text-2xl font-semibold text-primary mb-1">
@@ -102,7 +102,7 @@ const TherapistProfilePage = () => {
                 If you need them, they must be fetched from the full Questionnaire JSON. */}
           </div>
 
-          <div className="flex items-end justify-between mt-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mt-6">
             <div>
               <p className="font-semibold">{t('app.therapist.profile.availability')}</p>
               <p>{profile.Availability?.join(', ') || t('app.therapist.profile.notSpecified')}</p>

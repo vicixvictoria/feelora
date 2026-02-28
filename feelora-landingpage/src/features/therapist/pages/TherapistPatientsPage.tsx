@@ -57,7 +57,7 @@ const PatientsPage = () => {
       {/* Coming Soon Watermark */}
       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
         <p
-          className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
           {t('app.therapist.patients.comingSoon')}
@@ -70,7 +70,7 @@ const PatientsPage = () => {
       </h1>
 
       <div className="feelora-card mb-10">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {existingPatients.map((patient, index) => (
             <div
               key={index}
@@ -106,7 +106,7 @@ const PatientsPage = () => {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {newPatients.map((patient, index) => (
             <div key={index} className="feelora-card relative">
               <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full z-20">
@@ -140,7 +140,7 @@ const PatientsPage = () => {
                 {t('app.therapist.patients.request')} {patient.request}
               </p>
 
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button className="feelora-btn-primary text-sm">
                   {t('app.therapist.patients.profile')}
                   <Search className="w-4 h-4" />

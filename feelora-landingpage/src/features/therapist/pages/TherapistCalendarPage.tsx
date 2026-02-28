@@ -65,7 +65,7 @@ const TherapistCalendarPage = () => {
       {/* Coming Soon Watermark */}
       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
         <p
-          className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
           {t('app.therapist.calendar.comingSoon')}

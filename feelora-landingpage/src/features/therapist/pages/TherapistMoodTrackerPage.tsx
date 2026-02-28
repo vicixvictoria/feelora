@@ -69,15 +69,17 @@ const TherapistMoodTrackerPage = () => {
         {/* Mood entries */}
         <div className="flex-1 flex flex-col gap-4">
           {patients.map((patient, index) => (
-            <div key={index} className="feelora-card flex items-center gap-6">
-              <img
-                src={patient.avatar}
-                alt={patient.name}
-                className="w-14 h-14 rounded-full object-cover"
-              />
-              <div className="min-w-[120px]">
-                <p className="font-semibold text-foreground">{patient.name}</p>
-                <p className="text-sm text-primary">{patient.date}</p>
+            <div key={index} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-4 sm:gap-6">
+                <img
+                  src={patient.avatar}
+                  alt={patient.name}
+                  className="w-14 h-14 rounded-full object-cover"
+                />
+                <div className="min-w-[120px]">
+                  <p className="font-semibold text-foreground">{patient.name}</p>
+                  <p className="text-sm text-primary">{patient.date}</p>
+                </div>
               </div>
               <div className="flex items-center gap-8 flex-1">
                 <div className="text-center">
@@ -99,7 +101,7 @@ const TherapistMoodTrackerPage = () => {
                   </p>
                 </div>
               </div>
-              <button className="text-primary font-medium hover:underline flex items-center gap-1">
+              <button className="text-primary font-medium hover:underline flex items-center gap-1 self-end sm:self-auto">
                 {t('app.therapist.moodTracker.details')} <ChevronRight className="w-4 h-4" />
               </button>
             </div>
