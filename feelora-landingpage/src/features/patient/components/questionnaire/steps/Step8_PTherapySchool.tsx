@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface TherapySchoolStepProps {
   onNext: () => void;
@@ -12,11 +13,11 @@ interface TherapySchoolStepProps {
 }
 
 // List of therapy school options - add more if needed
-const therapySchoolOptions = [
-  'Humanistische Orientierung',
-  'Verhaltenstherapeutische Orientierung',
-  'Psychoanalytisch-Psychodynamische Orientierung',
-  'Systemische Orientierung',
+const getTherapySchoolOptions = (t: (key: string) => string) => [
+  t('q.p.therapySchool.options.humanistic'),
+  t('q.p.therapySchool.options.behavioral'),
+  t('q.p.therapySchool.options.psychodynamic'),
+  t('q.p.therapySchool.options.systemic'),
 ];
 
 const IDK_OPTION = 'Ich weiß es nicht';
@@ -42,6 +43,8 @@ const step8Schema = z
 
 // Step Component
 const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySchoolStepProps) => {
+  const { t } = useTranslation();
+  const therapySchoolOptions = getTherapySchoolOptions(t);
   // 2. Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -97,14 +100,14 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Therapie Präferenzen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapySchool.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Welche Therapiemethode bevorzugst du (falls bekannt)?
+          {t('q.p.therapySchool.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selected ? t('q.p.therapySchool.error') : t('q.p.therapySchool.multiSelect')}
         </p>
       </div>
 
@@ -141,14 +144,14 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
                 checked={data.selected.includes('Andere')}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground">Andere</span>
+              <span className="text-foreground">{t('q.p.therapySchool.other')}</span>
             </label>
 
             {data.selected.includes('Andere') && !isIdkSelected && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
-                  placeholder="Bitte angeben..."
+                  placeholder={t('q.p.therapySchool.specifyPlaceholder')}
                   value={data.other || ''}
                   onChange={(e) => {
                     clearError('other');
@@ -157,7 +160,7 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <span className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</span>
+                  <span className="text-xs text-destructive mt-1 ml-1">{t('q.p.therapySchool.detailsError')}</span>
                 )}
               </div>
             )}
@@ -175,7 +178,7 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
               checked={isIdkSelected}
               onCheckedChange={handleIdkToggle}
             />
-            <span className="text-foreground font-medium">Ich weiß es nicht</span>
+            <span className="text-foreground font-medium">{t('q.p.therapySchool.idk')}</span>
           </label>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Phone, RefreshCw, Plus } from 'lucide-react';
 import { addWeeks, subWeeks, startOfWeek, addDays, format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -46,6 +47,7 @@ const colorMap = {
 };
 
 const TherapistCalendarPage = () => {
+  const { t } = useTranslation();
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
@@ -66,7 +68,7 @@ const TherapistCalendarPage = () => {
           className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
-          Coming Soon
+          {t('app.therapist.calendar.comingSoon')}
         </p>
       </div>
 
@@ -88,7 +90,7 @@ const TherapistCalendarPage = () => {
           </button>
         </div>
         <button className="feelora-btn-primary">
-          neu
+          {t('app.therapist.calendar.new')}
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -161,10 +163,10 @@ const TherapistCalendarPage = () => {
                     <p className="text-sm font-semibold text-foreground truncate">{apt.title}</p>
                     <div className="flex gap-2 mt-1">
                       <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        Anruf Starten <Phone className="w-3 h-3" />
+                        {t('app.therapist.calendar.startCall')} <Phone className="w-3 h-3" />
                       </button>
                       <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        neu planen <RefreshCw className="w-3 h-3" />
+                        {t('app.therapist.calendar.reschedule')} <RefreshCw className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

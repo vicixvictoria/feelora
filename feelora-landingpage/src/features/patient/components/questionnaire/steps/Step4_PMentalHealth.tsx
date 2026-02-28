@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface SpecialtiesStepProps {
   onNext: () => void;
@@ -11,20 +12,6 @@ interface SpecialtiesStepProps {
   data: { selected: string[]; other?: string };
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
-
-const specialtyOptions = [
-  'Depression',
-  'Angst',
-  'Stress',
-  'Psychosomatik',
-  'Trauma',
-  'Sucht',
-  'Sexuelle Identität',
-  'Zwang',
-  'Gewalterfahrungen',
-  'Chronische Schmerzen',
-  'Essverhalten',
-];
 
 // Define Validation Schema with Conditional Logic
 const step4Schema = z
@@ -47,6 +34,22 @@ const step4Schema = z
   );
 
 const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: SpecialtiesStepProps) => {
+  const { t } = useTranslation();
+
+  const specialtyOptions = [
+    { value: 'Depression', label: t('q.options.depression') },
+    { value: 'Angst', label: t('q.options.anxiety') },
+    { value: 'Stress', label: t('q.options.stress') },
+    { value: 'Psychosomatik', label: t('q.options.psychosomatics') },
+    { value: 'Trauma', label: t('q.options.trauma') },
+    { value: 'Sucht', label: t('q.options.addiction') },
+    { value: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
+    { value: 'Zwang', label: t('q.options.ocd') },
+    { value: 'Gewalterfahrungen', label: t('q.options.violence') },
+    { value: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
+    { value: 'Essverhalten', label: t('q.options.eatingDisorder') },
+  ];
+
   //Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -89,14 +92,14 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Mentale Gesundheit</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.mentalHealth.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Was sind die Hauptprobleme, für die du Hilfe suchst?
+          {t('q.p.mentalHealth.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected ? 'Bitte wähle mindestens eine Option aus' : 'Mehrere auswählbar'}
+          {errors.selected ? t('q.common.selectAtLeastOne') : t('q.common.multiSelect')}
         </p>
       </div>
 
@@ -137,7 +140,7 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
-                  placeholder="Bitte angeben..."
+                  placeholder={t('q.p.mental.specifyPlaceholder')}
                   value={data.other || ''}
                   onChange={(e) => {
                     clearError('other');

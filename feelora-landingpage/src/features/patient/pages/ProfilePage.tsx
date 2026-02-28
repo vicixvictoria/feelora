@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { patientService } from '../api/patientService';
@@ -14,6 +15,7 @@ const calculateAge = (birthDateUnix: number | null | undefined) => {
 };
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const [patient, setPatient] = useState<PatientProfile | null>(null);
   const [therapist, setTherapist] = useState<MatchedTherapist | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ const ProfilePage = () => {
         }
       } catch (err) {
         console.error('Error fetching profile data:', err);
-        setError('Fehler beim Laden der Profildaten.');
+        setError(t('patient.profile.loadError'));
       } finally {
         setLoading(false);
       }
@@ -61,7 +63,7 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground mb-6">Dein Profil</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">{t('patient.profile.yourProfile')}</h1>
 
       {/* User Profile Card */}
       <div className="feelora-card mb-10">
@@ -76,17 +78,17 @@ const ProfilePage = () => {
               {patient.Name} {patient.Surname}
             </h2>
             <div className="space-y-1 text-foreground">
-              <p>Alter: {calculateAge(patient.BirthDate)}</p>
-              <p>Stadt: {patient.City || 'Nicht angegeben'}</p>
-              <p className="mt-3">Rolle: Patient</p>
+              <p>{t('patient.profile.age')}: {calculateAge(patient.BirthDate)}</p>
+              <p>{t('patient.profile.city')}: {patient.City || t('patient.profile.notSpecified')}</p>
+              <p className="mt-3">{t('patient.profile.role')}: {t('patient.profile.rolePatient')}</p>
               <div className="flex items-center gap-4 mt-4">
-                <p>Therapeuten Match: {therapist ? therapist.Name : 'Noch kein Match'}</p>
+                <p>{t('patient.profile.therapistMatch')}: {therapist ? therapist.Name : t('patient.profile.noMatch')}</p>
               </div>
             </div>
           </div>
           <div className="self-center">
             <button className="feelora-btn-primary flex items-center gap-2">
-              Bearbeiten
+              {t('patient.profile.edit')}
               <ExternalLink className="w-4 h-4" />
             </button>
           </div>
@@ -94,14 +96,14 @@ const ProfilePage = () => {
       </div>
 
       {/* Therapist Section */}
-      <h2 className="text-xl font-bold text-foreground mb-4">Dein/e zugewiesene/r Therapeut:in</h2>
+      <h2 className="text-xl font-bold text-foreground mb-4">{t('patient.profile.assignedTherapist')}</h2>
 
       {therapist ? (
         <div className="feelora-card">
           <div className="flex gap-8">
             <img
               src={avatar}
-              alt={therapist.Name || 'Therapeut Profilbild'}
+              alt={therapist.Name || t('patient.profile.therapistAvatar')}
               className="w-40 h-40 rounded-lg object-cover"
             />
             <div className="flex-1">
@@ -109,29 +111,28 @@ const ProfilePage = () => {
                 {therapist.Name} {therapist.Surname}
               </h2>
               <div className="space-y-1 text-foreground">
-                <p>Alter: {calculateAge(therapist.BirthDate)}</p>
-                <p>Stadt: {therapist.City || 'Nicht angegeben'}</p>
-                <p className="mt-3">Rolle: Therapeut</p>
+                <p>{t('patient.profile.age')}: {calculateAge(therapist.BirthDate)}</p>
+                <p>{t('patient.profile.city')}: {therapist.City || t('patient.profile.notSpecified')}</p>
+                <p className="mt-3">{t('patient.profile.role')}: {t('patient.profile.roleTherapist')}</p>
                 <p>
-                  Spezialisierung:{' '}
-                  {therapist?.Specialties?.join(', ') || 'Keine Spezialisierung angegeben'}
+                  {t('patient.profile.specialization')}:{' '}
+                  {therapist?.Specialties?.join(', ') || t('patient.profile.noSpecialization')}
                 </p>
                 <p className="mt-1">
-                  Verfügbarkeit: {therapist.Availability?.join(', ') || 'Nicht angegeben'}
+                  {t('patient.profile.availability')}: {therapist.Availability?.join(', ') || t('patient.profile.notSpecified')}
                 </p>
                 {therapist.Address && (
-                  <p className="mt-3">Praxis: {therapist.Address || 'keine Praxis angegeben'}</p>
+                  <p className="mt-3">{t('patient.profile.practice')}: {therapist.Address || t('patient.profile.noPractice')}</p>
                 )}
-                {/* Note: Languages we need to add later */}
               </div>
             </div>
             <div className="flex flex-col gap-3 self-start">
               <button className="feelora-btn-primary flex items-center gap-2 justify-center">
-                Profil
+                {t('patient.profile.profileBtn')}
                 <Search className="w-4 h-4" />
               </button>
               <button className="feelora-btn-primary flex items-center gap-2 justify-center">
-                Nachricht
+                {t('patient.profile.message')}
                 <Send className="w-4 h-4" />
               </button>
             </div>
@@ -139,7 +140,7 @@ const ProfilePage = () => {
         </div>
       ) : (
         <div className="feelora-card p-6 text-center text-foreground">
-          <p>Du hast aktuell noch keine/n zugewiesene/n Therapeut:in.</p>
+          <p>{t('patient.profile.noTherapistAssigned')}</p>
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface TherapySettingStepProps {
   onNext: () => void;
@@ -11,7 +12,11 @@ interface TherapySettingStepProps {
 }
 
 // Separate the standard options from the exclusive option
-const settingOptions = ['Vor Ort', 'Online (Video Call)', 'Telefon / Anruf'];
+const getSettingOptions = (t: (key: string) => string) => [
+  t('q.p.therapySetting.options.onSite'),
+  t('q.p.therapySetting.options.online'),
+  t('q.p.therapySetting.options.phone'),
+];
 
 const NO_PREFERENCE = 'keine Präferenz';
 
@@ -21,6 +26,8 @@ const step9Schema = z.object({
 });
 
 const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySettingStepProps) => {
+  const { t } = useTranslation();
+  const settingOptions = getSettingOptions(t);
   // Initialize hook, wrapping the array `data` inside an object key called "selection"
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { selection: data },
@@ -60,14 +67,14 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Bevorzugter Therapie Setting Modus</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapySetting.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Welches Setting bevorzugst du für den Therapie-Sitzungstyp?
+          {t('q.p.therapySetting.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.p.therapySetting.error') : t('q.p.therapySetting.multiSelect')}
         </p>
       </div>
 
@@ -97,7 +104,7 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
           {/* Exclusive "No Preference" option */}
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
-            <span className="text-foreground font-medium">{NO_PREFERENCE}</span>
+            <span className="text-foreground font-medium">{t('q.p.therapySetting.noPreference')}</span>
           </label>
         </div>
       </div>

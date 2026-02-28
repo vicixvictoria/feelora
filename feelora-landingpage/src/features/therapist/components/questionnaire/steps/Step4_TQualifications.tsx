@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface QualificationsStepProps {
   onNext: () => void;
@@ -22,8 +23,8 @@ const step4Schema = z
     titleFromSuffix: z.string().optional(),
 
     // Mandatory fields
-    licenseNumber: z.string().min(1, 'Lizenznummer erforderlich'),
-    idFileName: z.string().min(1, 'Ausweis erforderlich'),
+    licenseNumber: z.string().min(1, 'License required'),
+    idFileName: z.string().min(1, 'Upload required'),
 
     // Optional field
     qualifications: z.string().optional(),
@@ -36,18 +37,20 @@ const step4Schema = z
     if (!hasPrefix && !hasSuffix) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Mindestens ein Titel erforderlich',
+        message: 'Title required',
         path: ['titlePrefix'],
       });
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Mindestens ein Titel erforderlich',
+        message: 'Title required',
         path: ['titleSuffix'],
       });
     }
   });
 
 const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: QualificationsStepProps) => {
+  const { t } = useTranslation();
+
   // Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -71,16 +74,15 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Titel und Qualifikationen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.qualifications.title')}</h1>
         <p className="text-muted-foreground">
-          Gib deine (professionellen) Titel an und wo du diese erworben hast, deine offizielle
-          Lizenznummer, sowie weitere relevante Qualifikationen.
+          {t('q.t.qualifications.subtitle')}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">Titel und Qualifikationen</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.qualifications.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
@@ -88,7 +90,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
               htmlFor="titlePrefix"
               className={errors.titlePrefix ? 'text-destructive' : 'text-foreground'}
             >
-              Titel vorgestellt {errors.titlePrefix && '*'}
+              {t('q.t.qualifications.titlePrefix')} {errors.titlePrefix && '*'}
             </Label>
             <Input
               id="titlePrefix"
@@ -98,7 +100,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
               className={`bg-background ${errors.titlePrefix ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             />
             {errors.titlePrefix && (
-              <p className="text-xs text-destructive">Bitte fülle mind. einen Titel aus</p>
+              <p className="text-xs text-destructive">{t('q.t.qualifications.titleRequired')}</p>
             )}
           </div>
 
@@ -107,9 +109,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
               htmlFor="titleSuffix"
               className={errors.titleSuffix ? 'text-destructive' : 'text-foreground'}
             >
-              Titel nachgestellt{' '}
+              {t('q.t.qualifications.titleSuffix')}{' '}
               <span className={errors.titleSuffix ? 'text-destructive' : 'text-muted-foreground'}>
-                (optional)
+                ({t('q.common.optional')})
               </span>
             </Label>
             <Input
@@ -123,7 +125,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
           <div className="space-y-2">
             <Label htmlFor="titleFromPrefix" className="text-foreground">
-              von
+              {t('q.t.qualifications.titleFrom')}
             </Label>
             <Input
               id="titleFromPrefix"
@@ -136,7 +138,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
           <div className="space-y-2">
             <Label htmlFor="titleFromSuffix" className="text-foreground">
-              von
+              {t('q.t.qualifications.titleFrom')}
             </Label>
             <Input
               id="titleFromSuffix"
@@ -153,24 +155,24 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
             htmlFor="licenseNumber"
             className={errors.licenseNumber ? 'text-destructive' : 'text-foreground'}
           >
-            Lizenznummer {errors.licenseNumber && '*'}
+            {t('q.t.qualifications.licenseNumber')} {errors.licenseNumber && '*'}
           </Label>
           <Input
             id="licenseNumber"
             type="text"
             value={data.licenseNumber || ''}
             onChange={(e) => handleChange('licenseNumber', e.target.value)}
-            placeholder="z.B. PSY-12345"
+            placeholder={t('q.t.qualifications.licensePlaceholder')}
             className={`bg-background ${errors.licenseNumber ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           />
           {errors.licenseNumber && (
-            <p className="text-xs text-destructive">Lizenznummer ist erforderlich</p>
+            <p className="text-xs text-destructive">{t('q.t.qualifications.licenseRequired')}</p>
           )}
         </div>
 
         <div className="space-y-2 mb-6">
           <Label htmlFor="qualifications" className="text-foreground">
-            Qualifikationen <span className="text-muted-foreground">(optional)</span>
+            {t('q.t.qualifications.qualifications')} <span className="text-muted-foreground">({t('q.common.optional')})</span>
           </Label>
           <Textarea
             id="qualifications"
@@ -185,9 +187,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
             htmlFor="idUpload"
             className={errors.idFileName ? 'text-destructive font-medium' : 'text-foreground'}
           >
-            Ausweis hochladen {errors.idFileName && '*'} <br />
+            {t('q.t.qualifications.idUpload')} {errors.idFileName && '*'} <br />
             <span className="text-muted-foreground text-sm font-normal">
-              (wird benötigt, um die Identität und Lizenznummer zu verifizieren)
+              {t('q.t.qualifications.idUploadHint')}
             </span>
           </Label>
           <div className="flex items-center gap-4">
@@ -204,15 +206,15 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                 <div className="flex flex-col items-center gap-1 text-foreground/80">
                   <Check className="w-6 h-6 text-green-500" />
                   <span className="text-sm">{data.idFileName}</span>
-                  <span className="text-xs text-muted-foreground">Klicke um zu ändern</span>
+                  <span className="text-xs text-muted-foreground">{t('q.t.qualifications.clickToChange')}</span>
                 </div>
               ) : (
                 <div
                   className={`flex flex-col items-center gap-1 ${errors.idFileName ? 'text-destructive' : 'text-muted-foreground'}`}
                 >
                   <Upload className="w-6 h-6" />
-                  <span className="text-sm">Bild auswählen</span>
-                  <span className="text-xs">JPG, PNG oder PDF</span>
+                  <span className="text-sm">{t('q.t.qualifications.selectImage')}</span>
+                  <span className="text-xs">{t('q.t.qualifications.fileTypes')}</span>
                 </div>
               )}
               <input
@@ -232,7 +234,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
           </div>
           {errors.idFileName && (
             <p className="text-xs text-destructive">
-              Bitte lade ein Dokument zur Verifizierung hoch
+              {t('q.t.qualifications.uploadRequired')}
             </p>
           )}
         </div>

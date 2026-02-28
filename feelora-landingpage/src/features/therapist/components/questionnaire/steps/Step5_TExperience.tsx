@@ -2,6 +2,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface ExperienceStepProps {
   onNext: () => void;
@@ -10,30 +11,32 @@ interface ExperienceStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-const experienceOptions = [
-  {
-    id: 'supervision',
-    label: 'Unter Supervision',
-    description: 'Frisch/e Absolvent:Innen und Therapeut:Innen unter Supervision',
-  },
-  {
-    id: '1-3years',
-    label: '1-3 Jahre Erfahung',
-    description: 'Solo Therapeut:In',
-  },
-  {
-    id: '3+years',
-    label: '3+ Jahre',
-    description: '',
-  },
-];
-
 // Define validation schema expecting an object with a "selection" array
 const step5Schema = z.object({
-  selection: z.array(z.string()).min(1, 'Bitte wähle eine Option aus'),
+  selection: z.array(z.string()).min(1, 'Please select an option'),
 });
 
 const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
+  const { t } = useTranslation();
+
+  const experienceOptions = [
+    {
+      id: 'supervision',
+      label: t('q.t.experience.supervision'),
+      description: t('q.t.experience.supervisionDesc'),
+    },
+    {
+      id: '1-3years',
+      label: t('q.t.experience.1to3years'),
+      description: t('q.t.experience.1to3yearsDesc'),
+    },
+    {
+      id: '3+years',
+      label: t('q.t.experience.3plusYears'),
+      description: '',
+    },
+  ];
+
   const safeData = data || [];
   const currentValue = safeData[0] || '';
 
@@ -52,12 +55,12 @@ const Step5_TExperience = ({ onNext, onBack, data, onDataChange }: ExperienceSte
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Erfahrung seit</h1>
-        <p className="text-muted-foreground">Erzähle uns von deiner Erfahrung als Therapeut:In.</p>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.experience.title')}</h1>
+        <p className="text-muted-foreground">{t('q.t.experience.subtitle')}</p>
         {/* Error message in header */}
         {errors.selection && (
           <p className="text-sm text-destructive font-semibold mt-2">
-            Bitte wähle eine Option aus.
+            {t('q.t.experience.selectError')}
           </p>
         )}
       </div>

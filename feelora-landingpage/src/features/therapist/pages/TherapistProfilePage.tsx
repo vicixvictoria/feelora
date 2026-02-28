@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import therapistAvatar from '@/assets/avatar-Placeholder.png';
 import { therapistService } from '../api/therapistService'; // Adjust path if needed
 import { TherapistProfile } from '../types/profiles'; // Import TherapistProfile type
 
 const TherapistProfilePage = () => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<TherapistProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +21,7 @@ const TherapistProfilePage = () => {
         setProfile(data);
       } catch (err) {
         console.error('Failed to load profile', err);
-        setError('Profil konnte nicht geladen werden.');
+        setError(t('app.therapist.profile.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -37,7 +39,7 @@ const TherapistProfilePage = () => {
   }
 
   if (error || !profile) {
-    return <div className="text-center text-red-500 mt-10">{error || 'Kein Profil gefunden.'}</div>;
+    return <div className="text-center text-red-500 mt-10">{error || t('app.therapist.profile.noProfile')}</div>;
   }
 
   // Calculate age from Unix timestamp (BirthDate float)
@@ -48,7 +50,7 @@ const TherapistProfilePage = () => {
 
   return (
     <div className="max-w-4xl animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground mb-6">Dein Profil</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.profile.title')}</h1>
 
       <div className="feelora-card">
         <div className="flex gap-8 mb-6">
@@ -62,10 +64,10 @@ const TherapistProfilePage = () => {
               Dr. {profile.Name} {profile.Surname}
             </h2>
             <div className="space-y-0.5 text-foreground">
-              <p>Alter: {age}</p>
-              <p>Stadt: {profile.City}</p>
-              {profile.Address && <p>Adresse: {profile.Address}</p>}
-              <p>Rolle: Therapeut*in</p>
+              <p>{t('app.therapist.profile.age')} {age}</p>
+              <p>{t('app.therapist.profile.city')} {profile.City}</p>
+              {profile.Address && <p>{t('app.therapist.profile.address')} {profile.Address}</p>}
+              <p>{t('app.therapist.profile.role')} {t('app.therapist.profile.therapist')}</p>
             </div>
           </div>
         </div>
@@ -73,12 +75,12 @@ const TherapistProfilePage = () => {
         <div className="space-y-4 text-foreground">
           <div>
             <p>
-              <span className="font-semibold">Spezialisiert in:</span>{' '}
-              {profile.Specialties?.join(', ') || 'Keine Angabe'}
+              <span className="font-semibold">{t('app.therapist.profile.specializedIn')}</span>{' '}
+              {profile.Specialties?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
             <p>
-              <span className="font-semibold">Sprachen:</span>{' '}
-              {profile.Languages?.join(', ') || 'Keine Angabe'}
+              <span className="font-semibold">{t('app.therapist.profile.languages')}</span>{' '}
+              {profile.Languages?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
             {/* Note: Methodik & Information are not saved in your TherapistProfile GraphQL schema, so they are omitted here.
                 If you need them, they must be fetched from the full Questionnaire JSON. */}
@@ -86,11 +88,11 @@ const TherapistProfilePage = () => {
 
           <div className="flex items-end justify-between mt-6">
             <div>
-              <p className="font-semibold">Verfügbarkeit</p>
-              <p>{profile.Availability?.join(', ') || 'Nicht angegeben'}</p>
+              <p className="font-semibold">{t('app.therapist.profile.availability')}</p>
+              <p>{profile.Availability?.join(', ') || t('app.therapist.profile.notSpecified')}</p>
             </div>
             <button className="feelora-btn-primary">
-              Bearbeiten
+              {t('app.therapist.profile.edit')}
               <ExternalLink className="w-4 h-4 ml-2" />
             </button>
           </div>

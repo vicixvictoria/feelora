@@ -1,5 +1,6 @@
 import { Textarea } from '@/components/ui/textarea';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { useTranslation } from 'react-i18next';
 interface AdditionalInfoStepProps {
   onNext: () => void;
   onBack: () => void;
@@ -12,23 +13,23 @@ const Step16_PAdditionalInfo = ({
   data,
   onDataChange,
 }: AdditionalInfoStepProps) => {
+  const { t } = useTranslation();
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Zusätzliche Information</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.additionalInfo.title')}</h1>
         <p className="text-muted-foreground">
-          Bitte teile uns alle weiteren wichtigen Informationen oder Anmerkungen mit.
+          {t('q.p.additionalInfo.subtitle')}
         </p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">
         <p className="text-foreground/80 mb-4">
-          Möchtest du uns noch etwas weiteres über deine bevorstehende Therapie oder besondere
-          Anforderungen oder Präferenzen bezüglich deines/r Therapeut:in mitteilen? (Optional)
+          {t('q.p.additionalInfo.description')}
         </p>
         <Textarea
-          placeholder="hier tippen..."
+          placeholder={t('q.p.additionalInfo.placeholder')}
           value={data}
           onChange={(e) => onDataChange(e.target.value)}
           className="min-h-[120px] resize-y bg-background"

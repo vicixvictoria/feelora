@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 // Props Interface
 interface SessionFrequencyStepProps {
@@ -15,13 +16,13 @@ interface SessionFrequencyStepProps {
 const NO_PREFERENCE = 'keine-praeferenz';
 
 // List of session frequency options - add more if needed
-const frequencyOptions = [
-  { id: 'flexibel', label: 'Flexibel', description: 'Ganz nach Patient:Innen Wunsch' },
-  { id: 'woechentlich', label: 'Wöchentlich', description: 'Wöchentlich wiederholende Termine' },
+const getFrequencyOptions = (t: (key: string) => string) => [
+  { id: 'flexibel', label: t('q.p.sessionFrequency.options.flexible.label'), description: t('q.p.sessionFrequency.options.flexible.description') },
+  { id: 'woechentlich', label: t('q.p.sessionFrequency.options.weekly.label'), description: t('q.p.sessionFrequency.options.weekly.description') },
   {
     id: 'zweiwoechentlich',
-    label: 'Zweiwöchentlich',
-    description: 'Termine wiederholen alle zwei Wochen',
+    label: t('q.p.sessionFrequency.options.biweekly.label'),
+    description: t('q.p.sessionFrequency.options.biweekly.description'),
   },
 ];
 
@@ -37,6 +38,8 @@ const Step12_PSessionFrequency = ({
   data = [],
   onDataChange,
 }: SessionFrequencyStepProps) => {
+  const { t } = useTranslation();
+  const frequencyOptions = getFrequencyOptions(t);
   const safeData = data || [];
 
   // Initialize validation hook
@@ -79,14 +82,14 @@ const Step12_PSessionFrequency = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Sitzungsfrequenz</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.sessionFrequency.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Erzähle uns von deiner bevorzugten Sitzungsfrequenz.
+          {t('q.p.sessionFrequency.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.p.sessionFrequency.error') : t('q.p.sessionFrequency.multiSelect')}
         </p>
       </div>
 
@@ -133,7 +136,7 @@ const Step12_PSessionFrequency = ({
               className="mt-0.5"
             />
             <div className="flex flex-col">
-              <span className="text-foreground">Keine Präferenz</span>
+              <span className="text-foreground">{t('q.p.sessionFrequency.noPreference')}</span>
             </div>
           </label>
         </div>

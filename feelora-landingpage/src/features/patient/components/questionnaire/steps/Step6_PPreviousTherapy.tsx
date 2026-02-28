@@ -3,6 +3,7 @@ import { Textarea } from '@/components/ui/textarea';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface PreviousTherapyStepProps {
   onNext: () => void;
@@ -11,12 +12,12 @@ interface PreviousTherapyStepProps {
   onDataChange: (data: { selected: string[]; other?: string; neverHadTherapy: boolean }) => void;
 }
 
-const therapyOptions = [
-  'Kognitive Verhaltenstherapie (KVT)',
-  'Psychoanalyse',
-  'Personenzentrierte Therapie',
-  'Gestalttherapie',
-  'Trauma-informierte Therapie',
+const getTherapyOptions = (t: (key: string) => string) => [
+  t('q.p.previousTherapy.options.cbt'),
+  t('q.p.previousTherapy.options.psychoanalysis'),
+  t('q.p.previousTherapy.options.personCentered'),
+  t('q.p.previousTherapy.options.gestalt'),
+  t('q.p.previousTherapy.options.traumaInformed'),
 ];
 
 // Define validation schema with  conditional logic
@@ -54,6 +55,8 @@ const Step6_PPreviousTherapy = ({
   data,
   onDataChange,
 }: PreviousTherapyStepProps) => {
+  const { t } = useTranslation();
+  const therapyOptions = getTherapyOptions(t);
   const safeData = data || { selected: [], other: '', neverHadTherapy: false };
 
   // 2. Initialize Hook
@@ -105,18 +108,17 @@ const Step6_PPreviousTherapy = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Vorherige Therapie</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.previousTherapy.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Hast du schon einmal einen Therapeuten aufgesucht? Wenn ja, welche Art von Therapie hast
-          du erhalten?
+          {t('q.p.previousTherapy.subtitle')}
         </p>
         {/* 3. Show error message in header if nothing is selected */}
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground italic'}`}
         >
           {errors.selected
-            ? "Bitte wähle eine Option oder 'Ich hatte noch nie Therapie' aus."
-            : 'Mehrfachauswahl möglich'}
+            ? t('q.p.previousTherapy.error')
+            : t('q.p.previousTherapy.multiSelect')}
         </p>
       </div>
 
@@ -155,14 +157,14 @@ const Step6_PPreviousTherapy = ({
                 onCheckedChange={handleOtherToggle}
                 disabled={safeData.neverHadTherapy}
               />
-              <span className="text-foreground">Andere</span>
+              <span className="text-foreground">{t('q.p.previousTherapy.other')}</span>
             </label>
 
             {/* 4. Validate Textarea for "Andere" */}
             {safeData.selected.includes('Andere') && !safeData.neverHadTherapy && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Textarea
-                  placeholder="Bitte spezifizieren..."
+                  placeholder={t('q.p.previousTherapy.specifyPlaceholder')}
                   value={safeData.other}
                   onChange={(e) => {
                     clearError('other');
@@ -171,7 +173,7 @@ const Step6_PPreviousTherapy = ({
                   className={`bg-background resize-none ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <p className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</p>
+                  <p className="text-xs text-destructive mt-1 ml-1">{t('q.p.previousTherapy.detailsError')}</p>
                 )}
               </div>
             )}
@@ -189,7 +191,7 @@ const Step6_PPreviousTherapy = ({
               checked={safeData.neverHadTherapy}
               onCheckedChange={handleNeverTherapy}
             />
-            <span className="text-foreground font-medium">Ich hatte noch nie Therapie</span>
+            <span className="text-foreground font-medium">{t('q.p.previousTherapy.neverHadTherapy')}</span>
           </label>
         </div>
       </div>

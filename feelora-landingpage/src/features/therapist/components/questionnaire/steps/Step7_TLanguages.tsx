@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface LanguagesStepProps {
   onNext: () => void;
@@ -59,24 +60,25 @@ const otherLanguages = [
 // Define Validation Schema with Conditional Logic
 const step7Schema = z
   .object({
-    selected: z.array(z.string()).min(1, 'Bitte wähle mindestens eine Sprache'),
+    selected: z.array(z.string()).min(1, 'Please select at least one language'),
     other: z.array(z.string()).optional(),
   })
   .refine(
     (data) => {
-      // Wenn "Andere" gewählt ist, MUSS das 'other' Array mindestens 1 Element haben
       if (data.selected.includes('Andere')) {
         return data.other && data.other.length > 0;
       }
       return true;
     },
     {
-      message: 'Bitte wähle mindestens eine weitere Sprache aus',
+      message: 'Please select at least one other language',
       path: ['other'],
     },
   );
 
 const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepProps) => {
+  const { t } = useTranslation();
+
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step7Schema,
@@ -97,14 +99,12 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
     clearError('other');
 
     if (data.selected.includes('Andere')) {
-      // Wenn abgewählt, leeren wir auch das 'other' Array
       onDataChange({ ...data, selected: data.selected.filter((l) => l !== 'Andere'), other: [] });
     } else {
       onDataChange({ ...data, selected: [...data.selected, 'Andere'], other: data.other || [] });
     }
   };
 
-  // Functionn to handle toggling of languages in the "other" category
   const handleOtherLanguageToggle = (language: string) => {
     clearError('other');
     const currentOther = data.other || [];
@@ -119,16 +119,16 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Sprachen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.languages.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Bitte wähle aus, in welchen Sprachen du Therapies anbieten willst.
+          {t('q.t.languages.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
           {errors.selected
-            ? 'Bitte wähle mindestens eine Sprache aus.'
-            : 'Mehrfachauswahl möglich.'}
+            ? t('q.t.languages.selectError')
+            : t('q.common.multiSelect')}
         </p>
       </div>
 
@@ -160,16 +160,15 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 checked={data.selected.includes('Andere')}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground font-medium">Andere Sprachen...</span>
+              <span className="text-foreground font-medium">{t('q.common.otherLanguages')}</span>
             </label>
 
-            {/* 4. Scrollbare Checkbox-Liste für weitere Sprachen */}
             {data.selected.includes('Andere') && (
               <div
                 className={`animate-in fade-in slide-in-from-top-2 duration-300 p-4 rounded-lg border bg-muted/20 ${errors.other ? 'border-destructive ring-1 ring-destructive' : 'border-border'}`}
               >
                 <p className="text-sm font-medium mb-3 text-foreground">
-                  Weitere Sprachen auswählen:
+                  {t('q.common.selectMoreLanguages')}
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
@@ -189,7 +188,7 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
 
                 {errors.other && (
                   <p className="text-xs text-destructive mt-3">
-                    Bitte wähle mindestens eine weitere Sprache aus.
+                    {t('q.t.languages.otherError')}
                   </p>
                 )}
               </div>

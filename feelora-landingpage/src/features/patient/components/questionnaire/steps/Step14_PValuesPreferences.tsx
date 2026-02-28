@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface ValuesPreferencesStepProps {
   onNext: () => void;
@@ -55,6 +56,7 @@ const Step14_PValuesPreferences = ({
   data,
   onDataChange,
 }: ValuesPreferencesStepProps) => {
+  const { t } = useTranslation();
   // Initialize validationhook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -113,15 +115,14 @@ const Step14_PValuesPreferences = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Werte und Präferenzen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.valuesPreferences.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Welche Eigenschaften, Werte oder Fachgebiete sind dir bei einer Therapeutin oder einem
-          Therapeuten besonders wichtig?
+          {t('q.p.valuesPreferences.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selected ? t('q.p.valuesPreferences.error') : t('q.p.valuesPreferences.hint')}
         </p>
       </div>
 
@@ -162,7 +163,7 @@ const Step14_PValuesPreferences = ({
                 onCheckedChange={handleOtherToggle}
                 disabled={hasNoPreference}
               />
-              <span className="text-foreground">Andere</span>
+              <span className="text-foreground">{t('q.p.valuesPreferences.other')}</span>
             </label>
 
             {/* Conditional Input */}
@@ -170,7 +171,7 @@ const Step14_PValuesPreferences = ({
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
-                  placeholder="Bitte angeben..."
+                  placeholder={t('q.p.valuesPreferences.otherPlaceholder')}
                   value={data.other || ''}
                   onChange={(e) => {
                     clearError('other');
@@ -179,7 +180,7 @@ const Step14_PValuesPreferences = ({
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <span className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</span>
+                  <span className="text-xs text-destructive mt-1 ml-1">{t('q.p.valuesPreferences.otherError')}</span>
                 )}
               </div>
             )}

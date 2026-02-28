@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Video, Smile, Plus, Clock } from 'lucide-react';
 import {
   format,
@@ -17,38 +18,46 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-const daysOfWeek = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
-
-const appointments = [
-  {
-    title: 'Online Therapy Session with Eva',
-    time: 'at 13:00',
-    icon: Video,
-    iconColor: 'text-primary',
-  },
-  {
-    title: 'Weekly Mood Tracker Recording',
-    time: 'all day',
-    icon: Smile,
-    iconColor: 'text-primary',
-  },
-];
-
-const emergencyNumbers = [
-  {
-    name: 'Rat auf Draht',
-    number: '+43 800 1234',
-    description:
-      'Benötigst du dringend Unterstützung? Diese Hotline ist rund um die Uhr erreichbar. Kostenlos.',
-  },
-  { name: 'Other Number', number: '', description: '' },
-  { name: 'Other Numer', number: '', description: '' },
-  { name: 'Other Number', number: '', description: '' },
-];
-
 const CalendarPage = () => {
+  const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const daysOfWeek = [
+    t('patient.calendar.sun'),
+    t('patient.calendar.mon'),
+    t('patient.calendar.tue'),
+    t('patient.calendar.wed'),
+    t('patient.calendar.thu'),
+    t('patient.calendar.fri'),
+    t('patient.calendar.sat'),
+  ];
+
+  const appointments = [
+    {
+      title: t('patient.calendar.onlineTherapySession'),
+      time: t('patient.calendar.at1300'),
+      icon: Video,
+      iconColor: 'text-primary',
+    },
+    {
+      title: t('patient.calendar.weeklyMoodTracker'),
+      time: t('patient.calendar.allDay'),
+      icon: Smile,
+      iconColor: 'text-primary',
+    },
+  ];
+
+  const emergencyNumbers = [
+    {
+      name: 'Rat auf Draht',
+      number: '+43 800 1234',
+      description: t('patient.calendar.emergencyDescription'),
+    },
+    { name: 'Other Number', number: '', description: '' },
+    { name: 'Other Number', number: '', description: '' },
+    { name: 'Other Number', number: '', description: '' },
+  ];
 
   const handlePrevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -83,7 +92,7 @@ const CalendarPage = () => {
             className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
             style={{ transform: 'rotate(-25deg)' }}
           >
-            Coming Soon
+            {t('patient.calendar.comingSoon')}
           </p>
         </div>
         {/* Left Column - Calendar */}
@@ -160,7 +169,7 @@ const CalendarPage = () => {
                   <p className="text-sm text-muted-foreground">{apt.time}</p>
                 </div>
                 <button className="feelora-btn-outline">
-                  Start
+                  {t('patient.calendar.start')}
                   <apt.icon className="w-4 h-4" />
                 </button>
               </div>
@@ -171,21 +180,21 @@ const CalendarPage = () => {
           <div className="flex justify-center">
             <button className="feelora-btn-primary">
               <Clock className="w-4 h-4" />
-              Request Session
+              {t('patient.calendar.requestSession')}
             </button>
           </div>
         </div>
 
         {/* Right Column - Appointments & Emergency */}
         <div className="w-96">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Termine eintragen</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">{t('patient.calendar.addAppointments')}</h2>
 
           {/* Appointment requests */}
           <div className="feelora-card mb-4">
             <div className="flex items-center justify-between py-2">
-              <span className="font-medium text-foreground">Therapie Stunde mit Dr. Eva</span>
+              <span className="font-medium text-foreground">{t('patient.calendar.therapySessionWithDr')}</span>
               <button className="feelora-btn-outline text-sm">
-                Request
+                {t('patient.calendar.request')}
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -193,16 +202,16 @@ const CalendarPage = () => {
 
           <div className="feelora-card mb-8">
             <div className="flex items-center justify-between py-2">
-              <span className="font-medium text-foreground">Anderes Verwalten</span>
+              <span className="font-medium text-foreground">{t('patient.calendar.manageOther')}</span>
               <button className="feelora-btn-outline text-sm text-primary">
-                new
+                {t('patient.calendar.new')}
                 <Plus className="w-4 h-4" />
               </button>
             </div>
           </div>
 
           {/* Emergency Numbers */}
-          <h2 className="text-2xl font-bold text-foreground mb-4">Notfall Nummern</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">{t('patient.calendar.emergencyNumbers')}</h2>
           <Accordion type="single" collapsible className="space-y-2">
             {emergencyNumbers.map((item, index) => (
               <AccordionItem

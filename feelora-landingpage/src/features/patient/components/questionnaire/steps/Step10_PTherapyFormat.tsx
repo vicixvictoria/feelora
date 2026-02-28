@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface TherapyFormatStepProps {
   onNext: () => void;
@@ -14,11 +15,11 @@ interface TherapyFormatStepProps {
 const NO_PREFERENCE = 'keine-praeferenz';
 
 // List of therapy format options - add more if needed
-const formatOptions = [
-  { id: 'einzel', label: 'Einzel', description: 'One-on-one Sessions' },
-  { id: 'paar', label: 'Paar', description: 'Paartherapie' },
-  { id: 'gruppe', label: 'Gruppe', description: 'Gruppentherapie Sessions' },
-  { id: 'familien', label: 'Familien', description: 'Therapie mit Familien' },
+const getFormatOptions = (t: (key: string) => string) => [
+  { id: 'einzel', label: t('q.p.therapyFormat.options.individual.label'), description: t('q.p.therapyFormat.options.individual.description') },
+  { id: 'paar', label: t('q.p.therapyFormat.options.couple.label'), description: t('q.p.therapyFormat.options.couple.description') },
+  { id: 'gruppe', label: t('q.p.therapyFormat.options.group.label'), description: t('q.p.therapyFormat.options.group.description') },
+  { id: 'familien', label: t('q.p.therapyFormat.options.family.label'), description: t('q.p.therapyFormat.options.family.description') },
 ];
 
 // Define validation schema expecting an object with a "selection" array
@@ -33,6 +34,8 @@ const Step10_PTherapyFormat = ({
   data = [],
   onDataChange,
 }: TherapyFormatStepProps) => {
+  const { t } = useTranslation();
+  const formatOptions = getFormatOptions(t);
   const safeData = data || [];
 
   // Initialize validation hook
@@ -75,12 +78,12 @@ const Step10_PTherapyFormat = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Bevorzugtes Therapie Setting Format</h1>
-        <p className="text-muted-foreground mb-2">Welche Therapieformate würdest du bevorzugen?</p>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapyFormat.title')}</h1>
+        <p className="text-muted-foreground mb-2">{t('q.p.therapyFormat.subtitle')}</p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens ein Format aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.p.therapyFormat.error') : t('q.p.therapyFormat.multiSelect')}
         </p>
       </div>
 
@@ -127,7 +130,7 @@ const Step10_PTherapyFormat = ({
               className="mt-0.5"
             />
             <div className="flex flex-col">
-              <span className="text-foreground">Keine Präferenz</span>
+              <span className="text-foreground">{t('q.p.therapyFormat.noPreference')}</span>
             </div>
           </label>
         </div>

@@ -2,6 +2,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface TherapyDurationStepProps {
   onNext: () => void;
@@ -10,11 +11,11 @@ interface TherapyDurationStepProps {
   onDataChange: (data: string) => void;
 }
 // List of therapy duration options - add more if needed
-const durationOptions = [
-  { id: 'kurzzeit', label: 'Kurzzeit', description: '(ca. 10-20 Sitzungen)' },
-  { id: 'langzeit', label: 'Langzeit', description: '(>20 Sitzungen)' },
-  { id: 'unsicher', label: 'Ich weiß es nicht', description: '' },
-  { id: 'keine-praeferenz', label: 'Keine Präferenz', description: '' },
+const getDurationOptions = (t: (key: string) => string) => [
+  { id: 'kurzzeit', label: t('q.p.therapyDuration.options.shortTerm.label'), description: t('q.p.therapyDuration.options.shortTerm.description') },
+  { id: 'langzeit', label: t('q.p.therapyDuration.options.longTerm.label'), description: t('q.p.therapyDuration.options.longTerm.description') },
+  { id: 'unsicher', label: t('q.p.therapyDuration.options.unsure.label'), description: '' },
+  { id: 'keine-praeferenz', label: t('q.p.therapyDuration.options.noPreference.label'), description: '' },
 ];
 
 // 1. Define validation schema for a single string
@@ -29,6 +30,8 @@ const Step11_PTherapyDuration = ({
   data,
   onDataChange,
 }: TherapyDurationStepProps) => {
+  const { t } = useTranslation();
+  const durationOptions = getDurationOptions(t);
   // Initialize hook, wrapping the string `data` inside an object
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { duration: data || '' },
@@ -45,12 +48,12 @@ const Step11_PTherapyDuration = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Therapiedauer</h1>
-        <p className="text-muted-foreground">Bevorzugst du Kurzzeit oder Langzeit Therapie?</p>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapyDuration.title')}</h1>
+        <p className="text-muted-foreground">{t('q.p.therapyDuration.subtitle')}</p>
         {/* Error message in header */}
         {errors.duration && (
           <p className="text-sm text-destructive font-semibold mt-2">
-            Bitte wähle eine Option aus.
+            {t('q.p.therapyDuration.error')}
           </p>
         )}
       </div>

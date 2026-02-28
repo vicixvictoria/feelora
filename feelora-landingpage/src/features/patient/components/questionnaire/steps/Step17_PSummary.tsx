@@ -1,6 +1,7 @@
 import { Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuestionnaireData } from '@/features/patient/types/questionnaire';
+import { useTranslation } from 'react-i18next';
 
 // --- Steps ---
 interface SummaryStepProps {
@@ -32,27 +33,28 @@ const formatArrayWithOther = (selected: string[] | undefined, other?: string | s
 
 // Step Component for final summary and review of all answers before submission
 const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummaryStepProps) => {
+  const { t } = useTranslation();
   const sections: SummarySection[] = [
     {
       step: 1,
-      title: 'Persönliche Daten',
+      title: t('q.p.summary.personalData'),
       content: (
         <p className="text-foreground/80">
           {data.personalData?.firstName || '—'} {data.personalData?.lastName || ''}
           {data.personalData?.title && ` (${data.personalData.title})`}
-          {data.personalData?.age && `, ${data.personalData.age} Jahre`}
+          {data.personalData?.age && `, ${data.personalData.age} ${t('q.p.summary.years')}`}
           {data.personalData?.profession && `, ${data.personalData.profession}`}
         </p>
       ),
     },
     {
       step: 2,
-      title: 'Kontaktinformationen',
+      title: t('q.p.summary.contactInfo'),
       content: (
         <>
           <p className="text-foreground/80">
-            Mobil: {data.contactInfo?.phone || '—'}
-            {' · '}Mail: {data.contactInfo?.email || '—'}
+            {t('q.p.summary.phone')}: {data.contactInfo?.phone || '—'}
+            {' · '}{t('q.p.summary.email')}: {data.contactInfo?.email || '—'}
           </p>
           <p className="text-foreground/80">
             {data.contactInfo?.address || '—'}, {data.contactInfo?.postalCode || ''}{' '}
@@ -63,7 +65,7 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 3,
-      title: 'Mentale Gesundheit',
+      title: t('q.p.summary.mentalHealth'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.mentalHealth?.selected, data.mentalHealth?.other)}
@@ -72,12 +74,12 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 4,
-      title: 'Zeitraum der Beschwerden',
+      title: t('q.p.summary.timeframe'),
       content: <p className="text-foreground/80">{formatArray(data.timeframe)}</p>,
     },
     {
       step: 5,
-      title: 'Vorherige Therapieerfahrungen',
+      title: t('q.p.summary.previousTherapy'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.previousTherapy?.selected, data.previousTherapy?.other)}
@@ -86,7 +88,7 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 6,
-      title: 'Sprachen',
+      title: t('q.p.summary.languages'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.languages?.selected, data.languages?.other)}
@@ -95,7 +97,7 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 7,
-      title: 'Therapiepräferenzen',
+      title: t('q.p.summary.therapySchool'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other)}
@@ -104,32 +106,32 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 8,
-      title: 'Bevorzugter Therapie Setting Modus',
+      title: t('q.p.summary.therapySetting'),
       content: <p className="text-foreground/80">{data.therapySetting || '—'}</p>,
     },
     {
       step: 9,
-      title: 'Bevorzugtes Therapie Setting Format',
+      title: t('q.p.summary.therapyFormat'),
       content: <p className="text-foreground/80">{formatArray(data.therapyFormat)}</p>,
     },
     {
       step: 10,
-      title: 'Therapiedauer',
+      title: t('q.p.summary.therapyDuration'),
       content: <p className="text-foreground/80">{data.therapyDuration || '—'}</p>,
     },
     {
       step: 11,
-      title: 'Sitzungsfrequenz',
+      title: t('q.p.summary.sessionFrequency'),
       content: <p className="text-foreground/80">{formatArray(data.sessionFrequency)}</p>,
     },
     {
       step: 12,
-      title: 'Therapeut:Innen Geschlecht',
+      title: t('q.p.summary.therapistGender'),
       content: <p className="text-foreground/80">{formatArray(data.therapistGender)}</p>,
     },
     {
       step: 13,
-      title: 'Werte und Präferenzen',
+      title: t('q.p.summary.valuesPreferences'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.valuesPreferences?.selected, data.valuesPreferences?.other)}
@@ -138,12 +140,12 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     },
     {
       step: 14,
-      title: 'Zusätzliche Information',
+      title: t('q.p.summary.additionalInfo'),
       content: <p className="text-foreground/80">{data.additionalInfo || '—'}</p>,
     },
     {
       step: 15,
-      title: 'Verfügbarkeit',
+      title: t('q.p.summary.availability'),
       content: (
         <p className="text-foreground/80">
           {formatArray(data.availability?.map((d) => d.toUpperCase()))}
@@ -155,10 +157,9 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Zusammenfassung</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.summary.title')}</h1>
         <p className="text-muted-foreground">
-          Bitte überprüfe alle Daten und deine Antworten, bevor du den Screening-Fragebogen
-          absendest.
+          {t('q.p.summary.subtitle')}
         </p>
       </div>
       {/* Summary Sections */}
@@ -168,7 +169,7 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
             <button
               onClick={() => onEdit(section.step)}
               className="absolute top-4 right-4 p-2 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-              aria-label={`${section.title} bearbeiten`}
+              aria-label={`${section.title} ${t('q.p.summary.edit')}`}
             >
               <Pencil className="w-4 h-4" />
             </button>
@@ -185,17 +186,17 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
           className="feelora-btn-outline"
           disabled={isLoading}
         >
-          ← zurück
+          {t('q.p.summary.back')}
         </Button>
         <Button onClick={onNext} className="feelora-btn-primary" disabled={isLoading}>
           {isLoading ? (
             <>
-              Wird gesendet...
+              {t('q.p.summary.submitting')}
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
             </>
           ) : (
             <>
-              Absenden
+              {t('q.p.summary.submit')}
               <Check className="w-4 h-4" />
             </>
           )}

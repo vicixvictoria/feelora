@@ -1,6 +1,7 @@
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface AvailabilityStepProps {
   onNext: () => void;
@@ -28,6 +29,7 @@ const step15Schema = z.object({
 
 // Step Component
 const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
+  const { t } = useTranslation();
   const safeData = data || [];
 
   // Initialize validation hook
@@ -51,16 +53,15 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Verfügbarkeit</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.availability.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Bitte teile uns mit, an welchen Tagen pro Woche du für Therapiesitzungen zur Verfügung
-          stehen wirst. Du kannst deine Verfügbarkeit später immer anpassen.
+          {t('q.p.availability.subtitle')}
         </p>
         {/* Dynamic error message in header */}
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens einen Tag aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.p.availability.error') : t('q.p.availability.hint')}
         </p>
       </div>
 

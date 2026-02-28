@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface TherapySettingStepProps {
   onNext: () => void;
@@ -10,15 +11,9 @@ interface TherapySettingStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-// Extract "keine Präferenz" as a constant
-const NO_PREFERENCE = 'keine Präferenz';
-
-// List of therapy setting options - add more if needed
-const settingOptions = ['Vor Ort', 'Online (Video Call)', 'Telefon / Anruf'];
-
 // Define validation schema expecting an object with a "selection" array
 const step10Schema = z.object({
-  selection: z.array(z.string()).min(1, 'Bitte wähle mindestens eine Option aus'),
+  selection: z.array(z.string()).min(1, 'Please select at least one option'),
 });
 
 // Step Component
@@ -28,6 +23,16 @@ const Step10_TTherapySetting = ({
   data,
   onDataChange,
 }: TherapySettingStepProps) => {
+  const { t } = useTranslation();
+
+  const NO_PREFERENCE = t('q.common.noPreference');
+
+  const settingOptions = [
+    { value: 'Vor Ort', label: t('q.options.onsite') },
+    { value: 'Online (Video Call)', label: t('q.options.online') },
+    { value: 'Telefon / Anruf', label: t('q.options.phone') },
+  ];
+
   const safeData = data || [];
 
   // Initialize hook
@@ -37,18 +42,18 @@ const Step10_TTherapySetting = ({
     onNext,
   });
 
-  const hasNoPreference = safeData.includes(NO_PREFERENCE);
+  const hasNoPreference = safeData.includes('keine Präferenz');
 
-  const handleToggle = (setting: string) => {
+  const handleToggle = (value: string) => {
     clearError('selection');
 
     // Remove "keine Präferenz" if a specific setting is clicked
-    let currentSelection = safeData.filter((s) => s !== NO_PREFERENCE);
+    let currentSelection = safeData.filter((s) => s !== 'keine Präferenz');
 
-    if (currentSelection.includes(setting)) {
-      currentSelection = currentSelection.filter((s) => s !== setting);
+    if (currentSelection.includes(value)) {
+      currentSelection = currentSelection.filter((s) => s !== value);
     } else {
-      currentSelection = [...currentSelection, setting];
+      currentSelection = [...currentSelection, value];
     }
 
     onDataChange(currentSelection);
@@ -58,11 +63,9 @@ const Step10_TTherapySetting = ({
     clearError('selection');
 
     if (hasNoPreference) {
-      // Uncheck it -> empty array
       onDataChange([]);
     } else {
-      // Check it -> wipe out all other selections
-      onDataChange([NO_PREFERENCE]);
+      onDataChange(['keine Präferenz']);
     }
   };
 
@@ -70,14 +73,14 @@ const Step10_TTherapySetting = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Bevorzugter Therapie Setting Modus</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.therapySetting.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Welches Setting bevorzugst du für den Therapie-Sitzungstyp?
+          {t('q.t.therapySetting.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.t.therapySetting.selectError') : t('q.common.multiSelect')}
         </p>
       </div>
 
@@ -90,17 +93,17 @@ const Step10_TTherapySetting = ({
           {/* Standard Options */}
           {settingOptions.map((setting) => (
             <label
-              key={setting}
+              key={setting.value}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 hasNoPreference ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={safeData.includes(setting)}
-                onCheckedChange={() => handleToggle(setting)}
+                checked={safeData.includes(setting.value)}
+                onCheckedChange={() => handleToggle(setting.value)}
                 disabled={hasNoPreference}
               />
-              <span className="text-foreground">{setting}</span>
+              <span className="text-foreground">{setting.label}</span>
             </label>
           ))}
 

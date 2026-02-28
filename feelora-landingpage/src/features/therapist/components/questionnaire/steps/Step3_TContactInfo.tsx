@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface ContactInfoStepProps {
   onNext: () => void;
@@ -10,15 +11,6 @@ interface ContactInfoStepProps {
   data: Record<string, string>;
   onDataChange: (data: Record<string, string>) => void;
 }
-
-const fieldLabels: Record<string, string> = {
-  phone: 'Handy/Mobil',
-  email: 'E-Mail',
-  city: 'Stadt',
-  address: 'Adresse',
-  postalCode: 'Postleitzahl',
-  country: 'Land',
-};
 
 // Define which fields are optional
 const optionalFields = ['phone', 'email', 'address', 'postalCode'];
@@ -35,10 +27,21 @@ const step3Schema = z.object({
   postalCode: z.string().optional(),
 
   // Email: Empty string, undefined, OR valid email
-  email: z.union([z.literal(''), z.string().email('Ungültiges E-Mail-Format')]).optional(), // in case its undefined
+  email: z.union([z.literal(''), z.string().email('Invalid email')]).optional(),
 });
 
 const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
+  const { t } = useTranslation();
+
+  const fieldLabels: Record<string, string> = {
+    phone: t('q.t.contact.phone'),
+    email: t('q.t.contact.email'),
+    city: t('q.t.contact.city'),
+    address: t('q.t.contact.address'),
+    postalCode: t('q.t.contact.postalCode'),
+    country: t('q.t.contact.country'),
+  };
+
   // Initialize the validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -55,25 +58,22 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Kontaktinformationen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.contact.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Gib deine Kontaktdaten an, damit deine Patient:Innen dich erreichen können. Wir können
-          diese nicht validieren, bitte überprüfe die Eingabe genau. Bei keiner Angabe wird die
-          Email von deinem Feelora Login verwendet.
+          {t('q.t.contact.subtitle1')}
         </p>
         <p className="text-muted-foreground mb-2">
-          Füge auch die Adresse deiner Praxis hinzu wenn du eine hast. Andernfalls, gib bitte dein
-          Land und deine Stadt an.
+          {t('q.t.contact.subtitle2')}
         </p>
         <p className="text-muted-foreground mb-2">
-          Diese Informationen werden öffentlich in deinem Profil angezeigt.
+          {t('q.t.contact.subtitle3')}
         </p>
-        <p className="text-muted-foreground text-sm">Du kannst diese Angaben jederzeit ändern.</p>
+        <p className="text-muted-foreground text-sm">{t('q.t.contact.subtitle4')}</p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">Kontaktinformationen</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.contact.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
@@ -90,7 +90,7 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   {fieldLabels[field]} {!isOptional && errors[field] && '*'}
                   {isOptional && (
                     <span className="text-muted-foreground font-normal text-xs ml-1">
-                      (optional)
+                      ({t('q.common.optional')})
                     </span>
                   )}
                 </Label>
@@ -105,10 +105,10 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
 
                 {/* Error messages */}
                 {errors[field] && field === 'email' && (
-                  <p className="text-[0.8rem] text-destructive">Ungültiges E-Mail-Format</p>
+                  <p className="text-[0.8rem] text-destructive">{t('q.common.invalidEmail')}</p>
                 )}
                 {errors[field] && !isOptional && (
-                  <p className="text-[0.8rem] text-destructive">Pflichtfeld</p>
+                  <p className="text-[0.8rem] text-destructive">{t('q.common.required')}</p>
                 )}
               </div>
             );

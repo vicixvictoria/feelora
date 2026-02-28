@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { useTranslation } from 'react-i18next';
 
 // Props Interface
 interface SessionFrequencyStepProps {
@@ -9,18 +10,6 @@ interface SessionFrequencyStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-// List of session frequency options - add more if needed
-const frequencyOptions = [
-  { id: 'flexibel', label: 'Flexibel', description: 'Ganz nach Patient:Innen Wunsch' },
-  { id: 'woechentlich', label: 'Wöchentlich', description: 'Wöchentlich wiederholende Termine' },
-  {
-    id: 'zweiwoechentlich',
-    label: 'Zweiwöchentlich',
-    description: 'Termine wiederholen alle zwei Wochen',
-  },
-  { id: 'keine-praeferenz', label: 'Keine Präferenz', description: '' },
-];
-
 // Step Component
 const Step13_TSessionFrequency = ({
   onNext,
@@ -28,7 +17,20 @@ const Step13_TSessionFrequency = ({
   data = [],
   onDataChange,
 }: SessionFrequencyStepProps) => {
+  const { t } = useTranslation();
   const safeData = data || [];
+
+  const frequencyOptions = [
+    { id: 'flexibel', label: t('q.t.sessionFrequency.flexible'), description: t('q.t.sessionFrequency.flexibleDesc') },
+    { id: 'woechentlich', label: t('q.t.sessionFrequency.weekly'), description: t('q.t.sessionFrequency.weeklyDesc') },
+    {
+      id: 'zweiwoechentlich',
+      label: t('q.t.sessionFrequency.biweekly'),
+      description: t('q.t.sessionFrequency.biweeklyDesc'),
+    },
+    { id: 'keine-praeferenz', label: t('q.t.sessionFrequency.noPreference'), description: '' },
+  ];
+
   const handleToggle = (id: string) => {
     if (safeData.includes(id)) {
       onDataChange(safeData.filter((item) => item !== id));
@@ -40,11 +42,11 @@ const Step13_TSessionFrequency = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Sitzungsfrequenz</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.sessionFrequency.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Erzähle uns von deiner bevorzugten Sitzungsfrequenz.
+          {t('q.t.sessionFrequency.subtitle')}
         </p>
-        <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
+        <p className="text-sm text-muted-foreground">{t('q.t.sessionFrequency.multiSelect')}</p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">

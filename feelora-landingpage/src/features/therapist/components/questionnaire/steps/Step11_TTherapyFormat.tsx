@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { useTranslation } from 'react-i18next';
 
 interface TherapyFormatStepProps {
   onNext: () => void;
@@ -7,14 +8,6 @@ interface TherapyFormatStepProps {
   data: string[];
   onDataChange: (data: string[]) => void;
 }
-// List of therapy format options - add more if needed
-const formatOptions = [
-  { id: 'einzel', label: 'Einzel', description: 'One-on-one Sessions' },
-  { id: 'paar', label: 'Paar', description: 'Paartherapie' },
-  { id: 'gruppe', label: 'Gruppe', description: 'Gruppentherapie Sessions' },
-  { id: 'familien', label: 'Familien', description: 'Therapie mit Familien' },
-  { id: 'keine-praeferenz', label: 'Keine Präferenz', description: '' },
-];
 
 // Step Component
 const Step11_TTherapyFormat = ({
@@ -23,7 +16,16 @@ const Step11_TTherapyFormat = ({
   data = [],
   onDataChange,
 }: TherapyFormatStepProps) => {
+  const { t } = useTranslation();
   const safeData = data || [];
+
+  const formatOptions = [
+    { id: 'einzel', label: t('q.t.therapyFormat.individual'), description: t('q.t.therapyFormat.individualDesc') },
+    { id: 'paar', label: t('q.t.therapyFormat.couple'), description: t('q.t.therapyFormat.coupleDesc') },
+    { id: 'gruppe', label: t('q.t.therapyFormat.group'), description: t('q.t.therapyFormat.groupDesc') },
+    { id: 'familien', label: t('q.t.therapyFormat.family'), description: t('q.t.therapyFormat.familyDesc') },
+    { id: 'keine-praeferenz', label: t('q.t.therapyFormat.noPreference'), description: '' },
+  ];
 
   const handleToggle = (id: string) => {
     if (safeData.includes(id)) {
@@ -37,9 +39,9 @@ const Step11_TTherapyFormat = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Bevorzugtes Therapie Setting Format</h1>
-        <p className="text-muted-foreground mb-2">Welche Therapieformate bietest du an?</p>
-        <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.therapyFormat.title')}</h1>
+        <p className="text-muted-foreground mb-2">{t('q.t.therapyFormat.subtitle')}</p>
+        <p className="text-sm text-muted-foreground">{t('q.t.therapyFormat.multiSelect')}</p>
       </div>
 
       {/* Form Card */}

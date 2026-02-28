@@ -2,6 +2,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface ExperienceStepProps {
   onNext: () => void;
@@ -10,22 +11,22 @@ interface ExperienceStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-const experienceOptions = [
+const getExperienceOptions = (t: (key: string) => string) => [
   {
     id: 'weniger3months',
-    label: 'weniger als 3 Monate',
+    label: t('q.p.timeframe.lessThan3Months'),
   },
   {
     id: '3-6months',
-    label: '3-6 Monate',
+    label: t('q.p.timeframe.3to6Months'),
   },
   {
     id: '6-12months',
-    label: '6-12 Monate',
+    label: t('q.p.timeframe.6to12Months'),
   },
   {
     id: '12+months',
-    label: 'Mehr als 1 Jahr',
+    label: t('q.p.timeframe.moreThan1Year'),
   },
 ];
 
@@ -35,6 +36,8 @@ const step5Schema = z.object({
 });
 
 const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStepProps) => {
+  const { t } = useTranslation();
+  const experienceOptions = getExperienceOptions(t);
   // Take the first item of the array as the current value for the RadioGroup
   const currentValue = data[0] || '';
 
@@ -54,9 +57,9 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Zeitraum</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.timeframe.title')}</h1>
         <p className="text-muted-foreground">
-          Seit wann bestehen die vorher genannten Probleme schon?
+          {t('q.p.timeframe.subtitle')}
         </p>
       </div>
 
@@ -85,7 +88,7 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
         {/* Optional: text message if error */}
         {errors.selection && (
           <p className="text-sm text-destructive mt-4 text-center font-medium">
-            Bitte wähle einen Zeitraum aus.
+            {t('q.p.timeframe.error')}
           </p>
         )}
       </div>

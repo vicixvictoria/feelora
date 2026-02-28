@@ -3,6 +3,7 @@ import { Check, ChevronLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import therapistAvatar from '@/assets/avatar-Placeholder.png'; // Placeholder
 import { AlgorithmMatch } from '../../../types/profiles';
+import { useTranslation } from 'react-i18next';
 
 interface TherapistMatchStepProps {
   therapists: AlgorithmMatch[];
@@ -11,15 +12,16 @@ interface TherapistMatchStepProps {
 }
 
 const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchStepProps) => {
+  const { t } = useTranslation();
   const [showAlternativeMatches, setShowAlternativeMatches] = useState(false);
 
   // Fallback if no therapists were found
   if (!therapists || therapists.length === 0) {
     return (
       <div className="text-center p-8">
-        <h2>Leider wurden keine passenden Therapeuten gefunden.</h2>
+        <h2>{t('q.p.therapistMatch.noResults')}</h2>
         <Button onClick={onBack} className="mt-4">
-          Zurück zum Fragebogen
+          {t('q.p.therapistMatch.backToQuestionnaire')}
         </Button>
       </div>
     );
@@ -56,19 +58,19 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
                 </h2>
                 {/* ADD therapist.JobTitle before Gender and Age */}
                 <p className="text-purple text-sm">
-                  {therapist.JobTitle} • {therapist.Gender}, {age} Jahre
+                  {therapist.JobTitle} • {therapist.Gender}, {age} {t('q.p.therapistMatch.years')}
                 </p>
               </div>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">Stadt:</span> {therapist.City}
+                <span className="text-muted-foreground">{t('q.p.therapistMatch.city')}:</span> {therapist.City}
               </p>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">Sprachen:</span>{' '}
-                {therapist.Languages?.join(', ') || 'Keine Angabe'}
+                <span className="text-muted-foreground">{t('q.p.therapistMatch.languages')}:</span>{' '}
+                {therapist.Languages?.join(', ') || t('q.p.therapistMatch.noInfo')}
               </p>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">Spezialisierungen:</span>{' '}
-                {therapist.Specialties?.join(', ') || 'Keine Angabe'}
+                <span className="text-muted-foreground">{t('q.p.therapistMatch.specialties')}:</span>{' '}
+                {therapist.Specialties?.join(', ') || t('q.p.therapistMatch.noInfo')}
               </p>
 
               <div className="flex gap-3 mt-4 pt-2">
@@ -76,7 +78,7 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
                   onClick={() => onAccept(therapist.Id)}
                   className="feelora-btn-primary flex-1"
                 >
-                  Akzeptieren <Check className="w-4 h-4 ml-2" />
+                  {t('q.p.therapistMatch.accept')} <Check className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </div>
@@ -96,13 +98,12 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold text-purple mb-4">
-          Wir haben {showAlternativeMatches ? 'weitere Therapeut*innen' : 'eine/n Therapeut*in'} für
-          dich gefunden!
+          {showAlternativeMatches ? t('q.p.therapistMatch.titleAlternatives') : t('q.p.therapistMatch.titleBest')}
         </h1>
         <p className="text-foreground/80 leading-relaxed mb-4">
           {showAlternativeMatches
-            ? 'Hier sind alternative Profile, die ebenfalls gut zu dir passen könnten. Schau sie dir an und wähle jemanden aus!'
-            : 'Hier siehst du dein bestes Match basierend auf deinen Antworten des Fragebogen. Schau dir das Profil an, und dann kannst du mit "akzeptieren" deine Therapie-Reise beginnen.'}
+            ? t('q.p.therapistMatch.subtitleAlternatives')
+            : t('q.p.therapistMatch.subtitleBest')}
         </p>
       </div>
 
@@ -117,7 +118,7 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
               onClick={() => setShowAlternativeMatches(true)}
               className="text-muted-foreground"
             >
-              Anderes Match wählen <X className="w-4 h-4 ml-2" />
+              {t('q.p.therapistMatch.chooseOther')} <X className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </>
@@ -133,7 +134,7 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
       <div className="flex justify-start mt-8">
         <Button variant="outline" onClick={onBack} className="feelora-btn-outline">
           <ChevronLeft className="w-4 h-4" />
-          zurück {showAlternativeMatches && 'zum besten Match'}
+          {t('q.p.therapistMatch.back')} {showAlternativeMatches && t('q.p.therapistMatch.toBestMatch')}
         </Button>
       </div>
     </div>

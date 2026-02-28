@@ -2,6 +2,7 @@ import { Textarea } from '@/components/ui/textarea';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 // Props Interface
 interface TherapyMethodsStepProps {
@@ -13,10 +14,12 @@ interface TherapyMethodsStepProps {
 
 // 1. Define validationschema for a single text field
 const step9Schema = z.object({
-  methods: z.string().trim().min(1, 'Bitte beschreibe deine Methoden'),
+  methods: z.string().trim().min(1, 'Please describe your methods'),
 });
 
 const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMethodsStepProps) => {
+  const { t } = useTranslation();
+
   // Initialize validationhook, wrapping the string `data` inside an object
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { methods: data || '' },
@@ -25,7 +28,7 @@ const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMe
   });
 
   const handleChange = (value: string) => {
-    clearError('methods'); //Clear error when typing
+    clearError('methods');
     onDataChange(value);
   };
 
@@ -33,23 +36,22 @@ const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMe
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Genaue Therapiemethode(n)</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.therapyMethods.title')}</h1>
         <p className="text-muted-foreground">
-          Bitte erzähle uns in ein paar Sätzen von deiner/n genauen Therapiemethoden die du anwenden
-          möchtest
+          {t('q.t.therapyMethods.subtitle')}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
         <p className="text-foreground/80 mb-4">
-          Versuche spezifischen Methoden zu erläutern, die zuvor nicht erwähnt wurden.
+          {t('q.t.therapyMethods.hint')}
         </p>
 
         {/* Validation styling on the Textarea */}
         <div className="space-y-2">
           <Textarea
-            placeholder="hier tippen..."
+            placeholder={t('q.common.typePlaceholder')}
             value={data || ''}
             onChange={(e) => handleChange(e.target.value)}
             className={`min-h-[120px] resize-y bg-background ${
@@ -57,7 +59,7 @@ const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMe
             }`}
           />
           {errors.methods && (
-            <p className="text-xs text-destructive font-medium">Bitte fülle dieses Feld aus</p>
+            <p className="text-xs text-destructive font-medium">{t('q.t.therapyMethods.required')}</p>
           )}
         </div>
       </div>

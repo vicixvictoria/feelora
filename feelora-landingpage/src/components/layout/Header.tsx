@@ -1,5 +1,6 @@
 import { ChevronDown, LogOut } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const Header = () => {
+  const { t } = useTranslation();
+
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
       {/* Logo */}
@@ -23,50 +26,50 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Emergency
+            {t('layout.header.emergency')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Notfall Nummern</DropdownMenuItem>
-            <DropdownMenuItem>Krisenhotline</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.emergencyNumbers')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.crisisHotline')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Insights
+            {t('layout.header.insights')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Mood Statistiken</DropdownMenuItem>
-            <DropdownMenuItem>Fortschritt</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.moodStatistics')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.progress')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Settings
+            {t('layout.header.settings')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Notifications</DropdownMenuItem>
-            <DropdownMenuItem>Datenschutz</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.notifications')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.privacy')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Personal Data
+            {t('layout.header.personalData')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Meine Daten</DropdownMenuItem>
-            <DropdownMenuItem>Daten exportieren</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.myData')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('layout.header.exportData')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <button className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
           <LogOut className="w-4 h-4" />
-          Log Out
+          {t('layout.header.logOut')}
         </button>
       </nav>
     </header>

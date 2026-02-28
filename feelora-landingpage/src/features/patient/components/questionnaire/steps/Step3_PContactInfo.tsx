@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface ContactInfoStepProps {
   onNext: () => void;
@@ -10,15 +11,6 @@ interface ContactInfoStepProps {
   data: Record<string, string>;
   onDataChange: (data: Record<string, string>) => void;
 }
-
-const fieldLabels: Record<string, string> = {
-  phone: 'Handy/Mobil',
-  email: 'E-Mail',
-  city: 'Stadt*',
-  address: 'Adresse',
-  postalCode: 'Postleitzahl',
-  country: 'Land*',
-};
 
 // Validation Schema
 const step3Schema = z.object({
@@ -31,10 +23,20 @@ const step3Schema = z.object({
   postalCode: z.string().optional(),
   // Email is optional, BUT if filled, must be valid
   // z.literal("") allows an empty string to pass validation
-  email: z.union([z.literal(''), z.string().email('Ungültiges E-Mail-Format')]).optional(), // .optional() so that the email can be empty
+  email: z.union([z.literal(''), z.string().email('Invalid email')]).optional(),
 });
 
 const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
+  const { t } = useTranslation();
+
+  const fieldLabels: Record<string, string> = {
+    phone: t('q.p.contact.phone'),
+    email: t('q.p.contact.email'),
+    city: t('q.p.contact.city'),
+    address: t('q.p.contact.address'),
+    postalCode: t('q.p.contact.postalCode'),
+    country: t('q.p.contact.country'),
+  };
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step3Schema,
@@ -50,20 +52,15 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Kontaktinformationen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.contact.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Gib deine Kontaktdaten an, damit deine Patient:Innen dich erreichen können. Wenn du noch
-          eine weitere E-Mail, neben der email mit der du dich angemeldet hast, oder deine
-          Telefonnummer angeben möchtest gib sie hier ein (optional). Wir können diese Daten nicht
-          validieren oder auf Richtigkeit prüfen! Füge butte auch die Adresse deiner Praxis hinzu
-          falls du eine hast. Wenn du nur online Therapis anbietest, gib bitte die Stadt und das
-          Land an, in der du dich befindest.
+          {t('q.p.contact.subtitle')}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">Kontaktinformationen</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.p.contact.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => (
@@ -90,7 +87,7 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
               />
               {/* Only show error message for invalid Email format */}
               {errors[field] && field === 'email' && (
-                <p className="text-[0.8rem] text-destructive">Ungültiges E-Mail-Format</p>
+                <p className="text-[0.8rem] text-destructive">{t('q.common.invalidEmail')}</p>
               )}
             </div>
           ))}

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { useTranslation } from 'react-i18next';
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -17,19 +18,6 @@ interface PersonalDataStepProps {
   data: Record<string, string>;
   onDataChange: (data: Record<string, string>) => void;
 }
-
-const genderOptions = [
-  { value: 'male', label: 'Männlich' },
-  { value: 'female', label: 'Weiblich' },
-  { value: 'diverse', label: 'Divers' },
-];
-
-const fieldLabels: Record<string, string> = {
-  firstName: 'Vorname',
-  lastName: 'Nachname',
-  bday: 'Geburtstag',
-  gender: 'Geschlecht',
-};
 
 // Define Rules specifically for THIS step
 const step2Schema = z.object({
@@ -40,6 +28,21 @@ const step2Schema = z.object({
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
+  const { t } = useTranslation();
+
+  const genderOptions = [
+    { value: 'male', label: t('q.p.personal.male') },
+    { value: 'female', label: t('q.p.personal.female') },
+    { value: 'diverse', label: t('q.p.personal.diverse') },
+  ];
+
+  const fieldLabels: Record<string, string> = {
+    firstName: t('q.p.personal.firstName'),
+    lastName: t('q.p.personal.lastName'),
+    bday: t('q.p.personal.birthday'),
+    gender: t('q.p.personal.gender'),
+  };
+
   // Use the hook (One line of logic!)
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -56,15 +59,15 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Persönliche Daten</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.personal.title')}</h1>
         <p className="text-muted-foreground">
-          Bitte teile uns deine persönlichen Daten für dein Profil mit.
+          {t('q.p.personal.subtitle')}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">Deine Information</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.p.personal.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => (
@@ -83,7 +86,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                   <SelectTrigger
                     className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
                   >
-                    <SelectValue placeholder="Bitte wählen" />
+                    <SelectValue placeholder={t('q.common.pleaseSelect')} />
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
                     {genderOptions.map((option) => (

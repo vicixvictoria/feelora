@@ -1,6 +1,7 @@
 import { ChevronDown, LogOut } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +11,7 @@ import {
 
 const Header = () => {
   const { logout } = useAuth();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     await logout('user');
@@ -30,29 +32,29 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Notfall
+            {t('patient.header.emergency')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Notfall Nummern</DropdownMenuItem>
-            <DropdownMenuItem>Krisenhotline</DropdownMenuItem>
+            <DropdownMenuItem>{t('patient.header.emergencyNumbers')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('patient.header.crisisHotline')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Settings
+            {t('patient.header.settings')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Benachrichtigungen</DropdownMenuItem>
-            <DropdownMenuItem>Privatsphäre & Datenschutz</DropdownMenuItem>
+            <DropdownMenuItem>{t('patient.header.notifications')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('patient.header.privacy')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1 text-foreground hover:text-primary transition-colors">
             <ChevronDown className="w-4 h-4" />
-            Sprachen
+            {t('patient.header.languages')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>Deutsch</DropdownMenuItem>
@@ -65,7 +67,7 @@ const Header = () => {
           className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Log Out
+          {t('patient.header.logOut')}
         </button>
       </nav>
     </header>

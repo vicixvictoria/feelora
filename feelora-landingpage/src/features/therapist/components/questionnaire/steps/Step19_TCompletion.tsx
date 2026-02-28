@@ -1,9 +1,12 @@
 import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+
 interface CompletionStepProps {
   onRestart: () => void;
 }
 const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
+  const { t } = useTranslation();
   return (
     <div className="max-w-2xl mx-auto animate-fade-in text-center py-12">
       {/* Success Icon */}
@@ -13,17 +16,14 @@ const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
         </div>
       </div>
       {/* Title */}
-      <h1 className="text-3xl font-bold text-purple mb-4">Vielen Dank!</h1>
+      <h1 className="text-3xl font-bold text-purple mb-4">{t('q.t.completion.title')}</h1>
       {/* Description */}
       <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-        Dein Therapeutenprofil wurde erfolgreich erstellt. Wir überprüfen nun deine Lizenznummer und
-        bereiten dein Profil für die Vermittlung vor. Wir werden dich per Mail benachrichtigen,
-        sobald du als Therapeut:In in unserem System aktiv bist und auf dein Dashboard zugreifen
-        kannst. Das kann 1-3 Werktage dauern.
+        {t('q.t.completion.description')}
       </p>
       {/* Restart Button */}
       <Button onClick={onRestart} className="feelora-btn-outline">
-        Fragebogen erneut starten falls du etwas ändern möchtest
+        {t('q.t.completion.restart')}
       </Button>
     </div>
   );

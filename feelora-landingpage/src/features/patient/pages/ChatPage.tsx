@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
@@ -36,6 +37,7 @@ const messages = [
 ];
 
 const ChatPage = () => {
+  const { t } = useTranslation();
   const [selectedChat, setSelectedChat] = useState(chatList[0]);
   const [newMessage, setNewMessage] = useState('');
 
@@ -50,7 +52,7 @@ const ChatPage = () => {
     <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
       {/* Chat List */}
       <div className="w-72 bg-card rounded-l-xl border border-border border-r-0 p-4">
-        <h2 className="text-2xl font-semibold text-primary mb-6">Chats</h2>
+        <h2 className="text-2xl font-semibold text-primary mb-6">{t('patient.chat.chats')}</h2>
         <div className="space-y-2">
           {chatList.map((chat) => (
             <button
@@ -124,7 +126,7 @@ const ChatPage = () => {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="tippe hier, um eine Nachricht zu schreiben..."
+              placeholder={t('patient.chat.placeholder')}
               className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
             <button

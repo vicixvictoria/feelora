@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface SpecialtiesStepProps {
   onNext: () => void;
@@ -11,24 +12,10 @@ interface SpecialtiesStepProps {
   onDataChange: (data: { selected: string[]; other: string }) => void;
 }
 
-const specialtyOptions = [
-  'Depression',
-  'Angst',
-  'Stress',
-  'Psychosomatik',
-  'Trauma',
-  'Sucht',
-  'Sexuelle Identität',
-  'Zwang',
-  'Gewalterfahrungen',
-  'Chronische Schmerzen',
-  'Essverhalten',
-];
-
 // Define validation schema with conditional logic for "other"
 const step6Schema = z
   .object({
-    selected: z.array(z.string()).min(1, 'Bitte wähle mindestens ein Fachgebiet aus'),
+    selected: z.array(z.string()).min(1, 'Please select at least one'),
     other: z.string().optional(),
   })
   .refine(
@@ -40,12 +27,28 @@ const step6Schema = z
       return true;
     },
     {
-      message: 'Bitte spezifizieren',
+      message: 'Please specify',
       path: ['other'],
     },
   );
 
 const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesStepProps) => {
+  const { t } = useTranslation();
+
+  const specialtyOptions = [
+    { value: 'Depression', label: t('q.options.depression') },
+    { value: 'Angst', label: t('q.options.anxiety') },
+    { value: 'Stress', label: t('q.options.stress') },
+    { value: 'Psychosomatik', label: t('q.options.psychosomatics') },
+    { value: 'Trauma', label: t('q.options.trauma') },
+    { value: 'Sucht', label: t('q.options.addiction') },
+    { value: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
+    { value: 'Zwang', label: t('q.options.ocd') },
+    { value: 'Gewalterfahrungen', label: t('q.options.violence') },
+    { value: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
+    { value: 'Essverhalten', label: t('q.options.eatingDisorder') },
+  ];
+
   // Initialize hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -53,13 +56,13 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
     onNext,
   });
 
-  const handleToggle = (specialty: string) => {
+  const handleToggle = (value: string) => {
     clearError('selected'); // Clear main error when user interacts
 
-    if (data.selected.includes(specialty)) {
-      onDataChange({ ...data, selected: data.selected.filter((s) => s !== specialty) });
+    if (data.selected.includes(value)) {
+      onDataChange({ ...data, selected: data.selected.filter((s) => s !== value) });
     } else {
-      onDataChange({ ...data, selected: [...data.selected, specialty] });
+      onDataChange({ ...data, selected: [...data.selected, value] });
     }
   };
 
@@ -78,14 +81,14 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Fachgebiete</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.specialties.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Erzähle uns von deinen Fachgebieten in denen du auch Therapie anbieten wirst.
+          {t('q.t.specialties.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected ? 'Bitte wähle mindestens ein Fachgebiet aus.' : 'Mehrere auswählbar'}
+          {errors.selected ? t('q.t.specialties.selectError') : t('q.common.multiSelect')}
         </p>
       </div>
 
@@ -97,14 +100,14 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
         >
           {specialtyOptions.map((specialty) => (
             <label
-              key={specialty}
+              key={specialty.value}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
             >
               <Checkbox
-                checked={data.selected.includes(specialty)}
-                onCheckedChange={() => handleToggle(specialty)}
+                checked={data.selected.includes(specialty.value)}
+                onCheckedChange={() => handleToggle(specialty.value)}
               />
-              <span className="text-foreground">{specialty}</span>
+              <span className="text-foreground">{specialty.label}</span>
             </label>
           ))}
 
@@ -119,7 +122,7 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
                 checked={data.selected.includes('Andere')}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground">Andere</span>
+              <span className="text-foreground">{t('q.common.other')}</span>
             </label>
 
             {/* Conditional Input with error styling */}
@@ -127,7 +130,7 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
-                  placeholder="Bitte angeben..."
+                  placeholder={t('q.common.otherPlaceholder')}
                   value={data.other}
                   onChange={(e) => {
                     clearError('other');
@@ -136,7 +139,7 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <span className="text-xs text-destructive mt-1 ml-1">Bitte gib Details an</span>
+                  <span className="text-xs text-destructive mt-1 ml-1">{t('q.common.otherPlaceholder')}</span>
                 )}
               </div>
             )}

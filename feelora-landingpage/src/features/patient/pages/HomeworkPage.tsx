@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Check, FileText, RefreshCw } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 
@@ -36,6 +37,8 @@ const completedTasks: Task[] = [
 ];
 
 const HomeworkPage = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-4xl animate-fade-in">
       {/* Coming Soon Watermark */}
@@ -44,11 +47,11 @@ const HomeworkPage = () => {
           className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
-          Coming Soon
+          {t('patient.homework.comingSoon')}
         </p>
       </div>
       {/* New Tasks */}
-      <h1 className="text-2xl font-bold text-purple mb-6">Neue Aufgaben</h1>
+      <h1 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.newTasks')}</h1>
       <div className="space-y-4 mb-10">
         {newTasks.map((task) => (
           <div key={task.id} className="feelora-card flex items-center gap-4">
@@ -58,11 +61,11 @@ const HomeworkPage = () => {
             </div>
             <div className="flex gap-2">
               <button className="feelora-btn-outline">
-                Notizen
+                {t('patient.homework.notes')}
                 <FileText className="w-4 h-4" />
               </button>
               <button className="feelora-btn-primary">
-                Erledigt!
+                {t('patient.homework.done')}
                 <Check className="w-4 h-4" />
               </button>
             </div>
@@ -71,7 +74,7 @@ const HomeworkPage = () => {
       </div>
 
       {/* Completed Tasks */}
-      <h2 className="text-2xl font-bold text-purple mb-6">Erledigte Aufgaben</h2>
+      <h2 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.completedTasks')}</h2>
       <div className="space-y-4">
         {completedTasks.map((task) => (
           <div key={task.id} className="feelora-card flex items-center gap-4">
@@ -79,7 +82,7 @@ const HomeworkPage = () => {
               <p className="text-foreground">{task.message}</p>
             </div>
             <button className="feelora-btn-primary">
-              Wiederholen
+              {t('patient.homework.repeat')}
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>

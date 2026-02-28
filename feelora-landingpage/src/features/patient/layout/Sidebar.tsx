@@ -1,46 +1,49 @@
 import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-
-const menuItems = [
-  {
-    title: 'Kalender',
-    description: 'Zeitplan verwalten',
-    icon: Calendar,
-    path: '/patient/calendar',
-  },
-  {
-    title: 'Profil',
-    description: 'Profil und Therapeut einsehen',
-    icon: User,
-    path: '/patient/profile',
-  },
-  {
-    title: 'Chat',
-    description: 'Nachrichten ansehen und schreiben',
-    icon: Send,
-    path: '/patient/',
-  },
-  {
-    title: 'Mood Tracker',
-    description: 'Erfasse deine heutigen Emotionen und Gefühle',
-    icon: Smile,
-    path: '/patient/mood-tracker',
-  },
-  {
-    title: 'Homework',
-    description: 'Erledige deine Aufgaben',
-    icon: BookOpen,
-    path: '/patient/homework',
-  },
-  {
-    title: 'Dashboard',
-    description: 'Einsicht in deine wichtigsten Informationen',
-    icon: LayoutDashboard,
-    path: '/patient/dashboard',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 const Sidebar = () => {
+  const { t } = useTranslation();
+
+  const menuItems = [
+    {
+      titleKey: 'patient.sidebar.calendar',
+      descKey: 'patient.sidebar.calendarDesc',
+      icon: Calendar,
+      path: '/patient/calendar',
+    },
+    {
+      titleKey: 'patient.sidebar.profile',
+      descKey: 'patient.sidebar.profileDesc',
+      icon: User,
+      path: '/patient/profile',
+    },
+    {
+      titleKey: 'patient.sidebar.chat',
+      descKey: 'patient.sidebar.chatDesc',
+      icon: Send,
+      path: '/patient/',
+    },
+    {
+      titleKey: 'patient.sidebar.moodTracker',
+      descKey: 'patient.sidebar.moodTrackerDesc',
+      icon: Smile,
+      path: '/patient/mood-tracker',
+    },
+    {
+      titleKey: 'patient.sidebar.homework',
+      descKey: 'patient.sidebar.homeworkDesc',
+      icon: BookOpen,
+      path: '/patient/homework',
+    },
+    {
+      titleKey: 'patient.sidebar.dashboard',
+      descKey: 'patient.sidebar.dashboardDesc',
+      icon: LayoutDashboard,
+      path: '/patient/dashboard',
+    },
+  ];
+
   return (
     <aside className="w-60 bg-sidebar min-h-screen py-6 px-3">
       <nav className="flex flex-col gap-1">
@@ -53,8 +56,8 @@ const Sidebar = () => {
           >
             <item.icon className="w-5 h-5 text-sidebar-text mt-0.5" />
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-sidebar-text">{item.title}</span>
-              <span className="text-xs text-sidebar-muted leading-tight">{item.description}</span>
+              <span className="text-sm font-medium text-sidebar-text">{t(item.titleKey)}</span>
+              <span className="text-xs text-sidebar-muted leading-tight">{t(item.descKey)}</span>
             </div>
           </NavLink>
         ))}

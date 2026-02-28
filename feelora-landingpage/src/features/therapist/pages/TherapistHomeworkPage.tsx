@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, X, Send, Clock, Check, Search } from 'lucide-react';
 import ninaAvatar from '@/assets/avatar-Placeholder.png';
 
@@ -42,6 +43,7 @@ const taskStatuses: TaskStatus[] = [
 ];
 
 const TherapistHomeworkPage = () => {
+  const { t } = useTranslation();
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [taskText, setTaskText] = useState('');
 
@@ -69,11 +71,11 @@ const TherapistHomeworkPage = () => {
           className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
-          Coming Soon
+          {t('app.therapist.homework.comingSoon')}
         </p>
       </div>
       {/* New Tasks Section */}
-      <h1 className="text-2xl font-bold text-foreground mb-6">Neue Aufgaben erstellen</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.homework.createTasks')}</h1>
 
       <div className="flex gap-6 mb-12">
         {/* Patient List */}
@@ -87,7 +89,7 @@ const TherapistHomeworkPage = () => {
               />
               <p className="font-semibold text-foreground flex-1">{patient.name}</p>
               <button className="feelora-btn-primary" onClick={() => handleAssign(patient.name)}>
-                Aufgabe geben
+                {t('app.therapist.homework.assignTask')}
                 <BookOpen className="w-4 h-4" />
               </button>
             </div>
@@ -98,21 +100,21 @@ const TherapistHomeworkPage = () => {
         {selectedPatient && (
           <div className="w-80 feelora-card flex flex-col gap-4">
             <p className="text-foreground font-medium text-center">
-              Verfasse und sende eine neue Aufgabe an {selectedPatient}
+              {t('app.therapist.homework.composeTask', { name: selectedPatient })}
             </p>
             <textarea
               className="w-full border border-border rounded-xl p-3 text-sm text-foreground bg-background resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-primary/30"
-              placeholder="Until our next session .."
+              placeholder={t('app.therapist.homework.taskPlaceholder')}
               value={taskText}
               onChange={(e) => setTaskText(e.target.value)}
             />
             <div className="flex justify-end gap-3">
               <button className="feelora-btn-outline" onClick={handleCancel}>
-                Abbrechen
+                {t('app.therapist.homework.cancel')}
                 <X className="w-4 h-4" />
               </button>
               <button className="feelora-btn-primary" onClick={handleSend}>
-                Senden
+                {t('app.therapist.homework.send')}
                 <Send className="w-4 h-4" />
               </button>
             </div>
@@ -121,7 +123,7 @@ const TherapistHomeworkPage = () => {
       </div>
 
       {/* Task Status Section */}
-      <h2 className="text-2xl font-bold text-foreground mb-6">Aufgaben Status</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.homework.taskStatus')}</h2>
       <div className="flex flex-col gap-4">
         {taskStatuses.map((task, index) => (
           <div key={index} className="feelora-card flex items-center gap-4">
@@ -131,7 +133,7 @@ const TherapistHomeworkPage = () => {
               className="w-12 h-12 rounded-full object-cover"
             />
             <p className="font-semibold text-foreground min-w-[140px]">{task.patientName}</p>
-            <p className="text-sm text-muted-foreground italic flex-1">Aufgabe vom {task.date}</p>
+            <p className="text-sm text-muted-foreground italic flex-1">{t('app.therapist.homework.taskFrom', { date: task.date })}</p>
             <span
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                 task.status === 'Erledigt'
@@ -144,10 +146,10 @@ const TherapistHomeworkPage = () => {
               ) : (
                 <Clock className="w-3.5 h-3.5" />
               )}
-              {task.status}
+              {task.status === 'Erledigt' ? t('app.therapist.homework.completed') : t('app.therapist.homework.inProgress')}
             </span>
             <button className="feelora-btn-primary">
-              Details
+              {t('app.therapist.homework.details')}
               <Search className="w-4 h-4" />
             </button>
           </div>

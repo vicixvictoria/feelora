@@ -1,46 +1,49 @@
 import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-
-const menuItems = [
-  {
-    title: 'Chat',
-    description: 'Nachrichten ansehen und schreiben',
-    icon: Send,
-    path: '/therapist/',
-  },
-  {
-    title: 'Mood Tracker',
-    description: 'Erfasse deine heutigen Emotionen und Gefühle',
-    icon: Smile,
-    path: '/therapist/mood-tracker',
-  },
-  {
-    title: 'Profil',
-    description: 'Einsicht in dein Profil und persönliche Informationen',
-    icon: User,
-    path: '/therapist/profile',
-  },
-  {
-    title: 'Aufgaben',
-    description: 'Einsicht in die Aufgaben deiner Patient*innen',
-    icon: BookOpen,
-    path: '/therapist/homework',
-  },
-  {
-    title: 'Patient*innen',
-    description: 'Einsicht in deine Patient*innen und neue Matches',
-    icon: Users2,
-    path: '/therapist/patients',
-  },
-  {
-    title: 'Kalender',
-    description: 'Einsicht in deine Termine und Verfügbarkeit',
-    icon: Calendar,
-    path: '/therapist/calendar',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 const Sidebar = () => {
+  const { t } = useTranslation();
+
+  const menuItems = [
+    {
+      title: t('app.therapist.sidebar.chat'),
+      description: t('app.therapist.sidebar.chatDesc'),
+      icon: Send,
+      path: '/therapist/',
+    },
+    {
+      title: t('app.therapist.sidebar.moodTracker'),
+      description: t('app.therapist.sidebar.moodTrackerDesc'),
+      icon: Smile,
+      path: '/therapist/mood-tracker',
+    },
+    {
+      title: t('app.therapist.sidebar.profile'),
+      description: t('app.therapist.sidebar.profileDesc'),
+      icon: User,
+      path: '/therapist/profile',
+    },
+    {
+      title: t('app.therapist.sidebar.homework'),
+      description: t('app.therapist.sidebar.homeworkDesc'),
+      icon: BookOpen,
+      path: '/therapist/homework',
+    },
+    {
+      title: t('app.therapist.sidebar.patients'),
+      description: t('app.therapist.sidebar.patientsDesc'),
+      icon: Users2,
+      path: '/therapist/patients',
+    },
+    {
+      title: t('app.therapist.sidebar.calendar'),
+      description: t('app.therapist.sidebar.calendarDesc'),
+      icon: Calendar,
+      path: '/therapist/calendar',
+    },
+  ];
+
   return (
     <aside className="w-60 bg-sidebar min-h-screen py-6 px-3">
       <nav className="flex flex-col gap-1">

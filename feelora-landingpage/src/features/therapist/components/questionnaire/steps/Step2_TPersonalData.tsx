@@ -10,6 +10,7 @@ import {
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -17,21 +18,6 @@ interface PersonalDataStepProps {
   data: Record<string, string>;
   onDataChange: (data: Record<string, string>) => void;
 }
-
-const genderOptions = [
-  { value: 'male', label: 'Männlich' },
-  { value: 'female', label: 'Weiblich' },
-  { value: 'diverse', label: 'Divers' },
-];
-
-const fieldLabels: Record<string, string> = {
-  firstName: 'Vorname',
-  lastName: 'Nachname',
-  bday: 'Geburtstag',
-  gender: 'Geschlecht',
-  job: 'Berufsbezeichnung',
-  title: 'Titel (wird vor dem Namen angezeigt)', //maybe we use this to show the title in the profile, optional
-};
 
 // Define which fields are optional
 const optionalFields = ['title'];
@@ -48,6 +34,23 @@ const step2Schema = z.object({
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
+  const { t } = useTranslation();
+
+  const genderOptions = [
+    { value: 'male', label: t('q.t.personal.male') },
+    { value: 'female', label: t('q.t.personal.female') },
+    { value: 'diverse', label: t('q.t.personal.diverse') },
+  ];
+
+  const fieldLabels: Record<string, string> = {
+    firstName: t('q.t.personal.firstName'),
+    lastName: t('q.t.personal.lastName'),
+    bday: t('q.t.personal.birthday'),
+    gender: t('q.t.personal.gender'),
+    job: t('q.t.personal.job'),
+    title: t('q.t.personal.titleField'),
+  };
+
   //  Initialize the validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
@@ -64,15 +67,15 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Persönliche Daten</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.personal.title')}</h1>
         <p className="text-muted-foreground">
-          Bitte teile uns deine persönlichen Daten für dein Profil mit.
+          {t('q.t.personal.subtitle')}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">Deine Information</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.personal.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
@@ -88,7 +91,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                   {fieldLabels[field]} {!isOptional && errors[field] && '*'}
                   {isOptional && (
                     <span className="text-muted-foreground font-normal text-xs ml-1">
-                      (optional)
+                      ({t('q.common.optional')})
                     </span>
                   )}
                 </Label>
@@ -101,7 +104,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                     <SelectTrigger
                       className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
                     >
-                      <SelectValue placeholder="Bitte wählen" />
+                      <SelectValue placeholder={t('q.common.pleaseSelect')} />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-50">
                       {genderOptions.map((option) => (
@@ -117,7 +120,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                     type={field === 'bday' ? 'date' : 'text'}
                     value={data[field] || ''}
                     onChange={(e) => handleChange(field, e.target.value)}
-                    placeholder={field === 'title' ? 'z.B. Dr. med.' : ''}
+                    placeholder={field === 'title' ? t('q.t.personal.titlePlaceholder') : ''}
                     className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                 )}
@@ -125,7 +128,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                 {/* Error message for mandatory fields */}
                 {errors[field] && !isOptional && (
                   <p className="text-xs text-destructive font-medium">
-                    Dieses Feld ist erforderlich
+                    {t('q.common.required')}
                   </p>
                 )}
               </div>

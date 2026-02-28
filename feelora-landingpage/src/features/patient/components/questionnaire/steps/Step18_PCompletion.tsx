@@ -1,9 +1,11 @@
 import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 interface CompletionStepProps {
   onRestart: () => void;
 }
 const Step18_PCompletion = ({ onRestart }: CompletionStepProps) => {
+  const { t } = useTranslation();
   return (
     <div className="max-w-2xl mx-auto animate-fade-in text-center py-12">
       {/* Success Icon */}
@@ -13,15 +15,14 @@ const Step18_PCompletion = ({ onRestart }: CompletionStepProps) => {
         </div>
       </div>
       {/* Title */}
-      <h1 className="text-3xl font-bold text-purple mb-4">Vielen Dank!</h1>
+      <h1 className="text-3xl font-bold text-purple mb-4">{t('q.p.completion.title')}</h1>
       {/* Description */}
       <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
-        Dein Patientenprofil wurde erfolgreich erstellt. Wir werden dich benachrichtigen, sobald
-        passende Therapeut:Innen verfügbar sind.
+        {t('q.p.completion.description')}
       </p>
       {/* Restart Button */}
       <Button onClick={onRestart} className="feelora-btn-outline">
-        Fragebogen erneut starten
+        {t('q.p.completion.restart')}
       </Button>
     </div>
   );

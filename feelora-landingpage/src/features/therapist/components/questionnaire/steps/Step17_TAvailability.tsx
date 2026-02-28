@@ -1,4 +1,6 @@
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
+import { useTranslation } from 'react-i18next';
+
 interface AvailabilityStepProps {
   onNext: () => void;
   onBack: () => void;
@@ -6,20 +8,21 @@ interface AvailabilityStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-// List of days of the week
-const days = [
-  { id: 'mo', label: 'Mo' },
-  { id: 'di', label: 'Di' },
-  { id: 'mi', label: 'Mi' },
-  { id: 'do', label: 'Do' },
-  { id: 'fr', label: 'Fr' },
-  { id: 'sa', label: 'Sa' },
-  { id: 'so', label: 'So' },
-];
-
 // Step Component
 const Step17_Availability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
+  const { t } = useTranslation();
   const safeData = data || [];
+
+  const days = [
+    { id: 'mo', label: t('q.t.availability.mon') },
+    { id: 'di', label: t('q.t.availability.tue') },
+    { id: 'mi', label: t('q.t.availability.wed') },
+    { id: 'do', label: t('q.t.availability.thu') },
+    { id: 'fr', label: t('q.t.availability.fri') },
+    { id: 'sa', label: t('q.t.availability.sat') },
+    { id: 'so', label: t('q.t.availability.sun') },
+  ];
+
   const handleToggle = (dayId: string) => {
     if (safeData.includes(dayId)) {
       onDataChange(safeData.filter((d) => d !== dayId));
@@ -31,12 +34,11 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Verfügbarkeit</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.availability.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Bitte teile uns mit, an welchen Tagen pro Woche du für Therapiesitzungen zur Verfügung
-          stehen wirst. Du kannst deine Verfügbarkeit später immer anpassen.
+          {t('q.t.availability.subtitle')}
         </p>
-        <p className="text-sm text-muted-foreground">Mehrfachauswahl möglich</p>
+        <p className="text-sm text-muted-foreground">{t('q.t.availability.multiSelect')}</p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">

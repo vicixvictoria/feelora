@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface PatientGenderStepProps {
   onNext: () => void;
@@ -28,6 +29,7 @@ const Step13_PTherapistGender = ({
   data = [],
   onDataChange,
 }: PatientGenderStepProps) => {
+  const { t } = useTranslation();
   const safeData = data || [];
 
   // Initialize validation hook
@@ -70,14 +72,14 @@ const Step13_PTherapistGender = ({
     <div className="max-w-2xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Patient:Innen Geschlecht</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapistGender.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Falls relevant, welches Geschlecht bevorzugst du bei deinem/r Therapeut:In?
+          {t('q.p.therapistGender.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? 'Bitte wähle mindestens eine Option aus.' : 'Mehrfachauswahl möglich'}
+          {errors.selection ? t('q.p.therapistGender.error') : t('q.p.therapistGender.hint')}
         </p>
       </div>
 

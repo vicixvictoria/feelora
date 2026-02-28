@@ -4,8 +4,10 @@ import { ArrowLeftIcon, ShieldIcon, FileTextIcon, CookieIcon } from 'lucide-reac
 import { Button } from '@/components/ui/buttonLanding';
 import { Card } from '@/components/ui/cardLanding';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function PrivacyPolicyPage() {
+  const { t } = useTranslation();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -14,9 +16,9 @@ export function PrivacyPolicyPage() {
   const [activeSection, setActiveSection] = useState<'privacy' | 'terms' | 'cookies'>('privacy');
 
   const sections = [
-    { id: 'privacy' as const, label: 'Datenschutzerklärung', icon: ShieldIcon },
-    { id: 'terms' as const, label: 'Nutzungsbedingungen', icon: FileTextIcon },
-    { id: 'cookies' as const, label: 'Cookie-Richtlinie', icon: CookieIcon },
+    { id: 'privacy' as const, label: t('privacy.tab.privacy'), icon: ShieldIcon },
+    { id: 'terms' as const, label: t('privacy.tab.terms'), icon: FileTextIcon },
+    { id: 'cookies' as const, label: t('privacy.tab.cookies'), icon: CookieIcon },
   ];
 
   return (
@@ -34,11 +36,11 @@ export function PrivacyPolicyPage() {
               className="mb-8 text-gray-700 hover:text-primary"
             >
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Zurück
+              {t('privacy.back')}
             </Button>
 
             <h1 className="text-h1 font-headline font-bold text-[#4f378b] tracking-headline leading-headline mb-8">
-              Feelora – Rechtliche Dokumente
+              {t('privacy.pageTitle')}
             </h1>
 
             <div className="flex flex-wrap gap-4 mb-12">
@@ -76,16 +78,17 @@ export function PrivacyPolicyPage() {
 }
 
 function PrivacySection() {
+  const { t } = useTranslation();
   return (
     <Card className="p-12 bg-card border-border">
       <h2 className="text-h2 font-headline font-semibold text-gray-800 mb-6">
-        1. Datenschutzerklärung (Privacy Policy)
+        {t('privacy.privacy.title')}
       </h2>
 
       <div className="space-y-8 text-body leading-body" style={{ color: '#2F3E46' }}>
         <div>
-          <p className="font-semibold mb-2">Stand: Oktober 2025</p>
-          <p className="font-semibold mb-2">Verantwortlich:</p>
+          <p className="font-semibold mb-2">{t('privacy.privacy.asOf')}</p>
+          <p className="font-semibold mb-2">{t('privacy.privacy.responsible')}</p>
           <p>Feelora</p>
           <p>Feldkellergasse 24/16</p>
           <p>1130 Wien, Österreich</p>
@@ -94,101 +97,72 @@ function PrivacySection() {
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">1. Allgemeines</h3>
-          <p>
-            Der Schutz Ihrer persönlichen Daten ist uns ein zentrales Anliegen. Wir verarbeiten Ihre
-            Daten ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, DSG). In dieser
-            Datenschutzerklärung informieren wir Sie über Art, Umfang und Zweck der Erhebung und
-            Verarbeitung personenbezogener Daten im Rahmen der Nutzung unserer Website und
-            Plattform.
-          </p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s1.title')}</h3>
+          <p>{t('privacy.privacy.s1.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            2. Verantwortliche Stelle
+            {t('privacy.privacy.s2.title')}
           </h3>
-          <p>Verantwortlich für die Datenverarbeitung ist:</p>
-          <p className="mt-2">
-            Feelora: Aylin Schatz, Feldkellergasse 24/16, 1130 Wien, Österreich
-          </p>
+          <p>{t('privacy.privacy.s2.text')}</p>
+          <p className="mt-2">{t('privacy.privacy.s2.detail')}</p>
           <p>E-Mail: info@feelora.com</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            3. Zweck und Umfang der Datenverarbeitung
+            {t('privacy.privacy.s3.title')}
           </h3>
-          <p className="mb-3">Wir verarbeiten personenbezogene Daten, um:</p>
+          <p className="mb-3">{t('privacy.privacy.s3.text')}</p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Nutzer:innen mit passenden Therapeut:innen zu verbinden,</li>
-            <li>die Kommunikation zwischen Nutzer:innen und Therapeut:innen zu ermöglichen,</li>
-            <li>Anfragen über das Kontaktformular zu beantworten,</li>
-            <li>Nutzungsstatistiken zu erstellen und unsere Website zu optimieren,</li>
-            <li>rechtliche Verpflichtungen zu erfüllen.</li>
+            <li>{t('privacy.privacy.s3.li1')}</li>
+            <li>{t('privacy.privacy.s3.li2')}</li>
+            <li>{t('privacy.privacy.s3.li3')}</li>
+            <li>{t('privacy.privacy.s3.li4')}</li>
+            <li>{t('privacy.privacy.s3.li5')}</li>
           </ul>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            4. Cookies und Tracking
+            {t('privacy.privacy.s4.title')}
           </h3>
-          <p>
-            Unsere Website verwendet Cookies, um Ihnen ein optimales Nutzungserlebnis zu bieten.
-            Dazu zählen notwendige, Analyse- und Marketing-Cookies. Beim ersten Besuch werden Sie
-            über ein Cookie-Banner informiert und können Ihre Einwilligung individuell erteilen.
-          </p>
+          <p>{t('privacy.privacy.s4.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">5. Webanalyse</h3>
-          <p>
-            Wir verwenden Google Analytics (Google Ireland Limited, Dublin, Irland) zur Analyse des
-            Nutzerverhaltens. Die Datenverarbeitung erfolgt auf Grundlage Ihrer Einwilligung (Art. 6
-            Abs. 1 lit. a DSGVO).
-          </p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s5.title')}</h3>
+          <p>{t('privacy.privacy.s5.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            6. Datenweitergabe und Auftragsverarbeiter
+            {t('privacy.privacy.s6.title')}
           </h3>
-          <p>
-            Eine Weitergabe erfolgt nur, wenn dies zur Erfüllung unserer Leistungen erforderlich ist
-            oder Sie zugestimmt haben. Hosting über Amazon Web Services (AWS) mit Serverstandort in
-            der EU.
-          </p>
+          <p>{t('privacy.privacy.s6.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            7. Speicherdauer
+            {t('privacy.privacy.s7.title')}
           </h3>
-          <p>
-            Ihre Daten werden nur so lange gespeichert, wie es für die genannten Zwecke erforderlich
-            ist oder gesetzliche Aufbewahrungsfristen bestehen.
-          </p>
+          <p>{t('privacy.privacy.s7.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">8. Ihre Rechte</h3>
-          <p>
-            Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung,
-            Datenübertragbarkeit, Widerspruch und Widerruf. Anfragen: info@feelora.com
-          </p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s8.title')}</h3>
+          <p>{t('privacy.privacy.s8.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">9. Sicherheit</h3>
-          <p>Wir treffen technische und organisatorische Maßnahmen, um Ihre Daten zu schützen.</p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s9.title')}</h3>
+          <p>{t('privacy.privacy.s9.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">10. Änderungen</h3>
-          <p>
-            Diese Datenschutzerklärung kann angepasst werden. Die aktuelle Version ist auf unserer
-            Website abrufbar.
-          </p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s10.title')}</h3>
+          <p>{t('privacy.privacy.s10.text')}</p>
         </div>
       </div>
     </Card>
@@ -196,88 +170,68 @@ function PrivacySection() {
 }
 
 function TermsSection() {
+  const { t } = useTranslation();
   return (
     <Card className="p-12 bg-card border-border">
       <h2 className="text-h2 font-headline font-semibold text-gray-800 mb-6">
-        2. Nutzungsbedingungen (Terms & Conditions)
+        {t('privacy.terms.title')}
       </h2>
 
       <div className="space-y-8 text-body leading-body" style={{ color: '#2F3E46' }}>
-        <p className="font-semibold">Stand: Oktober 2025</p>
+        <p className="font-semibold">{t('privacy.terms.asOf')}</p>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            1. Geltungsbereich
+            {t('privacy.terms.s1.title')}
           </h3>
-          <p>
-            Diese Nutzungsbedingungen gelten für die Nutzung der Website www.feelora.com und aller
-            damit verbundenen Dienste von Feelora.
-          </p>
+          <p>{t('privacy.terms.s1.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            2. Leistungen von Feelora
+            {t('privacy.terms.s2.title')}
           </h3>
-          <p>
-            Feelora ist eine digitale Plattform, die Nutzer:innen mit qualifizierten Therapeut:innen
-            zusammenbringt. Wir bieten Matching, Mood-Tracking und Termin-Tools. Feelora selbst
-            bietet keine psychotherapeutische Behandlung an.
-          </p>
+          <p>{t('privacy.terms.s2.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            3. Registrierung und Konto
+            {t('privacy.terms.s3.title')}
           </h3>
-          <p>
-            Für bestimmte Funktionen ist ein Benutzerkonto erforderlich. Sie verpflichten sich,
-            korrekte Angaben zu machen und Zugangsdaten vertraulich zu behandeln.
-          </p>
+          <p>{t('privacy.terms.s3.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            4. Pflichten der Nutzer:innen
+            {t('privacy.terms.s4.title')}
           </h3>
-          <p>
-            Die Plattform darf nur zu legalen, persönlichen Zwecken genutzt werden. Inhalte dürfen
-            nicht kopiert oder weitergegeben werden.
-          </p>
+          <p>{t('privacy.terms.s4.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            5. Haftungsausschluss
+            {t('privacy.terms.s5.title')}
           </h3>
-          <p>
-            Feelora übernimmt keine Haftung für die Qualität der Beratungen, technische Ausfälle
-            oder externe Links. Haftung nur bei grober Fahrlässigkeit oder Vorsatz.
-          </p>
+          <p>{t('privacy.terms.s5.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            6. Geistiges Eigentum
+            {t('privacy.terms.s6.title')}
           </h3>
-          <p>
-            Alle Inhalte sind urheberrechtlich geschützt. Nutzung ohne Zustimmung ist untersagt.
-          </p>
+          <p>{t('privacy.terms.s6.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">7. Änderungen</h3>
-          <p>
-            Feelora kann diese Bedingungen jederzeit ändern. Mit fortgesetzter Nutzung stimmen Sie
-            den Änderungen zu.
-          </p>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.terms.s7.title')}</h3>
+          <p>{t('privacy.terms.s7.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            8. Anwendbares Recht
+            {t('privacy.terms.s8.title')}
           </h3>
-          <p>Es gilt österreichisches Recht. Gerichtsstand ist Wien.</p>
+          <p>{t('privacy.terms.s8.text')}</p>
         </div>
       </div>
     </Card>
@@ -285,55 +239,50 @@ function TermsSection() {
 }
 
 function CookiesSection() {
+  const { t } = useTranslation();
   return (
     <Card className="p-12 bg-card border-border">
       <h2 className="text-h2 font-headline font-semibold text-gray-800 mb-6">
-        3. Cookie-Richtlinie (Cookie Policy)
+        {t('privacy.cookies.title')}
       </h2>
 
       <div className="space-y-8 text-body leading-body" style={{ color: '#2F3E46' }}>
-        <p className="font-semibold">Stand: Oktober 2025</p>
+        <p className="font-semibold">{t('privacy.cookies.asOf')}</p>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            1. Was sind Cookies?
+            {t('privacy.cookies.s1.title')}
           </h3>
-          <p>
-            Cookies sind kleine Textdateien, die auf Ihrem Gerät gespeichert werden, um unsere
-            Website funktionsfähig zu machen und Ihre Nutzererfahrung zu verbessern.
-          </p>
+          <p>{t('privacy.cookies.s1.text')}</p>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            2. Wie wir Cookies verwenden
+            {t('privacy.cookies.s2.title')}
           </h3>
-          <p className="mb-3">Feelora nutzt Cookies zu folgenden Zwecken:</p>
+          <p className="mb-3">{t('privacy.cookies.s2.text')}</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <strong>Technisch notwendige Cookies:</strong> Login, Sicherheit
+              <strong>{t('privacy.cookies.s2.necessary')}</strong> {t('privacy.cookies.s2.necessaryDesc')}
             </li>
             <li>
-              <strong>Analyse-Cookies:</strong> z. B. Google Analytics
+              <strong>{t('privacy.cookies.s2.analytics')}</strong> {t('privacy.cookies.s2.analyticsDesc')}
             </li>
             <li>
-              <strong>Marketing-Cookies:</strong> z. B. Meta Pixel
+              <strong>{t('privacy.cookies.s2.marketing')}</strong> {t('privacy.cookies.s2.marketingDesc')}
             </li>
           </ul>
         </div>
 
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            3. Verwaltung Ihrer Cookie-Einstellungen
+            {t('privacy.cookies.s3.title')}
           </h3>
-          <p>
-            Sie können Ihre Einwilligung jederzeit über das Cookie-Banner oder Ihren Browser ändern
-            oder widerrufen.
-          </p>
+          <p>{t('privacy.cookies.s3.text')}</p>
         </div>
 
         <div className="mt-12 p-6 bg-tertiary/20 rounded-lg">
-          <p className="font-semibold text-gray-800 mb-2">Kontakt für Datenschutzfragen:</p>
+          <p className="font-semibold text-gray-800 mb-2">{t('privacy.cookies.contact')}</p>
           <p>E-Mail: info@feelora.com</p>
           <p>Adresse: Feldkellergasse 24/16, 1130 Wien, Österreich</p>
         </div>

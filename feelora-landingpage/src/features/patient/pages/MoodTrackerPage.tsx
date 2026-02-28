@@ -1,137 +1,139 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
 
 interface MoodOption {
   emoji: string;
-  label: string;
+  labelKey: string;
 }
 
 interface MoodCategory {
-  question: string;
+  questionKey: string;
   options: MoodOption[];
 }
 
-const moodCategories: MoodCategory[] = [
+const moodCategoryDefs: MoodCategory[] = [
   {
-    question: 'Wie fühlst du dich heute?',
+    questionKey: 'patient.moodTracker.howAreYou',
     options: [
-      { emoji: '😊', label: 'Glücklich' },
-      { emoji: '😌', label: 'Zufrieden' },
-      { emoji: '😐', label: 'Neutral' },
-      { emoji: '😢', label: 'Traurig' },
-      { emoji: '😰', label: 'Ängstlich' },
-      { emoji: '😤', label: 'Gestresst' },
-      { emoji: '😴', label: 'Müde' },
-      { emoji: '😠', label: 'Wütend' },
-      { emoji: '😕', label: 'Verwirrt' },
-      { emoji: '🥰', label: 'Verliebt' },
+      { emoji: '😊', labelKey: 'patient.moodTracker.happy' },
+      { emoji: '😌', labelKey: 'patient.moodTracker.content' },
+      { emoji: '😐', labelKey: 'patient.moodTracker.neutral' },
+      { emoji: '😢', labelKey: 'patient.moodTracker.sad' },
+      { emoji: '😰', labelKey: 'patient.moodTracker.anxious' },
+      { emoji: '😤', labelKey: 'patient.moodTracker.stressed' },
+      { emoji: '😴', labelKey: 'patient.moodTracker.tired' },
+      { emoji: '😠', labelKey: 'patient.moodTracker.angry' },
+      { emoji: '😕', labelKey: 'patient.moodTracker.confused' },
+      { emoji: '🥰', labelKey: 'patient.moodTracker.inLove' },
     ],
   },
   {
-    question: 'Hast du genug geschlafen?',
+    questionKey: 'patient.moodTracker.enoughSleep',
     options: [
-      { emoji: '😊', label: 'Ausgeschlafen' },
-      { emoji: '😴', label: 'Etwas müde' },
-      { emoji: '💤', label: 'Unruhig geschlafen' },
-      { emoji: '😩', label: 'Kaum geschlafen' },
-      { emoji: '😵', label: 'Zu viel geschlafen' },
+      { emoji: '😊', labelKey: 'patient.moodTracker.wellRested' },
+      { emoji: '😴', labelKey: 'patient.moodTracker.somewhatTired' },
+      { emoji: '💤', labelKey: 'patient.moodTracker.restlessSleep' },
+      { emoji: '😩', labelKey: 'patient.moodTracker.barelySlept' },
+      { emoji: '😵', labelKey: 'patient.moodTracker.tooMuchSleep' },
     ],
   },
   {
-    question: 'Hast du gegessen?',
+    questionKey: 'patient.moodTracker.haveYouEaten',
     options: [
-      { emoji: '🍽️', label: 'Regelmäßig gegessen' },
-      { emoji: '🥗', label: 'Etwas Kleines gegessen' },
-      { emoji: '🍿', label: 'Nur gesnackt' },
-      { emoji: '❌', label: 'Mahlzeit ausgelassen' },
-      { emoji: '🤢', label: 'Zu viel gegessen, fühle mich unwohl' },
+      { emoji: '🍽️', labelKey: 'patient.moodTracker.ateRegularly' },
+      { emoji: '🥗', labelKey: 'patient.moodTracker.ateSmall' },
+      { emoji: '🍿', labelKey: 'patient.moodTracker.onlySnacked' },
+      { emoji: '❌', labelKey: 'patient.moodTracker.skippedMeal' },
+      { emoji: '🤢', labelKey: 'patient.moodTracker.ateTooMuch' },
     ],
   },
   {
-    question: 'Hast du dich bewegt / warst du draußen?',
+    questionKey: 'patient.moodTracker.exercise',
     options: [
-      { emoji: '🌳', label: 'Viel bewegt & draußen gewesen' },
-      { emoji: '🚶', label: 'Kurz draußen gewesen' },
-      { emoji: '🏠', label: 'Drinnen geblieben' },
-      { emoji: '💪', label: 'Sport gemacht' },
-      { emoji: '🧘', label: 'Leichte Bewegung / Stretching' },
-      { emoji: '💤', label: 'Keine Bewegung' },
+      { emoji: '🌳', labelKey: 'patient.moodTracker.movedOutdoors' },
+      { emoji: '🚶', labelKey: 'patient.moodTracker.brieflyOutside' },
+      { emoji: '🏠', labelKey: 'patient.moodTracker.stayedInside' },
+      { emoji: '💪', labelKey: 'patient.moodTracker.didSports' },
+      { emoji: '🧘', labelKey: 'patient.moodTracker.lightMovement' },
+      { emoji: '💤', labelKey: 'patient.moodTracker.noMovement' },
     ],
   },
   {
-    question: 'Wie fühlst du dich körperlich?',
+    questionKey: 'patient.moodTracker.physicalFeeling',
     options: [
-      { emoji: '💚', label: 'Energetisch' },
-      { emoji: '😌', label: 'Entspannt' },
-      { emoji: '😩', label: 'Erschöpft' },
-      { emoji: '😣', label: 'Schmerzen' },
-      { emoji: '🤒', label: 'Krank' },
-      { emoji: '😫', label: 'Schwach' },
+      { emoji: '💚', labelKey: 'patient.moodTracker.energetic' },
+      { emoji: '😌', labelKey: 'patient.moodTracker.relaxed' },
+      { emoji: '😩', labelKey: 'patient.moodTracker.exhausted' },
+      { emoji: '😣', labelKey: 'patient.moodTracker.pain' },
+      { emoji: '🤒', labelKey: 'patient.moodTracker.sick' },
+      { emoji: '😫', labelKey: 'patient.moodTracker.weak' },
     ],
   },
   {
-    question: 'Stresslevel',
+    questionKey: 'patient.moodTracker.stressLevel',
     options: [
-      { emoji: '😌', label: 'Entspannt' },
-      { emoji: '😐', label: 'Etwas angespannt' },
-      { emoji: '😤', label: 'Gestresst' },
-      { emoji: '🤯', label: 'Überfordert' },
+      { emoji: '😌', labelKey: 'patient.moodTracker.relaxedStress' },
+      { emoji: '😐', labelKey: 'patient.moodTracker.somewhatTense' },
+      { emoji: '😤', labelKey: 'patient.moodTracker.stressedLevel' },
+      { emoji: '🤯', labelKey: 'patient.moodTracker.overwhelmed' },
     ],
   },
   {
-    question: 'Fokus & Produktivität',
+    questionKey: 'patient.moodTracker.focusProductivity',
     options: [
-      { emoji: '🎯', label: 'Sehr fokussiert' },
-      { emoji: '😊', label: 'Produktiv' },
-      { emoji: '😐', label: 'Abgelenkt' },
-      { emoji: '😞', label: 'Unmotiviert' },
+      { emoji: '🎯', labelKey: 'patient.moodTracker.veryFocused' },
+      { emoji: '😊', labelKey: 'patient.moodTracker.productive' },
+      { emoji: '😐', labelKey: 'patient.moodTracker.distracted' },
+      { emoji: '😞', labelKey: 'patient.moodTracker.unmotivated' },
     ],
   },
   {
-    question: 'Soziale Verbindung heute',
+    questionKey: 'patient.moodTracker.socialConnection',
     options: [
-      { emoji: '❤️', label: 'Zeit mit anderen verbracht' },
-      { emoji: '💬', label: 'Mit jemandem gesprochen' },
-      { emoji: '😔', label: 'Einsam gefühlt' },
-      { emoji: '🚫', label: 'Allein sein wollen' },
+      { emoji: '❤️', labelKey: 'patient.moodTracker.timeWithOthers' },
+      { emoji: '💬', labelKey: 'patient.moodTracker.talkedToSomeone' },
+      { emoji: '😔', labelKey: 'patient.moodTracker.feltLonely' },
+      { emoji: '🚫', labelKey: 'patient.moodTracker.wantedAlone' },
     ],
   },
   {
-    question: 'Selbstfürsorge',
+    questionKey: 'patient.moodTracker.selfCare',
     options: [
-      { emoji: '💚', label: 'Etwas für mich getan' },
-      { emoji: '🎨', label: 'Etwas Schönes gemacht' },
-      { emoji: '🧘', label: 'Entspannt / meditiert' },
-      { emoji: '🚫', label: 'Keine Selbstfürsorge' },
+      { emoji: '💚', labelKey: 'patient.moodTracker.didSomethingForMe' },
+      { emoji: '🎨', labelKey: 'patient.moodTracker.didSomethingNice' },
+      { emoji: '🧘', labelKey: 'patient.moodTracker.relaxedMeditated' },
+      { emoji: '🚫', labelKey: 'patient.moodTracker.noSelfCare' },
     ],
   },
   {
-    question: 'Dankbarkeit / Highlight des Tages',
+    questionKey: 'patient.moodTracker.gratitude',
     options: [
-      { emoji: '🌟', label: 'Etwas Gutes ist passiert' },
-      { emoji: '❤️', label: 'Dankbar' },
-      { emoji: '😔', label: 'Schwieriger Tag' },
-      { emoji: '❌', label: 'Nichts Positives heute' },
+      { emoji: '🌟', labelKey: 'patient.moodTracker.somethingGoodHappened' },
+      { emoji: '❤️', labelKey: 'patient.moodTracker.grateful' },
+      { emoji: '😔', labelKey: 'patient.moodTracker.difficultDay' },
+      { emoji: '❌', labelKey: 'patient.moodTracker.nothingPositive' },
     ],
   },
 ];
 
 const MoodTrackerPage = () => {
+  const { t } = useTranslation();
   const [selectedMoods, setSelectedMoods] = useState<Record<number, string[]>>({});
 
-  const toggleMood = (categoryIndex: number, label: string) => {
+  const toggleMood = (categoryIndex: number, labelKey: string) => {
     setSelectedMoods((prev) => {
       const current = prev[categoryIndex] || [];
-      if (current.includes(label)) {
-        return { ...prev, [categoryIndex]: current.filter((l) => l !== label) };
+      if (current.includes(labelKey)) {
+        return { ...prev, [categoryIndex]: current.filter((l) => l !== labelKey) };
       }
-      return { ...prev, [categoryIndex]: [...current, label] };
+      return { ...prev, [categoryIndex]: [...current, labelKey] };
     });
   };
 
-  const isMoodSelected = (categoryIndex: number, label: string) => {
-    return selectedMoods[categoryIndex]?.includes(label) || false;
+  const isMoodSelected = (categoryIndex: number, labelKey: string) => {
+    return selectedMoods[categoryIndex]?.includes(labelKey) || false;
   };
 
   return (
@@ -139,7 +141,7 @@ const MoodTrackerPage = () => {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <img src={feeloraLogo} alt="Feelora" className="w-12 h-12" />
-        <h1 className="text-2xl font-bold text-foreground">Track your Mood</h1>
+        <h1 className="text-2xl font-bold text-foreground">{t('patient.moodTracker.title')}</h1>
       </div>
 
       <hr className="border-border mb-6" />
@@ -149,28 +151,27 @@ const MoodTrackerPage = () => {
         <img src={feeloraLogo} alt="Feelora" className="w-10 h-10" />
         <div className="bg-tertiary rounded-2xl rounded-bl-sm px-4 py-3 max-w-md">
           <p className="text-foreground">
-            Hey Nina! Möchtest du mir etwas über deine aktuelle Stimmung erzählen? Wie fühlst du
-            dich heute?
+            {t('patient.moodTracker.greeting')}
           </p>
         </div>
       </div>
 
       {/* Mood Categories */}
       <div className="space-y-8">
-        {moodCategories.map((category, categoryIndex) => (
+        {moodCategoryDefs.map((category, categoryIndex) => (
           <div key={categoryIndex} className="feelora-card">
-            <h3 className="font-semibold text-foreground mb-4">{category.question}</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t(category.questionKey)}</h3>
             <div className="flex flex-wrap gap-2">
               {category.options.map((option, optionIndex) => (
                 <button
                   key={optionIndex}
-                  onClick={() => toggleMood(categoryIndex, option.label)}
+                  onClick={() => toggleMood(categoryIndex, option.labelKey)}
                   className={`mood-chip ${
-                    isMoodSelected(categoryIndex, option.label) ? 'mood-chip-selected' : ''
+                    isMoodSelected(categoryIndex, option.labelKey) ? 'mood-chip-selected' : ''
                   }`}
                 >
                   <span className="text-lg">{option.emoji}</span>
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-sm">{t(option.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -181,7 +182,7 @@ const MoodTrackerPage = () => {
       {/* Submit Button */}
       <div className="flex justify-center mt-8">
         <button className="feelora-btn-primary px-8">
-          Nächste
+          {t('patient.moodTracker.next')}
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

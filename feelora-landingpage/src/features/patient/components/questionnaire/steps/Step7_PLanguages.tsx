@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { useTranslation } from 'react-i18next';
 
 interface LanguagesStepProps {
   onNext: () => void;
@@ -10,50 +11,50 @@ interface LanguagesStepProps {
   onDataChange: (data: { selected: string[]; other?: string[] }) => void;
 }
 
-const languageOptions = [
-  'Deutsch',
-  'Kroatisch',
-  'Englisch',
-  'Arabisch',
-  'Türkisch',
-  'Polnisch',
-  'Serbisch',
-  'Italienisch',
-  'Ungarisch',
-  'Farsi / Persisch',
-  'Rumänisch',
-  'Spanisch',
-  'Französisch',
-  'Ukrainisch',
-  'Russisch',
+const getLanguageOptions = (t: (key: string) => string) => [
+  t('q.p.languages.options.german'),
+  t('q.p.languages.options.croatian'),
+  t('q.p.languages.options.english'),
+  t('q.p.languages.options.arabic'),
+  t('q.p.languages.options.turkish'),
+  t('q.p.languages.options.polish'),
+  t('q.p.languages.options.serbian'),
+  t('q.p.languages.options.italian'),
+  t('q.p.languages.options.hungarian'),
+  t('q.p.languages.options.farsi'),
+  t('q.p.languages.options.romanian'),
+  t('q.p.languages.options.spanish'),
+  t('q.p.languages.options.french'),
+  t('q.p.languages.options.ukrainian'),
+  t('q.p.languages.options.russian'),
 ];
 
-const otherLanguages = [
-  'Albanisch',
-  'Portugiesisch',
-  'Chinesisch', // Mandarin/Cantonese
-  'Japanisch',
-  'Koreanisch',
-  'Niederländisch',
-  'Schwedisch',
-  'Dänisch',
-  'Norwegisch',
-  'Finnisch',
-  'Griechisch',
-  'Hebräisch',
-  'Tschechisch', // Czech
-  'Slowakisch', // Slovak
-  'Bulgarisch', // Bulgarian
-  'Slowenisch', // Slovenian
-  'Hindi', // Significant global population
-  'Bengalisch', // Bengali
-  'Vietnamesisch', // Large community in DE/AT/Europe
-  'Thailändisch', // Thai
-  'Urdu', // Pakistan/India
-  'Paschtu', // Pashto (Afghanistan)
-  'Kurdisch', // Kurdish
-  'Dari', // Afghanistan
-  'Indonesisch', // Indonesian
+const getOtherLanguages = (t: (key: string) => string) => [
+  t('q.p.languages.other.albanian'),
+  t('q.p.languages.other.portuguese'),
+  t('q.p.languages.other.chinese'),
+  t('q.p.languages.other.japanese'),
+  t('q.p.languages.other.korean'),
+  t('q.p.languages.other.dutch'),
+  t('q.p.languages.other.swedish'),
+  t('q.p.languages.other.danish'),
+  t('q.p.languages.other.norwegian'),
+  t('q.p.languages.other.finnish'),
+  t('q.p.languages.other.greek'),
+  t('q.p.languages.other.hebrew'),
+  t('q.p.languages.other.czech'),
+  t('q.p.languages.other.slovak'),
+  t('q.p.languages.other.bulgarian'),
+  t('q.p.languages.other.slovenian'),
+  t('q.p.languages.other.hindi'),
+  t('q.p.languages.other.bengali'),
+  t('q.p.languages.other.vietnamese'),
+  t('q.p.languages.other.thai'),
+  t('q.p.languages.other.urdu'),
+  t('q.p.languages.other.pashto'),
+  t('q.p.languages.other.kurdish'),
+  t('q.p.languages.other.dari'),
+  t('q.p.languages.other.indonesian'),
 ];
 
 // Define Validation Schema with Conditional Logic
@@ -77,6 +78,9 @@ const step7Schema = z
   );
 
 const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepProps) => {
+  const { t } = useTranslation();
+  const languageOptions = getLanguageOptions(t);
+  const otherLanguages = getOtherLanguages(t);
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step7Schema,
@@ -119,17 +123,16 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-purple mb-2">Sprachen</h1>
+        <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.languages.title')}</h1>
         <p className="text-muted-foreground mb-2">
-          Bitte wähle aus, in welchen Sprachen du Therapiestunden haben willst. (Wähle nur Sprachen
-          aus, in denen du dich gut ausdrücken kannst, damit die Therapie effektiv ist.)
+          {t('q.p.languages.subtitle')}
         </p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
           {errors.selected
-            ? 'Bitte wähle mindestens eine Sprache aus.'
-            : 'Mehrfachauswahl möglich.'}
+            ? t('q.p.languages.error')
+            : t('q.p.languages.multiSelect')}
         </p>
       </div>
 
@@ -161,7 +164,7 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 checked={data.selected.includes('Andere')}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground font-medium">Andere Sprachen...</span>
+              <span className="text-foreground font-medium">{t('q.p.languages.otherLanguages')}</span>
             </label>
 
             {/* 4. Scrollbare Checkbox-Liste für weitere Sprachen */}
@@ -170,7 +173,7 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 className={`animate-in fade-in slide-in-from-top-2 duration-300 p-4 rounded-lg border bg-muted/20 ${errors.other ? 'border-destructive ring-1 ring-destructive' : 'border-border'}`}
               >
                 <p className="text-sm font-medium mb-3 text-foreground">
-                  Weitere Sprachen auswählen:
+                  {t('q.p.languages.selectMore')}
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
@@ -190,7 +193,7 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
 
                 {errors.other && (
                   <p className="text-xs text-destructive mt-3">
-                    Bitte wähle mindestens eine weitere Sprache aus.
+                    {t('q.p.languages.otherError')}
                   </p>
                 )}
               </div>

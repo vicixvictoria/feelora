@@ -1,5 +1,6 @@
 import { ChevronRight, Search, Send, Check, ChevronLeft } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
+import { useTranslation } from 'react-i18next';
 
 interface Patient {
   name: string;
@@ -49,6 +50,8 @@ const newPatients: NewPatient[] = [
 ];
 
 const PatientsPage = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-5xl mx-auto animate-fade-in relative">
       {/* Coming Soon Watermark */}
@@ -57,12 +60,12 @@ const PatientsPage = () => {
           className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
           style={{ transform: 'rotate(-25deg)' }}
         >
-          Coming Soon
+          {t('app.therapist.patients.comingSoon')}
         </p>
       </div>
 
       {/* Existing Patients */}
-      <h1 className="text-2xl font-bold text-foreground mb-6">Deine Patient*innen</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.patients.title')}</h1>
 
       <div className="feelora-card mb-10">
         <div className="grid grid-cols-2 gap-4">
@@ -85,7 +88,7 @@ const PatientsPage = () => {
 
       {/* New Patients */}
       <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-2xl font-bold text-foreground">Neue Patient*innen</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t('app.therapist.patients.newPatients')}</h2>
         <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
           new
         </span>
@@ -114,26 +117,26 @@ const PatientsPage = () => {
                 />
                 <div className="flex flex-col justify-center">
                   <p className="font-bold text-primary text-lg">{patient.name}</p>
-                  <p className="text-sm text-foreground">Alter: {patient.age}</p>
-                  <p className="text-sm text-foreground">Stadt: {patient.city}</p>
-                  <p className="text-sm text-foreground">Rolle: {patient.role}</p>
-                  <p className="text-sm text-foreground">Therapie: {patient.therapy}</p>
+                  <p className="text-sm text-foreground">{t('app.therapist.patients.age')} {patient.age}</p>
+                  <p className="text-sm text-foreground">{t('app.therapist.patients.city')} {patient.city}</p>
+                  <p className="text-sm text-foreground">{t('app.therapist.patients.role')} {patient.role}</p>
+                  <p className="text-sm text-foreground">{t('app.therapist.patients.therapy')} {patient.therapy}</p>
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground mb-4">Request: {patient.request}</p>
+              <p className="text-sm text-muted-foreground mb-4">{t('app.therapist.patients.request')} {patient.request}</p>
 
               <div className="flex gap-3">
                 <button className="feelora-btn-primary text-sm">
-                  Profile
+                  {t('app.therapist.patients.profile')}
                   <Search className="w-4 h-4" />
                 </button>
                 <button className="feelora-btn-primary text-sm">
-                  Nachricht
+                  {t('app.therapist.patients.message')}
                   <Send className="w-4 h-4" />
                 </button>
                 <button className="border border-destructive text-destructive px-4 py-2 rounded-full font-medium hover:bg-destructive/10 transition-all duration-200 flex items-center gap-2 text-sm">
-                  Erstgespräch
+                  {t('app.therapist.patients.initialSession')}
                   <Check className="w-4 h-4" />
                 </button>
               </div>
