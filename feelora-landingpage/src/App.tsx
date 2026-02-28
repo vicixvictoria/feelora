@@ -1,20 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
+import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apolloClient';
 import { Amplify } from 'aws-amplify';
-import { amplifyConfig } from './config/amplify'; // Default to standard user
+import { amplifyConfig } from './config/amplify';
 
 // --- Contexts ---
-
 import { AuthProvider } from './contexts/AuthContext';
-import { TooltipProvider } from '@/components/ui/tooltip'; // Dashboard requirement
-import { RequireAuth } from '@/components/auth/RequireAuth'; // Patients and Therapists require Auth
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { RequireAuth } from '@/components/auth/RequireAuth';
 
 // --- Global UI ---
-import { Toaster } from '@/components/ui/toaster'; // Dashboard Toasts
-import { Toaster as Sonner } from '@/components/ui/sonner'; // Dashboard Toasts
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
 
 // --- LANDING Page Imports ---
 import { Navbar } from './features/landing/layout/Navbar';
@@ -42,7 +40,7 @@ import HomeworkPage from './features/patient/pages/HomeworkPage';
 import NotFound from './features/patient/pages/NotFound';
 import PatientQuestionnaire from './features/patient/pages/PatientQuestionnaire';
 
-// --- THERAPIST Imports Dummy Dashboard ---
+// --- THERAPIST Imports ---
 import TherapistLayout from './features/therapist/layout/TherapistLayout';
 import TherapistChat from './features/therapist/pages/TherapistChat';
 import TherapistMoodTrackerPage from './features/therapist/pages/TherapistMoodTrackerPage';
@@ -53,9 +51,8 @@ import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsP
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
 
 // --- Amplify Configuration ---
-Amplify.configure(amplifyConfig); // Use the default configuration (standard user pool) for the entire app.
+Amplify.configure(amplifyConfig);
 
-// 1. Initialize Query Client
 const queryClient = new QueryClient();
 
 // --- Components ---
@@ -73,39 +70,36 @@ function HomePage() {
   );
 }
 
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
+// --- Root Layout (provides AuthProvider + global UI) ---
+
+function RootLayout() {
+  return (
+    <AuthProvider>
+      <ScrollRestoration />
+      <Toaster />
+      <Sonner />
+      <Outlet />
+    </AuthProvider>
+  );
 }
 
 // --- Layout Wrappers ---
 
-// 1. Wrapper for Landing Pages (Navbar + Footer)
-const LandingLayout = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <main>
-        {/* Outlet renders the child route (HomePage, AboutUsPage, etc.) */}
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
-  );
-};
-
-// 2. Wrapper for Patient Dashboard
-//Wrap the Outlet in AppLayout that Sidebar appears
-const PatientLayoutWrapper = () => {
-  return (
-    <PatientAppLayout>
+const LandingLayout = () => (
+  <div className="min-h-screen bg-background text-foreground">
+    <Navbar />
+    <main>
       <Outlet />
-    </PatientAppLayout>
-  );
-};
+    </main>
+    <Footer />
+  </div>
+);
+
+const PatientLayoutWrapper = () => (
+  <PatientAppLayout>
+    <Outlet />
+  </PatientAppLayout>
+);
 
 const TherapistLayoutWrapper = () => (
   <TherapistLayout>
@@ -113,77 +107,78 @@ const TherapistLayoutWrapper = () => (
   </TherapistLayout>
 );
 
+// --- Router ---
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      // Public landing pages
+      {
+        element: <LandingLayout />,
+        children: [
+          { path: '/', element: <HomePage /> },
+          { path: '/about', element: <AboutUsPage /> },
+          { path: '/login', element: <LoginPage userType="user" /> },
+          { path: '/loginTherapist', element: <LoginPage userType="therapist" /> },
+          { path: '/auth/callback', element: <AuthCallback /> },
+          { path: '/privacy', element: <PrivacyPolicyPage /> },
+          { path: '/support', element: <SupportPage /> },
+        ],
+      },
+      // Test routes
+      { path: '/test-therapist', element: <TherapistQuestionnaire /> },
+      { path: '/test-patient', element: <PatientQuestionnaire /> },
+      // Patient protected routes
+      {
+        element: <RequireAuth allowedType="user" />,
+        children: [
+          { path: '/patient/questionnaire', element: <PatientQuestionnaire /> },
+          {
+            path: '/patient',
+            element: <PatientLayoutWrapper />,
+            children: [
+              { index: true, element: <ChatPage /> },
+              { path: 'calendar', element: <CalendarPage /> },
+              { path: 'profile', element: <ProfilePage /> },
+              { path: 'dashboard', element: <PatientDashboard /> },
+              { path: 'mood-tracker', element: <MoodTrackerPage /> },
+              { path: 'homework', element: <HomeworkPage /> },
+            ],
+          },
+        ],
+      },
+      // Therapist protected routes
+      {
+        element: <RequireAuth allowedType="therapist" />,
+        children: [
+          { path: '/therapist/questionnaire', element: <TherapistQuestionnaire /> },
+          {
+            path: '/therapist',
+            element: <TherapistLayoutWrapper />,
+            children: [
+              { index: true, element: <TherapistChat /> },
+              { path: 'mood-tracker', element: <TherapistMoodTrackerPage /> },
+              { path: 'profile', element: <TherapistProfilePage /> },
+              { path: 'homework', element: <TherapistHomeworkPage /> },
+              { path: 'patients', element: <TherapistPatientsPage /> },
+              { path: 'calendar', element: <TherapistCalendarPage /> },
+            ],
+          },
+        ],
+      },
+      // 404
+      { path: '*', element: <NotFound /> },
+    ],
+  },
+]);
+
 function App() {
   return (
     <ApolloProvider client={apolloClient}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Router>
-            <AuthProvider>
-              <ScrollToTop />
-              <Toaster />
-              <Sonner />
-
-              <Routes>
-                {/* === GROUP 1: Public Landing Pages === */}
-                <Route element={<LandingLayout />}>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/about" element={<AboutUsPage />} />
-                  <Route path="/login" element={<LoginPage userType="user" />} />
-                  <Route path="/loginTherapist" element={<LoginPage userType="therapist" />} />
-                  <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                  <Route path="/support" element={<SupportPage />} />
-                </Route>
-                {/* 🚧 TEST ONLY: Temporary access to test UI without login 🚧 */}
-                <Route path="/test-therapist" element={<TherapistQuestionnaire />} />
-                <Route path="/test-patient" element={<PatientQuestionnaire />} />
-                {/* === GROUP 2: Patient Dashboard (Protected)=== */}
-                {/* Only Patient Users. Therapists are BLOCKED. */}
-                {/* Wrap patient dashboard and screening with RequireAuth */}
-                <Route element={<RequireAuth allowedType="user" />}>
-                  {/* Questionnaire Pages (Protected) */}
-                  <Route path="/patient/questionnaire" element={<PatientQuestionnaire />} />
-
-                  {/* All routes here are prefixed with /patient
-                    Example: /patient (dashboard), /patient/calendar 
-                    QU
-                */}
-                  <Route path="/patient" element={<PatientLayoutWrapper />}>
-                    <Route index element={<ChatPage />} />
-                    <Route path="calendar" element={<CalendarPage />} />
-                    <Route path="profile" element={<ProfilePage />} />
-                    <Route path="dashboard" element={<PatientDashboard />} />
-                    <Route path="mood-tracker" element={<MoodTrackerPage />} />
-                    <Route path="homework" element={<HomeworkPage />} />
-                  </Route>
-                </Route>{' '}
-                {/* End of Patient Protected Routes*/}
-                {/* === GROUP 3: THERAPIST DASHBOARD (Protected) === */}
-                {/* Only Therapists. Patients are BLOCKED. */}
-                {/* Wrap therapist dashboard and screening with RequireAuth */}
-                <Route element={<RequireAuth allowedType="therapist" />}>
-                  {/* Questionnaire Pages (Protected) */}
-                  <Route path="/therapist/questionnaire" element={<TherapistQuestionnaire />} />
-
-                  {/* All routes here are prefixed with /patient
-                    Example: /patient (dashboard), /patient/calendar 
-                    QU
-                */}
-                  <Route path="/therapist" element={<TherapistLayoutWrapper />}>
-                    <Route index element={<TherapistChat />} />
-                    <Route path="mood-tracker" element={<TherapistMoodTrackerPage />} />
-                    <Route path="profile" element={<TherapistProfilePage />} />
-                    <Route path="homework" element={<TherapistHomeworkPage />} />
-                    <Route path="patients" element={<TherapistPatientsPage />} />
-                    <Route path="calendar" element={<TherapistCalendarPage />} />
-                  </Route>
-                </Route>
-                {/* Fallback for 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AuthProvider>
-          </Router>
+          <RouterProvider router={router} />
         </TooltipProvider>
       </QueryClientProvider>
     </ApolloProvider>
