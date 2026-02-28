@@ -20,19 +20,24 @@ interface LoginPageProps {
 function LoginPage({ userType = 'user' }: LoginPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAuthenticated, isLoading, error, login, clearError } = useAuth();
+  const { user, isAuthenticated, isLoading, error, login, clearError } = useAuth();
   const { t } = useTranslation();
 
   // Get redirect path from URL params
-  const redirectPath = searchParams.get('redirect') || '/';
+  const explicitRedirect = searchParams.get('redirect');
   const urlError = searchParams.get('error');
 
-  // If already authenticated, redirect
+  // If already authenticated, redirect to dashboard based on user group
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      navigate(redirectPath, { replace: true });
+      if (explicitRedirect) {
+        navigate(explicitRedirect, { replace: true });
+      } else {
+        const isTherapistUser = user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
+        navigate(isTherapistUser ? '/therapist' : '/patient', { replace: true });
+      }
     }
-  }, [isAuthenticated, isLoading, navigate, redirectPath]);
+  }, [isAuthenticated, isLoading, navigate, explicitRedirect, user]);
 
   // Handle login button click
   const handleLogin = () => {

@@ -62,22 +62,44 @@ function parseUserFromToken(token: string): User | null {
   }
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  {
-    /*Mock-User for testing without login flow. Remove this and uncomment the real state for production.*/
-  }
-  /*const [user, setUser] = useState<User | null>({
-    id: 'test-123',
-    email: 'test@example.com',
-    name: 'Test',
-    familyName: 'User',
-    groups: ['type:U'] // Matches the schema's requirement for matchingAlgorithm
-  });
-  const [accessToken, setAccessToken] = useState<string | null>('fake-token');
-  const [isLoading, setIsLoading] = useState(false); 
-  const [error, setError] = useState<string | null>(null); */
+const IS_LOCAL_AUTH = import.meta.env.VITE_AUTH_MODE === 'local';
 
-  //comment out for testing to not use real authentication flow
+function buildLocalMockUser(): User {
+  const groups = (import.meta.env.VITE_LOCAL_USER_GROUPS || 'type:U')
+    .split(',')
+    .map((g: string) => g.trim());
+  return {
+    id: 'local-dev-user',
+    email: 'dev@localhost',
+    name: 'Local',
+    familyName: 'Dev',
+    username: 'local-dev',
+    groups,
+  };
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Local auth mode: skip OAuth, use mock user + test token from env
+  if (IS_LOCAL_AUTH) {
+    const mockUser = buildLocalMockUser();
+    const testToken = import.meta.env.VITE_TEST_AUTH_TOKEN || 'local-dev-token';
+    setApolloAccessToken(testToken);
+
+    const value: AuthContextType = {
+      user: mockUser,
+      accessToken: testToken,
+      isAuthenticated: true,
+      isLoading: false,
+      error: null,
+      login: () => {},
+      logout: async () => { window.location.reload(); },
+      refreshToken: async () => true,
+      clearError: () => {},
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  }
+
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -232,8 +254,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // --- INITIALIZATION (The "Engine") ---
   useEffect(() => {
-    //setIsLoading(false); return; //bypass auth for testing. Remove this line to enable real authentication flow.
-
     if (initRef.current) return;
     initRef.current = true;
 
@@ -285,8 +305,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     accessToken,
-    //isAuthenticated: true,  // For testing purposes, set this to true. In production, it should be !!user or a more robust check.
-    isAuthenticated: !!user, // Simple boolean check
+    isAuthenticated: !!user,
     isLoading,
     error,
     login,
