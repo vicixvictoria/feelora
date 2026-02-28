@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { ExternalLink, Loader2 } from "lucide-react";
-import therapistAvatar from "@/assets/avatar-Placeholder.png";
-import { therapistService } from "../api/therapistService"; // Adjust path if needed
-import { TherapistProfile } from "../types/profiles"; // Import TherapistProfile type
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ExternalLink, Loader2 } from 'lucide-react';
+import therapistAvatar from '@/assets/avatar-Placeholder.png';
+import { therapistService } from '../api/therapistService'; // Adjust path if needed
+import { TherapistProfile } from '../types/profiles'; // Import TherapistProfile type
 
 const TherapistProfilePage = () => {
   const { t } = useTranslation();
@@ -20,8 +20,8 @@ const TherapistProfilePage = () => {
         const data = await therapistService.getProfile();
         setProfile(data);
       } catch (err) {
-        console.error("Failed to load profile", err);
-        setError(t("app.therapist.profile.loadError"));
+        console.error('Failed to load profile', err);
+        setError(t('app.therapist.profile.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -41,7 +41,7 @@ const TherapistProfilePage = () => {
   if (error || !profile) {
     return (
       <div className="text-center text-red-500 mt-10">
-        {error || t("app.therapist.profile.noProfile")}
+        {error || t('app.therapist.profile.noProfile')}
       </div>
     );
   }
@@ -50,12 +50,12 @@ const TherapistProfilePage = () => {
   // Fallback to 'k.A.' (keine Angabe / no data) if missing
   const age = profile.BirthDate
     ? Math.floor((Date.now() - profile.BirthDate * 1000) / 31557600000)
-    : "k.A.";
+    : 'k.A.';
 
   return (
     <div className="max-w-4xl animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground mb-6">
-        {t("app.therapist.profile.title")}
+        {t('app.therapist.profile.title')}
       </h1>
 
       <div className="feelora-card">
@@ -71,19 +71,18 @@ const TherapistProfilePage = () => {
             </h2>
             <div className="space-y-0.5 text-foreground">
               <p>
-                {t("app.therapist.profile.age")} {age}
+                {t('app.therapist.profile.age')} {age}
               </p>
               <p>
-                {t("app.therapist.profile.city")} {profile.City}
+                {t('app.therapist.profile.city')} {profile.City}
               </p>
               {profile.Address && (
                 <p>
-                  {t("app.therapist.profile.address")} {profile.Address}
+                  {t('app.therapist.profile.address')} {profile.Address}
                 </p>
               )}
               <p>
-                {t("app.therapist.profile.role")}{" "}
-                {t("app.therapist.profile.therapist")}
+                {t('app.therapist.profile.role')} {t('app.therapist.profile.therapist')}
               </p>
             </div>
           </div>
@@ -92,18 +91,12 @@ const TherapistProfilePage = () => {
         <div className="space-y-4 text-foreground">
           <div>
             <p>
-              <span className="font-semibold">
-                {t("app.therapist.profile.specializedIn")}
-              </span>{" "}
-              {profile.Specialties?.join(", ") ||
-                t("app.therapist.profile.noInfo")}
+              <span className="font-semibold">{t('app.therapist.profile.specializedIn')}</span>{' '}
+              {profile.Specialties?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
             <p>
-              <span className="font-semibold">
-                {t("app.therapist.profile.languages")}
-              </span>{" "}
-              {profile.Languages?.join(", ") ||
-                t("app.therapist.profile.noInfo")}
+              <span className="font-semibold">{t('app.therapist.profile.languages')}</span>{' '}
+              {profile.Languages?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
             {/* Note: Methodik & Information are not saved in your TherapistProfile GraphQL schema, so they are omitted here.
                 If you need them, they must be fetched from the full Questionnaire JSON. */}
@@ -111,16 +104,11 @@ const TherapistProfilePage = () => {
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mt-6">
             <div>
-              <p className="font-semibold">
-                {t("app.therapist.profile.availability")}
-              </p>
-              <p>
-                {profile.Availability?.join(", ") ||
-                  t("app.therapist.profile.notSpecified")}
-              </p>
+              <p className="font-semibold">{t('app.therapist.profile.availability')}</p>
+              <p>{profile.Availability?.join(', ') || t('app.therapist.profile.notSpecified')}</p>
             </div>
             <button className="feelora-btn-primary">
-              {t("app.therapist.profile.edit")}
+              {t('app.therapist.profile.edit')}
               <ExternalLink className="w-4 h-4 ml-2" />
             </button>
           </div>

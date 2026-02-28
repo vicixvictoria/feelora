@@ -103,7 +103,10 @@ const Dashboard = () => {
       </h2>
       <div className="flex flex-col gap-4">
         {moodDiary.map((entry, index) => (
-          <div key={index} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+          <div
+            key={index}
+            className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
+          >
             <div className="flex items-center gap-4 sm:gap-6 flex-1">
               <img src={avatar} alt="User" className="w-14 h-14 rounded-full object-cover" />
               <div className="flex-1">
@@ -115,7 +118,9 @@ const Dashboard = () => {
               <div className="flex items-center gap-4 sm:gap-6">
                 <div className="text-center">
                   <span className="text-2xl">{entry.mood}</span>
-                  <p className="text-xs text-muted-foreground mt-1">{t('patient.dashboard.mood')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('patient.dashboard.mood')}
+                  </p>
                 </div>
                 <div className="text-center">
                   <span className="text-2xl">{entry.outdoor}</span>

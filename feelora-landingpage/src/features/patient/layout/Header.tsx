@@ -71,8 +71,12 @@ const Header = () => {
             {t('patient.header.languages')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => switchLang('de')} disabled={i18n.language === 'de'}>Deutsch</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => switchLang('en')} disabled={i18n.language === 'en'}>English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => switchLang('de')} disabled={i18n.language === 'de'}>
+              Deutsch
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => switchLang('en')} disabled={i18n.language === 'en'}>
+              English
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -111,12 +115,8 @@ const Header = () => {
           </div>
 
           <div className="border-t border-border px-3 py-4 flex flex-col gap-2">
-            <button className="sidebar-item text-sm">
-              {t('patient.header.emergency')}
-            </button>
-            <button className="sidebar-item text-sm">
-              {t('patient.header.settings')}
-            </button>
+            <button className="sidebar-item text-sm">{t('patient.header.emergency')}</button>
+            <button className="sidebar-item text-sm">{t('patient.header.settings')}</button>
             <button
               className="sidebar-item text-sm"
               onClick={() => switchLang(i18n.language === 'de' ? 'en' : 'de')}

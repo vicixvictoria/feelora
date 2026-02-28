@@ -1,38 +1,32 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Phone,
-  RefreshCw,
-  Plus,
-} from "lucide-react";
-import { addWeeks, subWeeks, startOfWeek, addDays, format } from "date-fns";
-import { de } from "date-fns/locale";
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ChevronLeft, ChevronRight, Phone, RefreshCw, Plus } from 'lucide-react';
+import { addWeeks, subWeeks, startOfWeek, addDays, format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface Appointment {
   day: number; // 0=Mon, 1=Tue, etc.
   startSlot: number; // index into timeSlots
   span: number; // how many slots wide
   title: string;
-  color: "teal" | "yellow" | "peach";
+  color: 'teal' | 'yellow' | 'peach';
 }
 
 const timeSlots = [
-  "08:00",
-  "08:15",
-  "08:30",
-  "08:45",
-  "09:00",
-  "09:15",
-  "09:30",
-  "09:45",
-  "10:00",
-  "10:15",
-  "10:30",
-  "10:45",
-  "11:00",
-  "11:15",
+  '08:00',
+  '08:15',
+  '08:30',
+  '08:45',
+  '09:00',
+  '09:15',
+  '09:30',
+  '09:45',
+  '10:00',
+  '10:15',
+  '10:30',
+  '10:45',
+  '11:00',
+  '11:15',
 ];
 
 const appointments: Appointment[] = [
@@ -40,46 +34,46 @@ const appointments: Appointment[] = [
     day: 0,
     startSlot: 1,
     span: 7,
-    title: "Online Therapie Nina",
-    color: "teal",
+    title: 'Online Therapie Nina',
+    color: 'teal',
   },
   {
     day: 1,
     startSlot: 3,
     span: 7,
-    title: "Online Therapie Tom",
-    color: "teal",
+    title: 'Online Therapie Tom',
+    color: 'teal',
   },
-  { day: 3, startSlot: 6, span: 7, title: "Erstgespräch Mel", color: "yellow" },
+  { day: 3, startSlot: 6, span: 7, title: 'Erstgespräch Mel', color: 'yellow' },
   {
     day: 3,
     startSlot: 11,
     span: 7,
-    title: "Online Therapie Jon",
-    color: "teal",
+    title: 'Online Therapie Jon',
+    color: 'teal',
   },
   {
     day: 4,
     startSlot: 1,
     span: 7,
-    title: "Online Therapie Nina",
-    color: "teal",
+    title: 'Online Therapie Nina',
+    color: 'teal',
   },
   {
     day: 4,
     startSlot: 8,
     span: 7,
-    title: "Vor Ort Therapie Tom",
-    color: "peach",
+    title: 'Vor Ort Therapie Tom',
+    color: 'peach',
   },
 ];
 
-const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sst", "Sun"];
+const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sst', 'Sun'];
 
 const colorMap = {
-  teal: "bg-primary/15 border-primary/30",
-  yellow: "bg-yellow-100 border-yellow-300",
-  peach: "bg-orange-100 border-orange-300",
+  teal: 'bg-primary/15 border-primary/30',
+  yellow: 'bg-yellow-100 border-yellow-300',
+  peach: 'bg-orange-100 border-orange-300',
 };
 
 const TherapistCalendarPage = () => {
@@ -88,17 +82,13 @@ const TherapistCalendarPage = () => {
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
 
-  const handlePrevWeek = () =>
-    setCurrentWeekStart(subWeeks(currentWeekStart, 1));
-  const handleNextWeek = () =>
-    setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+  const handlePrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
+  const handleNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
 
   const weekEnd = addDays(currentWeekStart, 6);
-  const weekLabel = `${format(currentWeekStart, "d")}.- ${format(weekEnd, "d")}. ${format(weekEnd, "MMMM yyyy", { locale: de })}`;
+  const weekLabel = `${format(currentWeekStart, 'd')}.- ${format(weekEnd, 'd')}. ${format(weekEnd, 'MMMM yyyy', { locale: de })}`;
 
-  const weekDays = Array.from({ length: 7 }, (_, i) =>
-    addDays(currentWeekStart, i),
-  );
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in relative">
@@ -106,9 +96,9 @@ const TherapistCalendarPage = () => {
       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
         <p
           className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: "rotate(-25deg)" }}
+          style={{ transform: 'rotate(-25deg)' }}
         >
-          {t("app.therapist.calendar.comingSoon")}
+          {t('app.therapist.calendar.comingSoon')}
         </p>
       </div>
 
@@ -130,7 +120,7 @@ const TherapistCalendarPage = () => {
           </button>
         </div>
         <button className="feelora-btn-primary">
-          {t("app.therapist.calendar.new")}
+          {t('app.therapist.calendar.new')}
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -157,9 +147,7 @@ const TherapistCalendarPage = () => {
 
         {/* Day rows */}
         {weekDays.map((date, dayIndex) => {
-          const dayAppointments = appointments.filter(
-            (a) => a.day === dayIndex,
-          );
+          const dayAppointments = appointments.filter((a) => a.day === dayIndex);
           return (
             <div
               key={dayIndex}
@@ -174,7 +162,7 @@ const TherapistCalendarPage = () => {
                   {dayLabels[dayIndex]}
                 </span>
                 <span className="text-lg font-bold text-foreground">
-                  {format(date, "dd")}.{format(date, "MMM", { locale: de })}
+                  {format(date, 'dd')}.{format(date, 'MMM', { locale: de })}
                 </span>
               </div>
 
@@ -183,9 +171,9 @@ const TherapistCalendarPage = () => {
                 className="relative col-span-full"
                 style={{
                   gridColumn: `2 / -1`,
-                  display: "grid",
+                  display: 'grid',
                   gridTemplateColumns: `repeat(${timeSlots.length}, minmax(70px, 1fr))`,
-                  minHeight: "80px",
+                  minHeight: '80px',
                 }}
               >
                 {/* Grid lines */}
@@ -204,17 +192,13 @@ const TherapistCalendarPage = () => {
                       width: `${(apt.span / timeSlots.length) * 100}%`,
                     }}
                   >
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {apt.title}
-                    </p>
+                    <p className="text-sm font-semibold text-foreground truncate">{apt.title}</p>
                     <div className="flex gap-2 mt-1">
                       <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        {t("app.therapist.calendar.startCall")}{" "}
-                        <Phone className="w-3 h-3" />
+                        {t('app.therapist.calendar.startCall')} <Phone className="w-3 h-3" />
                       </button>
                       <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        {t("app.therapist.calendar.reschedule")}{" "}
-                        <RefreshCw className="w-3 h-3" />
+                        {t('app.therapist.calendar.reschedule')} <RefreshCw className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

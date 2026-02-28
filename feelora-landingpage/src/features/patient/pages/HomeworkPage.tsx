@@ -54,9 +54,16 @@ const HomeworkPage = () => {
       <h1 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.newTasks')}</h1>
       <div className="space-y-4 mb-10">
         {newTasks.map((task) => (
-          <div key={task.id} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4">
+          <div
+            key={task.id}
+            className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4"
+          >
             <div className="flex items-center gap-4 flex-1">
-              <img src={avatar} alt="Therapist" className="w-12 h-12 rounded-full object-cover shrink-0" />
+              <img
+                src={avatar}
+                alt="Therapist"
+                className="w-12 h-12 rounded-full object-cover shrink-0"
+              />
               <div className="flex-1 bg-secondary/10 rounded-2xl rounded-bl-sm px-4 py-3">
                 <p className="text-foreground">{task.message}</p>
               </div>
