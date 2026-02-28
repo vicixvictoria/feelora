@@ -93,9 +93,7 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.mentalHealth.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.mentalHealth.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.mentalHealth.subtitle')}</p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
@@ -110,14 +108,14 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
         >
           {specialtyOptions.map((specialty) => (
             <label
-              key={specialty}
+              key={specialty.value}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
             >
               <Checkbox
-                checked={data.selected.includes(specialty)}
-                onCheckedChange={() => handleToggle(specialty)}
+                checked={data.selected.includes(specialty.value)}
+                onCheckedChange={() => handleToggle(specialty.value)}
               />
-              <span className="text-foreground">{specialty}</span>
+              <span className="text-foreground">{specialty.label}</span>
             </label>
           ))}
 

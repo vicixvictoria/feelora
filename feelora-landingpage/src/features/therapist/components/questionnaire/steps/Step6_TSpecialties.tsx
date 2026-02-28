@@ -82,9 +82,7 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.specialties.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.specialties.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.t.specialties.subtitle')}</p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
@@ -139,7 +137,9 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <span className="text-xs text-destructive mt-1 ml-1">{t('q.common.otherPlaceholder')}</span>
+                  <span className="text-xs text-destructive mt-1 ml-1">
+                    {t('q.common.otherPlaceholder')}
+                  </span>
                 )}
               </div>
             )}

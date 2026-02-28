@@ -109,16 +109,12 @@ const Step6_PPreviousTherapy = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.previousTherapy.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.previousTherapy.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.previousTherapy.subtitle')}</p>
         {/* 3. Show error message in header if nothing is selected */}
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground italic'}`}
         >
-          {errors.selected
-            ? t('q.p.previousTherapy.error')
-            : t('q.p.previousTherapy.multiSelect')}
+          {errors.selected ? t('q.p.previousTherapy.error') : t('q.p.previousTherapy.multiSelect')}
         </p>
       </div>
 
@@ -173,7 +169,9 @@ const Step6_PPreviousTherapy = ({
                   className={`bg-background resize-none ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <p className="text-xs text-destructive mt-1 ml-1">{t('q.p.previousTherapy.detailsError')}</p>
+                  <p className="text-xs text-destructive mt-1 ml-1">
+                    {t('q.p.previousTherapy.detailsError')}
+                  </p>
                 )}
               </div>
             )}
@@ -191,7 +189,9 @@ const Step6_PPreviousTherapy = ({
               checked={safeData.neverHadTherapy}
               onCheckedChange={handleNeverTherapy}
             />
-            <span className="text-foreground font-medium">{t('q.p.previousTherapy.neverHadTherapy')}</span>
+            <span className="text-foreground font-medium">
+              {t('q.p.previousTherapy.neverHadTherapy')}
+            </span>
           </label>
         </div>
       </div>

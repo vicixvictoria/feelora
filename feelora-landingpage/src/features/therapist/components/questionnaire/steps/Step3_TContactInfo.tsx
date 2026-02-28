@@ -59,15 +59,9 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.contact.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.contact.subtitle1')}
-        </p>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.contact.subtitle2')}
-        </p>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.contact.subtitle3')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.t.contact.subtitle1')}</p>
+        <p className="text-muted-foreground mb-2">{t('q.t.contact.subtitle2')}</p>
+        <p className="text-muted-foreground mb-2">{t('q.t.contact.subtitle3')}</p>
         <p className="text-muted-foreground text-sm">{t('q.t.contact.subtitle4')}</p>
       </div>
 

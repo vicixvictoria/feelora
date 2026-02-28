@@ -68,9 +68,7 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapySetting.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.therapySetting.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.therapySetting.subtitle')}</p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
@@ -104,7 +102,9 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
           {/* Exclusive "No Preference" option */}
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
-            <span className="text-foreground font-medium">{t('q.p.therapySetting.noPreference')}</span>
+            <span className="text-foreground font-medium">
+              {t('q.p.therapySetting.noPreference')}
+            </span>
           </label>
         </div>
       </div>

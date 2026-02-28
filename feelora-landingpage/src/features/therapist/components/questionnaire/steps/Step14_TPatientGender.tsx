@@ -38,9 +38,7 @@ const Step14_TPatientGender = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.patientGender.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.t.patientGender.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.t.patientGender.subtitle')}</p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">

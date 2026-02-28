@@ -150,9 +150,7 @@ const MoodTrackerPage = () => {
       <div className="flex items-start gap-3 mb-8">
         <img src={feeloraLogo} alt="Feelora" className="w-10 h-10" />
         <div className="bg-tertiary rounded-2xl rounded-bl-sm px-4 py-3 max-w-md">
-          <p className="text-foreground">
-            {t('patient.moodTracker.greeting')}
-          </p>
+          <p className="text-foreground">{t('patient.moodTracker.greeting')}</p>
         </div>
       </div>
 

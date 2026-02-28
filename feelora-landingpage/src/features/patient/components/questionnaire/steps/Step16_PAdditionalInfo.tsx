@@ -19,15 +19,11 @@ const Step16_PAdditionalInfo = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.additionalInfo.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.p.additionalInfo.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.p.additionalInfo.subtitle')}</p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">
-        <p className="text-foreground/80 mb-4">
-          {t('q.p.additionalInfo.description')}
-        </p>
+        <p className="text-foreground/80 mb-4">{t('q.p.additionalInfo.description')}</p>
         <Textarea
           placeholder={t('q.p.additionalInfo.placeholder')}
           value={data}

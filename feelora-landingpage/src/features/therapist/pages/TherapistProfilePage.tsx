@@ -28,7 +28,7 @@ const TherapistProfilePage = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [t]);
 
   if (isLoading) {
     return (
@@ -39,7 +39,11 @@ const TherapistProfilePage = () => {
   }
 
   if (error || !profile) {
-    return <div className="text-center text-red-500 mt-10">{error || t('app.therapist.profile.noProfile')}</div>;
+    return (
+      <div className="text-center text-red-500 mt-10">
+        {error || t('app.therapist.profile.noProfile')}
+      </div>
+    );
   }
 
   // Calculate age from Unix timestamp (BirthDate float)
@@ -50,7 +54,9 @@ const TherapistProfilePage = () => {
 
   return (
     <div className="max-w-4xl animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.profile.title')}</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">
+        {t('app.therapist.profile.title')}
+      </h1>
 
       <div className="feelora-card">
         <div className="flex gap-8 mb-6">
@@ -64,10 +70,20 @@ const TherapistProfilePage = () => {
               Dr. {profile.Name} {profile.Surname}
             </h2>
             <div className="space-y-0.5 text-foreground">
-              <p>{t('app.therapist.profile.age')} {age}</p>
-              <p>{t('app.therapist.profile.city')} {profile.City}</p>
-              {profile.Address && <p>{t('app.therapist.profile.address')} {profile.Address}</p>}
-              <p>{t('app.therapist.profile.role')} {t('app.therapist.profile.therapist')}</p>
+              <p>
+                {t('app.therapist.profile.age')} {age}
+              </p>
+              <p>
+                {t('app.therapist.profile.city')} {profile.City}
+              </p>
+              {profile.Address && (
+                <p>
+                  {t('app.therapist.profile.address')} {profile.Address}
+                </p>
+              )}
+              <p>
+                {t('app.therapist.profile.role')} {t('app.therapist.profile.therapist')}
+              </p>
             </div>
           </div>
         </div>

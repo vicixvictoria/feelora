@@ -12,10 +12,22 @@ interface TherapyDurationStepProps {
 }
 // List of therapy duration options - add more if needed
 const getDurationOptions = (t: (key: string) => string) => [
-  { id: 'kurzzeit', label: t('q.p.therapyDuration.options.shortTerm.label'), description: t('q.p.therapyDuration.options.shortTerm.description') },
-  { id: 'langzeit', label: t('q.p.therapyDuration.options.longTerm.label'), description: t('q.p.therapyDuration.options.longTerm.description') },
+  {
+    id: 'kurzzeit',
+    label: t('q.p.therapyDuration.options.shortTerm.label'),
+    description: t('q.p.therapyDuration.options.shortTerm.description'),
+  },
+  {
+    id: 'langzeit',
+    label: t('q.p.therapyDuration.options.longTerm.label'),
+    description: t('q.p.therapyDuration.options.longTerm.description'),
+  },
   { id: 'unsicher', label: t('q.p.therapyDuration.options.unsure.label'), description: '' },
-  { id: 'keine-praeferenz', label: t('q.p.therapyDuration.options.noPreference.label'), description: '' },
+  {
+    id: 'keine-praeferenz',
+    label: t('q.p.therapyDuration.options.noPreference.label'),
+    description: '',
+  },
 ];
 
 // 1. Define validation schema for a single string

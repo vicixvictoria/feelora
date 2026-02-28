@@ -54,9 +54,7 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: Availabili
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.availability.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.availability.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.availability.subtitle')}</p>
         {/* Dynamic error message in header */}
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}

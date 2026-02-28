@@ -191,7 +191,7 @@ function LoginPage({ initialState = 'signIn' }: LoginPageProps) {
             components={components}
           >
             {({ user, signOut }) => {
-              if (!user) return null;
+              if (!user) return <></>;
 
               return (
                 <div className="bg-white rounded-lg shadow-lg p-8">

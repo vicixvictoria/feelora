@@ -75,14 +75,14 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.qualifications.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.t.qualifications.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.t.qualifications.subtitle')}</p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.qualifications.cardTitle')}</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">
+          {t('q.t.qualifications.cardTitle')}
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
@@ -172,7 +172,8 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
         <div className="space-y-2 mb-6">
           <Label htmlFor="qualifications" className="text-foreground">
-            {t('q.t.qualifications.qualifications')} <span className="text-muted-foreground">({t('q.common.optional')})</span>
+            {t('q.t.qualifications.qualifications')}{' '}
+            <span className="text-muted-foreground">({t('q.common.optional')})</span>
           </Label>
           <Textarea
             id="qualifications"
@@ -206,7 +207,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                 <div className="flex flex-col items-center gap-1 text-foreground/80">
                   <Check className="w-6 h-6 text-green-500" />
                   <span className="text-sm">{data.idFileName}</span>
-                  <span className="text-xs text-muted-foreground">{t('q.t.qualifications.clickToChange')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('q.t.qualifications.clickToChange')}
+                  </span>
                 </div>
               ) : (
                 <div
@@ -233,9 +236,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
             </label>
           </div>
           {errors.idFileName && (
-            <p className="text-xs text-destructive">
-              {t('q.t.qualifications.uploadRequired')}
-            </p>
+            <p className="text-xs text-destructive">{t('q.t.qualifications.uploadRequired')}</p>
           )}
         </div>
       </div>

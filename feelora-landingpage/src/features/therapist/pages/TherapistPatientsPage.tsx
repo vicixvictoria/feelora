@@ -65,7 +65,9 @@ const PatientsPage = () => {
       </div>
 
       {/* Existing Patients */}
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.patients.title')}</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">
+        {t('app.therapist.patients.title')}
+      </h1>
 
       <div className="feelora-card mb-10">
         <div className="grid grid-cols-2 gap-4">
@@ -88,7 +90,9 @@ const PatientsPage = () => {
 
       {/* New Patients */}
       <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-2xl font-bold text-foreground">{t('app.therapist.patients.newPatients')}</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          {t('app.therapist.patients.newPatients')}
+        </h2>
         <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
           new
         </span>
@@ -117,14 +121,24 @@ const PatientsPage = () => {
                 />
                 <div className="flex flex-col justify-center">
                   <p className="font-bold text-primary text-lg">{patient.name}</p>
-                  <p className="text-sm text-foreground">{t('app.therapist.patients.age')} {patient.age}</p>
-                  <p className="text-sm text-foreground">{t('app.therapist.patients.city')} {patient.city}</p>
-                  <p className="text-sm text-foreground">{t('app.therapist.patients.role')} {patient.role}</p>
-                  <p className="text-sm text-foreground">{t('app.therapist.patients.therapy')} {patient.therapy}</p>
+                  <p className="text-sm text-foreground">
+                    {t('app.therapist.patients.age')} {patient.age}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {t('app.therapist.patients.city')} {patient.city}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {t('app.therapist.patients.role')} {patient.role}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {t('app.therapist.patients.therapy')} {patient.therapy}
+                  </p>
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground mb-4">{t('app.therapist.patients.request')} {patient.request}</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t('app.therapist.patients.request')} {patient.request}
+              </p>
 
               <div className="flex gap-3">
                 <button className="feelora-btn-primary text-sm">

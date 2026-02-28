@@ -12,7 +12,10 @@ const Dashboard = () => {
       icon: Calendar,
       iconColor: 'text-purple',
       title: t('patient.dashboard.calendar'),
-      lines: [t('patient.dashboard.upcomingAppointments'), t('patient.dashboard.appointmentRequest')],
+      lines: [
+        t('patient.dashboard.upcomingAppointments'),
+        t('patient.dashboard.appointmentRequest'),
+      ],
       path: '/calendar',
     },
     {
@@ -95,7 +98,9 @@ const Dashboard = () => {
       </div>
 
       {/* Mood Tracker Diary */}
-      <h2 className="text-2xl font-bold text-foreground mb-6">{t('patient.dashboard.moodDiary')}</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">
+        {t('patient.dashboard.moodDiary')}
+      </h2>
       <div className="flex flex-col gap-4">
         {moodDiary.map((entry, index) => (
           <div key={index} className="feelora-card flex items-center gap-6">
@@ -111,14 +116,20 @@ const Dashboard = () => {
               </div>
               <div className="text-center">
                 <span className="text-2xl">{entry.outdoor}</span>
-                <p className="text-xs text-muted-foreground mt-1">{t('patient.dashboard.outdoor')}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('patient.dashboard.outdoor')}
+                </p>
               </div>
               <div className="text-center">
                 <span className="text-2xl">{entry.physical}</span>
-                <p className="text-xs text-muted-foreground mt-1">{t('patient.dashboard.physical')}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('patient.dashboard.physical')}
+                </p>
               </div>
             </div>
-            <button className="text-primary font-medium hover:underline">{t('patient.dashboard.details')}</button>
+            <button className="text-primary font-medium hover:underline">
+              {t('patient.dashboard.details')}
+            </button>
           </div>
         ))}
       </div>

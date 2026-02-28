@@ -68,14 +68,14 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.personal.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.t.personal.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.t.personal.subtitle')}</p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.personal.cardTitle')}</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">
+          {t('q.t.personal.cardTitle')}
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
@@ -127,9 +127,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
 
                 {/* Error message for mandatory fields */}
                 {errors[field] && !isOptional && (
-                  <p className="text-xs text-destructive font-medium">
-                    {t('q.common.required')}
-                  </p>
+                  <p className="text-xs text-destructive font-medium">{t('q.common.required')}</p>
                 )}
               </div>
             );

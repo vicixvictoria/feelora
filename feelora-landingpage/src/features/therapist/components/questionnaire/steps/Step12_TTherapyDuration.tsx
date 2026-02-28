@@ -19,8 +19,16 @@ const Step12_TTherapyDuration = ({
   const { t } = useTranslation();
 
   const durationOptions = [
-    { id: 'kurzzeit', label: t('q.t.therapyDuration.shortTerm'), description: t('q.t.therapyDuration.shortTermDesc') },
-    { id: 'langzeit', label: t('q.t.therapyDuration.longTerm'), description: t('q.t.therapyDuration.longTermDesc') },
+    {
+      id: 'kurzzeit',
+      label: t('q.t.therapyDuration.shortTerm'),
+      description: t('q.t.therapyDuration.shortTermDesc'),
+    },
+    {
+      id: 'langzeit',
+      label: t('q.t.therapyDuration.longTerm'),
+      description: t('q.t.therapyDuration.longTermDesc'),
+    },
     { id: 'unsicher', label: t('q.t.therapyDuration.unsure'), description: '' },
     { id: 'keine-praeferenz', label: t('q.t.therapyDuration.noPreference'), description: '' },
   ];
@@ -30,9 +38,7 @@ const Step12_TTherapyDuration = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.therapyDuration.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.t.therapyDuration.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.t.therapyDuration.subtitle')}</p>
       </div>
       {/* Form Card */}
       <div className="feelora-card">

@@ -52,7 +52,9 @@ const TherapistChat = () => {
     <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
       {/* Chat List */}
       <div className="w-72 bg-card rounded-l-xl border border-border border-r-0 p-4">
-        <h2 className="text-2xl font-semibold text-primary mb-6">{t('app.therapist.chat.title')}</h2>
+        <h2 className="text-2xl font-semibold text-primary mb-6">
+          {t('app.therapist.chat.title')}
+        </h2>
         <div className="space-y-2">
           {chatList.map((chat) => (
             <button

@@ -33,7 +33,8 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
       if (explicitRedirect) {
         navigate(explicitRedirect, { replace: true });
       } else {
-        const isTherapistUser = user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
+        const isTherapistUser =
+          user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
         navigate(isTherapistUser ? '/therapist' : '/patient', { replace: true });
       }
     }
@@ -42,7 +43,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
   // Handle login button click
   const handleLogin = () => {
     clearError();
-    login(userType, redirectPath);
+    login(userType, explicitRedirect || '/');
   };
 
   // Handle redirect to other login type
@@ -60,9 +61,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">
-            {t('login.loading')}
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-700">{t('login.loading')}</h2>
         </div>
       </div>
     );
@@ -94,9 +93,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  {t('login.error.title')}
-                </h3>
+                <h3 className="text-sm font-medium text-red-800">{t('login.error.title')}</h3>
                 <p className="mt-1 text-sm text-red-700">{displayError}</p>
               </div>
               <button onClick={clearError} className="ml-auto text-red-400 hover:text-red-600">
@@ -127,9 +124,7 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
-                {t('login.signIn')}
-              </span>
+              <span className="px-2 bg-white text-gray-500">{t('login.signIn')}</span>
             </div>
           </div>
 
@@ -138,14 +133,10 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             onClick={handleLogin}
             className="w-full flex items-center justify-center gap-3 bg-primary text-white hover:bg-primary/90 py-6"
           >
-            <span className="font-medium">
-              {t('login.continueSignIn')}
-            </span>
+            <span className="font-medium">{t('login.continueSignIn')}</span>
           </Button>
 
-          <p className="mt-4 text-center text-xs text-gray-500">
-            {t('login.signInHint')}
-          </p>
+          <p className="mt-4 text-center text-xs text-gray-500">{t('login.signInHint')}</p>
 
           {/* Terms */}
           <p className="mt-6 text-center text-xs text-gray-500">

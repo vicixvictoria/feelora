@@ -45,7 +45,7 @@ const ProfilePage = () => {
     };
 
     fetchProfileData();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
@@ -63,7 +63,9 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('patient.profile.yourProfile')}</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">
+        {t('patient.profile.yourProfile')}
+      </h1>
 
       {/* User Profile Card */}
       <div className="feelora-card mb-10">
@@ -78,11 +80,20 @@ const ProfilePage = () => {
               {patient.Name} {patient.Surname}
             </h2>
             <div className="space-y-1 text-foreground">
-              <p>{t('patient.profile.age')}: {calculateAge(patient.BirthDate)}</p>
-              <p>{t('patient.profile.city')}: {patient.City || t('patient.profile.notSpecified')}</p>
-              <p className="mt-3">{t('patient.profile.role')}: {t('patient.profile.rolePatient')}</p>
+              <p>
+                {t('patient.profile.age')}: {calculateAge(patient.BirthDate)}
+              </p>
+              <p>
+                {t('patient.profile.city')}: {patient.City || t('patient.profile.notSpecified')}
+              </p>
+              <p className="mt-3">
+                {t('patient.profile.role')}: {t('patient.profile.rolePatient')}
+              </p>
               <div className="flex items-center gap-4 mt-4">
-                <p>{t('patient.profile.therapistMatch')}: {therapist ? therapist.Name : t('patient.profile.noMatch')}</p>
+                <p>
+                  {t('patient.profile.therapistMatch')}:{' '}
+                  {therapist ? therapist.Name : t('patient.profile.noMatch')}
+                </p>
               </div>
             </div>
           </div>
@@ -96,7 +107,9 @@ const ProfilePage = () => {
       </div>
 
       {/* Therapist Section */}
-      <h2 className="text-xl font-bold text-foreground mb-4">{t('patient.profile.assignedTherapist')}</h2>
+      <h2 className="text-xl font-bold text-foreground mb-4">
+        {t('patient.profile.assignedTherapist')}
+      </h2>
 
       {therapist ? (
         <div className="feelora-card">
@@ -111,18 +124,28 @@ const ProfilePage = () => {
                 {therapist.Name} {therapist.Surname}
               </h2>
               <div className="space-y-1 text-foreground">
-                <p>{t('patient.profile.age')}: {calculateAge(therapist.BirthDate)}</p>
-                <p>{t('patient.profile.city')}: {therapist.City || t('patient.profile.notSpecified')}</p>
-                <p className="mt-3">{t('patient.profile.role')}: {t('patient.profile.roleTherapist')}</p>
+                <p>
+                  {t('patient.profile.age')}: {calculateAge(therapist.BirthDate)}
+                </p>
+                <p>
+                  {t('patient.profile.city')}: {therapist.City || t('patient.profile.notSpecified')}
+                </p>
+                <p className="mt-3">
+                  {t('patient.profile.role')}: {t('patient.profile.roleTherapist')}
+                </p>
                 <p>
                   {t('patient.profile.specialization')}:{' '}
                   {therapist?.Specialties?.join(', ') || t('patient.profile.noSpecialization')}
                 </p>
                 <p className="mt-1">
-                  {t('patient.profile.availability')}: {therapist.Availability?.join(', ') || t('patient.profile.notSpecified')}
+                  {t('patient.profile.availability')}:{' '}
+                  {therapist.Availability?.join(', ') || t('patient.profile.notSpecified')}
                 </p>
                 {therapist.Address && (
-                  <p className="mt-3">{t('patient.profile.practice')}: {therapist.Address || t('patient.profile.noPractice')}</p>
+                  <p className="mt-3">
+                    {t('patient.profile.practice')}:{' '}
+                    {therapist.Address || t('patient.profile.noPractice')}
+                  </p>
                 )}
               </div>
             </div>

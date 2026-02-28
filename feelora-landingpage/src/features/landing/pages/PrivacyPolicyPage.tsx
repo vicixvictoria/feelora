@@ -97,7 +97,9 @@ function PrivacySection() {
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s1.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.privacy.s1.title')}
+          </h3>
           <p>{t('privacy.privacy.s1.text')}</p>
         </div>
 
@@ -132,7 +134,9 @@ function PrivacySection() {
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s5.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.privacy.s5.title')}
+          </h3>
           <p>{t('privacy.privacy.s5.text')}</p>
         </div>
 
@@ -151,17 +155,23 @@ function PrivacySection() {
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s8.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.privacy.s8.title')}
+          </h3>
           <p>{t('privacy.privacy.s8.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s9.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.privacy.s9.title')}
+          </h3>
           <p>{t('privacy.privacy.s9.text')}</p>
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.privacy.s10.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.privacy.s10.title')}
+          </h3>
           <p>{t('privacy.privacy.s10.text')}</p>
         </div>
       </div>
@@ -223,7 +233,9 @@ function TermsSection() {
         </div>
 
         <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">{t('privacy.terms.s7.title')}</h3>
+          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+            {t('privacy.terms.s7.title')}
+          </h3>
           <p>{t('privacy.terms.s7.text')}</p>
         </div>
 
@@ -263,13 +275,16 @@ function CookiesSection() {
           <p className="mb-3">{t('privacy.cookies.s2.text')}</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <strong>{t('privacy.cookies.s2.necessary')}</strong> {t('privacy.cookies.s2.necessaryDesc')}
+              <strong>{t('privacy.cookies.s2.necessary')}</strong>{' '}
+              {t('privacy.cookies.s2.necessaryDesc')}
             </li>
             <li>
-              <strong>{t('privacy.cookies.s2.analytics')}</strong> {t('privacy.cookies.s2.analyticsDesc')}
+              <strong>{t('privacy.cookies.s2.analytics')}</strong>{' '}
+              {t('privacy.cookies.s2.analyticsDesc')}
             </li>
             <li>
-              <strong>{t('privacy.cookies.s2.marketing')}</strong> {t('privacy.cookies.s2.marketingDesc')}
+              <strong>{t('privacy.cookies.s2.marketing')}</strong>{' '}
+              {t('privacy.cookies.s2.marketingDesc')}
             </li>
           </ul>
         </div>

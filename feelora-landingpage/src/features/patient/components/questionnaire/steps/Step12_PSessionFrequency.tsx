@@ -17,8 +17,16 @@ const NO_PREFERENCE = 'keine-praeferenz';
 
 // List of session frequency options - add more if needed
 const getFrequencyOptions = (t: (key: string) => string) => [
-  { id: 'flexibel', label: t('q.p.sessionFrequency.options.flexible.label'), description: t('q.p.sessionFrequency.options.flexible.description') },
-  { id: 'woechentlich', label: t('q.p.sessionFrequency.options.weekly.label'), description: t('q.p.sessionFrequency.options.weekly.description') },
+  {
+    id: 'flexibel',
+    label: t('q.p.sessionFrequency.options.flexible.label'),
+    description: t('q.p.sessionFrequency.options.flexible.description'),
+  },
+  {
+    id: 'woechentlich',
+    label: t('q.p.sessionFrequency.options.weekly.label'),
+    description: t('q.p.sessionFrequency.options.weekly.description'),
+  },
   {
     id: 'zweiwoechentlich',
     label: t('q.p.sessionFrequency.options.biweekly.label'),
@@ -83,13 +91,13 @@ const Step12_PSessionFrequency = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.sessionFrequency.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.sessionFrequency.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.sessionFrequency.subtitle')}</p>
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection ? t('q.p.sessionFrequency.error') : t('q.p.sessionFrequency.multiSelect')}
+          {errors.selection
+            ? t('q.p.sessionFrequency.error')
+            : t('q.p.sessionFrequency.multiSelect')}
         </p>
       </div>
 

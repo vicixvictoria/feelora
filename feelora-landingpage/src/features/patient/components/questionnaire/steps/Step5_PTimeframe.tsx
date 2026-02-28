@@ -58,9 +58,7 @@ const Step5_PTimeframe = ({ onNext, onBack, data, onDataChange }: ExperienceStep
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.timeframe.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.p.timeframe.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.p.timeframe.subtitle')}</p>
       </div>
 
       <div

@@ -101,9 +101,7 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.therapySchool.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.therapySchool.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.therapySchool.subtitle')}</p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
@@ -160,7 +158,9 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
                 {errors.other && (
-                  <span className="text-xs text-destructive mt-1 ml-1">{t('q.p.therapySchool.detailsError')}</span>
+                  <span className="text-xs text-destructive mt-1 ml-1">
+                    {t('q.p.therapySchool.detailsError')}
+                  </span>
                 )}
               </div>
             )}

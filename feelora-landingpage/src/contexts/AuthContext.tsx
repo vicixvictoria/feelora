@@ -92,7 +92,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       error: null,
       login: () => {},
-      logout: async () => { window.location.reload(); },
+      logout: async () => {
+        window.location.reload();
+      },
       refreshToken: async () => true,
       clearError: () => {},
     };

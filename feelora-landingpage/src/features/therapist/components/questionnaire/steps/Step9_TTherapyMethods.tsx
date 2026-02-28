@@ -37,16 +37,12 @@ const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMe
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.therapyMethods.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.t.therapyMethods.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.t.therapyMethods.subtitle')}</p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
-        <p className="text-foreground/80 mb-4">
-          {t('q.t.therapyMethods.hint')}
-        </p>
+        <p className="text-foreground/80 mb-4">{t('q.t.therapyMethods.hint')}</p>
 
         {/* Validation styling on the Textarea */}
         <div className="space-y-2">
@@ -59,7 +55,9 @@ const Step9_TTherapyMethods = ({ onNext, onBack, data, onDataChange }: TherapyMe
             }`}
           />
           {errors.methods && (
-            <p className="text-xs text-destructive font-medium">{t('q.t.therapyMethods.required')}</p>
+            <p className="text-xs text-destructive font-medium">
+              {t('q.t.therapyMethods.required')}
+            </p>
           )}
         </div>
       </div>

@@ -74,7 +74,9 @@ const HomeworkPage = () => {
       </div>
 
       {/* Completed Tasks */}
-      <h2 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.completedTasks')}</h2>
+      <h2 className="text-2xl font-bold text-purple mb-6">
+        {t('patient.homework.completedTasks')}
+      </h2>
       <div className="space-y-4">
         {completedTasks.map((task) => (
           <div key={task.id} className="feelora-card flex items-center gap-4">

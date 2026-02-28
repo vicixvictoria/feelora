@@ -61,9 +61,7 @@ const TherapistMoodTrackerPage = () => {
         <h1 className="text-2xl font-bold text-foreground">
           {t('app.therapist.moodTracker.title')}
         </h1>
-        <p className="text-primary italic mt-1">
-          {t('app.therapist.moodTracker.subtitle')}
-        </p>
+        <p className="text-primary italic mt-1">{t('app.therapist.moodTracker.subtitle')}</p>
       </div>
 
       {/* Patient List with Next Session column */}
@@ -84,15 +82,21 @@ const TherapistMoodTrackerPage = () => {
               <div className="flex items-center gap-8 flex-1">
                 <div className="text-center">
                   <span className="text-2xl">{patient.mood}</span>
-                  <p className="text-xs text-muted-foreground mt-1">{t('app.therapist.moodTracker.feeling')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('app.therapist.moodTracker.feeling')}
+                  </p>
                 </div>
                 <div className="text-center">
                   <span className="text-2xl">{patient.outdoor}</span>
-                  <p className="text-xs text-muted-foreground mt-1">{t('app.therapist.moodTracker.outdoor')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('app.therapist.moodTracker.outdoor')}
+                  </p>
                 </div>
                 <div className="text-center">
                   <span className="text-2xl">{patient.physical}</span>
-                  <p className="text-xs text-muted-foreground mt-1">{t('app.therapist.moodTracker.physical')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('app.therapist.moodTracker.physical')}
+                  </p>
                 </div>
               </div>
               <button className="text-primary font-medium hover:underline flex items-center gap-1">

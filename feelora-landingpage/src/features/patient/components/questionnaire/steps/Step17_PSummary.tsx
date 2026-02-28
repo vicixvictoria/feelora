@@ -54,7 +54,8 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
         <>
           <p className="text-foreground/80">
             {t('q.p.summary.phone')}: {data.contactInfo?.phone || '—'}
-            {' · '}{t('q.p.summary.email')}: {data.contactInfo?.email || '—'}
+            {' · '}
+            {t('q.p.summary.email')}: {data.contactInfo?.email || '—'}
           </p>
           <p className="text-foreground/80">
             {data.contactInfo?.address || '—'}, {data.contactInfo?.postalCode || ''}{' '}
@@ -158,9 +159,7 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.summary.title')}</h1>
-        <p className="text-muted-foreground">
-          {t('q.p.summary.subtitle')}
-        </p>
+        <p className="text-muted-foreground">{t('q.p.summary.subtitle')}</p>
       </div>
       {/* Summary Sections */}
       <div className="space-y-4">

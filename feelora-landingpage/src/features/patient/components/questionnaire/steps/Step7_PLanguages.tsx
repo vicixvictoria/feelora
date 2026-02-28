@@ -124,15 +124,11 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.languages.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.p.languages.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.p.languages.subtitle')}</p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected
-            ? t('q.p.languages.error')
-            : t('q.p.languages.multiSelect')}
+          {errors.selected ? t('q.p.languages.error') : t('q.p.languages.multiSelect')}
         </p>
       </div>
 
@@ -164,7 +160,9 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 checked={data.selected.includes('Andere')}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground font-medium">{t('q.p.languages.otherLanguages')}</span>
+              <span className="text-foreground font-medium">
+                {t('q.p.languages.otherLanguages')}
+              </span>
             </label>
 
             {/* 4. Scrollbare Checkbox-Liste für weitere Sprachen */}
@@ -192,9 +190,7 @@ const Step7_PLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 </div>
 
                 {errors.other && (
-                  <p className="text-xs text-destructive mt-3">
-                    {t('q.p.languages.otherError')}
-                  </p>
+                  <p className="text-xs text-destructive mt-3">{t('q.p.languages.otherError')}</p>
                 )}
               </div>
             )}

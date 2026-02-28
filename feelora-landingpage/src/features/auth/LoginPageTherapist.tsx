@@ -79,8 +79,8 @@ function TherapistLoginPage() {
           >
             {/* ... rest of your Authenticator child function ... */}
             {({ user }) => {
-              if (!user) return null;
-              // ... user signed in state ...
+              if (!user) return <></>;
+              return <></>;
             }}
           </Authenticator>
         </React.StrictMode>

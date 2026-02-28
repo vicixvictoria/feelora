@@ -187,12 +187,16 @@ const CalendarPage = () => {
 
         {/* Right Column - Appointments & Emergency */}
         <div className="w-96">
-          <h2 className="text-2xl font-bold text-foreground mb-6">{t('patient.calendar.addAppointments')}</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">
+            {t('patient.calendar.addAppointments')}
+          </h2>
 
           {/* Appointment requests */}
           <div className="feelora-card mb-4">
             <div className="flex items-center justify-between py-2">
-              <span className="font-medium text-foreground">{t('patient.calendar.therapySessionWithDr')}</span>
+              <span className="font-medium text-foreground">
+                {t('patient.calendar.therapySessionWithDr')}
+              </span>
               <button className="feelora-btn-outline text-sm">
                 {t('patient.calendar.request')}
                 <Plus className="w-4 h-4" />
@@ -202,7 +206,9 @@ const CalendarPage = () => {
 
           <div className="feelora-card mb-8">
             <div className="flex items-center justify-between py-2">
-              <span className="font-medium text-foreground">{t('patient.calendar.manageOther')}</span>
+              <span className="font-medium text-foreground">
+                {t('patient.calendar.manageOther')}
+              </span>
               <button className="feelora-btn-outline text-sm text-primary">
                 {t('patient.calendar.new')}
                 <Plus className="w-4 h-4" />
@@ -211,7 +217,9 @@ const CalendarPage = () => {
           </div>
 
           {/* Emergency Numbers */}
-          <h2 className="text-2xl font-bold text-foreground mb-4">{t('patient.calendar.emergencyNumbers')}</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            {t('patient.calendar.emergencyNumbers')}
+          </h2>
           <Accordion type="single" collapsible className="space-y-2">
             {emergencyNumbers.map((item, index) => (
               <AccordionItem

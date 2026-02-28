@@ -120,15 +120,11 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.languages.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.languages.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.t.languages.subtitle')}</p>
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected
-            ? t('q.t.languages.selectError')
-            : t('q.common.multiSelect')}
+          {errors.selected ? t('q.t.languages.selectError') : t('q.common.multiSelect')}
         </p>
       </div>
 
@@ -187,9 +183,7 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
                 </div>
 
                 {errors.other && (
-                  <p className="text-xs text-destructive mt-3">
-                    {t('q.t.languages.otherError')}
-                  </p>
+                  <p className="text-xs text-destructive mt-3">{t('q.t.languages.otherError')}</p>
                 )}
               </div>
             )}

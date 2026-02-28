@@ -21,8 +21,16 @@ const Step13_TSessionFrequency = ({
   const safeData = data || [];
 
   const frequencyOptions = [
-    { id: 'flexibel', label: t('q.t.sessionFrequency.flexible'), description: t('q.t.sessionFrequency.flexibleDesc') },
-    { id: 'woechentlich', label: t('q.t.sessionFrequency.weekly'), description: t('q.t.sessionFrequency.weeklyDesc') },
+    {
+      id: 'flexibel',
+      label: t('q.t.sessionFrequency.flexible'),
+      description: t('q.t.sessionFrequency.flexibleDesc'),
+    },
+    {
+      id: 'woechentlich',
+      label: t('q.t.sessionFrequency.weekly'),
+      description: t('q.t.sessionFrequency.weeklyDesc'),
+    },
     {
       id: 'zweiwoechentlich',
       label: t('q.t.sessionFrequency.biweekly'),
@@ -43,9 +51,7 @@ const Step13_TSessionFrequency = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.sessionFrequency.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.sessionFrequency.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.t.sessionFrequency.subtitle')}</p>
         <p className="text-sm text-muted-foreground">{t('q.t.sessionFrequency.multiSelect')}</p>
       </div>
       {/* Form Card */}

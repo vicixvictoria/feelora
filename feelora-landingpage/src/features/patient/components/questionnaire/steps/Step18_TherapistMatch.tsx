@@ -62,14 +62,17 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
                 </p>
               </div>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">{t('q.p.therapistMatch.city')}:</span> {therapist.City}
+                <span className="text-muted-foreground">{t('q.p.therapistMatch.city')}:</span>{' '}
+                {therapist.City}
               </p>
               <p className="text-foreground text-sm">
                 <span className="text-muted-foreground">{t('q.p.therapistMatch.languages')}:</span>{' '}
                 {therapist.Languages?.join(', ') || t('q.p.therapistMatch.noInfo')}
               </p>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">{t('q.p.therapistMatch.specialties')}:</span>{' '}
+                <span className="text-muted-foreground">
+                  {t('q.p.therapistMatch.specialties')}:
+                </span>{' '}
                 {therapist.Specialties?.join(', ') || t('q.p.therapistMatch.noInfo')}
               </p>
 
@@ -98,7 +101,9 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold text-purple mb-4">
-          {showAlternativeMatches ? t('q.p.therapistMatch.titleAlternatives') : t('q.p.therapistMatch.titleBest')}
+          {showAlternativeMatches
+            ? t('q.p.therapistMatch.titleAlternatives')
+            : t('q.p.therapistMatch.titleBest')}
         </h1>
         <p className="text-foreground/80 leading-relaxed mb-4">
           {showAlternativeMatches
@@ -134,7 +139,8 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
       <div className="flex justify-start mt-8">
         <Button variant="outline" onClick={onBack} className="feelora-btn-outline">
           <ChevronLeft className="w-4 h-4" />
-          {t('q.p.therapistMatch.back')} {showAlternativeMatches && t('q.p.therapistMatch.toBestMatch')}
+          {t('q.p.therapistMatch.back')}{' '}
+          {showAlternativeMatches && t('q.p.therapistMatch.toBestMatch')}
         </Button>
       </div>
     </div>

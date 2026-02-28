@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
 import { TherapistQuestionnaireData } from '../types/questionnaireT';
-import { Title } from '@radix-ui/react-toast';
 
 // --- GraphQL Definitions --- //
 

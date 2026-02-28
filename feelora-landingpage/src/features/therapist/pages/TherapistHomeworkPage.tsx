@@ -75,7 +75,9 @@ const TherapistHomeworkPage = () => {
         </p>
       </div>
       {/* New Tasks Section */}
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.homework.createTasks')}</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">
+        {t('app.therapist.homework.createTasks')}
+      </h1>
 
       <div className="flex gap-6 mb-12">
         {/* Patient List */}
@@ -123,7 +125,9 @@ const TherapistHomeworkPage = () => {
       </div>
 
       {/* Task Status Section */}
-      <h2 className="text-2xl font-bold text-foreground mb-6">{t('app.therapist.homework.taskStatus')}</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">
+        {t('app.therapist.homework.taskStatus')}
+      </h2>
       <div className="flex flex-col gap-4">
         {taskStatuses.map((task, index) => (
           <div key={index} className="feelora-card flex items-center gap-4">
@@ -133,7 +137,9 @@ const TherapistHomeworkPage = () => {
               className="w-12 h-12 rounded-full object-cover"
             />
             <p className="font-semibold text-foreground min-w-[140px]">{task.patientName}</p>
-            <p className="text-sm text-muted-foreground italic flex-1">{t('app.therapist.homework.taskFrom', { date: task.date })}</p>
+            <p className="text-sm text-muted-foreground italic flex-1">
+              {t('app.therapist.homework.taskFrom', { date: task.date })}
+            </p>
             <span
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                 task.status === 'Erledigt'
@@ -146,7 +152,9 @@ const TherapistHomeworkPage = () => {
               ) : (
                 <Clock className="w-3.5 h-3.5" />
               )}
-              {task.status === 'Erledigt' ? t('app.therapist.homework.completed') : t('app.therapist.homework.inProgress')}
+              {task.status === 'Erledigt'
+                ? t('app.therapist.homework.completed')
+                : t('app.therapist.homework.inProgress')}
             </span>
             <button className="feelora-btn-primary">
               {t('app.therapist.homework.details')}

@@ -35,9 +35,7 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.availability.title')}</h1>
-        <p className="text-muted-foreground mb-2">
-          {t('q.t.availability.subtitle')}
-        </p>
+        <p className="text-muted-foreground mb-2">{t('q.t.availability.subtitle')}</p>
         <p className="text-sm text-muted-foreground">{t('q.t.availability.multiSelect')}</p>
       </div>
       {/* Form Card */}

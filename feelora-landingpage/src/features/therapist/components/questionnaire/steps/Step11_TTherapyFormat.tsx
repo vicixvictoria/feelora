@@ -20,10 +20,26 @@ const Step11_TTherapyFormat = ({
   const safeData = data || [];
 
   const formatOptions = [
-    { id: 'einzel', label: t('q.t.therapyFormat.individual'), description: t('q.t.therapyFormat.individualDesc') },
-    { id: 'paar', label: t('q.t.therapyFormat.couple'), description: t('q.t.therapyFormat.coupleDesc') },
-    { id: 'gruppe', label: t('q.t.therapyFormat.group'), description: t('q.t.therapyFormat.groupDesc') },
-    { id: 'familien', label: t('q.t.therapyFormat.family'), description: t('q.t.therapyFormat.familyDesc') },
+    {
+      id: 'einzel',
+      label: t('q.t.therapyFormat.individual'),
+      description: t('q.t.therapyFormat.individualDesc'),
+    },
+    {
+      id: 'paar',
+      label: t('q.t.therapyFormat.couple'),
+      description: t('q.t.therapyFormat.coupleDesc'),
+    },
+    {
+      id: 'gruppe',
+      label: t('q.t.therapyFormat.group'),
+      description: t('q.t.therapyFormat.groupDesc'),
+    },
+    {
+      id: 'familien',
+      label: t('q.t.therapyFormat.family'),
+      description: t('q.t.therapyFormat.familyDesc'),
+    },
     { id: 'keine-praeferenz', label: t('q.t.therapyFormat.noPreference'), description: '' },
   ];
 

@@ -16,10 +16,26 @@ const NO_PREFERENCE = 'keine-praeferenz';
 
 // List of therapy format options - add more if needed
 const getFormatOptions = (t: (key: string) => string) => [
-  { id: 'einzel', label: t('q.p.therapyFormat.options.individual.label'), description: t('q.p.therapyFormat.options.individual.description') },
-  { id: 'paar', label: t('q.p.therapyFormat.options.couple.label'), description: t('q.p.therapyFormat.options.couple.description') },
-  { id: 'gruppe', label: t('q.p.therapyFormat.options.group.label'), description: t('q.p.therapyFormat.options.group.description') },
-  { id: 'familien', label: t('q.p.therapyFormat.options.family.label'), description: t('q.p.therapyFormat.options.family.description') },
+  {
+    id: 'einzel',
+    label: t('q.p.therapyFormat.options.individual.label'),
+    description: t('q.p.therapyFormat.options.individual.description'),
+  },
+  {
+    id: 'paar',
+    label: t('q.p.therapyFormat.options.couple.label'),
+    description: t('q.p.therapyFormat.options.couple.description'),
+  },
+  {
+    id: 'gruppe',
+    label: t('q.p.therapyFormat.options.group.label'),
+    description: t('q.p.therapyFormat.options.group.description'),
+  },
+  {
+    id: 'familien',
+    label: t('q.p.therapyFormat.options.family.label'),
+    description: t('q.p.therapyFormat.options.family.description'),
+  },
 ];
 
 // Define validation schema expecting an object with a "selection" array
