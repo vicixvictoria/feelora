@@ -68,7 +68,7 @@ const Dashboard = () => {
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       {/* Notification Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         {notificationCards.map((card, index) => (
           <button
             key={index}
@@ -103,33 +103,37 @@ const Dashboard = () => {
       </h2>
       <div className="flex flex-col gap-4">
         {moodDiary.map((entry, index) => (
-          <div key={index} className="feelora-card flex items-center gap-6">
-            <img src={avatar} alt="User" className="w-14 h-14 rounded-full object-cover" />
-            <div className="flex-1">
-              <p className="font-medium text-primary">{entry.date}</p>
-              <p className="text-sm text-muted-foreground italic">{entry.status}</p>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <span className="text-2xl">{entry.mood}</span>
-                <p className="text-xs text-muted-foreground mt-1">{t('patient.dashboard.mood')}</p>
-              </div>
-              <div className="text-center">
-                <span className="text-2xl">{entry.outdoor}</span>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t('patient.dashboard.outdoor')}
-                </p>
-              </div>
-              <div className="text-center">
-                <span className="text-2xl">{entry.physical}</span>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t('patient.dashboard.physical')}
-                </p>
+          <div key={index} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 flex-1">
+              <img src={avatar} alt="User" className="w-14 h-14 rounded-full object-cover" />
+              <div className="flex-1">
+                <p className="font-medium text-primary">{entry.date}</p>
+                <p className="text-sm text-muted-foreground italic">{entry.status}</p>
               </div>
             </div>
-            <button className="text-primary font-medium hover:underline">
-              {t('patient.dashboard.details')}
-            </button>
+            <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="text-center">
+                  <span className="text-2xl">{entry.mood}</span>
+                  <p className="text-xs text-muted-foreground mt-1">{t('patient.dashboard.mood')}</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-2xl">{entry.outdoor}</span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('patient.dashboard.outdoor')}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <span className="text-2xl">{entry.physical}</span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('patient.dashboard.physical')}
+                  </p>
+                </div>
+              </div>
+              <button className="text-primary font-medium hover:underline">
+                {t('patient.dashboard.details')}
+              </button>
+            </div>
           </div>
         ))}
       </div>

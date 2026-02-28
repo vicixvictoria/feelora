@@ -69,11 +69,11 @@ const ProfilePage = () => {
 
       {/* User Profile Card */}
       <div className="feelora-card mb-10">
-        <div className="flex gap-8">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
           <img
             src={avatar}
             alt={`${patient.Name} ${patient.Surname}`}
-            className="w-40 h-40 rounded-lg object-cover"
+            className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
           />
           <div className="flex-1">
             <h2 className="text-2xl font-semibold text-primary mb-4">
@@ -113,11 +113,11 @@ const ProfilePage = () => {
 
       {therapist ? (
         <div className="feelora-card">
-          <div className="flex gap-8">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
             <img
               src={avatar}
               alt={therapist.Name || t('patient.profile.therapistAvatar')}
-              className="w-40 h-40 rounded-lg object-cover"
+              className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
             />
             <div className="flex-1">
               <h2 className="text-2xl font-semibold text-primary mb-2">
@@ -149,7 +149,7 @@ const ProfilePage = () => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col gap-3 self-start">
+            <div className="flex flex-row sm:flex-col gap-3 self-start">
               <button className="feelora-btn-primary flex items-center gap-2 justify-center">
                 {t('patient.profile.profileBtn')}
                 <Search className="w-4 h-4" />

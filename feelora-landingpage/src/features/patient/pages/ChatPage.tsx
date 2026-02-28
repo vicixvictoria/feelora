@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Info, ChevronRight } from 'lucide-react';
+import { Send, Info, ChevronRight, ArrowLeft } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
 
@@ -40,24 +40,33 @@ const ChatPage = () => {
   const { t } = useTranslation();
   const [selectedChat, setSelectedChat] = useState(chatList[0]);
   const [newMessage, setNewMessage] = useState('');
+  const [mobileShowChat, setMobileShowChat] = useState(false);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      // In a real app, this would send the message
       setNewMessage('');
     }
+  };
+
+  const handleSelectChat = (chat: (typeof chatList)[0]) => {
+    setSelectedChat(chat);
+    setMobileShowChat(true);
   };
 
   return (
     <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
       {/* Chat List */}
-      <div className="w-72 bg-card rounded-l-xl border border-border border-r-0 p-4">
+      <div
+        className={`w-full md:w-72 bg-card rounded-l-xl border border-border md:border-r-0 p-4 ${
+          mobileShowChat ? 'hidden md:block' : 'block'
+        }`}
+      >
         <h2 className="text-2xl font-semibold text-primary mb-6">{t('patient.chat.chats')}</h2>
         <div className="space-y-2">
           {chatList.map((chat) => (
             <button
               key={chat.id}
-              onClick={() => setSelectedChat(chat)}
+              onClick={() => handleSelectChat(chat)}
               className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
                 selectedChat.id === chat.id ? 'bg-muted' : 'hover:bg-muted/50'
               }`}
@@ -78,11 +87,20 @@ const ChatPage = () => {
       </div>
 
       {/* Chat Window */}
-      <div className="flex-1 bg-card rounded-r-xl border border-border flex flex-col">
+      <div
+        className={`flex-1 bg-card rounded-r-xl border border-border flex flex-col ${
+          mobileShowChat ? 'block' : 'hidden md:flex'
+        }`}
+      >
         {/* Chat Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-4">
-            {/* selectedChat.avatar to load other images */}
+            <button
+              onClick={() => setMobileShowChat(false)}
+              className="md:hidden p-1 hover:bg-muted rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            </button>
             <img
               src={avatar}
               alt={selectedChat.name}

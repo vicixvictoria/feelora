@@ -85,11 +85,11 @@ const CalendarPage = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Coming Soon Watermark */}
         <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
           <p
-            className="text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
+            className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
             style={{ transform: 'rotate(-25deg)' }}
           >
             {t('patient.calendar.comingSoon')}
@@ -186,7 +186,7 @@ const CalendarPage = () => {
         </div>
 
         {/* Right Column - Appointments & Emergency */}
-        <div className="w-96">
+        <div className="w-full md:w-96">
           <h2 className="text-2xl font-bold text-foreground mb-6">
             {t('patient.calendar.addAppointments')}
           </h2>
