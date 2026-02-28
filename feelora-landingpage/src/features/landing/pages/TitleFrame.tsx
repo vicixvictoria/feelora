@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-export const TitleFrame = (): JSX.Element => {
+export const TitleFrame = () => {
   const { t } = useTranslation();
   return (
     <header className="inline-flex flex-col items-center gap-2.5 relative max-w-7xl mx-auto px-8">
