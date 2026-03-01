@@ -4,7 +4,7 @@ import { ZodSchema } from 'zod'; // Import Zod for schema validation
 
 interface UseStepValidationProps<T> {
   data: T;
-  schema: ZodSchema<any>;
+  schema: ZodSchema<T>;
   onNext: () => void;
 }
 

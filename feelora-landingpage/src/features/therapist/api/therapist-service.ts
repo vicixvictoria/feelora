@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
+import { TherapistProfile } from '../types/profiles';
 
 // --- GraphQL Definitions --- //
 
@@ -52,7 +53,7 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
-  submitQuestionnaire: async (data: TherapistQuestionnaireData): Promise<any> => {
+  submitQuestionnaire: async (data: TherapistQuestionnaireData): Promise<{ success: boolean; savedData?: { Id: string; Type: string; Questionnaire: string }; error?: string }> => {
     // 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
@@ -85,7 +86,7 @@ export const therapistService = {
 
   // -- Create User Profile API call --
   // (Triggered earlier in the flow on the Availability step)
-  createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<any> => {
+  createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<TherapistProfile> => {
     const formattedAddress = [
       data.contactInfo?.street,
       data.contactInfo?.zip,
@@ -126,7 +127,7 @@ export const therapistService = {
   },
 
   // -- Get profile API call --
-  getProfile: async (): Promise<any> => {
+  getProfile: async (): Promise<TherapistProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_THERAPIST_PROFILE_QUERY,
       fetchPolicy: 'network-only', // Ensure fresh data

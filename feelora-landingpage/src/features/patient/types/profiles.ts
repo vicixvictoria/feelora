@@ -44,7 +44,7 @@ export interface TherapistProfile {
   Matches?: string[] | null;
   Plan: string;
   Address?: string | null;
-  LicenseData: any; // Assuming AWSJSON is parsed or kept as any/string
+  LicenseData: string;
   LicenseVerified: string;
 }
 

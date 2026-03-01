@@ -28,7 +28,7 @@ export function usePersistedQuestionnaire<T>(storageKey: string, initialData: T)
   }, [data, currentStep, storageKey]);
 
   // 3. Helper functions to update fields and clear progress
-  const updateField = (field: keyof T, value: any) => {
+  const updateField = (field: keyof T, value: T[keyof T]) => {
     setData((prev) => ({ ...prev, [field]: value }));
   };
 
