@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
-import { usePersistedQuestionnaire } from '@/hooks/usePersistedQuestionnaire';
+import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
 import WelcomeStep from '../components/questionnaire/steps/Step1_TWelcome.tsx';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_TPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_TContactInfo';
@@ -22,8 +22,8 @@ import AvailabilityStep from '../components/questionnaire/steps/Step17_TAvailabi
 import SummaryStep from '../components/questionnaire/steps/Step18_TSummary';
 import CompletionStep from '../components/questionnaire/steps/Step19_TCompletion';
 
-import { therapistService } from '../api/therapistService';
-import { TherapistQuestionnaireData } from '../types/questionnaireT';
+import { therapistService } from '../api/therapist-service';
+import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
 
 // Initial empty data structure for the questionnaire
 const initialData: TherapistQuestionnaireData = {

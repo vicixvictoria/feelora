@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/questionnaire/input';
 import { Label } from '@/components/ui/label';
-import { useStepValidation } from '@/hooks/useStepValidation';
+import { useStepValidation } from '@/hooks/use-step-validation';
 import { z } from 'zod';
 import {
   Select,

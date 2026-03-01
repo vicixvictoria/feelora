@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { ArrowLeftIcon } from 'lucide-react';
-import { Button } from '@/components/ui/buttonLanding';
-import { Card } from '@/components/ui/cardLanding';
+import { Button } from '@/components/ui/button-landing';
+import { Card } from '@/components/ui/card-landing';
 import pitchDay from '@/assets/RBSPitchDay.jpg';
 import { useTranslation } from 'react-i18next';
 import aylinFoto from '@/assets/Aylin-Foto.png';

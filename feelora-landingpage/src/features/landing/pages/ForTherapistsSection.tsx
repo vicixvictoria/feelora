@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
-import { Button } from '@/components/ui/buttonLanding';
-import { Card } from '@/components/ui/cardLanding';
+import { Button } from '@/components/ui/button-landing';
+import { Card } from '@/components/ui/card-landing';
 import forTherapistsImg from '@/assets/for_therapists.png';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

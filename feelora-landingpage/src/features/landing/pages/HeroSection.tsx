@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/buttonLanding';
+import { Button } from '@/components/ui/button-landing';
 import { AnimatedWaves } from './AnimatedWaves';
 import { TitleFrame } from './TitleFrame';
 import { useTranslation } from 'react-i18next';

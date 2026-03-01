@@ -1,4 +1,4 @@
-// hooks/useStepValidation.ts
+// hooks/use-step-validation.ts
 import { useState } from 'react';
 import { ZodSchema } from 'zod'; // Import Zod for schema validation
 

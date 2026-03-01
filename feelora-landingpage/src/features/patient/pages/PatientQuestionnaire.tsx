@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
-import { usePersistedQuestionnaire } from '@/hooks/usePersistedQuestionnaire';
+import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
 import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo.tsx';
@@ -23,7 +23,7 @@ import TherapistMatchStep from '../components/questionnaire/steps/Step18_Therapi
 import { AlgorithmMatch } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
 
-import { patientService } from '../api/patientService';
+import { patientService } from '../api/patient-service';
 import { QuestionnaireData } from '../types/questionnaire';
 
 /*interface QuestionnaireData {

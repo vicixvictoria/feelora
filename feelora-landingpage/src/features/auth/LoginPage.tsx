@@ -5,7 +5,7 @@ import '@aws-amplify/ui-react/styles.css';
 import { CheckboxField } from '@aws-amplify/ui-react';
 import { amplifyConfig } from '@/config/amplify';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/buttonLanding';
+import { Button } from '@/components/ui/button-landing';
 import { useTranslation } from 'react-i18next';
 
 const components = {

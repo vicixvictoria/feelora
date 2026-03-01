@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
 import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
-import { Card } from '@/components/ui/cardLanding';
+import { Card } from '@/components/ui/card-landing';
 import { useTranslation } from 'react-i18next';
 
 export function WhyFeeloraSection() {

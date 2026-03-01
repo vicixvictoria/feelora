@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { jwtDecode } from 'jwt-decode';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig, therapistAmplifyConfig } from '@/config/amplify';
-import { setApolloAccessToken } from '@/lib/apolloClient';
+import { setApolloAccessToken } from '@/lib/apollo-client';
 
 // --- CONFIGURATION ---
 // Must Point to backend URL

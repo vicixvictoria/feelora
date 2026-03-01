@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { MenuIcon, XIcon, GlobeIcon } from 'lucide-react';
-import { Button } from '@/components/ui/buttonLanding';
+import { Button } from '@/components/ui/button-landing';
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
-} from '@/components/ui/navigation-menuLanding';
+} from '@/components/ui/navigation-menu-landing';
 import logoFeelora from '@/assets/logo_feelora.png';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';

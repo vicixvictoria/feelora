@@ -5,7 +5,7 @@ import '@aws-amplify/ui-react/styles.css';
 import { therapistAmplifyConfig } from '@/config/amplify';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/buttonLanding';
+import { Button } from '@/components/ui/button-landing';
 
 // You can re-use the components and formFields logic,
 // or define a therapist-specific one if the fields differ.

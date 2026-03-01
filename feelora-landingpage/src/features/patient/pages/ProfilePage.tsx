@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
-import { patientService } from '../api/patientService';
+import { patientService } from '../api/patient-service';
 import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import your new types!
 
 // Helper to convert Unix timestamp (in seconds) to Age

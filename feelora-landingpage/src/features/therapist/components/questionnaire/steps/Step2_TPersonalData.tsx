@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
-import { useStepValidation } from '@/hooks/useStepValidation';
+import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
 
 interface PersonalDataStepProps {

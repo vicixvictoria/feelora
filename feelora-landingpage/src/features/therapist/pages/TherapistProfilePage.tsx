@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import therapistAvatar from '@/assets/avatar-Placeholder.png';
-import { therapistService } from '../api/therapistService'; // Adjust path if needed
+import { therapistService } from '../api/therapist-service'; // Adjust path if needed
 import { TherapistProfile } from '../types/profiles'; // Import TherapistProfile type
 
 const TherapistProfilePage = () => {

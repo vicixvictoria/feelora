@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apolloClient';
-import { TherapistQuestionnaireData } from '../types/questionnaireT';
+import { apolloClient } from '@/lib/apollo-client';
+import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
 
 // --- GraphQL Definitions --- //
 

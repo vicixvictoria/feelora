@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ApolloProvider } from '@apollo/client';
-import { apolloClient } from './lib/apolloClient';
+import { apolloClient } from './lib/apollo-client';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig } from './config/amplify';
 

@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
-import { useStepValidation } from '@/hooks/useStepValidation';
+import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
 
 interface ContactInfoStepProps {

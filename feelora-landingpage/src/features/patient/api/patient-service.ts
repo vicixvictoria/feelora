@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apolloClient';
+import { apolloClient } from '@/lib/apollo-client';
 import { QuestionnaireData } from '../types/questionnaire';
 import { PatientProfile, MatchedTherapist } from '../types/profiles';
 

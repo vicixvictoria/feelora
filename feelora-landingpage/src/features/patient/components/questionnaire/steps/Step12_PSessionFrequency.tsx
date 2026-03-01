@@ -1,7 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
-import { useStepValidation } from '@/hooks/useStepValidation';
+import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
 
 // Props Interface

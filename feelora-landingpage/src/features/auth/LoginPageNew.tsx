@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/buttonLanding';
+import { Button } from '@/components/ui/button-landing';
 
 interface LoginPageProps {
   /** User type: 'user' or 'therapist ' */
