@@ -53,7 +53,13 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
-  submitQuestionnaire: async (data: TherapistQuestionnaireData): Promise<{ success: boolean; savedData?: { Id: string; Type: string; Questionnaire: string }; error?: string }> => {
+  submitQuestionnaire: async (
+    data: TherapistQuestionnaireData,
+  ): Promise<{
+    success: boolean;
+    savedData?: { Id: string; Type: string; Questionnaire: string };
+    error?: string;
+  }> => {
     // 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
@@ -86,7 +92,9 @@ export const therapistService = {
 
   // -- Create User Profile API call --
   // (Triggered earlier in the flow on the Availability step)
-  createTherapistProfile: async (data: Partial<TherapistQuestionnaireData>): Promise<TherapistProfile> => {
+  createTherapistProfile: async (
+    data: Partial<TherapistQuestionnaireData>,
+  ): Promise<TherapistProfile> => {
     const formattedAddress = [
       data.contactInfo?.street,
       data.contactInfo?.zip,

@@ -99,7 +99,9 @@ const PING_LAMBDA_QUERY = gql`
 // --- Service Object --- //
 export const patientService = {
   // -- API call to submit the questionnaire and get matches based on the input data --
-  submitQuestionnaire: async (data: QuestionnaireData): Promise<{ success: boolean; matches: AlgorithmMatch[]; error?: string }> => {
+  submitQuestionnaire: async (
+    data: QuestionnaireData,
+  ): Promise<{ success: boolean; matches: AlgorithmMatch[]; error?: string }> => {
     // 1. Prepare Input (Matches 'MatchingInput' in schema)
     const input = {
       Questionnaire: JSON.stringify(data),
@@ -136,7 +138,9 @@ export const patientService = {
   },
 
   //-- Create User Profile API call --
-  createPatientProfile: async (data: Partial<QuestionnaireData>): Promise<Partial<PatientProfile>> => {
+  createPatientProfile: async (
+    data: Partial<QuestionnaireData>,
+  ): Promise<Partial<PatientProfile>> => {
     //Prepare Payload according to the UserProfileInput type in the schema
     const input = {
       Name: data.personalData?.firstName,
