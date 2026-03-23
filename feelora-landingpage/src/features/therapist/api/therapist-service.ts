@@ -138,7 +138,7 @@ export const therapistService = {
   getProfile: async (): Promise<TherapistProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_THERAPIST_PROFILE_QUERY,
-      fetchPolicy: 'network-only', // Ensure fresh data
+      fetchPolicy: 'cache-first', // Ensure to not always hit the backend, but use cache when available for better performance
     });
 
     return responseData.getOwnTherapistProfile;

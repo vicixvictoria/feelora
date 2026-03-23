@@ -164,7 +164,7 @@ export const patientService = {
   getProfile: async (): Promise<PatientProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_USER_PROFILE_QUERY,
-      fetchPolicy: 'network-only', // Ensure to get fresh data
+      fetchPolicy: 'cache-first', // Ensure to not always hit the backend, but use cache when available for better performance
     });
     return responseData.getOwnUserProfile;
   },
