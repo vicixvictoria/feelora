@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apollo-client'; 
+import { apolloClient } from '@/lib/apollo-client';
 
 // --- Types ---
 export interface ChatConversation {
@@ -69,11 +69,11 @@ export const chatService = {
   getChatConversations: async (): Promise<ChatConversation[]> => {
     const { data } = await apolloClient.query({
       query: GET_CONVERSATIONS_QUERY,
-      fetchPolicy: 'network-only', 
+      fetchPolicy: 'network-only',
     });
     // Filter out the mood tracker so we only see actual "human" chats
     return data.getConversations.items.filter(
-      (chat: any) => !chat.participantIds.includes("moodtracker")
+      (chat: any) => !chat.participantIds.includes('moodtracker'),
     );
   },
 
