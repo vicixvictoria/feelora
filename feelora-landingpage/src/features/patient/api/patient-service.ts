@@ -89,6 +89,43 @@ const SAVE_MATCH_MUTATION = gql`
   }
 `;
 
+
+// --- Chat & Mood Tracker Mutations ---
+
+const CREATE_CONVERSATION_MUTATION = gql`
+  mutation CreateConversation($participantId: ID!) {
+    createConversation(participantId: $participantId) {
+      conversationId
+      participantIds
+      createdAt
+    }
+  }
+`;
+
+const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
+  mutation SendMoodTrackerMessage($conversationId: ID!, $content: String!, $moodTrackerQuestionnaire: Boolean) {
+    sendMoodTrackerMessage(
+      conversationId: $conversationId, 
+      content: $content, 
+      moodTrackerQuestionnaire: $moodTrackerQuestionnaire
+    ) {
+      messageId
+      sentAt
+    }
+  }
+`;
+
+const GET_CONVERSATIONS_QUERY = gql`
+  query GetConversations {
+    getConversations {
+      items {
+        conversationId
+        participantIds
+      }
+    }
+  }
+`;
+
 // For pinging algorithm
 const PING_LAMBDA_QUERY = gql`
   query PingLambda {
@@ -187,17 +224,76 @@ export const patientService = {
     return responseData.getMatchedTherapists.items || [];
   },
 
-  // -- API call to accept and save a therapist match --
+  // -- API call to accept and save a therapist match and automatically create conversations --
   saveMatch: async (therapistId: string): Promise<boolean> => {
     try {
+      // save the match
       const { data } = await apolloClient.mutate({
         mutation: SAVE_MATCH_MUTATION,
         variables: { match: therapistId },
       });
+
+      // 2. Automatically create the required conversations for the chat and mood tracker
+      console.log("Creating conversation for Therapist...");
+      await apolloClient.mutate({
+        mutation: CREATE_CONVERSATION_MUTATION,
+        variables: { participantId: therapistId }
+      });
+
+      /* //not in the MVP, but we can keep it here for later! We create the mood tracker conversation already at this step, so that it's ready to go when the patient enters the mood tracker for the first time. The conversation will be created with a special participantId "moodtracker" that we can use to identify it when we fetch the conversations list later and get its conversationId for sending messages into it.
+      console.log("Creating conversation for Mood Tracker...");
+      await apolloClient.mutate({
+        mutation: CREATE_CONVERSATION_MUTATION,
+        variables: { participantId: "moodtracker" }
+      });*/
+
       return data.saveMatch; // returns true or false
     } catch (error) {
-      console.error('Error saving match:', error);
+      console.error('Error saving match or creating conversations:', error);
       throw error;
+    }
+  },
+
+  // -- Fetch Conversations to find the Mood Tracker ID --
+  getMoodTrackerConversationId: async (): Promise<string | null> => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_CONVERSATIONS_QUERY,
+        fetchPolicy: 'network-only' // Always get fresh in case it was just created, dont rely on cache
+      });
+      
+      // Find the specific conversation where "moodtracker" is in the participantIds array!
+      const moodChat = data.getConversations.items.find(
+        (chat: any) => chat.participantIds && chat.participantIds.includes("moodtracker")
+      );
+      
+      return moodChat ? moodChat.conversationId : null; // Return conversationId, not id
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      return null;
+    }
+  },
+
+  // -- Save Mood Tracker Data --
+  saveMoodData: async (conversationId: string, moodData: Record<number, string[]>): Promise<boolean> => {
+    try {
+      // Stringify the questionnaire answers as schema requires
+      const payload = JSON.stringify(moodData);
+      
+      // Send the mood data as a message in the mood tracker conversation, with a flag to identify it as mood tracker data
+      await apolloClient.mutate({
+        mutation: SEND_MOOD_TRACKER_MESSAGE_MUTATION,
+        variables: { 
+          conversationId: conversationId,
+          content: payload,
+          moodTrackerQuestionnaire: true 
+        },
+      });
+      
+      return true; 
+    } catch (error) {
+      console.error('Error saving mood data:', error);
+      throw new Error('Failed to save mood tracking data.');
     }
   },
 
