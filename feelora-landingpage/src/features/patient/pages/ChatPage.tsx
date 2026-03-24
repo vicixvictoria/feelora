@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft } from 'lucide-react';
 import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
+import { chatService, ChatConversation, ChatMessage } from '@/features/chat/api/chatService';
 
 const chatList = [
   {
