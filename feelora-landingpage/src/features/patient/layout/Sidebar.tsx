@@ -67,7 +67,7 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
 
 const Sidebar = () => {
   return (
-    <aside className="w-60 bg-sidebar min-h-screen py-6 px-3">
+    <aside className="w-60 bg-sidebar h-screen sticky top-0 py-6 px-3 overflow-y-auto">
       <SidebarNav />
     </aside>
   );

@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { patientService } from '../api/patient-service';
-import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import your new types!
+import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import types - only needed if useEffect hook is used
+import { useQuery } from '@apollo/client';
+import { 
+  GET_OWN_USER_PROFILE_QUERY, 
+  GET_MATCHED_THERAPISTS_QUERY 
+} from '../api/patient-service';
+
 
 // Helper to convert Unix timestamp (in seconds) to Age
 const calculateAge = (birthDateUnix: number | null | undefined) => {
@@ -16,38 +22,30 @@ const calculateAge = (birthDateUnix: number | null | undefined) => {
 
 const ProfilePage = () => {
   const { t } = useTranslation();
-  const [patient, setPatient] = useState<PatientProfile | null>(null);
-  const [therapist, setTherapist] = useState<MatchedTherapist | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        // 1. Fetch Patient Profile
-        const userProfile = await patientService.getProfile();
-        setPatient(userProfile);
+// 1. Fetch Patient Profile
+  // Apollo uses 'cache-first' by default, so it won't hit the network if data exists.
+  const { 
+    data: patientData, 
+    loading: patientLoading, 
+    error: patientError 
+  } = useQuery(GET_OWN_USER_PROFILE_QUERY);
 
-        // 2. If patient has matches, fetch the first matched therapist
-        if (userProfile?.Matches && userProfile.Matches.length > 0) {
-          const matchedTherapists = await patientService.getMatchedTherapists(userProfile.Matches);
-          if (matchedTherapists && matchedTherapists.length > 0) {
-            setTherapist(matchedTherapists[0]); // We display the primary match --> (maybe with score and not position in list)
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching profile data:', err);
-        setError(t('patient.profile.loadError'));
-      } finally {
-        setLoading(false);
-      }
-    };
+  const patient = patientData?.getOwnUserProfile;
 
-    fetchProfileData();
-  }, [t]);
+  // 2. Fetch Therapist only if we have match IDs
+  // 'skip' prevents the query from running until the patient data is ready.
+  const { 
+    data: therapistData, 
+    loading: therapistLoading 
+  } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+    variables: { TherapistsIds: patient?.Matches },
+    skip: !patient?.Matches || patient.Matches.length === 0,
+  });
+  const therapist = therapistData?.getMatchedTherapists?.items?.[0];
 
-  if (loading) {
+  // Loading state (only show spinner if we don't have patient data yet)
+  if (patientLoading && !patient) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -55,8 +53,8 @@ const ProfilePage = () => {
     );
   }
 
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+  if (patientError) {
+    return <div className="text-red-500 text-center">{t('patient.profile.loadError')}</div>;
   }
 
   if (!patient) return null;

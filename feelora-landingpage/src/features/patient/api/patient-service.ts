@@ -28,7 +28,7 @@ const MATCHING_ALGORITHM_MUTATION = gql`
 `;
 
 // Get Logged-In Patient Profile
-const GET_OWN_USER_PROFILE_QUERY = gql`
+export const GET_OWN_USER_PROFILE_QUERY = gql`
   query GetOwnUserProfile {
     getOwnUserProfile {
       Id
@@ -61,8 +61,8 @@ const SAVE_USER_PROFILE_MUTATION = gql`
   }
 `;
 
-// Maybe we need that later (not for matching algorithm)
-const GET_MATCHED_THERAPISTS_QUERY = gql`
+// export to use for cache in profile page
+export const GET_MATCHED_THERAPISTS_QUERY = gql`
   query GetMatchedTherapists($TherapistsIds: [ID]) {
     getMatchedTherapists(TherapistsIds: $TherapistsIds) {
       items {
