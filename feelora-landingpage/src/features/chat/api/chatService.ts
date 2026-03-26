@@ -84,7 +84,7 @@ export const chatService = {
       fetchPolicy: 'network-only',
     });
     // Sort messages by time so the newest are at the bottom
-    return [...data.getMessages.items].sort((a, b) => a.sentAt - b.sentAt);
+    return data.getMessages.items.toSorted((a: ChatMessage, b: ChatMessage) => a.sentAt - b.sentAt);
   },
 
   sendChatMessage: async (conversationId: string, content: string): Promise<ChatMessage> => {

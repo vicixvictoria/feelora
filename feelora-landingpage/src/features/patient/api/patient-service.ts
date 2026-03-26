@@ -297,9 +297,10 @@ export const patientService = {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving mood data:', error);
-      throw new Error('Failed to save mood tracking data.');
+      // Using the 'cause' property links the two errors for better debugging
+      throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
     }
   },
 

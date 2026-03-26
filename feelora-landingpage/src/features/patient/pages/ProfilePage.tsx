@@ -28,13 +28,10 @@ const ProfilePage = () => {
 
   // 2. Fetch Therapist only if we have match IDs
   // 'skip' prevents the query from running until the patient data is ready.
-  const { data: therapistData } = useQuery(
-    GET_MATCHED_THERAPISTS_QUERY,
-    {
-      variables: { TherapistsIds: patient?.Matches },
-      skip: !patient?.Matches || patient.Matches.length === 0,
-    },
-  );
+  const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+    variables: { TherapistsIds: patient?.Matches },
+    skip: !patient?.Matches || patient.Matches.length === 0,
+  });
   const therapist = therapistData?.getMatchedTherapists?.items?.[0];
 
   // Loading state (only show spinner if we don't have patient data yet)
