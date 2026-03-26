@@ -227,13 +227,21 @@ const ChatPage = () => {
                 <div className="space-y-6">
                   {messages.map((message) => {
                     const isMe = message.from === user?.id;
+
+                    // Determine the correct avatar:
+                    // If isMe: Use user.picture (if it exists in auth object), otherwise use the avatar placeholder
+                    // If not isMe: Use the selectedChat.avatar (which already falls back to the placeholder in the sidebar logic)
+                    const profileImage = isMe 
+                      ? ((user as any)?.picture || avatar) 
+                      : selectedChat.avatar;
+                      
                     return (
                       <div
                         key={message.messageId}
                         className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : ''}`}
                       >
                         <img
-                          src={isMe ? feeloraLogo : selectedChat.avatar}
+                          src={profileImage}
                           alt=""
                           className="w-10 h-10 rounded-full object-cover"
                         />
