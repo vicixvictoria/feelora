@@ -33,6 +33,7 @@ const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
       Specialties
       LicenseData
       LicenseVerified
+      Matches
     }
   }
 `;
@@ -46,6 +47,21 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
       Surname
       Address
       LicenseVerified
+    }
+  }
+`;
+
+// get the matched patients of a therapist
+const GET_MATCHED_USERS_QUERY = gql`
+  query GetMatchedUsers($UsersIds: [ID]) {
+    getMatchedUsers(UsersIds: $UsersIds) {
+      items {
+        Id
+        Name
+        Surname
+        Gender
+        City
+      }
     }
   }
 `;
@@ -142,5 +158,26 @@ export const therapistService = {
     });
 
     return responseData.getOwnTherapistProfile;
+  },
+
+  // -- Fetch matched patient(s) profiles --
+  getMatchedPatients: async (patientIds: string[]): Promise<any[]> => {
+    // Safety net: if the therapist has no matches yet, just return an empty array
+    if (!patientIds || patientIds.length === 0) {
+      return [];
+    }
+
+    try {
+      const { data: responseData } = await apolloClient.query({
+        query: GET_MATCHED_USERS_QUERY,
+        variables: { UsersIds: patientIds },
+        fetchPolicy: 'cache-first', // Uses cache if we already loaded them elsewhere
+      });
+
+      return responseData.getMatchedUsers.items || [];
+    } catch (error) {
+      console.error('Error fetching matched patients:', error);
+      return [];
+    }
   },
 };

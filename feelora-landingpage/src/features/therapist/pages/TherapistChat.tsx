@@ -1,159 +1,297 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Info, ChevronRight, ArrowLeft } from 'lucide-react';
-import feeloraLogo from '@/assets/logo.png';
-import avatar from '@/assets/avatar-Placeholder.png';
-//import { chatService, ChatConversation, ChatMessage } from '@/features/chat/api/chatService';
+import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
+import avatar from '@/assets/avatar-Placeholder.png'; // Only using the placeholder now
+import { useAuth } from '@/contexts/AuthContext';
+import { chatService, ChatMessage } from '@/features/chat/api/chatService';
+import { therapistService } from '../api/therapist-service';
 
-const chatList = [
-  {
-    id: 1,
-    name: 'Dr. Eva Eddison',
-    lastMessage: 'Here is the report on our..',
-    avatar: avatar,
-    isTherapist: true,
-  },
-  {
-    id: 2,
-    name: 'Feelora',
-    lastMessage: 'Danke, dass du bei uns mit...',
-    avatar: feeloraLogo,
-    isBot: true,
-  },
-];
-
-const messages = [
-  {
-    id: 1,
-    sender: 'therapist',
-    text: 'Hier ist der Bericht unserer letzten Therapiesitzung. Wir sehen uns nächsten Dienstag um 15 Uhr!',
-    avatar: avatar,
-  },
-  {
-    id: 2,
-    sender: 'user',
-    text: 'Danke! Bis nächste Woche!',
-    avatar: avatar,
-  },
-];
+// --- Interface for the Sidebar ---
+interface SidebarChat {
+  contactId: string;
+  name: string;
+  avatar: string;
+  conversationId: string | null;
+  lastMessage: string;
+}
 
 const TherapistChat = () => {
   const { t } = useTranslation();
-  const [selectedChat, setSelectedChat] = useState(chatList[0]);
-  const [newMessage, setNewMessage] = useState('');
-  const [mobileShowChat, setMobileShowChat] = useState(false);
+  const { user } = useAuth();
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      setNewMessage('');
+  // State
+  const [chatList, setChatList] = useState<SidebarChat[]>([]);
+  const [selectedChat, setSelectedChat] = useState<SidebarChat | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+
+  // UI State
+  const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+
+  // 1. Fetch Matches AND Conversations on Load
+  useEffect(() => {
+    const fetchContactsAndChats = async () => {
+      try {
+        setIsLoadingChats(true);
+
+        // A. Get the Therapist's Profile
+        const profile = await therapistService.getProfile();
+
+        // B. Get the Therapist's matched Patients
+        // (Note: Make sure you have this function in your therapistService!)
+        const patients =
+          profile?.Matches && profile.Matches.length > 0
+            ? await therapistService.getMatchedPatients(profile.Matches)
+            : [];
+
+        // C. Get the active Conversations
+        const conversations = await chatService.getChatConversations();
+
+        // D. Combine them into our Sidebar List!
+        const sidebarItems: SidebarChat[] = patients.map((patient: any) => {
+          // Check if a conversation already exists for this patient
+          const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
+
+          return {
+            contactId: patient.Id,
+            name: `${patient.Name} ${patient.Surname}`,
+            avatar: avatar, // Placeholder avatar for the patient
+            conversationId: existingChat ? existingChat.conversationId : null,
+            lastMessage:
+              existingChat?.lastMessage || t('app.therapist.chat.startChat', 'Beginne den Chat...'),
+          };
+        });
+
+        setChatList(sidebarItems);
+
+        // Auto-select the first chat on desktop
+        if (sidebarItems.length > 0 && window.innerWidth >= 768) {
+          handleSelectChat(sidebarItems[0]);
+        }
+      } catch (error) {
+        console.error('Error loading chat contacts:', error);
+      } finally {
+        setIsLoadingChats(false);
+      }
+    };
+
+    fetchContactsAndChats();
+  }, [t]);
+
+  // 2. Fetch Messages when a contact is clicked
+  const handleSelectChat = async (chat: SidebarChat) => {
+    setSelectedChat(chat);
+    setMobileShowChat(true);
+    setMessages([]);
+
+    if (!chat.conversationId) return;
+
+    setIsLoadingMessages(true);
+    try {
+      const chatHistory = await chatService.getChatMessages(chat.conversationId);
+      setMessages(chatHistory);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setIsLoadingMessages(false);
     }
   };
 
-  const handleSelectChat = (chat: (typeof chatList)[0]) => {
-    setSelectedChat(chat);
-    setMobileShowChat(true);
+  // 3. Send Message
+  const handleSendMessage = async () => {
+    console.log('Send button triggered. Checking state...');
+
+    if (!newMessage.trim() || isSending) return;
+
+    if (!user) {
+      alert('Fehler: Benutzerdaten konnten nicht geladen werden (User ist null).');
+      return;
+    }
+
+    if (!selectedChat) {
+      alert('Fehler: Kein Chat ausgewählt.');
+      return;
+    }
+
+    if (!selectedChat.conversationId) {
+      alert(
+        'Fehler: Konversation wurde noch nicht generiert. Bitte lade die Seite neu oder kontaktiere den Support.',
+      );
+      return;
+    }
+
+    const messageText = newMessage.trim();
+    setIsSending(true);
+
+    try {
+      console.log('Attempting to send message to AWS...');
+      const realMessage = await chatService.sendChatMessage(
+        selectedChat.conversationId,
+        messageText,
+      );
+      console.log('Message sent successfully!', realMessage);
+
+      setMessages((prev) => [...prev, realMessage]);
+      setNewMessage('');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      alert('Nachricht konnte nicht gesendet werden.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
     <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
-      {/* Chat List */}
+      {/* --- CHAT LIST SIDEBAR --- */}
       <div
-        className={`w-full md:w-72 bg-card rounded-l-xl border border-border md:border-r-0 p-4 ${mobileShowChat ? 'hidden md:block' : ''}`}
+        className={`w-full md:w-72 bg-card rounded-l-xl border border-border md:border-r-0 p-4 ${mobileShowChat ? 'hidden md:block' : 'block'}`}
       >
         <h2 className="text-2xl font-semibold text-primary mb-6">
           {t('app.therapist.chat.title')}
         </h2>
-        <div className="space-y-2">
-          {chatList.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => handleSelectChat(chat)}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                selectedChat.id === chat.id ? 'bg-muted' : 'hover:bg-muted/50'
-              }`}
-            >
-              <img
-                src={chat.avatar}
-                alt={chat.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">{chat.name}</p>
-                <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </button>
-          ))}
-        </div>
-      </div>
 
-      {/* Chat Window */}
-      <div
-        className={`flex-1 bg-card rounded-r-xl border border-border flex flex-col ${!mobileShowChat ? 'hidden md:flex' : ''}`}
-      >
-        {/* Chat Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setMobileShowChat(false)}
-              className="md:hidden w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </button>
-            <img
-              src={avatar}
-              alt={selectedChat.name}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
+        {isLoadingChats ? (
+          <div className="flex justify-center p-4">
+            <Loader2 className="animate-spin text-primary" />
           </div>
-          <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
-            <Info className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 p-6 overflow-y-auto">
-          <div className="space-y-6">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-end gap-3 ${
-                  message.sender === 'user' ? 'flex-row-reverse' : ''
-                }`}
+        ) : chatList.length === 0 ? (
+          <div className="text-center text-muted-foreground p-4">
+            Du hast noch keine zugewiesenen Patient*innen.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {chatList.map((chat) => (
+              <button
+                key={chat.contactId}
+                onClick={() => handleSelectChat(chat)}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : 'hover:bg-muted/50'}`}
               >
-                <img src={message.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                <div
-                  className={`chat-bubble ${
-                    message.sender === 'user' ? 'chat-bubble-sent' : 'chat-bubble-received'
-                  }`}
-                >
-                  {message.text}
+                <img
+                  src={chat.avatar}
+                  alt={chat.name}
+                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                />
+                <div className="flex-1 text-left overflow-hidden">
+                  <p className="font-medium text-foreground truncate">{chat.name}</p>
+                  <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
                 </div>
-              </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              </button>
             ))}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Message Input */}
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={t('app.therapist.chat.placeholder')}
-              className="flex-1 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-            <button
-              onClick={handleSendMessage}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
-            >
-              <Send className="w-5 h-5" />
-            </button>
+      {/* --- CHAT WINDOW --- */}
+      <div
+        className={`flex-1 bg-card rounded-r-xl border border-border flex flex-col ${mobileShowChat ? 'flex' : 'hidden md:flex'}`}
+      >
+        {selectedChat ? (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setMobileShowChat(false)}
+                  className="md:hidden p-1 hover:bg-muted rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+                </button>
+                <img
+                  src={selectedChat.avatar}
+                  alt={selectedChat.name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
+              </div>
+              <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
+                <Info className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              {isLoadingMessages ? (
+                <div className="flex justify-center h-full items-center">
+                  <Loader2 className="animate-spin text-primary w-8 h-8" />
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="flex justify-center h-full items-center text-muted-foreground">
+                  Noch keine Nachrichten. Sende ein "Hallo!"
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {messages.map((message) => {
+                    const isMe = message.from === user?.id;
+
+                    // Use the user's profile picture if available, otherwise fallback to placeholder.
+                    // For the patient, use the sidebar placeholder.
+                    const profileImage = isMe
+                      ? (user as any)?.picture || avatar
+                      : selectedChat.avatar;
+
+                    return (
+                      <div
+                        key={message.messageId}
+                        className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : ''}`}
+                      >
+                        <img
+                          src={profileImage}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div
+                          className={`chat-bubble max-w-[70%] ${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'}`}
+                        >
+                          {message.content}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-border">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+                className="flex items-center gap-3 w-full"
+              >
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={t('app.therapist.chat.placeholder')}
+                  disabled={isSending}
+                  className="flex-1 w-full min-w-0 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || isSending}
+                  className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+                >
+                  {isSending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            Wähle einen Chat aus, um eine Nachricht zu senden.
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

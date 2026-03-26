@@ -14,4 +14,5 @@ export interface TherapistProfile {
   JobTitle?: string;
   LicenseData: string; // This will be a JSON string that we can parse into an object
   LicenseVerified: boolean;
+  Matches?: string[];
 }

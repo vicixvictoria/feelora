@@ -231,10 +231,10 @@ const ChatPage = () => {
                     // Determine the correct avatar:
                     // If isMe: Use user.picture (if it exists in auth object), otherwise use the avatar placeholder
                     // If not isMe: Use the selectedChat.avatar (which already falls back to the placeholder in the sidebar logic)
-                    const profileImage = isMe 
-                      ? ((user as any)?.picture || avatar) 
+                    const profileImage = isMe
+                      ? (user as any)?.picture || avatar
                       : selectedChat.avatar;
-                      
+
                     return (
                       <div
                         key={message.messageId}
