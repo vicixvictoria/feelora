@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
-import { patientService } from '../api/patient-service';
-import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import types - only needed if useEffect hook is used
 import { useQuery } from '@apollo/client';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
 
@@ -31,7 +28,7 @@ const ProfilePage = () => {
 
   // 2. Fetch Therapist only if we have match IDs
   // 'skip' prevents the query from running until the patient data is ready.
-  const { data: therapistData, loading: therapistLoading } = useQuery(
+  const { data: therapistData } = useQuery(
     GET_MATCHED_THERAPISTS_QUERY,
     {
       variables: { TherapistsIds: patient?.Matches },
