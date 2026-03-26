@@ -5,11 +5,7 @@ import avatar from '@/assets/avatar-Placeholder.png';
 import { patientService } from '../api/patient-service';
 import { PatientProfile, MatchedTherapist } from '../types/profiles'; // Import types - only needed if useEffect hook is used
 import { useQuery } from '@apollo/client';
-import { 
-  GET_OWN_USER_PROFILE_QUERY, 
-  GET_MATCHED_THERAPISTS_QUERY 
-} from '../api/patient-service';
-
+import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
 
 // Helper to convert Unix timestamp (in seconds) to Age
 const calculateAge = (birthDateUnix: number | null | undefined) => {
@@ -23,25 +19,25 @@ const calculateAge = (birthDateUnix: number | null | undefined) => {
 const ProfilePage = () => {
   const { t } = useTranslation();
 
-// 1. Fetch Patient Profile
+  // 1. Fetch Patient Profile
   // Apollo uses 'cache-first' by default, so it won't hit the network if data exists.
-  const { 
-    data: patientData, 
-    loading: patientLoading, 
-    error: patientError 
+  const {
+    data: patientData,
+    loading: patientLoading,
+    error: patientError,
   } = useQuery(GET_OWN_USER_PROFILE_QUERY);
 
   const patient = patientData?.getOwnUserProfile;
 
   // 2. Fetch Therapist only if we have match IDs
   // 'skip' prevents the query from running until the patient data is ready.
-  const { 
-    data: therapistData, 
-    loading: therapistLoading 
-  } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
-    variables: { TherapistsIds: patient?.Matches },
-    skip: !patient?.Matches || patient.Matches.length === 0,
-  });
+  const { data: therapistData, loading: therapistLoading } = useQuery(
+    GET_MATCHED_THERAPISTS_QUERY,
+    {
+      variables: { TherapistsIds: patient?.Matches },
+      skip: !patient?.Matches || patient.Matches.length === 0,
+    },
+  );
   const therapist = therapistData?.getMatchedTherapists?.items?.[0];
 
   // Loading state (only show spinner if we don't have patient data yet)
