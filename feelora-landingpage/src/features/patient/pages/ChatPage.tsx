@@ -4,7 +4,7 @@ import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
 //import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
-import { chatService, ChatMessage } from '@/features/chat/api/chatService'; 
+import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { patientService } from '../api/patient-service';
 
 // --- New Interface for the Sidebar ---
@@ -253,7 +253,7 @@ const ChatPage = () => {
                       </div>
                     );
                   })}
-                </div> 
+                </div>
               )}
             </div>
 
@@ -273,15 +273,15 @@ const ChatPage = () => {
                   onKeyDown={(e) => {
                     // Send message on Enter, but allow a new line if they hold Shift
                     if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
+                      e.preventDefault();
+                      handleSendMessage();
                     }
                   }}
                   placeholder={t('patient.chat.placeholder')}
                   disabled={isSending}
                   rows={1}
                   className="flex-1 w-full min-w-0 px-4 py-3 rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 resize-none overflow-y-auto max-h-32"
-                  />
+                />
                 <button
                   type="submit"
                   disabled={!newMessage.trim() || isSending}
