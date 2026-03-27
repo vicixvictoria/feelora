@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
-import feeloraLogo from '@/assets/logo.png';
+//import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService'; // <-- Update path
