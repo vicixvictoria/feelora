@@ -246,14 +246,14 @@ const ChatPage = () => {
                           className="w-10 h-10 rounded-full object-cover"
                         />
                         <div
-                          className={`chat-bubble max-w-[70%] ${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'}`}
+                          className={`chat-bubble max-w-[70%] break-words whitespace-pre-wrap ${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'}`}
                         >
                           {message.content}
                         </div>
                       </div>
                     );
                   })}
-                </div>
+                </div> 
               )}
             </div>
 
@@ -267,14 +267,21 @@ const ChatPage = () => {
                 }}
                 className="flex items-center gap-3 w-full"
               >
-                <input
-                  type="text"
+                <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Send message on Enter, but allow a new line if they hold Shift!
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                    }
+                  }}
                   placeholder={t('patient.chat.placeholder')}
                   disabled={isSending}
-                  className="flex-1 w-full min-w-0 px-4 py-3 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
-                />
+                  rows={1}
+                  className="flex-1 w-full min-w-0 px-4 py-3 rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 resize-none overflow-y-auto max-h-32"
+                  />
                 <button
                   type="submit"
                   disabled={!newMessage.trim() || isSending}

@@ -355,10 +355,10 @@
   }
 
   .chat-bubble-received {
-    @apply bg-primary text-white rounded-bl-sm;
+    @apply bg-muted text-foreground rounded-bl-sm;
   }
 
   .chat-bubble-sent {
-    @apply bg-muted text-foreground rounded-br-sm;
+    @apply bg-primary/70 text-white rounded-br-sm;
   }
 }
