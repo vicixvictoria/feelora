@@ -41,7 +41,6 @@ const TherapistChat = () => {
         const profile = await therapistService.getProfile();
 
         // B. Get the Therapist's matched Patients
-        // (Note: Make sure you have this function in your therapistService!)
         const patients =
           profile?.Matches && profile.Matches.length > 0
             ? await therapistService.getMatchedPatients(profile.Matches)
@@ -50,7 +49,7 @@ const TherapistChat = () => {
         // C. Get the active Conversations
         const conversations = await chatService.getChatConversations();
 
-        // D. Combine them into our Sidebar List!
+        // D. Combine them into Sidebar List
         const sidebarItems: SidebarChat[] = patients.map((patient: any) => {
           // Check if a conversation already exists for this patient
           const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));

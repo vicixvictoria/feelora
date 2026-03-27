@@ -4,7 +4,7 @@ import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
 //import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
-import { chatService, ChatMessage } from '@/features/chat/api/chatService'; // <-- Update path
+import { chatService, ChatMessage } from '@/features/chat/api/chatService'; 
 import { patientService } from '../api/patient-service';
 
 // --- New Interface for the Sidebar ---
@@ -53,7 +53,7 @@ const ChatPage = () => {
           return {
             contactId: therapist.Id,
             name: `${therapist.Name} ${therapist.Surname}`,
-            avatar: avatar, // Replace with therapist profile pic if you have it in the schema
+            avatar: avatar, // Will replace with therapist profile pic when S3 images work
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
               existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
@@ -82,7 +82,7 @@ const ChatPage = () => {
     setMobileShowChat(true);
     setMessages([]); // Clear previous messages while loading
 
-    // If they have no conversationId yet, there are no messages to fetch!
+    // If they have no conversationId yet, there are no messages to fetch
     if (!chat.conversationId) return;
 
     setIsLoadingMessages(true);
@@ -271,7 +271,7 @@ const ChatPage = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
-                    // Send message on Enter, but allow a new line if they hold Shift!
+                    // Send message on Enter, but allow a new line if they hold Shift
                     if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage();
