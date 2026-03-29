@@ -39,6 +39,7 @@ import MoodTrackerPage from './features/patient/pages/MoodTrackerPage';
 import HomeworkPage from './features/patient/pages/HomeworkPage';
 import NotFound from './features/patient/pages/NotFound';
 import PatientQuestionnaire from './features/patient/pages/PatientQuestionnaire';
+import AccountPage from './features/patient/pages/AccountPage';
 
 // --- THERAPIST Imports ---
 import TherapistLayout from './features/therapist/layout/TherapistLayout';
@@ -144,6 +145,7 @@ const router = createBrowserRouter([
               { path: 'dashboard', element: <PatientDashboard /> },
               { path: 'mood-tracker', element: <MoodTrackerPage /> },
               { path: 'homework', element: <HomeworkPage /> },
+              { path: 'account', element: <AccountPage /> },
             ],
           },
         ],

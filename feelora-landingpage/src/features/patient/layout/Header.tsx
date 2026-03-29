@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { SidebarNav } from './Sidebar';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -62,6 +64,8 @@ const Header = () => {
           <DropdownMenuContent>
             <DropdownMenuItem>{t('patient.header.notifications')}</DropdownMenuItem>
             <DropdownMenuItem>{t('patient.header.privacy')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('account')}>{'Account'} 
+</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
