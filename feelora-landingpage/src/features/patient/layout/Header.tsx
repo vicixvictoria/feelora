@@ -64,8 +64,7 @@ const Header = () => {
           <DropdownMenuContent>
             <DropdownMenuItem>{t('patient.header.notifications')}</DropdownMenuItem>
             <DropdownMenuItem>{t('patient.header.privacy')}</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('account')}>{'Account'} 
-</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('account')}>{'Account'}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

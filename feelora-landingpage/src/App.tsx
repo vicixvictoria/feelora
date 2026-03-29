@@ -50,6 +50,7 @@ import TherapistProfilePage from './features/therapist/pages/TherapistProfilePag
 import TherapistHomeworkPage from './features/therapist/pages/TherapistHomeworkPage';
 import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsPage';
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
+import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
@@ -165,6 +166,7 @@ const router = createBrowserRouter([
               { path: 'homework', element: <TherapistHomeworkPage /> },
               { path: 'patients', element: <TherapistPatientsPage /> },
               { path: 'calendar', element: <TherapistCalendarPage /> },
+              { path: 'account', element: <TherapistAccountPage /> },
             ],
           },
         ],

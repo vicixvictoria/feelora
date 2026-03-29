@@ -2,9 +2,8 @@ import { useState } from 'react';
 //import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserMinus, AlertTriangle, Loader2 } from 'lucide-react';
-//import { patientService } from '@/api/patientService'; //
 
-const AccountPage = () => {
+const TherapistAccountPage = () => {
   //const { t } = useTranslation();
   const { user, logout } = useAuth();
 
@@ -107,4 +106,4 @@ const AccountPage = () => {
   );
 };
 
-export default AccountPage;
+export default TherapistAccountPage;
