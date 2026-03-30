@@ -129,6 +129,13 @@ const GET_CONVERSATIONS_QUERY = gql`
   }
 `;
 
+// -- Delete Account Data Mutation
+const DELETE_DATA_MUTATION = gql`
+  mutation DeleteData {
+    deleteData
+  }
+`;
+
 // For pinging algorithm
 const PING_LAMBDA_QUERY = gql`
   query PingLambda {
@@ -301,6 +308,19 @@ export const patientService = {
       console.error('Error saving mood data:', error);
       // Using the 'cause' property links the two errors for better debugging
       throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
+    }
+  },
+
+  // -- Delete User Profile and all associated data --
+  deleteProfile: async (): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_DATA_MUTATION,
+      });
+      return data.deleteData; // This will return true if successful
+    } catch (error) {
+      console.error('Error deleting profile data:', error);
+      throw error;
     }
   },
 

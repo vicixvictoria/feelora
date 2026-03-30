@@ -2,7 +2,7 @@ import { useState } from 'react';
 //import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserMinus, AlertTriangle, Loader2 } from 'lucide-react';
-//import { patientService } from '@/api/patientService'; //
+import { patientService } from '../api/patient-service';
 
 const AccountPage = () => {
   //const { t } = useTranslation();
@@ -12,13 +12,19 @@ const AccountPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteAccount = async () => {
-    setIsDeleting(true);
+   setIsDeleting(true);
     try {
-      // 1. Call  backend mutation here to delete the profile from the database
-      // await patientService.deleteProfile();
+      // 1. Call backend mutation to delete the profile from the database
+      const isDeleted = await patientService.deleteProfile();
 
-      // 2. Log the user out of Cognito to clear their session
-      await logout(user?.groups?.includes('type:T') ? 'therapist' : 'user');
+      // 2. If it returns true, log the user out of Cognito to clear their session
+      if (isDeleted) {
+        // Checking for 'type:T' (Therapist) or 'type:P' (Pending Therapist)
+        const isTherapist = user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
+        await logout(isTherapist ? 'therapist' : 'user');
+      } else {
+        throw new Error("Backend returned false for deletion.");
+      }
     } catch (error) {
       console.error('Failed to delete account:', error);
       alert('Fehler beim Löschen des Kontos. Bitte versuche es später erneut.');
