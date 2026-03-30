@@ -143,6 +143,17 @@ const PING_LAMBDA_QUERY = gql`
   }
 `;
 
+// Websocket token
+const GENERATE_WEBSOCKET_TOKEN = gql`
+  mutation GenerateWSAuthToken {
+    generateWSAuthToken {
+      sessionId,
+      profileId,
+      used
+    }
+  }
+`;
+
 // --- Service Object --- //
 export const patientService = {
   // -- API call to submit the questionnaire and get matches based on the input data --
@@ -337,5 +348,23 @@ export const patientService = {
         // alert the user or stop them from continuing the questionnaire.
         console.debug('Ping Lambda failed (ignored):', error);
       });
+  },
+
+  // Generate Websocket Token
+  generateWebsocketToken: async () => {
+    // no "await" here! It's a "fire-and-forget" call.
+    const { data }: any = await apolloClient
+      .mutate({
+        mutation: GENERATE_WEBSOCKET_TOKEN,
+        fetchPolicy: 'network-only',
+      })
+      .catch((error) => {
+        // We catch the error silently.
+        console.debug('Generate Websocket Token (ignored):', error);
+      });
+
+      console.warn(data);
+
+    return data.generateWSAuthToken.sessionId;
   },
 };

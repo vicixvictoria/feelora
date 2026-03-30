@@ -51,6 +51,7 @@ import TherapistHomeworkPage from './features/therapist/pages/TherapistHomeworkP
 import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsPage';
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
 import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
+import { WebsocketProvider } from './contexts/WebsocketContext';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
@@ -77,10 +78,12 @@ function HomePage() {
 function RootLayout() {
   return (
     <AuthProvider>
-      <ScrollRestoration />
-      <Toaster />
-      <Sonner />
-      <Outlet />
+      <WebsocketProvider>
+        <ScrollRestoration />
+        <Toaster />
+        <Sonner />
+        <Outlet />
+      </WebsocketProvider>
     </AuthProvider>
   );
 }
