@@ -2,10 +2,50 @@ import { Calendar, Send, Smile, BookOpen, ChevronRight } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useMemo } from 'react';
+import { useWebsocket } from '@/contexts/WebsocketContext';
+
+interface IncomingNotification {
+  type?: string;
+  data?: {
+    type?: string;
+    conversationId?: string;
+    count?: number;
+  };
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { messages } = useWebsocket();
+
+  const unreadChatCount = useMemo(() => {
+    const unreadByConversation = new Map<string, number>();
+
+    for (const message of messages) {
+      try {
+        const parsed = JSON.parse(message) as IncomingNotification;
+        if (parsed.type !== 'notification' || parsed.data?.type !== 'new_message') continue;
+
+        const conversationId = parsed.data.conversationId;
+        if (!conversationId) continue;
+
+        const fallbackCount = (unreadByConversation.get(conversationId) ?? 0) + 1;
+        const count = typeof parsed.data.count === 'number' ? parsed.data.count : fallbackCount;
+        unreadByConversation.set(conversationId, Math.max(0, count));
+      } catch {
+        // Ignore non-json websocket payloads.
+      }
+    }
+
+    return Array.from(unreadByConversation.values()).reduce((total, count) => total + count, 0);
+  }, [messages]);
+
+  const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
+    count: unreadChatCount,
+    defaultValue:
+      unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
+  });
 
   const notificationCards = [
     {
@@ -17,13 +57,15 @@ const Dashboard = () => {
         t('patient.dashboard.appointmentRequest'),
       ],
       path: '/calendar',
+      isEnabled: false,
     },
     {
       icon: Send,
       iconColor: 'text-purple',
       title: t('patient.dashboard.chat'),
-      lines: [t('patient.dashboard.unreadMessage')],
-      path: '/chat',
+      lines: [unreadChatLine],
+      path: '/patient',
+      isEnabled: true,
     },
     {
       icon: Smile,
@@ -31,6 +73,7 @@ const Dashboard = () => {
       title: t('patient.dashboard.moodTracker'),
       lines: [t('patient.dashboard.dailyReminder')],
       path: '/mood-tracker',
+      isEnabled: false,
     },
     {
       icon: BookOpen,
@@ -38,6 +81,7 @@ const Dashboard = () => {
       title: t('patient.dashboard.tasks'),
       lines: [t('patient.dashboard.tasksWaiting')],
       path: '/homework',
+      isEnabled: false,
     },
   ];
 
@@ -72,12 +116,12 @@ const Dashboard = () => {
         {notificationCards.map((card, index) => (
           <button
             key={index}
-            className="feelora-card relative flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow text-left"
-            onClick={() => navigate(card.path)}
+            className={`feelora-card relative flex items-center gap-4 transition-shadow text-left ${card.isEnabled ? 'cursor-pointer hover:shadow-md' : 'cursor-default opacity-70'}`}
+            onClick={() => {
+              if (card.isEnabled) navigate(card.path);
+            }}
+            type="button"
           >
-            {'badge' in card && (card as { badge: number }).badge > 0 && (
-              <span className="feelora-badge">{(card as { badge: number }).badge}</span>
-            )}
             <card.icon className={`w-10 h-10 ${card.iconColor}`} />
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">{card.title}</h3>
@@ -87,7 +131,7 @@ const Dashboard = () => {
                 </p>
               ))}
             </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            {card.isEnabled && <ChevronRight className="w-5 h-5 text-muted-foreground" />}
           </button>
         ))}
       </div>

@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
 //import feeloraLogo from '@/assets/logo.png';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { patientService } from '../api/patient-service';
 
@@ -16,9 +17,19 @@ interface SidebarChat {
   lastMessage: string;
 }
 
+interface IncomingNotification {
+  type?: string;
+  data?: {
+    type?: string;
+    conversationId?: string;
+    count?: number;
+  };
+}
+
 const ChatPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { messages: websocketMessages } = useWebsocket();
 
   // State
   const [chatList, setChatList] = useState<SidebarChat[]>([]);
@@ -31,6 +42,43 @@ const ChatPage = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
+  const processedMessageCountRef = useRef(0);
+
+  const extractIncomingNotification = (rawMessage: string): IncomingNotification | null => {
+    try {
+      const parsed = JSON.parse(rawMessage) as IncomingNotification;
+      if (parsed.type !== 'notification') return null;
+      if (parsed.data?.type !== 'new_message') return null;
+      if (!parsed.data.conversationId) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (websocketMessages.length <= processedMessageCountRef.current) return;
+
+    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+    processedMessageCountRef.current = websocketMessages.length;
+
+    setUnreadByConversation((previous) => {
+      const next = { ...previous };
+
+      for (const rawMessage of newMessages) {
+        const incoming = extractIncomingNotification(rawMessage);
+        if (!incoming?.data?.conversationId) continue;
+
+        const conversationId = incoming.data.conversationId;
+        const fallbackCount = (next[conversationId] ?? 0) + 1;
+        const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
+        next[conversationId] = Math.max(0, count);
+      }
+
+      return next;
+    });
+  }, [websocketMessages]);
 
   // 1. Fetch Matches AND Conversations on Load
   useEffect(() => {
@@ -81,6 +129,16 @@ const ChatPage = () => {
     setSelectedChat(chat);
     setMobileShowChat(true);
     setMessages([]); // Clear previous messages while loading
+
+    if (chat.conversationId) {
+      const conversationId = chat.conversationId;
+      setUnreadByConversation((previous) => {
+        if (!(conversationId in previous)) return previous;
+        const next = { ...previous };
+        delete next[conversationId];
+        return next;
+      });
+    }
 
     // If they have no conversationId yet, there are no messages to fetch
     if (!chat.conversationId) return;
@@ -164,24 +222,31 @@ const ChatPage = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            {chatList.map((chat) => (
-              <button
-                key={chat.contactId}
-                onClick={() => handleSelectChat(chat)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : 'hover:bg-muted/50'}`}
-              >
-                <img
-                  src={chat.avatar}
-                  alt={chat.name}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                />
-                <div className="flex-1 text-left overflow-hidden">
-                  <p className="font-medium text-foreground truncate">{chat.name}</p>
-                  <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              </button>
-            ))}
+            {chatList.map((chat) => {
+              const unreadCount = chat.conversationId ? (unreadByConversation[chat.conversationId] ?? 0) : 0;
+
+              return (
+                <button
+                  key={chat.contactId}
+                  onClick={() => handleSelectChat(chat)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : unreadCount > 0 ? 'bg-primary/10 hover:bg-primary/15 ring-1 ring-primary/30' : 'hover:bg-muted/50'}`}
+                >
+                  <img
+                    src={chat.avatar}
+                    alt={chat.name}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 text-left overflow-hidden">
+                    <p className="font-medium text-foreground truncate">{chat.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="feelora-badge mr-1 min-w-6 text-center">{unreadCount}</span>
+                  )}
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
