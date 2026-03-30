@@ -16,7 +16,7 @@ const INSERT_QUESTIONNAIRE_MUTATION = gql`
   }
 `;
 
-// to match the Therapist Query
+// match the Therapist Query to get existing Therapist Data
 const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
   query GetOwnTherapistProfile {
     getOwnTherapistProfile {
@@ -38,7 +38,7 @@ const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
   }
 `;
 
-// to use the correct Therapist Mutation and Input Type
+// to save a new Therpaists Data
 const SAVE_THERAPIST_PROFILE_MUTATION = gql`
   mutation SaveTherapistProfile($input: CreateTherapistProfileInput!) {
     saveTherapistProfile(input: $input) {
@@ -63,6 +63,13 @@ const GET_MATCHED_USERS_QUERY = gql`
         City
       }
     }
+  }
+`;
+
+// -- Delete Account Data Mutation
+const DELETE_DATA_MUTATION = gql`
+  mutation DeleteData {
+    deleteData
   }
 `;
 
@@ -180,4 +187,20 @@ export const therapistService = {
       return [];
     }
   },
+
+  // -- Delete Therapist Profile and all associated data --
+  deleteProfile: async (): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_DATA_MUTATION,
+      });
+      return data.deleteData; // Returns true if successful
+    } catch (error) {
+      console.error('Error deleting therapist profile data:', error);
+      throw error;
+    }
+  },
+  
 };
+
+
