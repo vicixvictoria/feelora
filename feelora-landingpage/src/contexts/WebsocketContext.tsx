@@ -6,6 +6,7 @@ interface WebsocketContextType {
     websocket: any;
     messages: string[];
     connected: boolean;
+    nextToken?: string | null;
 }
 
 const WebsocketContext = createContext<WebsocketContextType | undefined>(undefined);
@@ -13,10 +14,29 @@ const WebsocketContext = createContext<WebsocketContextType | undefined>(undefin
 export function WebsocketProvider({ children }: { children: React.ReactNode }) {
     const [websocket, setWebsocket] = useState<any>(null);
     const [websocketToken, setWebsocketToken] = useState<string | null>(null);
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState<any[]>([]);
+    const [nextToken, setNextToken] = useState<string | null | undefined>(null);
     let isWebsocketConnected = websocket != null;
 
     const { isAuthenticated } = useAuth();
+
+    const fetchNotifications = async () => {
+        if (!isAuthenticated) return;
+        const notifications = await notificationService.getNotifications({
+            limit: 50,
+            nextToken: undefined,
+        });
+        console.log(`[WS] Initial notifications fetched:`, notifications);
+
+        setMessages((prevMessages) => [...prevMessages, ...notifications.notifications]);
+        setNextToken(notifications.nextToken);
+    }
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchNotifications();
+        }
+    }, [isAuthenticated]);
 
     const getWebsocketToken = async () => {
         if (!isAuthenticated) return;
@@ -45,14 +65,14 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
             newWebsocket.onopen = () => console.log(`[WS] Connected to WebSocket server, took ${Date.now() - now}ms`);
             newWebsocket.onmessage = (event: any) => {
                 console.log(`[WS] Received message from WebSocket server`, event.data);
-                setMessages((prevMessages) => [...prevMessages, event.data]);
+                setMessages((prevMessages) => [...prevMessages, JSON.parse(event.data)]);
             };
             newWebsocket.onclose = () => console.log(`[WS] Disconnected from WebSocket server, took ${Date.now() - now}ms`);
         }
     }, [isAuthenticated, websocket, websocketToken]);
 
     return (
-        <WebsocketContext.Provider value={{ websocket, messages, connected: isWebsocketConnected }}>
+        <WebsocketContext.Provider value={{ websocket, messages, connected: isWebsocketConnected, nextToken }}>
             {children}
         </WebsocketContext.Provider>
     );
