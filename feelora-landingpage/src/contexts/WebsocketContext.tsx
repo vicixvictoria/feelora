@@ -1,4 +1,4 @@
-import { notificationService } from "@/features/notification/api/notification-service";
+import { notificationService } from "@/features/notifications/api/notification-service";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
