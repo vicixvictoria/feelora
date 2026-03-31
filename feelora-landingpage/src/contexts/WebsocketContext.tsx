@@ -1,4 +1,4 @@
-import { patientService } from "@/features/patient/api/patient-service";
+import { notificationService } from "@/features/notification/api/notification-service";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
@@ -22,8 +22,8 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
         if (!isAuthenticated) return;
         let now = new Date().getTime();
 
-        // patientService is used to avoid method duplication (same logic for therapists)
-        const newWebsocketToken = await patientService.generateWebsocketToken();
+        // notificationService is used to avoid method duplication (same logic for therapists)
+        const newWebsocketToken = await notificationService.generateWebsocketToken();
 
         //! Testing log for performance
         console.log(`[WS] New Websocket Token, took ${new Date().getTime() - now}ms`);
