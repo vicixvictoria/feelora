@@ -4,9 +4,27 @@ import { useAuth } from './AuthContext';
 
 interface WebsocketContextType {
   websocket: any;
-  messages: string[];
+  messages: WebsocketNotification[];
   connected: boolean;
   nextToken?: string | null;
+}
+
+interface NotificationData {
+  recipientId?: string;
+  sk?: string;
+  type?: string;
+  conversationId?: string;
+  count?: number;
+  senderName?: string;
+  matchedId?: string;
+  unmatchedId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface WebsocketNotification {
+  type: string;
+  data: NotificationData;
 }
 
 const WebsocketContext = createContext<WebsocketContextType | undefined>(undefined);
@@ -14,7 +32,7 @@ const WebsocketContext = createContext<WebsocketContextType | undefined>(undefin
 export function WebsocketProvider({ children }: { children: React.ReactNode }) {
   const [websocket, setWebsocket] = useState<any>(null);
   const [websocketToken, setWebsocketToken] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<WebsocketNotification[]>([]);
   const [nextToken, setNextToken] = useState<string | null | undefined>(null);
   let isWebsocketConnected = websocket != null;
 
@@ -28,7 +46,13 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
     });
     console.log(`[WS] Initial notifications fetched:`, notifications);
 
-    setMessages((prevMessages) => [...prevMessages, ...notifications.notifications]);
+    const normalizedNotifications: WebsocketNotification[] =
+      notifications.notifications.map((notification: NotificationData) => ({
+        type: 'notification',
+        data: notification,
+      }));
+
+    setMessages((prevMessages) => [...prevMessages, ...normalizedNotifications]);
     setNextToken(notifications.nextToken);
   };
 

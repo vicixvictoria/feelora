@@ -38,19 +38,15 @@ const Dashboard = () => {
     const unreadByConversation = new Map<string, number>();
 
     for (const message of messages) {
-      try {
-        const parsed = JSON.parse(message) as IncomingNotification;
-        if (parsed.type !== 'notification' || parsed.data?.type !== 'new_message') continue;
+      const parsed = message as IncomingNotification;
+      if (parsed.type !== 'notification' || parsed.data?.type !== 'new_message') continue;
 
-        const conversationId = parsed.data.conversationId;
-        if (!conversationId) continue;
+      const conversationId = parsed.data.conversationId;
+      if (!conversationId) continue;
 
-        const fallbackCount = (unreadByConversation.get(conversationId) ?? 0) + 1;
-        const count = typeof parsed.data.count === 'number' ? parsed.data.count : fallbackCount;
-        unreadByConversation.set(conversationId, Math.max(0, count));
-      } catch {
-        // Ignore non-json websocket payloads.
-      }
+      const fallbackCount = (unreadByConversation.get(conversationId) ?? 0) + 1;
+      const count = typeof parsed.data.count === 'number' ? parsed.data.count : fallbackCount;
+      unreadByConversation.set(conversationId, Math.max(0, count));
     }
 
     return Array.from(unreadByConversation.values()).reduce((total, count) => total + count, 0);
