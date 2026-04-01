@@ -6,12 +6,13 @@ import feeloraLogo from '@/assets/logo.png';
 import { patientService } from '../api/patient-service';
 import { moodCategoryDefs } from '@/components/ui/moodtracker/mood-tracker';
 
+/*
 interface MoodOption {
   emoji: string;
   labelKey: string;
 }
 
-/*interface MoodCategory {
+interface MoodCategory {
   questionKey: string;
   options: MoodOption[];
 }*/
