@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import feeloraLogo from '@/assets/logo.png';
+import { patientService } from '../api/patient-service';
+import { moodCategoryDefs } from '@/components/ui/moodtracker/mood-tracker';
 
 interface MoodOption {
   emoji: string;
@@ -13,114 +16,13 @@ interface MoodCategory {
   options: MoodOption[];
 }
 
-const moodCategoryDefs: MoodCategory[] = [
-  {
-    questionKey: 'patient.moodTracker.howAreYou',
-    options: [
-      { emoji: '😊', labelKey: 'patient.moodTracker.happy' },
-      { emoji: '😌', labelKey: 'patient.moodTracker.content' },
-      { emoji: '😐', labelKey: 'patient.moodTracker.neutral' },
-      { emoji: '😢', labelKey: 'patient.moodTracker.sad' },
-      { emoji: '😰', labelKey: 'patient.moodTracker.anxious' },
-      { emoji: '😤', labelKey: 'patient.moodTracker.stressed' },
-      { emoji: '😴', labelKey: 'patient.moodTracker.tired' },
-      { emoji: '😠', labelKey: 'patient.moodTracker.angry' },
-      { emoji: '😕', labelKey: 'patient.moodTracker.confused' },
-      { emoji: '🥰', labelKey: 'patient.moodTracker.inLove' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.enoughSleep',
-    options: [
-      { emoji: '😊', labelKey: 'patient.moodTracker.wellRested' },
-      { emoji: '😴', labelKey: 'patient.moodTracker.somewhatTired' },
-      { emoji: '💤', labelKey: 'patient.moodTracker.restlessSleep' },
-      { emoji: '😩', labelKey: 'patient.moodTracker.barelySlept' },
-      { emoji: '😵', labelKey: 'patient.moodTracker.tooMuchSleep' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.haveYouEaten',
-    options: [
-      { emoji: '🍽️', labelKey: 'patient.moodTracker.ateRegularly' },
-      { emoji: '🥗', labelKey: 'patient.moodTracker.ateSmall' },
-      { emoji: '🍿', labelKey: 'patient.moodTracker.onlySnacked' },
-      { emoji: '❌', labelKey: 'patient.moodTracker.skippedMeal' },
-      { emoji: '🤢', labelKey: 'patient.moodTracker.ateTooMuch' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.exercise',
-    options: [
-      { emoji: '🌳', labelKey: 'patient.moodTracker.movedOutdoors' },
-      { emoji: '🚶', labelKey: 'patient.moodTracker.brieflyOutside' },
-      { emoji: '🏠', labelKey: 'patient.moodTracker.stayedInside' },
-      { emoji: '💪', labelKey: 'patient.moodTracker.didSports' },
-      { emoji: '🧘', labelKey: 'patient.moodTracker.lightMovement' },
-      { emoji: '💤', labelKey: 'patient.moodTracker.noMovement' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.physicalFeeling',
-    options: [
-      { emoji: '💚', labelKey: 'patient.moodTracker.energetic' },
-      { emoji: '😌', labelKey: 'patient.moodTracker.relaxed' },
-      { emoji: '😩', labelKey: 'patient.moodTracker.exhausted' },
-      { emoji: '😣', labelKey: 'patient.moodTracker.pain' },
-      { emoji: '🤒', labelKey: 'patient.moodTracker.sick' },
-      { emoji: '😫', labelKey: 'patient.moodTracker.weak' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.stressLevel',
-    options: [
-      { emoji: '😌', labelKey: 'patient.moodTracker.relaxedStress' },
-      { emoji: '😐', labelKey: 'patient.moodTracker.somewhatTense' },
-      { emoji: '😤', labelKey: 'patient.moodTracker.stressedLevel' },
-      { emoji: '🤯', labelKey: 'patient.moodTracker.overwhelmed' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.focusProductivity',
-    options: [
-      { emoji: '🎯', labelKey: 'patient.moodTracker.veryFocused' },
-      { emoji: '😊', labelKey: 'patient.moodTracker.productive' },
-      { emoji: '😐', labelKey: 'patient.moodTracker.distracted' },
-      { emoji: '😞', labelKey: 'patient.moodTracker.unmotivated' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.socialConnection',
-    options: [
-      { emoji: '❤️', labelKey: 'patient.moodTracker.timeWithOthers' },
-      { emoji: '💬', labelKey: 'patient.moodTracker.talkedToSomeone' },
-      { emoji: '😔', labelKey: 'patient.moodTracker.feltLonely' },
-      { emoji: '🚫', labelKey: 'patient.moodTracker.wantedAlone' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.selfCare',
-    options: [
-      { emoji: '💚', labelKey: 'patient.moodTracker.didSomethingForMe' },
-      { emoji: '🎨', labelKey: 'patient.moodTracker.didSomethingNice' },
-      { emoji: '🧘', labelKey: 'patient.moodTracker.relaxedMeditated' },
-      { emoji: '🚫', labelKey: 'patient.moodTracker.noSelfCare' },
-    ],
-  },
-  {
-    questionKey: 'patient.moodTracker.gratitude',
-    options: [
-      { emoji: '🌟', labelKey: 'patient.moodTracker.somethingGoodHappened' },
-      { emoji: '❤️', labelKey: 'patient.moodTracker.grateful' },
-      { emoji: '😔', labelKey: 'patient.moodTracker.difficultDay' },
-      { emoji: '❌', labelKey: 'patient.moodTracker.nothingPositive' },
-    ],
-  },
-];
 
 const MoodTrackerPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate(); // <-- Initialize navigation
+  
   const [selectedMoods, setSelectedMoods] = useState<Record<number, string[]>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // <-- Added loading state
 
   const toggleMood = (categoryIndex: number, labelKey: string) => {
     setSelectedMoods((prev) => {
@@ -136,9 +38,31 @@ const MoodTrackerPage = () => {
     return selectedMoods[categoryIndex]?.includes(labelKey) || false;
   };
 
+  // --- Questionnaire SUBMIT HANDLER ---
+  const handleSubmit = async () => {
+    // Makes sure they answered at least one question
+    if (Object.keys(selectedMoods).length === 0) {
+      alert("Bitte wähle mindestens eine Stimmung aus, bevor du fortfährst.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await patientService.saveMoodTrackerQuestionnaire(selectedMoods);
+      
+      // Success - Send user back to their dashboard --> should they be send to a specific page ?? UX discussion
+      navigate('/patient/dashboard'); 
+    } catch (error) {
+      console.error('Failed to submit mood tracker:', error);
+      alert('Fehler beim Speichern der Daten. Bitte versuche es erneut.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto animate-fade-in pb-10">
-      {/* Header */}
+        {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <img src={feeloraLogo} alt="Feelora" className="w-12 h-12" />
         <h1 className="text-2xl font-bold text-foreground">{t('patient.moodTracker.title')}</h1>
@@ -179,9 +103,19 @@ const MoodTrackerPage = () => {
 
       {/* Submit Button */}
       <div className="flex justify-center mt-8">
-        <button className="feelora-btn-primary px-8">
-          {t('patient.moodTracker.next')}
-          <ArrowRight className="w-4 h-4" />
+        <button 
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="feelora-btn-primary px-8 disabled:opacity-50"
+        >
+          {isSubmitting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              {t('patient.moodTracker.next', 'Weiter')}
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       </div>
     </div>

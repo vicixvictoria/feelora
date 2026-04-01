@@ -40,6 +40,7 @@ import HomeworkPage from './features/patient/pages/HomeworkPage';
 import NotFound from './features/patient/pages/NotFound';
 import PatientQuestionnaire from './features/patient/pages/PatientQuestionnaire';
 import AccountPage from './features/patient/pages/AccountPage';
+import MoodTrackerDetailsPage from './features/patient/pages/MoodTrackerDetailsPage';
 
 // --- THERAPIST Imports ---
 import TherapistLayout from './features/therapist/layout/TherapistLayout';
@@ -52,6 +53,7 @@ import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsP
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
 import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
 import { WebsocketProvider } from './contexts/WebsocketContext';
+import TherapistMoodTrackerDetailsPage from './features/therapist/pages/TherapistMoodTrackerDetailsPage';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
@@ -150,6 +152,7 @@ const router = createBrowserRouter([
               { path: 'mood-tracker', element: <MoodTrackerPage /> },
               { path: 'homework', element: <HomeworkPage /> },
               { path: 'account', element: <AccountPage /> },
+              { path: 'dashboard/details', element: <MoodTrackerDetailsPage /> },
             ],
           },
         ],
@@ -170,6 +173,7 @@ const router = createBrowserRouter([
               { path: 'patients', element: <TherapistPatientsPage /> },
               { path: 'calendar', element: <TherapistCalendarPage /> },
               { path: 'account', element: <TherapistAccountPage /> },
+              { path: 'mood-tracker/details', element: <TherapistMoodTrackerDetailsPage /> },
             ],
           },
         ],

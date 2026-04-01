@@ -5,6 +5,8 @@ import { PatientProfile, MatchedTherapist, AlgorithmMatch } from '../types/profi
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
 
+// -- Matching Algorithm and Questionnaire Mutations --
+
 // Matching Algorithm Mutation -- Accepts 'MatchingInput' and returns a list of 'Match'
 const MATCHING_ALGORITHM_MUTATION = gql`
   mutation MatchingAlgorithm($input: MatchingInput!) {
@@ -26,6 +28,14 @@ const MATCHING_ALGORITHM_MUTATION = gql`
     }
   }
 `;
+
+const SAVE_MATCH_MUTATION = gql`
+  mutation SaveMatch($match: ID!) {
+    saveMatch(match: $match)
+  }
+`;
+
+// -- User Profile Mutations --
 
 // Get Logged-In Patient Profile
 export const GET_OWN_USER_PROFILE_QUERY = gql`
@@ -61,6 +71,23 @@ const SAVE_USER_PROFILE_MUTATION = gql`
   }
 `;
 
+/*const UPDATE_OWN_USER_PROFILE_MUTATION = gql`
+  mutation UpdateOwnUserProfile($input: UserProfileInput!) {
+    updateOwnUserProfile(input: $input) {
+      Id
+      MoodTracker
+      Name      
+      City   
+    }
+  }
+`;*/
+
+const MOOD_TRACKER_SHARE_CONSENT_MUTATION = gql`
+  mutation MoodTrackerShareConsent($allow: Boolean!) {
+    MoodTrackerShareConsent(allow: $allow)
+  }
+`;
+
 // export to use for cache in profile page
 export const GET_MATCHED_THERAPISTS_QUERY = gql`
   query GetMatchedTherapists($TherapistsIds: [ID]) {
@@ -83,13 +110,7 @@ export const GET_MATCHED_THERAPISTS_QUERY = gql`
   }
 `;
 
-const SAVE_MATCH_MUTATION = gql`
-  mutation SaveMatch($match: ID!) {
-    saveMatch(match: $match)
-  }
-`;
-
-// --- Chat & Mood Tracker Mutations ---
+// --- Chat & Mood Tracker Chat Mutations ---
 
 const CREATE_CONVERSATION_MUTATION = gql`
   mutation CreateConversation($participantId: ID!) {
@@ -101,6 +122,7 @@ const CREATE_CONVERSATION_MUTATION = gql`
   }
 `;
 
+/* After MVP Feature 
 const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
   mutation SendMoodTrackerMessage(
     $conversationId: ID!
@@ -116,7 +138,7 @@ const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
       sentAt
     }
   }
-`;
+`;*/
 
 const GET_CONVERSATIONS_QUERY = gql`
   query GetConversations {
@@ -129,7 +151,30 @@ const GET_CONVERSATIONS_QUERY = gql`
   }
 `;
 
-// -- Delete Account Data Mutation
+// -- Mood Tracker Questionnaire Mutations--
+
+const SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION = gql`
+  mutation SaveMoodTrackerQuestionnaire($input: MoodTrackerQuestionnaireInput!) {
+    saveMoodTrackerQuestionnaire(input: $input) {
+      CreatedAt
+      UpdatedAt
+    }
+  }
+`;
+
+const GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY = gql`
+  query GetMoodTrackerQuestionnaires($limit: Int) {
+    getMoodTrackerQuestionnaires(limit: $limit) {
+      items {
+        CreatedAt
+        Questionnaire
+        QuestionnaireSummary
+      }
+    }
+  }
+`;
+
+// -- Delete Account Data Mutation --
 const DELETE_DATA_MUTATION = gql`
   mutation DeleteData {
     deleteData
@@ -218,6 +263,25 @@ export const patientService = {
     return responseData.getOwnUserProfile;
   },
 
+  // -- Update Mood Tracker Sharing Consent --
+  updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
+        variables: { allow: consent }, // <-- Using the dedicated 'allow' variable
+      });
+      
+      console.log(
+        `Security Firewall successfully updated! Therapist access: ${data.MoodTrackerShareConsent}`
+      );
+      
+      return data.MoodTrackerShareConsent;
+    } catch (error) {
+      console.error('❌ Error updating GDPR consent firewall:', error);
+      throw error;
+    }
+  },
+
   // Fetch matched therapist(s)
   getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
     // Log to understand return
@@ -286,7 +350,9 @@ export const patientService = {
     }
   },
 
-  // -- Save Mood Tracker Data --
+  // -- Save Mood Tracker Chat Message --
+  //Not in the MVP but keep it for later
+  /*
   saveMoodData: async (
     conversationId: string,
     moodData: Record<number, string[]>,
@@ -311,7 +377,7 @@ export const patientService = {
       // Using the 'cause' property links the two errors for better debugging
       throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
     }
-  },
+  },*/
 
   // -- Delete User Profile and all associated data --
   deleteProfile: async (): Promise<boolean> => {
@@ -325,6 +391,61 @@ export const patientService = {
       throw error;
     }
   },
+
+  // -- MOOD TRACKER API --
+
+  // -- Save Mood Tracker Data from Questionnaire --
+  saveMoodTrackerQuestionnaire: async (
+    moodData: Record<number, string[]>,
+  ): Promise<boolean> => {
+    try {
+      // The backend requires a 'QuestionnaireSummary' AWSJSON object.
+      // We create a basic summary of the main mood (Question 0) and total answered.
+      const summary = {
+        totalCategoriesAnswered: Object.keys(moodData).length,
+        primaryMood: moodData[0]?.[0] || 'Not specified', 
+      };
+
+      const input = {
+        Questionnaire: JSON.stringify(moodData),
+        QuestionnaireSummary: JSON.stringify(summary),
+      };
+
+      // for debugging: Capture the response from the mutation
+      const response = await apolloClient.mutate({
+        mutation: SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION,
+        variables: { input },
+      });
+
+      //debugging: Log the successful return data from the backend
+      console.log(
+        '✅ Mood Tracker data successfully saved in backend:', 
+        response.data?.saveMoodTrackerQuestionnaire
+      );
+
+      return true;
+    } catch (error: any) {
+      console.error('Error saving mood tracking data:', error);
+      throw new Error(`Failed to save mood tracking data: ${error.message}`);
+    }
+  },
+
+  // -- Fetch all saved Mood Trackers for the Dashboard --
+  getMoodTrackers: async () => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY,
+        variables: { limit: 20 }, // Fetch the 10 most recent --> do we need more / all?
+        fetchPolicy: 'network-only', // Always get fresh data for the dashboard
+      });
+      return data.getMoodTrackerQuestionnaires.items || [];
+    } catch (error) {
+      console.error('Error fetching mood trackers:', error);
+      return [];
+    }
+  },
+
+  // -- PING API --
 
   // -- Wake up the matching algorithm Lambda --
   pingMatchingAlgorithm: () => {
