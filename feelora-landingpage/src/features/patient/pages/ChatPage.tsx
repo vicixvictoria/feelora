@@ -26,6 +26,11 @@ interface IncomingNotification {
   };
 }
 
+interface WebsocketMessage {
+  type?: string;
+  data?: IncomingNotification['data'];
+}
+
 const ChatPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -45,16 +50,13 @@ const ChatPage = () => {
   const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
   const processedMessageCountRef = useRef(0);
 
-  const extractIncomingNotification = (rawMessage: string): IncomingNotification | null => {
-    try {
-      const parsed = JSON.parse(rawMessage) as IncomingNotification;
-      if (parsed.type !== 'notification') return null;
-      if (parsed.data?.type !== 'new_message') return null;
-      if (!parsed.data.conversationId) return null;
-      return parsed;
-    } catch {
-      return null;
-    }
+  const extractIncomingNotification = (
+    rawMessage: WebsocketMessage,
+  ): IncomingNotification | null => {
+    if (rawMessage.type !== 'notification') return null;
+    if (rawMessage.data?.type !== 'new_message') return null;
+    if (!rawMessage.data.conversationId) return null;
+    return rawMessage as IncomingNotification;
   };
 
   useEffect(() => {
@@ -243,7 +245,9 @@ const ChatPage = () => {
                     <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
                   </div>
                   {unreadCount > 0 && (
-                    <span className="feelora-badge mr-1 min-w-6 text-center">{unreadCount}</span>
+                    <span className="mr-1 inline-flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-destructive px-1 text-xs font-medium text-white">
+                      {unreadCount}
+                    </span>
                   )}
                   <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </button>
