@@ -215,16 +215,18 @@ export const therapistService = {
   },
 
   // -- Fetch Mood Trackers for a specific patient --
-  getPatientMoodTrackers: async (userId: string): Promise<{ trackers: any[], hasConsent: boolean }> => {
+  getPatientMoodTrackers: async (
+    userId: string,
+  ): Promise<{ trackers: any[]; hasConsent: boolean }> => {
     try {
       const { data } = await apolloClient.query({
         query: THERAPIST_GET_MOOD_TRACKERS_QUERY,
         variables: { userId, limit: 10 }, // Get their 10 most recent entries --> do we need more?
-        fetchPolicy: 'network-only', 
+        fetchPolicy: 'network-only',
       });
-      return { 
-        trackers: data.therapistGetMoodTrackerQuestionnaires.items || [], 
-        hasConsent: true 
+      return {
+        trackers: data.therapistGetMoodTrackerQuestionnaires.items || [],
+        hasConsent: true,
       };
     } catch (error: any) {
       // Check if the backend threw the specific GDPR consent error
@@ -232,12 +234,9 @@ export const therapistService = {
         console.info(`Patient ${userId} withheld consent for mood trackers.`); // Soft info instead of red error
         return { trackers: [], hasConsent: false };
       }
-      
+
       console.error(`Error fetching mood trackers for patient ${userId}:`, error);
       return { trackers: [], hasConsent: true }; // Return true for standard network drops to avoid false locked states
     }
   },
-
 };
-
-

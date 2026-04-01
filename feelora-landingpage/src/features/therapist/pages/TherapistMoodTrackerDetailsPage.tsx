@@ -25,11 +25,11 @@ const TherapistMoodTrackerDetailsPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in pb-10 p-4 md:p-8">
-      <button 
-        onClick={() => navigate(-1)} 
+      <button
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 mb-6 text-muted-foreground hover:text-primary transition-colors"
       >
-        <ArrowLeft className="w-5 h-5" /> 
+        <ArrowLeft className="w-5 h-5" />
         {t('common.back', 'Zurück')}
       </button>
 
@@ -49,8 +49,8 @@ const TherapistMoodTrackerDetailsPage = () => {
               <h3 className="font-medium text-foreground mb-3">{t(category.questionKey)}</h3>
               <div className="flex flex-wrap gap-3">
                 {answers.map((answerKey: string) => (
-                  <div 
-                    key={answerKey} 
+                  <div
+                    key={answerKey}
                     className="flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-full border border-border"
                   >
                     <span className="text-xl">{emojiDictionary[answerKey] || '✨'}</span>

@@ -23,7 +23,7 @@ const TherapistAccountPage = () => {
         const isTherapist = user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
         await logout(isTherapist ? 'therapist' : 'user');
       } else {
-        throw new Error("Backend returned false for deletion.");
+        throw new Error('Backend returned false for deletion.');
       }
     } catch (error) {
       console.error('Failed to delete account:', error);

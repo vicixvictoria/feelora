@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker'; 
+import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
 
 const MoodTrackerDetailsPage = () => {
   const location = useLocation();
@@ -28,11 +28,11 @@ const MoodTrackerDetailsPage = () => {
   return (
     <div className="max-w-3xl mx-auto animate-fade-in pb-10 p-4 md:p-8">
       {/* Header */}
-      <button 
-        onClick={() => navigate(-1)} 
+      <button
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 mb-6 text-muted-foreground hover:text-primary transition-colors"
       >
-        <ArrowLeft className="w-5 h-5" /> 
+        <ArrowLeft className="w-5 h-5" />
         {t('common.back', 'Zurück')}
       </button>
 
@@ -46,22 +46,22 @@ const MoodTrackerDetailsPage = () => {
         {moodCategoryDefs.map((category, index) => {
           // Check if this category has answers in the saved JSON
           const answers = fullQuestionnaire[index] || [];
-          
+
           // If the patient skipped this question, don't render it
           if (answers.length === 0) return null;
 
           return (
-            <div 
-              key={index} 
+            <div
+              key={index}
               // Removed 'feelora-card' and added a subtle bottom border that hides on the last item
               className="pb-6 border-b border-border last:border-0 last:pb-0"
             >
               <h3 className="font-medium text-foreground mb-3">{t(category.questionKey)}</h3>
-              
+
               <div className="flex flex-wrap gap-3">
                 {answers.map((answerKey: string) => (
-                  <div 
-                    key={answerKey} 
+                  <div
+                    key={answerKey}
                     className="flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-full border border-border"
                   >
                     <span className="text-xl">{emojiDictionary[answerKey] || '✨'}</span>

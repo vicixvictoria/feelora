@@ -10,8 +10,11 @@ import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
 const formatDate = (isoString: string) => {
   const date = new Date(isoString);
   return date.toLocaleString('de-DE', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
@@ -43,7 +46,9 @@ const TherapistMoodTrackerPage = () => {
         const allTrackers = [];
         for (const patient of patients) {
           // Destructure the new object format from our service
-          const { trackers, hasConsent } = await therapistService.getPatientMoodTrackers(patient.Id);
+          const { trackers, hasConsent } = await therapistService.getPatientMoodTrackers(
+            patient.Id,
+          );
           const patientFullName = `${patient.Name} ${patient.Surname || ''}`.trim();
 
           // If they denied consent, push a special locked entry and skip to the next patient
@@ -55,7 +60,7 @@ const TherapistMoodTrackerPage = () => {
               date: 'Keine Freigabe',
               rawDate: 0, // 0 ensures they appear at the very bottom of the sorted list
             });
-            continue; 
+            continue;
           }
 
           // Otherwise, map their data normally
@@ -64,13 +69,13 @@ const TherapistMoodTrackerPage = () => {
             return {
               isLocked: false,
               patientName: patientFullName,
-              avatar: placeholderAvatar, 
+              avatar: placeholderAvatar,
               date: formatDate(item.CreatedAt),
-              rawDate: new Date(item.CreatedAt).getTime(), 
+              rawDate: new Date(item.CreatedAt).getTime(),
               mood: emojiDictionary[questionnaire[0]?.[0]] || '📝',
               outdoor: emojiDictionary[questionnaire[3]?.[0]] || '🌤️',
               physical: emojiDictionary[questionnaire[4]?.[0]] || '💪',
-              fullQuestionnaire: questionnaire, 
+              fullQuestionnaire: questionnaire,
             };
           });
 
@@ -80,9 +85,8 @@ const TherapistMoodTrackerPage = () => {
         // 4. Sort everything by newest first
         allTrackers.sort((a, b) => b.rawDate - a.rawDate);
         setCombinedTrackers(allTrackers);
-
       } catch (error) {
-        console.error("Failed to load patient mood trackers", error);
+        console.error('Failed to load patient mood trackers', error);
       } finally {
         setIsLoading(false);
       }
@@ -109,7 +113,9 @@ const TherapistMoodTrackerPage = () => {
         </div>
       ) : combinedTrackers.length === 0 ? (
         <div className="feelora-card text-center p-8 border-dashed border-2">
-          <p className="text-muted-foreground text-lg">Noch keine Einträge von Patienten vorhanden.</p>
+          <p className="text-muted-foreground text-lg">
+            Noch keine Einträge von Patienten vorhanden.
+          </p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -127,7 +133,9 @@ const TherapistMoodTrackerPage = () => {
                 />
                 <div className="min-w-[120px]">
                   <p className="font-semibold text-foreground">{entry.patientName}</p>
-                  <p className={`text-sm ${entry.isLocked ? 'text-muted-foreground italic' : 'text-primary'}`}>
+                  <p
+                    className={`text-sm ${entry.isLocked ? 'text-muted-foreground italic' : 'text-primary'}`}
+                  >
                     {entry.date}
                   </p>
                 </div>
@@ -156,7 +164,7 @@ const TherapistMoodTrackerPage = () => {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => navigate('details', { state: { entry } })}
                     className="text-primary font-medium hover:underline flex items-center gap-1 self-end sm:self-auto"
                   >

@@ -12,7 +12,7 @@ const AccountPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteAccount = async () => {
-   setIsDeleting(true);
+    setIsDeleting(true);
     try {
       // 1. Call backend mutation to delete the profile from the database
       const isDeleted = await patientService.deleteProfile();
@@ -23,7 +23,7 @@ const AccountPage = () => {
         const isTherapist = user?.groups?.includes('type:T') || user?.groups?.includes('type:P');
         await logout(isTherapist ? 'therapist' : 'user');
       } else {
-        throw new Error("Backend returned false for deletion.");
+        throw new Error('Backend returned false for deletion.');
       }
     } catch (error) {
       console.error('Failed to delete account:', error);

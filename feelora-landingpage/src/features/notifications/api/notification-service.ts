@@ -27,14 +27,14 @@ export interface NotificationBatch {
 const GENERATE_WEBSOCKET_TOKEN = gql`
   mutation GenerateWSAuthToken {
     generateWSAuthToken {
-      sessionId,
-      profileId,
+      sessionId
+      profileId
       used
     }
   }
 `;
 
-// Batch notification fetch 
+// Batch notification fetch
 const GET_NOTIFICATIONS = gql`
   query GetNotifications($notificationType: NotificationType, $limit: Int, $nextToken: String) {
     getNotifications(notificationType: $notificationType, limit: $limit, nextToken: $nextToken) {
@@ -77,7 +77,7 @@ export const notificationService = {
         console.debug('Generate Websocket Token (ignored):', error);
       });
 
-      console.warn(data);
+    console.warn(data);
 
     return data.generateWSAuthToken.sessionId;
   },
@@ -98,7 +98,7 @@ export const notificationService = {
     });
     return data?.getNotifications ?? { notifications: [], nextToken: null };
   },
-  
+
   readNotification: async ({
     notificationType,
     notificationId,
@@ -113,4 +113,4 @@ export const notificationService = {
     });
     return Boolean(data?.readNotification);
   },
-}
+};

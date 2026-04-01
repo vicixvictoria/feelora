@@ -223,7 +223,9 @@ const ChatPage = () => {
         ) : (
           <div className="space-y-2">
             {chatList.map((chat) => {
-              const unreadCount = chat.conversationId ? (unreadByConversation[chat.conversationId] ?? 0) : 0;
+              const unreadCount = chat.conversationId
+                ? (unreadByConversation[chat.conversationId] ?? 0)
+                : 0;
 
               return (
                 <button

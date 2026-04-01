@@ -21,8 +21,11 @@ interface IncomingNotification {
 const formatDate = (isoString: string) => {
   const date = new Date(isoString);
   return date.toLocaleString('de-DE', {
-    day: '2-digit', month: '2-digit', year: '2-digit',
-    hour: '2-digit', minute: '2-digit'
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
@@ -55,8 +58,7 @@ const Dashboard = () => {
 
   const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
     count: unreadChatCount,
-    defaultValue:
-      unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
+    defaultValue: unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
   });
 
   // State for dynamically loaded mood trackers
@@ -79,24 +81,24 @@ const Dashboard = () => {
 
         // Fetch mood trackers
         const trackers = await patientService.getMoodTrackers();
-        
+
         // Map backend data to the format our UI needs
         const formattedTrackers = trackers.map((item: any) => {
-        const questionnaire = JSON.parse(item.Questionnaire);
+          const questionnaire = JSON.parse(item.Questionnaire);
           return {
             date: formatDate(item.CreatedAt),
-            status: t('patient.dashboard.statusSeen', 'Gespeichert'), 
+            status: t('patient.dashboard.statusSeen', 'Gespeichert'),
             // Look up the emoji using the first selected answer for that category, or provide a fallback
-            mood: emojiDictionary[questionnaire[0]?.[0]] || '📝',     // Category 0: Mood
-            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '🌤️',  // Category 3: Activity
+            mood: emojiDictionary[questionnaire[0]?.[0]] || '📝', // Category 0: Mood
+            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '🌤️', // Category 3: Activity
             physical: emojiDictionary[questionnaire[4]?.[0]] || '💪', // Category 4: Physical
-            fullQuestionnaire: questionnaire
+            fullQuestionnaire: questionnaire,
           };
         });
 
         setMoodDiary(formattedTrackers);
       } catch (error) {
-        console.error("Failed to load dashboard moods", error);
+        console.error('Failed to load dashboard moods', error);
       } finally {
         setIsLoadingMoods(false);
       }
@@ -111,14 +113,14 @@ const Dashboard = () => {
     const newConsentState = !isShared;
     try {
       // Optimistically update the UI instantly - then save it
-      setIsShared(newConsentState); 
+      setIsShared(newConsentState);
       // Save it to the backend
       await patientService.updateMoodTrackerConsent(newConsentState);
     } catch (error) {
-      console.error("Failed to update consent", error);
+      console.error('Failed to update consent', error);
       // If it fails, revert the switch back to its original state
       setIsShared(!newConsentState);
-      alert("Fehler beim Speichern der Freigabe. Bitte versuche es erneut.");
+      alert('Fehler beim Speichern der Freigabe. Bitte versuche es erneut.');
     } finally {
       setIsToggling(false);
     }
@@ -194,16 +196,16 @@ const Dashboard = () => {
         <button className="feelora-btn-primary px-8">{t('patient.dashboard.allRead')}</button>
       </div>
 
-     {/* --- Mood Tracker Diary Header with Flexbox Toggle --- */}
+      {/* --- Mood Tracker Diary Header with Flexbox Toggle --- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
-          {t('patient.dashboard.moodDiary')}
-        </h2>
-        
+        <h2 className="text-2xl font-bold text-foreground">{t('patient.dashboard.moodDiary')}</h2>
+
         {/* The Toggle Container */}
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-muted-foreground">
-            {isShared ? 'Mood Tracker wird mit Therapeut geteilt' : 'Privat (Mood Tracker wird nicht geteilt)'}
+            {isShared
+              ? 'Mood Tracker wird mit Therapeut geteilt'
+              : 'Privat (Mood Tracker wird nicht geteilt)'}
           </span>
           <button
             type="button"
@@ -214,7 +216,7 @@ const Dashboard = () => {
             // Tailwind classes to build the animated pill shape
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               isShared ? 'bg-primary' : 'bg-border'
-            } ${(isToggling || isLoadingMoods) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            } ${isToggling || isLoadingMoods ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="sr-only">Toggle data sharing</span>
             {/* The little sliding circle inside the pill */}
@@ -236,10 +238,7 @@ const Dashboard = () => {
       ) : moodDiary.length === 0 ? (
         <div className="feelora-card text-center p-8 border-dashed border-2">
           <p className="text-muted-foreground text-lg mb-4">Noch keine Mood Tracker Einträge.</p>
-          <button 
-            onClick={() => navigate('/mood-tracker')}
-            className="feelora-btn-outline"
-          >
+          <button onClick={() => navigate('/mood-tracker')} className="feelora-btn-outline">
             Ersten Eintrag erstellen
           </button>
         </div>
@@ -278,9 +277,10 @@ const Dashboard = () => {
                     </p>
                   </div>
                 </div>
-                <button 
-                onClick={() => navigate('details', { state: { entry } })}
-                className="text-primary font-medium hover:underline">
+                <button
+                  onClick={() => navigate('details', { state: { entry } })}
+                  className="text-primary font-medium hover:underline"
+                >
                   {t('patient.dashboard.details')}
                 </button>
               </div>

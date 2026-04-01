@@ -122,7 +122,7 @@ const CREATE_CONVERSATION_MUTATION = gql`
   }
 `;
 
-/* After MVP Feature 
+/* After MVP Feature
 const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
   mutation SendMoodTrackerMessage(
     $conversationId: ID!
@@ -187,8 +187,6 @@ const PING_LAMBDA_QUERY = gql`
     pingLambda
   }
 `;
-
-
 
 // --- Service Object --- //
 export const patientService = {
@@ -270,11 +268,11 @@ export const patientService = {
         mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
         variables: { allow: consent }, // <-- Using the dedicated 'allow' variable
       });
-      
+
       console.log(
-        `Security Firewall successfully updated! Therapist access: ${data.MoodTrackerShareConsent}`
+        `Security Firewall successfully updated! Therapist access: ${data.MoodTrackerShareConsent}`,
       );
-      
+
       return data.MoodTrackerShareConsent;
     } catch (error) {
       console.error('❌ Error updating GDPR consent firewall:', error);
@@ -395,15 +393,13 @@ export const patientService = {
   // -- MOOD TRACKER API --
 
   // -- Save Mood Tracker Data from Questionnaire --
-  saveMoodTrackerQuestionnaire: async (
-    moodData: Record<number, string[]>,
-  ): Promise<boolean> => {
+  saveMoodTrackerQuestionnaire: async (moodData: Record<number, string[]>): Promise<boolean> => {
     try {
       // The backend requires a 'QuestionnaireSummary' AWSJSON object.
       // We create a basic summary of the main mood (Question 0) and total answered.
       const summary = {
         totalCategoriesAnswered: Object.keys(moodData).length,
-        primaryMood: moodData[0]?.[0] || 'Not specified', 
+        primaryMood: moodData[0]?.[0] || 'Not specified',
       };
 
       const input = {
@@ -419,8 +415,8 @@ export const patientService = {
 
       //debugging: Log the successful return data from the backend
       console.log(
-        '✅ Mood Tracker data successfully saved in backend:', 
-        response.data?.saveMoodTrackerQuestionnaire
+        '✅ Mood Tracker data successfully saved in backend:',
+        response.data?.saveMoodTrackerQuestionnaire,
       );
 
       return true;

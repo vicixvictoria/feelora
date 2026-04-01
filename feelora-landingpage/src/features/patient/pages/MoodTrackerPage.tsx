@@ -11,16 +11,15 @@ interface MoodOption {
   labelKey: string;
 }
 
-interface MoodCategory {
+/*interface MoodCategory {
   questionKey: string;
   options: MoodOption[];
-}
-
+}*/
 
 const MoodTrackerPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate(); // <-- Initialize navigation
-  
+
   const [selectedMoods, setSelectedMoods] = useState<Record<number, string[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false); // <-- Added loading state
 
@@ -42,16 +41,16 @@ const MoodTrackerPage = () => {
   const handleSubmit = async () => {
     // Makes sure they answered at least one question
     if (Object.keys(selectedMoods).length === 0) {
-      alert("Bitte wähle mindestens eine Stimmung aus, bevor du fortfährst.");
+      alert('Bitte wähle mindestens eine Stimmung aus, bevor du fortfährst.');
       return;
     }
 
     setIsSubmitting(true);
     try {
       await patientService.saveMoodTrackerQuestionnaire(selectedMoods);
-      
+
       // Success - Send user back to their dashboard --> should they be send to a specific page ?? UX discussion
-      navigate('/patient/dashboard'); 
+      navigate('/patient/dashboard');
     } catch (error) {
       console.error('Failed to submit mood tracker:', error);
       alert('Fehler beim Speichern der Daten. Bitte versuche es erneut.');
@@ -62,7 +61,7 @@ const MoodTrackerPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in pb-10">
-        {/* Header */}
+      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <img src={feeloraLogo} alt="Feelora" className="w-12 h-12" />
         <h1 className="text-2xl font-bold text-foreground">{t('patient.moodTracker.title')}</h1>
@@ -103,7 +102,7 @@ const MoodTrackerPage = () => {
 
       {/* Submit Button */}
       <div className="flex justify-center mt-8">
-        <button 
+        <button
           onClick={handleSubmit}
           disabled={isSubmitting}
           className="feelora-btn-primary px-8 disabled:opacity-50"
