@@ -52,8 +52,8 @@ import TherapistHomeworkPage from './features/therapist/pages/TherapistHomeworkP
 import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsPage';
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
 import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
-import { WebsocketProvider } from './contexts/WebsocketContext';
 import TherapistMoodTrackerDetailsPage from './features/therapist/pages/TherapistMoodTrackerDetailsPage';
+import { WebsocketProvider } from './contexts/WebsocketContext';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
