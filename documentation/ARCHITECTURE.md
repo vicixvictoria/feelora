@@ -411,6 +411,15 @@ export function PatientsList() {
 
 ## Component Hierarchy
 
+### Therapist License Document Upload
+- Therapist profile now includes a `pathToLicenseDocument` field (see API)
+
+### Patient Dashboard Unread Messages
+- Dashboard component displays unread message count using new i18n keys
+
+### Landing Page Section Navigation
+- HeroSection uses DOM navigation for section scroll
+
 ### Patient Dashboard Hierarchy
 
 ```
@@ -464,6 +473,14 @@ App
 ---
 
 ## API Integration
+
+### Therapist API: License Document
+Field: `pathToLicenseDocument` (string) — path to uploaded license/qualification document
+
+### i18n Keys
+- `patient.dashboard.unreadMessage`, `patient.dashboard.unreadMessagesCount`
+- `q.t.qualifications.uploadRequired`
+- `privacy.pageTitle`
 
 ### GraphQL Queries Structure
 

@@ -28,6 +28,11 @@ Welcome to the Feelora frontend project! This guide will help you understand the
 - **Therapist Dashboard**: For therapists to manage patients, review mood data, assign homework, and coordinate with their patient roster
 
 ### Key Features
+- 📄 **Therapist License Document Upload** - Therapists can upload a license/qualification document for verification. Document path is stored as `pathToLicenseDocument` (see API). **Location:** `src/features/therapist/api/therapist-service.ts`
+- 🔔 **Unread Messages Indicator** - Patient dashboard now displays unread message count. Uses new i18n keys: `patient.dashboard.unreadMessage`, `patient.dashboard.unreadMessagesCount`. **Location:** `src/features/patient/pages/Dashboard.tsx`
+- 📑 **Qualification Document Upload Required** - New validation for therapist onboarding: document upload required. i18n key: `q.t.qualifications.uploadRequired`
+- 🧭 **Landing Page Section Navigation** - Improved navigation to sections on the landing page. Uses DOM navigation logic. **Location:** `src/features/landing/pages/HeroSection.tsx`
+- 📚 **Legal Documents Page Title** - New i18n key for privacy/legal documents page title: `privacy.pageTitle`
 - 🔐 **Secure Authentication** via AWS Cognito with support for email/password and Google OAuth
 - 👥 **Role-Based Access Control** (RBAC) - Different interfaces for patients and therapists
 - 📊 **Mood Tracking** - Patients can log and track mood over time
@@ -404,6 +409,27 @@ Located in `src/components/auth/RequireAuth.tsx`:
 ---
 
 ## Key Features
+### 7. **Therapist License Document Upload**
+- Therapists can upload a license/qualification document for verification
+- Document path is stored as `pathToLicenseDocument` (see API)
+- **Location:** `src/features/therapist/api/therapist-service.ts`
+
+### 8. **Unread Messages Indicator**
+- Patient dashboard now displays unread message count
+- Uses new i18n keys: `patient.dashboard.unreadMessage`, `patient.dashboard.unreadMessagesCount`
+- **Location:** `src/features/patient/pages/Dashboard.tsx`
+
+### 9. **Qualification Document Upload Required**
+- New validation for therapist onboarding: document upload required
+- i18n key: `q.t.qualifications.uploadRequired`
+
+### 10. **Landing Page Section Navigation**
+- Improved navigation to sections on the landing page
+- Uses DOM navigation logic
+- **Location:** `src/features/landing/pages/HeroSection.tsx`
+
+### 11. **Legal Documents Page Title**
+- New i18n key for privacy/legal documents page title: `privacy.pageTitle`
 
 ### 1. **Mood Tracking**
 - **Patient View**: Log mood, track over time, visualize trends
@@ -557,6 +583,12 @@ export function MyPage() {
 
 ## File Organization Guide
 
+### i18n/Translations
+New translation keys:
+- `patient.dashboard.unreadMessage`, `patient.dashboard.unreadMessagesCount` (en/de)
+- `q.t.qualifications.uploadRequired` (en)
+- `privacy.pageTitle` (en)
+
 ### Components
 
 Organize components by feature:
@@ -590,6 +622,15 @@ src/features/patient/types/
 ---
 
 ## Common Tasks
+
+### Task: Upload Therapist License Document
+See Profile Management and Therapist Onboarding sections. Document upload is now required for verification.
+
+### Task: Show Unread Messages
+Use the new i18n keys in the patient dashboard to display unread message counts.
+
+### Task: Navigate to Landing Page Section
+Use `document.getElementById(sectionId)` for smooth scroll/navigation.
 
 ### Task 1: Display User Information
 ```tsx

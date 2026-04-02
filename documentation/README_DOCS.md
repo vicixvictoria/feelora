@@ -241,11 +241,12 @@ frontend/
 
 **Important:** As the project evolves, keep docs updated:
 
-- [ ] New feature added? Add to [DEVELOPER_GUIDE.md → Key Features](DEVELOPER_GUIDE.md#key-features)
-- [ ] New route added? Update [ARCHITECTURE.md → Component Hierarchy](ARCHITECTURE.md#component-hierarchy)
-- [ ] New common task? Add to [DEVELOPER_GUIDE.md → Common Tasks](DEVELOPER_GUIDE.md#common-tasks)
-- [ ] New issue found? Add solution to [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
-- [ ] New dependency? Update [DEVELOPER_GUIDE.md → Technology Stack](DEVELOPER_GUIDE.md#technology-stack)
+- [x] Therapist license document upload: Added to [DEVELOPER_GUIDE.md → Key Features] and [ARCHITECTURE.md → API Integration]
+- [x] Patient dashboard unread messages: Added to [DEVELOPER_GUIDE.md → Key Features] and [ARCHITECTURE.md → Component Hierarchy]
+- [x] Qualification document upload required: Added to [DEVELOPER_GUIDE.md → Key Features]
+- [x] Landing page section navigation: Added to [DEVELOPER_GUIDE.md → Key Features] and [ARCHITECTURE.md → Component Hierarchy]
+- [x] Legal documents page title: Added to [DEVELOPER_GUIDE.md → Key Features]
+- [x] New i18n keys: Documented in [DEVELOPER_GUIDE.md → File Organization Guide] and [ARCHITECTURE.md → API Integration]
 
 ---
 
