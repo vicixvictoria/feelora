@@ -44,10 +44,10 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
     { value: 'Trauma', label: t('q.options.trauma') },
     { value: 'Sucht', label: t('q.options.addiction') },
     { value: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
-    { value: 'Zwang', label: t('q.options.ocd') },
+    { value: 'Zwang', label: t('q.options.compulsion') },
     { value: 'Gewalterfahrungen', label: t('q.options.violence') },
     { value: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
-    { value: 'Essverhalten', label: t('q.options.eatingDisorder') },
+    { value: 'Essverhalten', label: t('q.options.eatingBehavior') },
   ];
 
   //Initialize Validation Hook

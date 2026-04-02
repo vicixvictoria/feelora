@@ -15,7 +15,7 @@ interface PatientGenderStepProps {
 const NO_PREFERENCE = 'keine Präferenz';
 
 // List of gender options - add more if needed
-const genderOptions = ['männlich', 'weiblich', 'non-binary / divers'];
+//const genderOptions = ['männlich', 'weiblich', 'non-binary / divers'];
 
 // Define validation schema expecting a "selection" array
 const step13Schema = z.object({
@@ -39,13 +39,21 @@ const Step13_PTherapistGender = ({
     onNext,
   });
 
-  const hasNoPreference = safeData.includes(NO_PREFERENCE);
+  // Define gender options inside the component to access `t()`
+  const genderOptions = [
+    { id: 'männlich', label: t('q.options.male', 'männlich') },
+    { id: 'weiblich', label: t('q.options.female', 'weiblich') },
+    { id: 'non-binary / divers', label: t('q.options.diverse', 'non-binary / divers') },
+  ];
+  const NO_PREFERENCE = { id: 'keine Präferenz', label: t('q.common.noPreference', 'keine Präferenz') };
+
+  const hasNoPreference = safeData.includes(NO_PREFERENCE.id);
 
   const handleToggle = (gender: string) => {
     clearError('selection');
 
     // Remove "keine Präferenz" if a specific gender is clicked
-    let currentSelection = safeData.filter((item) => item !== NO_PREFERENCE);
+    let currentSelection = safeData.filter((item) => item !== NO_PREFERENCE.id);
 
     if (currentSelection.includes(gender)) {
       currentSelection = currentSelection.filter((item) => item !== gender);
@@ -64,7 +72,7 @@ const Step13_PTherapistGender = ({
       onDataChange([]);
     } else {
       // Check it -> wipe out all other selections
-      onDataChange([NO_PREFERENCE]);
+      onDataChange([NO_PREFERENCE.id]);
     }
   };
 
@@ -88,19 +96,19 @@ const Step13_PTherapistGender = ({
           className={`grid grid-cols-1 gap-3 p-1 rounded-xl ${errors.selection ? 'border border-destructive/50 bg-destructive/5' : ''}`}
         >
           {/* Standard Options */}
-          {genderOptions.map((gender) => (
+          {genderOptions.map((option) => (
             <label
-              key={gender}
+              key={option.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 hasNoPreference ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={safeData.includes(gender)}
-                onCheckedChange={() => handleToggle(gender)}
+                checked={safeData.includes(option.id)}
+                onCheckedChange={() => handleToggle(option.id)}
                 disabled={hasNoPreference}
               />
-              <span className="text-foreground">{gender}</span>
+              <span className="text-foreground">{option.label}</span>
             </label>
           ))}
 
@@ -109,7 +117,7 @@ const Step13_PTherapistGender = ({
           {/* Exclusive Option: Keine Präferenz */}
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
-            <span className="text-foreground font-medium">{NO_PREFERENCE}</span>
+            <span className="text-foreground font-medium">{NO_PREFERENCE.label}</span>
           </label>
         </div>
       </div>

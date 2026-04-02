@@ -129,6 +129,8 @@
   "login.termsAnd": " and ",
   "login.info.therapist": "Access your therapist dashboard and manage your patients.",
   "login.info.user": "Find the right therapist and start your wellness journey.",
+
+
   "q.common.next": "Next",
   "q.common.back": "Back",
   "q.common.question": "Question {{current}} of {{total}}",
@@ -168,7 +170,7 @@
   "q.p.personal.diverse": "Diverse",
   "q.p.contact.title": "Contact Information",
   "q.p.contact.cardTitle": "Contact Information",
-  "q.p.contact.subtitle": "Provide your contact details so your therapists can reach you. If you would like to provide an additional email or phone number besides the one you registered with, enter it here (optional). We cannot validate or verify this data! Also add your practice address if you have one. If you only offer online therapy, please provide the city and country you are located in.",
+  "q.p.contact.subtitle": "Provide your contact details where your therapist can reach you. If you would like to provide an additional email or phone number besides the one you registered with, enter it here (optional). We cannot validate or verify this data! Please check your entries carefully." ,
   "q.p.contact.phone": "Phone/Mobile",
   "q.p.contact.email": "Email",
   "q.p.contact.city": "City*",
@@ -189,7 +191,7 @@
   "q.p.previousTherapy.errorHint": "Please select an option or 'I have never had therapy'.",
   "q.p.previousTherapy.neverHad": "I have never had therapy",
   "q.p.languages.title": "Languages",
-  "q.p.languages.subtitle": "Please select the languages in which you would like to have therapy sessions. (Only select languages in which you can express yourself well for effective therapy.)",
+  "q.p.languages.subtitle": "Please select all the languages in which you would like/be able to have therapy sessions. (Only select languages in which you can express yourself well for effective therapy.)",
   "q.p.languages.selectError": "Please select at least one language.",
   "q.p.languages.otherError": "Please select at least one additional language.",
   "q.p.therapySchool.title": "Therapy Preferences",

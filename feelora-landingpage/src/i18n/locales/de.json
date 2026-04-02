@@ -1,4 +1,5 @@
 {
+ "_comment":"German translations for the Feelora landing page",
   "nav.forPatients": "Für Patient:Innen",
   "nav.forTherapists": "Für Therapeut:Innen",
   "nav.whyFeelora": "Warum Feelora",
@@ -153,6 +154,8 @@
   "q.common.selectAtLeastOne": "Bitte wähle mindestens eine Option aus",
   "q.common.selectAtLeastOneAlt": "Bitte wähle mindestens eine Option aus.",
   "q.common.typePlaceholder": "hier tippen...",
+  
+  "_comment": "German translations for Questionnaire",
   "q.p.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
   "q.p.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Patient*innenprofil für dich. Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen\" durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.",
   "q.p.welcome.questionCount": "Dieser Fragebogen umfasst 16 Fragen.",
@@ -327,6 +330,7 @@
   "q.t.therapySetting.selectError": "Bitte wähle mindestens eine Option aus.",
   "q.t.therapyFormat.title": "Bevorzugtes Therapie Setting Format",
   "q.t.therapyFormat.subtitle": "Welche Therapieformate bietest du an?",
+  "q.t.therapyFormat.selectError": "Bitte wähle mindestens eine Option aus.",
   "q.t.therapyDuration.title": "Therapiedauer",
   "q.t.therapyDuration.subtitle": "Bietest du eher Kurzzeit oder Langzeit Therapien an?",
   "q.t.sessionFrequency.title": "Sitzungsfrequenz",
