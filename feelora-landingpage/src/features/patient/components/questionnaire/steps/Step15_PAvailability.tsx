@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
@@ -11,26 +12,30 @@ interface AvailabilityStepProps {
   isLoading?: boolean;
 }
 
-// List of days of the week
-const days = [
-  { id: 'mo', label: 'Mo' },
-  { id: 'di', label: 'Di' },
-  { id: 'mi', label: 'Mi' },
-  { id: 'do', label: 'Do' },
-  { id: 'fr', label: 'Fr' },
-  { id: 'sa', label: 'Sa' },
-  { id: 'so', label: 'So' },
-];
-
-// Define validation schema expecting an object with a "selection" array
-const step15Schema = z.object({
-  selection: z.array(z.string()).min(1, 'Bitte wähle mindestens einen Tag aus'),
-});
-
 // Step Component
 const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
   const { t } = useTranslation();
   const safeData = data || [];
+
+  // 1. Define validation schema INSIDE the component using useMemo
+  const step15Schema = useMemo(() => {
+    return z.object({
+      selection: z
+        .array(z.string())
+        .min(1, t('q.p.availability.error', 'Bitte wähle mindestens einen Tag aus')),
+    });
+  }, [t]);
+
+  // 2. Define the days inside the component to map translated labels to stable IDs
+  const days = [
+    { id: 'mo', label: t('q.t.availability.mon', 'Mo') },
+    { id: 'di', label: t('q.t.availability.tue', 'Di') },
+    { id: 'mi', label: t('q.t.availability.wed', 'Mi') },
+    { id: 'do', label: t('q.t.availability.thu', 'Do') },
+    { id: 'fr', label: t('q.t.availability.fri', 'Fr') },
+    { id: 'sa', label: t('q.t.availability.sat', 'Sa') },
+    { id: 'so', label: t('q.t.availability.sun', 'So') },
+  ];
 
   // Initialize validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({

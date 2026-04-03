@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
@@ -12,43 +13,9 @@ interface ValuesPreferencesStepProps {
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
-// Extract the exclusive option
+// 1. Extract stable internal values
 const NO_PREFERENCE = 'keine Präferenz';
-
-// List of values/preferences options - add more if needed
-const valueOptions = [
-  'LGBTQ+ freundlich / affirmativ',
-  'Kulturell sensibel',
-  'Erfahrung mit leistungsorientierten Personen / Führungskräften',
-  'Expertise in Beziehungs- oder Familienthemen',
-  'Expertise bei Konflikten am Arbeitsplatz oder Mobbing',
-  'Erfahrung mit Expatriates oder internationalen Klient:innen',
-  'Geschlechtersensibler oder feministischer Ansatz',
-  'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)',
-  'Jemand Älteres mit mehr Erfahrung',
-  'Jemand Jüngeres',
-  'Ich bin offen für eine/n Therapeut:in in Supervision',
-];
-
-// 2. Define validation schema with complex conditional logic
-const step14Schema = z
-  .object({
-    selected: z.array(z.string()).min(1, 'Bitte wähle mindestens eine Option aus'),
-    other: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // If "Andere" is checked, the input cannot be empty
-      if (data.selected.includes('Andere')) {
-        return data.other && data.other.trim().length > 0;
-      }
-      return true;
-    },
-    {
-      message: 'Bitte spezifizieren',
-      path: ['other'],
-    },
-  );
+const OTHER_VALUE = 'Andere';
 
 const Step14_PValuesPreferences = ({
   onNext,
@@ -57,7 +24,45 @@ const Step14_PValuesPreferences = ({
   onDataChange,
 }: ValuesPreferencesStepProps) => {
   const { t } = useTranslation();
-  // Initialize validationhook
+
+  // 2. Define validation schema INSIDE component with useMemo
+  const step14Schema = useMemo(() => {
+    return z
+      .object({
+        selected: z.array(z.string()).min(1, t('q.p.valuesPreferences.error', 'Bitte wähle mindestens eine Option aus')),
+        other: z.string().optional(),
+      })
+      .refine(
+        (valData) => {
+          // If "Andere" is checked, the input cannot be empty
+          if (valData.selected.includes(OTHER_VALUE)) {
+            return valData.other && valData.other.trim().length > 0;
+          }
+          return true;
+        },
+        {
+          message: t('q.common.other', 'Bitte spezifizieren'),
+          path: ['other'],
+        },
+      );
+  }, [t]);
+
+  // 3. Map stable IDs to translated labels
+  const valueOptions = [
+    { id: 'LGBTQ+ freundlich / affirmativ', label: t('q.p.values.lgbtq', 'LGBTQ+ freundlich / affirmativ') },
+    { id: 'Kulturell sensibel', label: t('q.p.values.cultural', 'Kulturell sensibel') },
+    { id: 'Erfahrung mit leistungsorientierten Personen / Führungskräften', label: t('q.p.values.performance', 'Erfahrung mit leistungsorientierten Personen / Führungskräften') },
+    { id: 'Expertise in Beziehungs- oder Familienthemen', label: t('q.p.values.relationships', 'Expertise in Beziehungs- oder Familienthemen') },
+    { id: 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing', label: t('q.p.values.workplace', 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing') },
+    { id: 'Erfahrung mit Expatriates oder internationalen Klient:innen', label: t('q.p.values.expats', 'Erfahrung mit Expatriates oder internationalen Klient:innen') },
+    { id: 'Geschlechtersensibler oder feministischer Ansatz', label: t('q.p.values.feminist', 'Geschlechtersensibler oder feministischer Ansatz') },
+    { id: 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)', label: t('q.p.values.lifeChanges', 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)') },
+    { id: 'Jemand Älteres mit mehr Erfahrung', label: t('q.p.values.older', 'Jemand Älteres mit mehr Erfahrung') },
+    { id: 'Jemand Jüngeres', label: t('q.p.values.younger', 'Jemand Jüngeres') },
+    { id: 'Ich bin offen für eine/n Therapeut:in in Supervision', label: t('q.p.values.supervision', 'Ich bin offen für eine/n Therapeut:in in Supervision') },
+  ];
+
+  // Initialize validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step14Schema,
@@ -66,16 +71,16 @@ const Step14_PValuesPreferences = ({
 
   const hasNoPreference = data.selected.includes(NO_PREFERENCE);
 
-  const handleToggle = (value: string) => {
+  const handleToggle = (optionId: string) => {
     clearError('selected');
 
     // Remove "keine Präferenz" if a specific value is clicked
     let currentSelection = data.selected.filter((v) => v !== NO_PREFERENCE);
 
-    if (currentSelection.includes(value)) {
-      currentSelection = currentSelection.filter((v) => v !== value);
+    if (currentSelection.includes(optionId)) {
+      currentSelection = currentSelection.filter((v) => v !== optionId);
     } else {
-      currentSelection = [...currentSelection, value];
+      currentSelection = [...currentSelection, optionId];
     }
 
     onDataChange({ ...data, selected: currentSelection });
@@ -87,14 +92,14 @@ const Step14_PValuesPreferences = ({
 
     let currentSelection = data.selected.filter((v) => v !== NO_PREFERENCE);
 
-    if (currentSelection.includes('Andere')) {
+    if (currentSelection.includes(OTHER_VALUE)) {
       onDataChange({
         ...data,
-        selected: currentSelection.filter((v) => v !== 'Andere'),
+        selected: currentSelection.filter((v) => v !== OTHER_VALUE),
         other: '',
       });
     } else {
-      onDataChange({ ...data, selected: [...currentSelection, 'Andere'] });
+      onDataChange({ ...data, selected: [...currentSelection, OTHER_VALUE] });
     }
   };
 
@@ -131,19 +136,19 @@ const Step14_PValuesPreferences = ({
           className={`grid grid-cols-1 gap-3 p-1 rounded-xl ${errors.selected ? 'border border-destructive/50 bg-destructive/5' : ''}`}
         >
           {/* Standard Options */}
-          {valueOptions.map((value) => (
+          {valueOptions.map((option) => (
             <label
-              key={value}
+              key={option.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 hasNoPreference ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={data.selected.includes(value)}
-                onCheckedChange={() => handleToggle(value)}
+                checked={data.selected.includes(option.id)}
+                onCheckedChange={() => handleToggle(option.id)}
                 disabled={hasNoPreference}
               />
-              <span className="text-foreground">{value}</span>
+              <span className="text-foreground">{option.label}</span>
             </label>
           ))}
 
@@ -157,15 +162,15 @@ const Step14_PValuesPreferences = ({
             >
               <Checkbox
                 id="p-values-other"
-                checked={data.selected.includes('Andere')}
+                checked={data.selected.includes(OTHER_VALUE)}
                 onCheckedChange={handleOtherToggle}
                 disabled={hasNoPreference}
               />
-              <span className="text-foreground">{t('q.p.valuesPreferences.other')}</span>
+              <span className="text-foreground">{t('q.p.valuesPreferences.other', 'Andere')}</span>
             </label>
 
             {/* Conditional Input */}
-            {data.selected.includes('Andere') && !hasNoPreference && (
+            {data.selected.includes(OTHER_VALUE) && !hasNoPreference && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
@@ -179,7 +184,7 @@ const Step14_PValuesPreferences = ({
                 />
                 {errors.other && (
                   <span className="text-xs text-destructive mt-1 ml-1">
-                    {t('q.p.valuesPreferences.otherError')}
+                    {t('q.p.valuesPreferences.otherError', 'Bitte gib Details an')}
                   </span>
                 )}
               </div>
@@ -191,7 +196,9 @@ const Step14_PValuesPreferences = ({
           {/* Exclusive Option: Keine Präferenz */}
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
-            <span className="text-foreground font-medium">{NO_PREFERENCE}</span>
+            <span className="text-foreground font-medium">
+              {t('q.common.noPreference', 'keine Präferenz')}
+            </span>
           </label>
         </div>
       </div>

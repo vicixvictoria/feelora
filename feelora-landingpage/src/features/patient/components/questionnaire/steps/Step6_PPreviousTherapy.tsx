@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
@@ -12,42 +13,8 @@ interface PreviousTherapyStepProps {
   onDataChange: (data: { selected: string[]; other?: string; neverHadTherapy: boolean }) => void;
 }
 
-const getTherapyOptions = (t: (key: string) => string) => [
-  t('q.p.previousTherapy.options.cbt'),
-  t('q.p.previousTherapy.options.psychoanalysis'),
-  t('q.p.previousTherapy.options.personCentered'),
-  t('q.p.previousTherapy.options.gestalt'),
-  t('q.p.previousTherapy.options.traumaInformed'),
-];
-
-// Define validation schema with  conditional logic
-const step6Schema = z
-  .object({
-    selected: z.array(z.string()),
-    other: z.string().optional(),
-    neverHadTherapy: z.boolean(),
-  })
-  .superRefine((data, ctx) => {
-    // Rule 1: If they haven't checked "Never had therapy", they MUST select at least one therapy.
-    if (!data.neverHadTherapy && data.selected.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Bitte wähle mindestens eine Option aus',
-        path: ['selected'], // Triggers errors.selected
-      });
-    }
-
-    // Rule 2: If "Andere" is checked, the text area must be filled.
-    if (!data.neverHadTherapy && data.selected.includes('Andere')) {
-      if (!data.other || data.other.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Bitte spezifizieren',
-          path: ['other'], // Triggers errors.other
-        });
-      }
-    }
-  });
+// 1. Define the stable internal value for the "Other" option
+const OTHER_VALUE = 'Andere';
 
 const Step6_PPreviousTherapy = ({
   onNext,
@@ -56,24 +23,63 @@ const Step6_PPreviousTherapy = ({
   onDataChange,
 }: PreviousTherapyStepProps) => {
   const { t } = useTranslation();
-  const therapyOptions = getTherapyOptions(t);
   const safeData = data || { selected: [], other: '', neverHadTherapy: false };
 
-  // 2. Initialize Hook
+  // 2. Define schema inside the component using useMemo to access translations
+  const step6Schema = useMemo(() => {
+    return z
+      .object({
+        selected: z.array(z.string()),
+        other: z.string().optional(),
+        neverHadTherapy: z.boolean(),
+      })
+      .superRefine((valData, ctx) => {
+        // Rule 1: If they haven't checked "Never had therapy", they MUST select at least one therapy.
+        if (!valData.neverHadTherapy && valData.selected.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('q.p.previousTherapy.error', 'Bitte wähle mindestens eine Option aus'),
+            path: ['selected'], // Triggers errors.selected
+          });
+        }
+
+        // Rule 2: If "Andere" is checked, the text area must be filled.
+        if (!valData.neverHadTherapy && valData.selected.includes(OTHER_VALUE)) {
+          if (!valData.other || valData.other.trim().length === 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('q.p.previousTherapy.detailsError', 'Bitte spezifizieren'),
+              path: ['other'], // Triggers errors.other
+            });
+          }
+        }
+      });
+  }, [t]);
+
+  // 3. Define options with stable IDs for the backend, but translated labels for the UI
+  const therapyOptions = [
+    { id: 'cbt', label: t('q.p.previousTherapy.options.cbt') },
+    { id: 'psychoanalysis', label: t('q.p.previousTherapy.options.psychoanalysis') },
+    { id: 'personCentered', label: t('q.p.previousTherapy.options.personCentered') },
+    { id: 'gestalt', label: t('q.p.previousTherapy.options.gestalt') },
+    { id: 'traumaInformed', label: t('q.p.previousTherapy.options.traumaInformed') },
+  ];
+
+  // Initialize Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: safeData,
     schema: step6Schema,
     onNext,
   });
 
-  const handleToggle = (option: string) => {
+  const handleToggle = (optionId: string) => {
     if (safeData.neverHadTherapy) return;
     clearError('selected'); // Clear main error when user interacts
 
-    if (safeData.selected.includes(option)) {
-      onDataChange({ ...safeData, selected: safeData.selected.filter((s) => s !== option) });
+    if (safeData.selected.includes(optionId)) {
+      onDataChange({ ...safeData, selected: safeData.selected.filter((s) => s !== optionId) });
     } else {
-      onDataChange({ ...safeData, selected: [...safeData.selected, option] });
+      onDataChange({ ...safeData, selected: [...safeData.selected, optionId] });
     }
   };
 
@@ -82,14 +88,14 @@ const Step6_PPreviousTherapy = ({
     clearError('selected');
     clearError('other');
 
-    if (safeData.selected.includes('Andere')) {
+    if (safeData.selected.includes(OTHER_VALUE)) {
       onDataChange({
         ...safeData,
-        selected: safeData.selected.filter((s) => s !== 'Andere'),
+        selected: safeData.selected.filter((s) => s !== OTHER_VALUE),
         other: '',
       });
     } else {
-      onDataChange({ ...safeData, selected: [...safeData.selected, 'Andere'] });
+      onDataChange({ ...safeData, selected: [...safeData.selected, OTHER_VALUE] });
     }
   };
 
@@ -100,6 +106,7 @@ const Step6_PPreviousTherapy = ({
     if (safeData.neverHadTherapy) {
       onDataChange({ ...safeData, neverHadTherapy: false });
     } else {
+      // Wipes out selected array and text if "Never had therapy" is checked
       onDataChange({ selected: [], other: '', neverHadTherapy: true });
     }
   };
@@ -110,7 +117,6 @@ const Step6_PPreviousTherapy = ({
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.previousTherapy.title')}</h1>
         <p className="text-muted-foreground mb-2">{t('q.p.previousTherapy.subtitle')}</p>
-        {/* 3. Show error message in header if nothing is selected */}
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground italic'}`}
         >
@@ -123,19 +129,21 @@ const Step6_PPreviousTherapy = ({
         className={`feelora-card transition-colors ${errors.selected ? 'border-destructive/50 bg-destructive/5' : ''}`}
       >
         <div className="grid grid-cols-1 gap-3">
+          
+          {/* Map through the newly structured options */}
           {therapyOptions.map((option) => (
             <label
-              key={option}
+              key={option.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 safeData.neverHadTherapy ? 'opacity-50 pointer-events-none bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={safeData.selected.includes(option)}
-                onCheckedChange={() => handleToggle(option)}
+                checked={safeData.selected.includes(option.id)}
+                onCheckedChange={() => handleToggle(option.id)}
                 disabled={safeData.neverHadTherapy}
               />
-              <span className="text-foreground">{option}</span>
+              <span className="text-foreground">{option.label}</span>
             </label>
           ))}
 
@@ -149,15 +157,15 @@ const Step6_PPreviousTherapy = ({
             >
               <Checkbox
                 id="previous-therapy-other"
-                checked={safeData.selected.includes('Andere')}
+                checked={safeData.selected.includes(OTHER_VALUE)}
                 onCheckedChange={handleOtherToggle}
                 disabled={safeData.neverHadTherapy}
               />
-              <span className="text-foreground">{t('q.p.previousTherapy.other')}</span>
+              <span className="text-foreground">{t('q.p.previousTherapy.other', 'Andere')}</span>
             </label>
 
-            {/* 4. Validate Textarea for "Andere" */}
-            {safeData.selected.includes('Andere') && !safeData.neverHadTherapy && (
+            {/* Validate Textarea for "Andere" */}
+            {safeData.selected.includes(OTHER_VALUE) && !safeData.neverHadTherapy && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Textarea
                   placeholder={t('q.p.previousTherapy.specifyPlaceholder')}
@@ -170,7 +178,7 @@ const Step6_PPreviousTherapy = ({
                 />
                 {errors.other && (
                   <p className="text-xs text-destructive mt-1 ml-1">
-                    {t('q.p.previousTherapy.detailsError')}
+                    {t('q.p.previousTherapy.detailsError', 'Bitte gib Details an')}
                   </p>
                 )}
               </div>
@@ -196,7 +204,7 @@ const Step6_PPreviousTherapy = ({
         </div>
       </div>
 
-      {/* 5. Use validateAndNext */}
+      {/* Use validateAndNext */}
       <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );

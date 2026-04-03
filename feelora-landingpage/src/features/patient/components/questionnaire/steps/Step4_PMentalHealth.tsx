@@ -1,3 +1,4 @@
+import { useMemo } from 'react'; // <-- 1. Import useMemo
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
@@ -8,33 +9,37 @@ import { useTranslation } from 'react-i18next';
 interface SpecialtiesStepProps {
   onNext: () => void;
   onBack: () => void;
-  // Note: Data structure is specific here
   data: { selected: string[]; other?: string };
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
-// Define Validation Schema with Conditional Logic
-const step4Schema = z
-  .object({
-    selected: z.array(z.string()).min(1, 'Bitte wähle mindestens eine Option'),
-    other: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Logic: If "Andere" is in the array, 'other' string cannot be empty
-      if (data.selected.includes('Andere')) {
-        return data.other && data.other.trim().length > 0;
-      }
-      return true;
-    },
-    {
-      message: 'Bitte spezifizieren',
-      path: ['other'], // Attaches error to the 'other' field
-    },
-  );
+// 2. Define the stable internal value for the "Other" option
+const OTHER_VALUE = 'Andere';
 
 const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: SpecialtiesStepProps) => {
   const { t } = useTranslation();
+
+  // 3. Move the schema inside the component and wrap it in useMemo
+  const step4Schema = useMemo(() => {
+    return z
+      .object({
+        selected: z.array(z.string()).min(1, t('q.common.selectAtLeastOne', 'Bitte wähle mindestens eine Option')),
+        other: z.string().optional(),
+      })
+      .refine(
+        (valData) => {
+          // Logic: If "Andere" is in the array, 'other' string cannot be empty
+          if (valData.selected.includes(OTHER_VALUE)) {
+            return valData.other && valData.other.trim().length > 0;
+          }
+          return true;
+        },
+        {
+          message: t('q.common.specifyDetails', 'Bitte spezifizieren'), // Translated Zod error
+          path: ['other'], 
+        },
+      );
+  }, [t]); // Dependency array ensures it updates if language changes
 
   const specialtyOptions = [
     { value: 'Depression', label: t('q.options.depression') },
@@ -50,7 +55,7 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
     { value: 'Essverhalten', label: t('q.options.eatingBehavior') },
   ];
 
-  //Initialize Validation Hook
+  // Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step4Schema,
@@ -58,9 +63,8 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
   });
 
   const handleToggle = (specialty: string) => {
-    clearError('selected'); // Clear main error when user interacts
+    clearError('selected');
 
-    // Create new array based on toggle
     let newSelected: string[];
     if (data.selected.includes(specialty)) {
       newSelected = data.selected.filter((s) => s !== specialty);
@@ -68,24 +72,23 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
       newSelected = [...data.selected, specialty];
     }
 
-    // Update data
     onDataChange({ ...data, selected: newSelected });
   };
 
   const handleOtherToggle = () => {
     clearError('selected');
-    clearError('other'); // Clear specific error
+    clearError('other'); 
 
-    if (data.selected.includes('Andere')) {
+    if (data.selected.includes(OTHER_VALUE)) {
       // Uncheck "Andere" -> remove it and clear text
       onDataChange({
         ...data,
-        selected: data.selected.filter((s) => s !== 'Andere'),
+        selected: data.selected.filter((s) => s !== OTHER_VALUE),
         other: '',
       });
     } else {
       // Check "Andere"
-      onDataChange({ ...data, selected: [...data.selected, 'Andere'] });
+      onDataChange({ ...data, selected: [...data.selected, OTHER_VALUE] });
     }
   };
 
@@ -102,7 +105,6 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
       </div>
 
       <div className="feelora-card">
-        {/* Add visual feedback if no selection is made */}
         <div
           className={`grid grid-cols-2 gap-3 p-1 rounded-xl ${errors.selected ? 'border border-destructive/50 bg-destructive/5' : ''}`}
         >
@@ -127,14 +129,14 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
             >
               <Checkbox
                 id="mental-health-other"
-                checked={data.selected.includes('Andere')}
+                checked={data.selected.includes(OTHER_VALUE)}
                 onCheckedChange={handleOtherToggle}
               />
-              <span className="text-foreground">Andere</span>
+              {/* 4. Display the translated string for "Other" */}
+              <span className="text-foreground">{t('q.common.other', 'Andere')}</span>
             </label>
 
-            {/* Conditional Input with validation style */}
-            {data.selected.includes('Andere') && (
+            {data.selected.includes(OTHER_VALUE) && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
@@ -146,8 +148,11 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
                   }}
                   className={`bg-background ${errors.other ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {/* 5. Render the translated Zod error directly */}
                 {errors.other && (
-                  <span className="text-xs text-destructive ml-1">Bitte gib Details an</span>
+                 <span className="text-xs text-destructive ml-1">
+                  {t('q.common.pleaseSpecify', 'Bitte gib Details an')}
+                  </span>
                 )}
               </div>
             )}

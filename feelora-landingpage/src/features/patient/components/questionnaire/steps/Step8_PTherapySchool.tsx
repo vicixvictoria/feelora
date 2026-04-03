@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
@@ -12,40 +13,44 @@ interface TherapySchoolStepProps {
   onDataChange: (data: { selected: string[]; other?: string }) => void;
 }
 
-// List of therapy school options - add more if needed
-const getTherapySchoolOptions = (t: (key: string) => string) => [
-  t('q.p.therapySchool.options.humanistic'),
-  t('q.p.therapySchool.options.behavioral'),
-  t('q.p.therapySchool.options.psychodynamic'),
-  t('q.p.therapySchool.options.systemic'),
-];
-
+// 1. Define stable internal values for exclusive/conditional options
+const OTHER_VALUE = 'Andere';
 const IDK_OPTION = 'Ich weiß es nicht';
-
-// Define Validation Schema with Conditional Logic
-const step8Schema = z
-  .object({
-    selected: z.array(z.string()).min(1, 'Bitte wähle mindestens eine Option'),
-    other: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.selected.includes('Andere')) {
-        return data.other && data.other.trim().length > 0;
-      }
-      return true;
-    },
-    {
-      message: 'Bitte spezifizieren',
-      path: ['other'],
-    },
-  );
 
 // Step Component
 const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySchoolStepProps) => {
   const { t } = useTranslation();
-  const therapySchoolOptions = getTherapySchoolOptions(t);
-  // 2. Initialize Validation Hook
+
+  // 2. Define schema INSIDE the component using useMemo
+  const step8Schema = useMemo(() => {
+    return z
+      .object({
+        selected: z.array(z.string()).min(1, t('q.p.therapySchool.error', 'Bitte wähle mindestens eine Option')),
+        other: z.string().optional(),
+      })
+      .refine(
+        (valData) => {
+          if (valData.selected.includes(OTHER_VALUE)) {
+            return valData.other && valData.other.trim().length > 0;
+          }
+          return true;
+        },
+        {
+          message: t('q.p.therapySchool.detailsError', 'Bitte spezifizieren'),
+          path: ['other'],
+        }
+      );
+  }, [t]);
+
+  // 3. Define options with stable IDs for the backend, and translated labels for the UI
+  const therapySchoolOptions = [
+    { id: 'humanistic', label: t('q.p.therapySchool.options.humanistic') },
+    { id: 'behavioral', label: t('q.p.therapySchool.options.behavioral') },
+    { id: 'psychodynamic', label: t('q.p.therapySchool.options.psychodynamic') },
+    { id: 'systemic', label: t('q.p.therapySchool.options.systemic') },
+  ];
+
+  // Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step8Schema,
@@ -54,16 +59,16 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
 
   const isIdkSelected = data.selected.includes(IDK_OPTION);
 
-  const handleToggle = (school: string) => {
+  const handleToggle = (optionId: string) => {
     clearError('selected'); // Clear main error when user interacts
 
     // If user clicks a specific school, make sure "Ich weiß es nicht" is removed
     let currentSelection = data.selected.filter((s) => s !== IDK_OPTION);
 
-    if (currentSelection.includes(school)) {
-      currentSelection = currentSelection.filter((s) => s !== school);
+    if (currentSelection.includes(optionId)) {
+      currentSelection = currentSelection.filter((s) => s !== optionId);
     } else {
-      currentSelection = [...currentSelection, school];
+      currentSelection = [...currentSelection, optionId];
     }
 
     onDataChange({ ...data, selected: currentSelection });
@@ -74,10 +79,12 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
     clearError('selected');
     clearError('other'); // Clear specific error
 
-    if (data.selected.includes('Andere')) {
-      onDataChange({ ...data, selected: data.selected.filter((s) => s !== 'Andere'), other: '' });
+    let currentSelection = data.selected.filter((s) => s !== IDK_OPTION);
+
+    if (currentSelection.includes(OTHER_VALUE)) {
+      onDataChange({ ...data, selected: currentSelection.filter((s) => s !== OTHER_VALUE), other: '' });
     } else {
-      onDataChange({ ...data, selected: [...data.selected, 'Andere'] });
+      onDataChange({ ...data, selected: [...currentSelection, OTHER_VALUE] });
     }
   };
 
@@ -114,18 +121,20 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
         <div
           className={`grid grid-cols-1 gap-3 p-1 rounded-xl ${errors.selected ? 'border border-destructive/50 bg-destructive/5' : ''}`}
         >
-          {therapySchoolOptions.map((school) => (
+          {/* Map through structured options */}
+          {therapySchoolOptions.map((option) => (
             <label
-              key={school}
+              key={option.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 isIdkSelected ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={data.selected.includes(school)}
-                onCheckedChange={() => handleToggle(school)}
+                checked={data.selected.includes(option.id)}
+                onCheckedChange={() => handleToggle(option.id)}
+                disabled={isIdkSelected}
               />
-              <span className="text-foreground">{school}</span>
+              <span className="text-foreground">{option.label}</span>
             </label>
           ))}
 
@@ -139,13 +148,14 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
             >
               <Checkbox
                 id="p-therapy-school-other"
-                checked={data.selected.includes('Andere')}
+                checked={data.selected.includes(OTHER_VALUE)}
                 onCheckedChange={handleOtherToggle}
+                disabled={isIdkSelected}
               />
-              <span className="text-foreground">{t('q.p.therapySchool.other')}</span>
+              <span className="text-foreground">{t('q.p.therapySchool.other', 'Andere')}</span>
             </label>
 
-            {data.selected.includes('Andere') && !isIdkSelected && (
+            {data.selected.includes(OTHER_VALUE) && !isIdkSelected && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <Input
                   type="text"
@@ -159,7 +169,7 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
                 />
                 {errors.other && (
                   <span className="text-xs text-destructive mt-1 ml-1">
-                    {t('q.p.therapySchool.detailsError')}
+                    {t('q.p.therapySchool.detailsError', 'Bitte gib Details an')}
                   </span>
                 )}
               </div>
