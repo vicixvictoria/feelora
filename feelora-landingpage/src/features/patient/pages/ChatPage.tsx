@@ -292,7 +292,7 @@ const ChatPage = () => {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex justify-center h-full items-center text-muted-foreground">
-                  Noch keine Nachrichten. Sende ein "Hallo!"
+                  {t('app.patient.chat.noMessages')}
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -369,7 +369,7 @@ const ChatPage = () => {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            Wähle einen Chat aus, um eine Nachricht zu senden.
+            {t('app.patient.chat.chooseChat')}
           </div>
         )}
       </div>

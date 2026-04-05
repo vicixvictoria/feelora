@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker'; // Adjust path!
+import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker'; 
 
 const TherapistMoodTrackerDetailsPage = () => {
   const location = useLocation();
@@ -13,7 +13,7 @@ const TherapistMoodTrackerDetailsPage = () => {
   if (!entry) {
     return (
       <div className="flex flex-col items-center justify-center p-10">
-        <p className="text-muted-foreground mb-4">Eintrag nicht gefunden.</p>
+        <p className="text-muted-foreground mb-4">{t('app.patient.moodTrackerDetails.notFound')}</p>
         <button onClick={() => navigate('/therapist/mood-tracker')} className="feelora-btn-primary">
           Zurück zur Übersicht
         </button>
@@ -30,13 +30,13 @@ const TherapistMoodTrackerDetailsPage = () => {
         className="flex items-center gap-2 mb-6 text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        {t('common.back', 'Zurück')}
+        {t('q.common.back', 'Zurück')}
       </button>
 
       {/* Therapist specific header showing Patient Name */}
       <div className="feelora-card mb-8 bg-primary/5 border-primary/20">
         <h1 className="text-2xl font-bold text-foreground">Mood Tracker: {patientName}</h1>
-        <p className="text-muted-foreground mt-1">Eingereicht am: {date}</p>
+        <p className="text-muted-foreground mt-1">{t('app.patient.moodTrackerDetails.createdAt')} {date}</p>
       </div>
 
       <div className="feelora-card space-y-6">

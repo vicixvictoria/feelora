@@ -15,7 +15,7 @@ const MoodTrackerDetailsPage = () => {
   if (!entry) {
     return (
       <div className="flex flex-col items-center justify-center p-10">
-        <p className="text-muted-foreground mb-4">Eintrag nicht gefunden.</p>
+        <p className="text-muted-foreground mb-4">{t('app.patient.moodTrackerDetails.notFound')}</p>
         <button onClick={() => navigate('/patient/dashboard')} className="feelora-btn-primary">
           Zurück zum Dashboard
         </button>
@@ -33,12 +33,12 @@ const MoodTrackerDetailsPage = () => {
         className="flex items-center gap-2 mb-6 text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        {t('common.back', 'Zurück')}
+        {t('q.common.back', 'Zurück')}
       </button>
 
       <div className="feelora-card mb-8 bg-primary/5 border-primary/20">
         <h1 className="text-2xl font-bold text-foreground">Mood Tracker Details</h1>
-        <p className="text-muted-foreground mt-1">Erstellt am: {date}</p>
+        <p className="text-muted-foreground mt-1">{t('app.patient.moodTrackerDetails.createdAt')} {date}</p>
       </div>
 
       {/* Answers Loop */}

@@ -200,8 +200,8 @@ const Dashboard = () => {
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-muted-foreground">
             {isShared
-              ? 'Mood Tracker wird mit Therapeut geteilt'
-              : 'Privat (Mood Tracker wird nicht geteilt)'}
+              ? t('app.patient.moodTrackerSharing.consent')
+              : t('app.patient.moodTrackerSharing.private')}
           </span>
           <button
             type="button"

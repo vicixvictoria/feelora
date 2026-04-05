@@ -42,7 +42,7 @@ const MoodTrackerPage = () => {
   const handleSubmit = async () => {
     // Makes sure they answered at least one question
     if (Object.keys(selectedMoods).length === 0) {
-      alert('Bitte wähle mindestens eine Stimmung aus, bevor du fortfährst.');
+      alert(t('patient.atleastOne'));
       return;
     }
 
@@ -54,7 +54,7 @@ const MoodTrackerPage = () => {
       navigate('/patient/dashboard');
     } catch (error) {
       console.error('Failed to submit mood tracker:', error);
-      alert('Fehler beim Speichern der Daten. Bitte versuche es erneut.');
+      alert(t('patient.error.save'));
     } finally {
       setIsSubmitting(false);
     }
