@@ -155,6 +155,8 @@
   "q.common.selectAtLeastOne": "Please select at least one option",
   "q.common.selectAtLeastOneAlt": "Please select at least one option.",
   "q.common.typePlaceholder": "Type here...",
+  "q.common.atleastOneError": "Please select at least one",
+  
   "q.p.welcome.title": "Thank you for joining Feelora!",
   "q.p.welcome.desc": "Before you can begin, we will create a patient profile for you. We will go through our patient screening questionnaire together to create an optimal profile and match you with suitable therapists.",
   "q.p.welcome.questionCount": "This questionnaire contains 16 questions.",
@@ -287,7 +289,7 @@
   "q.t.contact.title": "Contact Information",
   "q.t.contact.cardTitle": "Contact Information",
   "q.t.contact.subtitle1": "Provide your contact details so your patients can reach you. We cannot validate these, please check your entries carefully. If no email is provided, your Feelora login email will be used.",
-  "q.t.contact.subtitle2": "Also add your practice address if you have one. Otherwise, please provide your country and city.",
+  "q.t.contact.subtitle2": "Also add your office address where you provide on site sessions, if you have one. Otherwise, please provide your country and city.",
   "q.t.contact.subtitle3": "This information will be publicly displayed in your profile.",
   "q.t.contact.subtitle4": "You can change this information at any time.",
   "q.t.contact.phone": "Phone/Mobile",

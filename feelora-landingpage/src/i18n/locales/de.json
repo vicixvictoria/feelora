@@ -154,6 +154,7 @@
   "q.common.selectAtLeastOne": "Bitte wähle mindestens eine Option aus",
   "q.common.selectAtLeastOneAlt": "Bitte wähle mindestens eine Option aus.",
   "q.common.typePlaceholder": "hier tippen...",
+  "q.common.atleastOneError": "Bitte wähle mindestens eine Option aus.",
   
   "_comment": "German translations for Questionnaire",
   "q.p.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
