@@ -72,9 +72,9 @@ const TherapistMoodTrackerPage = () => {
               avatar: placeholderAvatar,
               date: formatDate(item.CreatedAt),
               rawDate: new Date(item.CreatedAt).getTime(),
-              mood: emojiDictionary[questionnaire[0]?.[0]] || '📝',
-              outdoor: emojiDictionary[questionnaire[3]?.[0]] || '🌤️',
-              physical: emojiDictionary[questionnaire[4]?.[0]] || '💪',
+              mood: emojiDictionary[questionnaire[0]?.[0]] || '❓',
+              outdoor: emojiDictionary[questionnaire[3]?.[0]] || '❓',
+              physical: emojiDictionary[questionnaire[4]?.[0]] || '❓',
               fullQuestionnaire: questionnaire,
             };
           });

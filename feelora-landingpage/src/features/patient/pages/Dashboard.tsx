@@ -85,9 +85,9 @@ const Dashboard = () => {
             date: formatDate(item.CreatedAt),
             status: t('patient.dashboard.statusSeen', 'Gespeichert'),
             // Look up the emoji using the first selected answer for that category, or provide a fallback
-            mood: emojiDictionary[questionnaire[0]?.[0]] || '📝', // Category 0: Mood
-            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '🌤️', // Category 3: Activity
-            physical: emojiDictionary[questionnaire[4]?.[0]] || '💪', // Category 4: Physical
+            mood: emojiDictionary[questionnaire[0]?.[0]] || '❓', // Category 0: Mood
+            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '❓', // Category 3: Activity
+            physical: emojiDictionary[questionnaire[4]?.[0]] || '❓', // Category 4: Physical
             fullQuestionnaire: questionnaire,
           };
         });
