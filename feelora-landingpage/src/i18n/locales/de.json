@@ -890,6 +890,11 @@
   "patient.moodTracker.grateful": "Dankbar",
   "patient.moodTracker.difficultDay": "Schwieriger Tag",
   "patient.moodTracker.nothingPositive": "Nichts Positives heute",
+  "moodTracker.overview.activity": "Aktivität",
+  "moodTracker.overview.physical": "Körperlich",
+  "moodTracker.overview.stimmung": "Stimmung",
+
+
   "patient.notFound.message": "Oops! Seite nicht gefunden",
   "patient.notFound.returnHome": "Zurück zur Startseite",
   "patient.profile.yourProfile": "Dein Profil",

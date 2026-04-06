@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png'; // Only using the placeholder now
@@ -30,6 +30,15 @@ const TherapistChat = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  // Create a reference to the bottom of the chat
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Helper function to scroll to the anchor
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }); 
+    // Note: Using 'auto' instead of 'smooth' so it snaps instantly when loading a chat with 100+ messages
+  };
 
   // 1. Fetch Matches AND Conversations on Load
   useEffect(() => {
@@ -79,6 +88,11 @@ const TherapistChat = () => {
 
     fetchContactsAndChats();
   }, [t]);
+
+  // Trigger the scroll whenever the messages array updates
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // 2. Fetch Messages when a contact is clicked
   const handleSelectChat = async (chat: SidebarChat) => {
@@ -251,6 +265,8 @@ const TherapistChat = () => {
                       </div>
                     );
                   })}
+                  {/* The invisible anchor div for scrolling to last message */}
+                  <div ref={messagesEndRef} />
                 </div>
               )}
             </div>

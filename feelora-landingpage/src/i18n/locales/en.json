@@ -889,6 +889,9 @@
   "app.patient.moodTrackerDetails.createdAt": "Created at:",
   "app.patient.moodTrackerSharing.consent": "Mood Tracker will be shared",
   "app.patient.moodTrackerSharing.private": "Private (Mood Tracker will not be shared)",
+  "moodTracker.overview.activity": "Activity",
+  "moodTracker.overview.physical": "Physical",
+  "moodTracker.overview.stimmung": "Mood",
 
   "patient.notFound.message": "Oops! Page not found",
   "patient.notFound.returnHome": "Return to Home",
