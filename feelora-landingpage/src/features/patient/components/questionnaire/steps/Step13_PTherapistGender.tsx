@@ -12,7 +12,7 @@ interface PatientGenderStepProps {
 }
 
 // Extract "keine Präferenz" as a constant
-const NO_PREFERENCE = 'keine Präferenz';
+//const NO_PREFERENCE = 'keine Präferenz';
 
 // List of gender options - add more if needed
 //const genderOptions = ['männlich', 'weiblich', 'non-binary / divers'];
