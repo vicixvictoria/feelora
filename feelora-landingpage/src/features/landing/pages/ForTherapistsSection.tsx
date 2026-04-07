@@ -120,7 +120,7 @@ export function ForTherapistsSection() {
               //onClick={therapistDashboardNav} // --> only use for testing Dashboard UI without Auth
               className="bg-primary text-secondary-foreground hover:bg-secondary font-normal text-base px-8"
             >
-              Mitmachen
+              {t('therapists.cta')}
             </Button>
           </div>
         </motion.div>
