@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface NavigationButtonsProps {
   onBack: () => void;
-  onNext: () => void;
+  onNext?: () => void;
   showBack?: boolean;
   nextLabel?: string;
   backLabel?: string;
@@ -15,7 +15,7 @@ interface NavigationButtonsProps {
 
 const NavigationButtons = ({
   onBack,
-  onNext,
+  //onNext,
   showBack = true,
   nextLabel,
   backLabel,
