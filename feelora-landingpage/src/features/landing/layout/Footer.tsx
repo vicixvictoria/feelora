@@ -50,7 +50,9 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <button className="text-gray-600 hover:text-primary transition-colors">
+                <button 
+                onClick={() => navigate('/support')}
+                className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.users.resources')}
                 </button>
               </li>
@@ -111,12 +113,6 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
-                >
-                  {t('footer.about.join')}
-                </button>
               </li>
               <li>
                 <button className="text-gray-600 hover:text-primary transition-colors">

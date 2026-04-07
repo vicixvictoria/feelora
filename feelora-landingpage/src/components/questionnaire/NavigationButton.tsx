@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, House } from 'lucide-react';
 import { Button } from '@/components/ui/questionnaire/button';
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +32,7 @@ const NavigationButtons = ({
       )}
       <Button variant="nav" onClick={onNext}>
         {resolvedNextLabel}
-        <ArrowRight className="w-4 h-4" />
+        <Home className="w-4 h-4" />
       </Button>
     </div>
   );

@@ -80,6 +80,11 @@ const PatientQuestionnaire = () => {
 
   const totalSteps = 18; // Welcome + 17 questions
 
+  const naviagteHome = () => {
+    clearProgress(); // Clear localStorage and reset state
+    navigate('/'); // Navigate to homepage or dashboard
+  };
+
   const goNext = () => {
     // 1. Fire the ping quietly in the background when transitioning from Step 14 or 15
     // This gives the Lambda a few seconds to warm up while the user reads the Summary step
@@ -187,7 +192,7 @@ const PatientQuestionnaire = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} />;
+        return <WelcomeStep onNext={naviagteHome} onBack={goBack} />;
       case 1:
         return (
           <PersonalDataStep

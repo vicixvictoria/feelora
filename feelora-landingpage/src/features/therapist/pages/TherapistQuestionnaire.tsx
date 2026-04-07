@@ -21,6 +21,7 @@ import AdditionalInfoStep from '../components/questionnaire/steps/Step16_TAdditi
 import AvailabilityStep from '../components/questionnaire/steps/Step17_TAvailability';
 import SummaryStep from '../components/questionnaire/steps/Step18_TSummary';
 import CompletionStep from '../components/questionnaire/steps/Step19_TCompletion';
+import { useNavigate } from 'react-router-dom';
 
 import { therapistService } from '../api/therapist-service';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
@@ -58,7 +59,14 @@ const TherapistQuestionnaire = () => {
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
     usePersistedQuestionnaire<TherapistQuestionnaireData>('feelora_therapist_v1', initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
 
+  const navigate = useNavigate(); // For navigating to dashboard after completeion --> lets see if backend does it after acceptin?
+
   const totalSteps = 18; // Welcome + 17 questions
+
+  const naviagteHome = () => {
+    clearProgress(); // Clear localStorage and reset state
+    navigate('/'); // Navigate to homepage or dashboard
+  };
 
   // Allow going to the next step
   const goNext = () => {
@@ -133,7 +141,7 @@ const TherapistQuestionnaire = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} />;
+        return <WelcomeStep onNext={naviagteHome} onBack={goBack} />;
       case 1:
         return (
           <PersonalDataStep
@@ -304,7 +312,7 @@ const TherapistQuestionnaire = () => {
         <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
       <div className="flex justify-end p-6">
-        <img src={FeeloraLogo} alt="Feelora Logo" className="h-21 w-28" />
+        <img src={FeeloraLogo} alt="Feelora Logo" className="h-16 w-50" />
       </div>
     </div>
   );
