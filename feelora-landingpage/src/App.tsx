@@ -133,9 +133,9 @@ const router = createBrowserRouter([
           { path: '/support', element: <SupportPage /> },
         ],
       },
-      // Test routes
-      { path: '/test-therapist', element: <TherapistQuestionnaire /> },
-      { path: '/test-patient', element: <PatientQuestionnaire /> },
+      
+
+      
       // Patient protected routes
       {
         element: <RequireAuth allowedType="user" />,
