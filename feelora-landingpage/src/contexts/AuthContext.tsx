@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     : import.meta.env.VITE_USER_POOL_CLIENT_ID;
   
   // 3. Encode the redirect URI (must match your AWS Console settings exactly)
-  const redirectUri = encodeURIComponent(`${import.meta.env.VITE_AMPLIFY_URL}/`);
+  const redirectUri = redirectPath || encodeURIComponent(`${import.meta.env.VITE_AMPLIFY_URL}/`);
 
   /**
    * Use /signup instead of /login or /oauth2/authorize

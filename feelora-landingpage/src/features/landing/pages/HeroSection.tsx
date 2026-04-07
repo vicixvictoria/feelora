@@ -5,12 +5,14 @@ import { TitleFrame } from './TitleFrame';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+/*
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
+*/
 
 export function HeroSection() {
   const navigate = useNavigate();

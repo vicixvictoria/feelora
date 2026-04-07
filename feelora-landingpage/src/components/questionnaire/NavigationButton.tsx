@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRight, Home, House } from 'lucide-react';
+//import { ArrowLeft, ArrowRight, Home, House } from 'lucide-react';
+import { ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/questionnaire/button';
 import { useTranslation } from 'react-i18next';
 
