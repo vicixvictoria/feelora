@@ -145,6 +145,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+
+  // -- Login with redirect only for pre-registration --
+ const login = useCallback((type: 'user' | 'therapist') => {
+  // 1. Amplify logi logic
+  Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig);
+
+  // 2. Get values from env
+  const domain = import.meta.env.VITE_COGNITO_DOMAIN; 
+  const clientId = type === 'therapist' 
+    ? import.meta.env.VITE_THERAPIST_POOL_CLIENT_ID 
+    : import.meta.env.VITE_USER_POOL_CLIENT_ID;
+  
+  // 3. Encode the redirect URI (must match your AWS Console settings exactly)
+  const redirectUri = encodeURIComponent(`${import.meta.env.VITE_AMPLIFY_URL}/`);
+
+  /**
+   * Use /signup instead of /login or /oauth2/authorize
+   * Cognito treats /signup as a direct command to show the registration tab.
+   */
+  const signupUrl = `https://${domain}/signup?` + 
+    `client_id=${clientId}&` +
+    `response_type=code&` +
+    `scope=email+openid+profile&` +
+    `redirect_uri=${redirectUri}`;
+
+  window.location.href = signupUrl;
+}, []);
+
+  
+  /* -- ACTUAL LOGIN FUNCTION --
   // 1. LOGIN: Redirects browser to Backend -> Cognito
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
     // Pre-configure ammplify so that the logout/login flow matches the intended client
@@ -155,6 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Redirect to backend login endpoint - for testing use fullRedirectUrl, otheriwse use currentPath
     window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
   }, []);
+  */
 
   // 2. EXCHANGE: Swaps Session ID (from URL) for Tokens
   const exchangeSessionForTokens = useCallback(
