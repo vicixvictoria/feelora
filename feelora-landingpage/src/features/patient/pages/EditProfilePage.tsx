@@ -6,6 +6,8 @@ import { Loader2, Camera, ArrowLeft, Save } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { patientService, GET_OWN_USER_PROFILE_QUERY } from '../api/patient-service';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useS3Upload } from '@/hooks/use-s3-upload';
+import { useS3Download } from '@/hooks/use-s3-download';
 
 // Helpers for Date conversions
 const toDateString = (unixSeconds?: number | null) => {
@@ -41,6 +43,10 @@ const EditProfilePage = () => {
 
   const [previewImage, setPreviewImage] = useState<string>(avatarPlaceholder);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const { upload } = useS3Upload();
+  const { download, imageUrl } = useS3Download();
 
   // --- TRANSLATED ARRAYS ---
   const languageOptions = useMemo(() => [
@@ -83,8 +89,19 @@ const EditProfilePage = () => {
         Languages: patient.Languages || [],
         Availability: patient.Availability || [],
       });
+      // Try to download the existing profile picture
+      download('profile.jpg', 'public').catch((err) => {
+        console.error('Could not download profile image:', err);
+      });
     }
   }, [patient]);
+
+  // Update preview when S3 image is loaded
+  useEffect(() => {
+    if (imageUrl) {
+      setPreviewImage(imageUrl);
+    }
+  }, [imageUrl]);
 
   // Handle Standard Text/Select Input Changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -103,13 +120,23 @@ const EditProfilePage = () => {
     });
   };
 
-  // Handle Dummy Image Upload
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle Real Image Upload
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setIsUploading(true);
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
-      console.log('Image selected for future S3 upload:', file.name);
+      
+      try {
+        const fileToUpload = new File([file], 'profile', { type: 'image/jpeg' });
+        await upload(fileToUpload, 'public');
+      } catch (err) {
+        console.error('Upload failed:', err);
+        alert(t('patient.profile.uploadError', 'Fehler beim Hochladen des Bildes'));
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -170,12 +197,18 @@ const EditProfilePage = () => {
               <img
                 src={previewImage}
                 alt="Profile Preview"
-                className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg"
+                className={`w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg ${isUploading ? 'opacity-50' : ''}`}
               />
+              {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-md hover:scale-105 transition-transform"
+                disabled={isUploading}
+                className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-md hover:scale-105 transition-transform disabled:opacity-50"
               >
                 <Camera className="w-5 h-5" />
               </button>
@@ -322,7 +355,7 @@ const EditProfilePage = () => {
           <div className="pt-6 flex justify-end">
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isUploading}
               className="feelora-btn-primary flex items-center gap-2"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

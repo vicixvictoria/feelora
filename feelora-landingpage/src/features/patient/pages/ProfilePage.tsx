@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
+import { useEffect } from 'react';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
+import { useS3Download } from '@/hooks/use-s3-download';
 
 // Helper to convert Unix timestamp (in seconds) to Age
 const calculateAge = (birthDateUnix: number | null | undefined) => {
@@ -36,6 +38,25 @@ const ProfilePage = () => {
   });
   const therapist = therapistData?.getMatchedTherapists?.items?.[0];
 
+  const { download, imageUrl } = useS3Download();
+  const { download: downloadTherapist, imageUrl: therapistImageUrl } = useS3Download();
+
+  useEffect(() => {
+    if (patient) {
+      download('profile.jpg', 'public').catch((err) => {
+        console.error('Could not download profile image:', err);
+      });
+    }
+  }, [patient]);
+
+  useEffect(() => {
+    if (therapist?.Id) {
+      downloadTherapist('profile.jpg', 'public', therapist.Id).catch((err) => {
+        console.error('Could not download therapist profile image:', err);
+      });
+    }
+  }, [therapist?.Id]);
+
   // Loading state (only show spinner if we don't have patient data yet)
   if (patientLoading && !patient) {
     return (
@@ -61,7 +82,7 @@ const ProfilePage = () => {
       <div className="feelora-card mb-10">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
           <img
-            src={avatar}
+            src={imageUrl || avatar}
             alt={`${patient.Name} ${patient.Surname}`}
             className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
           />
@@ -107,7 +128,7 @@ const ProfilePage = () => {
         <div className="feelora-card">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
             <img
-              src={avatar}
+              src={therapistImageUrl || avatar}
               alt={therapist.Name || t('patient.profile.therapistAvatar')}
               className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
             />
