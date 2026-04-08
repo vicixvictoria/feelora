@@ -128,7 +128,7 @@
   "login.termsPrefix": "By signing in, you agree to our ",
   "login.termsAnd": " and ",
   "login.info.therapist": "Access your therapist dashboard and manage your patients.",
-  "login.info.user": "Find the right therapist and start your wellness journey.",
+  "login.info.user": "Find the right therapist and start your mental health journey.",
 
   "q.common.next": "Next",
   "q.common.back": "Back",
@@ -581,6 +581,20 @@
   "app.patient.header.privacy": "Privacy & Data Protection",
   "app.patient.header.languages": "Languages",
   "app.patient.header.logout": "Log Out",
+
+  "patient.profile.editError": "Error updating profile. Please try again.",
+  "patient.profile.editProfile": "Edit Profile",
+  "patient.profile.uploadPhoto": "Click on the camera icon to upload a new profile picture",
+  "patient.profile.personalData": "Personal Data",
+  "patient.profile.firstName": "First Name",
+  "patient.profile.lastName": "Last Name",
+  "patient.profile.city": "City",
+  "patient.profile.birthDate": "Birth Date",
+  "patient.profile.gender": "Gender",
+  "patient.profile.languages": "Languages",
+  "patient.profile.availability": "Availability",
+
+  "common.save": "Save",
 
   "app.therapist.sidebar.chat": "Chat",
   "app.therapist.sidebar.chatDesc": "View and send messages",

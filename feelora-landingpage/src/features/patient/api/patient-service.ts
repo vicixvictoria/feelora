@@ -71,16 +71,22 @@ const SAVE_USER_PROFILE_MUTATION = gql`
   }
 `;
 
-/*const UPDATE_OWN_USER_PROFILE_MUTATION = gql`
+// -- Update User Profile Mutation --
+const UPDATE_OWN_USER_PROFILE_MUTATION = gql`
   mutation UpdateOwnUserProfile($input: UserProfileInput!) {
     updateOwnUserProfile(input: $input) {
       Id
+      Name
+      Surname
+      Gender
+      BirthDate
+      City
+      Languages
+      Availability
       MoodTracker
-      Name      
-      City   
     }
   }
-`;*/
+`;
 
 const MOOD_TRACKER_SHARE_CONSENT_MUTATION = gql`
   mutation MoodTrackerShareConsent($allow: Boolean!) {
@@ -260,6 +266,31 @@ export const patientService = {
     });
     return responseData.getOwnUserProfile;
   },
+
+// -- Update Patient Profile API call --
+  updateProfile: async (data: {
+    Name?: string;
+    Surname?: string;
+    Gender?: string;
+    BirthDate?: number | null;
+    City?: string;
+    Languages?: string[];
+    Availability?: string[];
+  }) => {
+    try {
+      const { data: responseData } = await apolloClient.mutate({
+        mutation: UPDATE_OWN_USER_PROFILE_MUTATION,
+        variables: { input: data },
+        // Refetch the profile query so the ProfilePage updates immediately
+        refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
+      });
+      return responseData.updateOwnUserProfile;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  },
+
 
   // -- Update Mood Tracker Sharing Consent --
   updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {

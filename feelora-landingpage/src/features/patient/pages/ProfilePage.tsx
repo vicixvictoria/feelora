@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom'; 
 import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
@@ -15,6 +16,7 @@ const calculateAge = (birthDateUnix: number | null | undefined) => {
 
 const ProfilePage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // 1. Fetch Patient Profile
   // Apollo uses 'cache-first' by default, so it won't hit the network if data exists.
@@ -86,7 +88,9 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="self-center">
-            <button className="feelora-btn-primary flex items-center gap-2">
+            <button 
+              onClick={() => navigate('edit')}
+              className="feelora-btn-primary flex items-center gap-2">
               {t('patient.profile.edit')}
               <ExternalLink className="w-4 h-4" />
             </button>
