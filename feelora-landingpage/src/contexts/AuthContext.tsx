@@ -129,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Helper function to set auth state from tokens
   const setAuthState = useCallback((access: string, idTokenStr: string) => {
     setAccessToken(access);
+    setIdToken(idTokenStr);
     setApolloAccessToken(access); // Sync token to Apollo Client
     const parsedUser = parseUserFromToken(idTokenStr); // Decode ID token for user info
     setUser(parsedUser);
