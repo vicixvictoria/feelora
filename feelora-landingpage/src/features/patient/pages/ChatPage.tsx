@@ -55,7 +55,7 @@ const ChatPage = () => {
 
   //Helper function to scroll to the anchor
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }); 
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
     // Note: Using 'auto' instead of 'smooth' so it snaps instantly when loading a chat with 100+ messages
   };
 
@@ -340,7 +340,6 @@ const ChatPage = () => {
                   })}
                   {/* The invisible anchor div for scrolling to last message */}
                   <div ref={messagesEndRef} />
-
                 </div>
               )}
             </div>

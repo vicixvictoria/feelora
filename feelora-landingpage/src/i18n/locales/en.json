@@ -130,7 +130,6 @@
   "login.info.therapist": "Access your therapist dashboard and manage your patients.",
   "login.info.user": "Find the right therapist and start your wellness journey.",
 
-
   "q.common.next": "Next",
   "q.common.back": "Back",
   "q.common.question": "Question {{current}} of {{total}}",
@@ -156,7 +155,7 @@
   "q.common.selectAtLeastOneAlt": "Please select at least one option.",
   "q.common.typePlaceholder": "Type here...",
   "q.common.atleastOneError": "Please select at least one",
-  
+
   "q.p.welcome.title": "Thank you for joining Feelora!",
   "q.p.welcome.desc": "Before you can begin, we will create a patient profile for you. We will go through our patient screening questionnaire together to create an optimal profile and match you with suitable therapists.",
   "q.p.welcome.questionCount": "This questionnaire contains 16 questions.",
@@ -172,7 +171,7 @@
   "q.p.personal.diverse": "Diverse",
   "q.p.contact.title": "Contact Information",
   "q.p.contact.cardTitle": "Contact Information",
-  "q.p.contact.subtitle": "Provide your contact details where your therapist can reach you. If you would like to provide an additional email or phone number besides the one you registered with, enter it here (optional). We cannot validate or verify this data! Please check your entries carefully." ,
+  "q.p.contact.subtitle": "Provide your contact details where your therapist can reach you. If you would like to provide an additional email or phone number besides the one you registered with, enter it here (optional). We cannot validate or verify this data! Please check your entries carefully.",
   "q.p.contact.phone": "Phone/Mobile",
   "q.p.contact.email": "Email",
   "q.p.contact.city": "City*",

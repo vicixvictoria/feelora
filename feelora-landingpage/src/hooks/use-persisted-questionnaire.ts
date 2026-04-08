@@ -16,9 +16,9 @@ export function usePersistedQuestionnaire<T>(storageKey: string, initialData: T)
 
   // Step tracking
   const [currentStep, setCurrentStep] = useState(() => {
-    if (typeof window === 'undefined') return 1;
+    if (typeof window === 'undefined') return 0;
     const savedStep = window.localStorage.getItem(`${storageKey}_step`);
-    return savedStep ? parseInt(savedStep, 10) : 1;
+    return savedStep ? parseInt(savedStep, 10) : 0;
   });
 
   // 2. Sync to LocalStorage on change

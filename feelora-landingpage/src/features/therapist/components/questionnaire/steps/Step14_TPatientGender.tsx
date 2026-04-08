@@ -28,9 +28,7 @@ const Step14_TPatientGender = ({
   // 2. Define schema inside component with useMemo
   const step14Schema = useMemo(() => {
     return z.object({
-      selection: z
-        .array(z.string())
-        .min(1, t('q.common.atleastOneError')),
+      selection: z.array(z.string()).min(1, t('q.common.atleastOneError')),
     });
   }, [t]);
 
@@ -89,8 +87,8 @@ const Step14_TPatientGender = ({
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection 
-            ? t('q.t.patientGender.error', 'Bitte wähle mindestens eine Option aus') 
+          {errors.selection
+            ? t('q.t.patientGender.error', 'Bitte wähle mindestens eine Option aus')
             : t('q.common.multiSelect', 'Mehrfachauswahl möglich')}
         </p>
       </div>
@@ -123,10 +121,7 @@ const Step14_TPatientGender = ({
           {/* Exclusive Option: Keine Präferenz */}
           {noPrefOption && (
             <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-              <Checkbox
-                checked={hasNoPreference}
-                onCheckedChange={handleNoPreferenceToggle}
-              />
+              <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
               <span className="text-foreground font-medium">{noPrefOption.label}</span>
             </label>
           )}

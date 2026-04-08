@@ -73,7 +73,9 @@ const Step12_TTherapyDuration = ({
       {/* Form Card */}
       <div className="feelora-card">
         {/* 4. Visual error wrapper for the entire RadioGroup */}
-        <div className={`p-1 rounded-xl ${errors.selection ? 'border border-destructive/50 bg-destructive/5' : ''}`}>
+        <div
+          className={`p-1 rounded-xl ${errors.selection ? 'border border-destructive/50 bg-destructive/5' : ''}`}
+        >
           <RadioGroup value={data || ''} onValueChange={handleValueChange} className="space-y-3">
             {durationOptions.map((option) => {
               const isSelected = data === option.id;
@@ -82,8 +84,8 @@ const Step12_TTherapyDuration = ({
                 <label
                   key={option.id}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    isSelected 
-                      ? 'border-purple bg-purple/5' 
+                    isSelected
+                      ? 'border-purple bg-purple/5'
                       : errors.selection
                         ? 'border-destructive/50 hover:bg-destructive/10'
                         : 'border-border hover:bg-muted/50'
@@ -102,7 +104,7 @@ const Step12_TTherapyDuration = ({
           </RadioGroup>
         </div>
       </div>
-      
+
       {/* 5. Swap onNext for validateAndNext */}
       <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>

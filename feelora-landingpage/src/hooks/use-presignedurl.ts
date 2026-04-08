@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext'; // adjust path
 import { presignedUrlService } from '@/features/auth/PresignedUrl';
 
 export const usePresignedUrl = () => {
-  const { accessToken } = useAuth(); 
+  const { accessToken } = useAuth();
   if (!accessToken) throw new Error('No access token available');
 
   return {

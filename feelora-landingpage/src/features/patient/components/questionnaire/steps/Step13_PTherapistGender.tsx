@@ -45,7 +45,10 @@ const Step13_PTherapistGender = ({
     { id: 'weiblich', label: t('q.options.female', 'weiblich') },
     { id: 'non-binary / divers', label: t('q.options.diverse', 'non-binary / divers') },
   ];
-  const NO_PREFERENCE = { id: 'keine Präferenz', label: t('q.common.noPreference', 'keine Präferenz') };
+  const NO_PREFERENCE = {
+    id: 'keine Präferenz',
+    label: t('q.common.noPreference', 'keine Präferenz'),
+  };
 
   const hasNoPreference = safeData.includes(NO_PREFERENCE.id);
 

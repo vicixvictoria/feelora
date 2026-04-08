@@ -1,5 +1,4 @@
 export const s3Service = {
-
   upload: async (presignedUrl: string, file: File): Promise<void> => {
     const response = await fetch(presignedUrl, {
       method: 'PUT',
@@ -13,7 +12,6 @@ export const s3Service = {
     const response = await fetch(presignedUrl);
     if (!response.ok) throw new Error(`S3 download failed: ${response.status}`);
     const blob = await response.blob();
-    return URL.createObjectURL(blob); 
+    return URL.createObjectURL(blob);
   },
-
 };

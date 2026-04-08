@@ -40,7 +40,9 @@ const TherapistAccountPage = () => {
       <div className="feelora-card flex flex-col gap-6">
         {/* User Info Section */}
         <div>
-          <h2 className="text-xl font-semibold text-foreground mb-1">{t('settings.account.profile')}</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-1">
+            {t('settings.account.profile')}
+          </h2>
           <p className="text-muted-foreground mb-4">{t('settings.account.subtitle')}</p>
 
           <div className="bg-muted/50 p-4 rounded-lg border border-border">
@@ -59,10 +61,10 @@ const TherapistAccountPage = () => {
 
         {/* Danger Zone */}
         <div>
-          <h2 className="text-xl font-semibold text-destructive mb-1">{t('settings.account.achtung')}</h2>
-          <p className="text-muted-foreground mb-4">
-            {t('settings.account.achtungWarning')}
-          </p>
+          <h2 className="text-xl font-semibold text-destructive mb-1">
+            {t('settings.account.achtung')}
+          </h2>
+          <p className="text-muted-foreground mb-4">{t('settings.account.achtungWarning')}</p>
 
           {!showConfirm ? (
             <button
@@ -77,7 +79,9 @@ const TherapistAccountPage = () => {
               <div className="flex items-start gap-3 mb-4">
                 <AlertTriangle className="w-6 h-6 text-destructive flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-destructive">{t('settings.account.deleteAccount.sure')}</h3>
+                  <h3 className="font-semibold text-destructive">
+                    {t('settings.account.deleteAccount.sure')}
+                  </h3>
                   <p className="text-sm text-destructive/80">
                     {t('settings.account.deleteAccount.hint')}
                   </p>

@@ -46,11 +46,12 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
     });
     console.log(`[WS] Initial notifications fetched:`, notifications);
 
-    const normalizedNotifications: WebsocketNotification[] =
-      notifications.notifications.map((notification: NotificationData) => ({
+    const normalizedNotifications: WebsocketNotification[] = notifications.notifications.map(
+      (notification: NotificationData) => ({
         type: 'notification',
         data: notification,
-      }));
+      }),
+    );
 
     setMessages((prevMessages) => [...prevMessages, ...normalizedNotifications]);
     setNextToken(notifications.nextToken);

@@ -25,7 +25,9 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
   const step8Schema = useMemo(() => {
     return z
       .object({
-        selected: z.array(z.string()).min(1, t('q.p.therapySchool.error', 'Bitte wähle mindestens eine Option')),
+        selected: z
+          .array(z.string())
+          .min(1, t('q.p.therapySchool.error', 'Bitte wähle mindestens eine Option')),
         other: z.string().optional(),
       })
       .refine(
@@ -38,7 +40,7 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
         {
           message: t('q.p.therapySchool.detailsError', 'Bitte spezifizieren'),
           path: ['other'],
-        }
+        },
       );
   }, [t]);
 
@@ -82,7 +84,11 @@ const Step8_PTherapySchool = ({ onNext, onBack, data, onDataChange }: TherapySch
     let currentSelection = data.selected.filter((s) => s !== IDK_OPTION);
 
     if (currentSelection.includes(OTHER_VALUE)) {
-      onDataChange({ ...data, selected: currentSelection.filter((s) => s !== OTHER_VALUE), other: '' });
+      onDataChange({
+        ...data,
+        selected: currentSelection.filter((s) => s !== OTHER_VALUE),
+        other: '',
+      });
     } else {
       onDataChange({ ...data, selected: [...currentSelection, OTHER_VALUE] });
     }

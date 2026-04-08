@@ -1,5 +1,5 @@
 {
- "_comment":"German translations for the Feelora landing page",
+  "_comment": "German translations for the Feelora landing page",
   "nav.forPatients": "Für Patient:Innen",
   "nav.forTherapists": "Für Therapeut:Innen",
   "nav.whyFeelora": "Warum Feelora",
@@ -155,7 +155,7 @@
   "q.common.selectAtLeastOneAlt": "Bitte wähle mindestens eine Option aus.",
   "q.common.typePlaceholder": "hier tippen...",
   "q.common.atleastOneError": "Bitte wähle mindestens eine Option aus.",
-  
+
   "_comment": "German translations for Questionnaire",
   "q.p.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
   "q.p.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Patient*innenprofil für dich. Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen\" durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.",
@@ -893,7 +893,6 @@
   "moodTracker.overview.activity": "Aktivität",
   "moodTracker.overview.physical": "Körperlich",
   "moodTracker.overview.stimmung": "Stimmung",
-
 
   "patient.notFound.message": "Oops! Seite nicht gefunden",
   "patient.notFound.returnHome": "Zurück zur Startseite",

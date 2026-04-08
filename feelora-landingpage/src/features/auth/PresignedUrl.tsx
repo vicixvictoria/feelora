@@ -5,13 +5,13 @@ export const presignedUrlService = {
     accessToken: string,
     fileName: string,
     contentType: string,
-    visibility: string
+    visibility: string,
   ): Promise<string> => {
     const response = await fetch(`${AUTH_API_URL}/presigned/upload`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,  
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ fileName, contentType, visibility }),
     });
@@ -26,15 +26,15 @@ export const presignedUrlService = {
     accessToken: string,
     imageId: string,
     visibility: string,
-    ownerSub?: string       
+    ownerSub?: string,
   ): Promise<string> => {
     const params = new URLSearchParams({ imageId, visibility });
-    if (ownerSub) params.append('ownerSub', ownerSub); 
+    if (ownerSub) params.append('ownerSub', ownerSub);
 
     const response = await fetch(`${AUTH_API_URL}/presigned/download?${params}`, {
-      method: 'GET',                                  
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 

@@ -23,7 +23,9 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
   const step4Schema = useMemo(() => {
     return z
       .object({
-        selected: z.array(z.string()).min(1, t('q.common.selectAtLeastOne', 'Bitte wähle mindestens eine Option')),
+        selected: z
+          .array(z.string())
+          .min(1, t('q.common.selectAtLeastOne', 'Bitte wähle mindestens eine Option')),
         other: z.string().optional(),
       })
       .refine(
@@ -36,7 +38,7 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
         },
         {
           message: t('q.common.specifyDetails', 'Bitte spezifizieren'), // Translated Zod error
-          path: ['other'], 
+          path: ['other'],
         },
       );
   }, [t]); // Dependency array ensures it updates if language changes
@@ -77,7 +79,7 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
 
   const handleOtherToggle = () => {
     clearError('selected');
-    clearError('other'); 
+    clearError('other');
 
     if (data.selected.includes(OTHER_VALUE)) {
       // Uncheck "Andere" -> remove it and clear text
@@ -150,8 +152,8 @@ const Step4_PMentalHealth = ({ onNext, onBack, data, onDataChange }: Specialties
                 />
                 {/* 5. Render the translated Zod error directly */}
                 {errors.other && (
-                 <span className="text-xs text-destructive ml-1">
-                  {t('q.common.pleaseSpecify', 'Bitte gib Details an')}
+                  <span className="text-xs text-destructive ml-1">
+                    {t('q.common.pleaseSpecify', 'Bitte gib Details an')}
                   </span>
                 )}
               </div>

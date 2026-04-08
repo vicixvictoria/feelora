@@ -19,9 +19,7 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
   // 1. Define validation schema inside component with useMemo
   const step17Schema = useMemo(() => {
     return z.object({
-      selection: z
-        .array(z.string())
-        .min(1, t('q.common.selectAtLeastOne')),
+      selection: z.array(z.string()).min(1, t('q.common.selectAtLeastOne')),
     });
   }, [t, i18n.language]); // i18n.language forces Zod to update the error text on language switch!
 
@@ -61,9 +59,7 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
         <p
           className={`text-sm ${errors.selection ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selection 
-            ? t('q.common.selectAtLeastOne') 
-            : t('q.t.availability.multiSelect')}
+          {errors.selection ? t('q.common.selectAtLeastOne') : t('q.t.availability.multiSelect')}
         </p>
       </div>
 

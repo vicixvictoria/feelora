@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker'; 
+import { moodCategoryDefs, emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
 
 const TherapistMoodTrackerDetailsPage = () => {
   const location = useLocation();
@@ -36,7 +36,9 @@ const TherapistMoodTrackerDetailsPage = () => {
       {/* Therapist specific header showing Patient Name */}
       <div className="feelora-card mb-8 bg-primary/5 border-primary/20">
         <h1 className="text-2xl font-bold text-foreground">Mood Tracker: {patientName}</h1>
-        <p className="text-muted-foreground mt-1">{t('app.patient.moodTrackerDetails.createdAt')} {date}</p>
+        <p className="text-muted-foreground mt-1">
+          {t('app.patient.moodTrackerDetails.createdAt')} {date}
+        </p>
       </div>
 
       <div className="feelora-card space-y-6">

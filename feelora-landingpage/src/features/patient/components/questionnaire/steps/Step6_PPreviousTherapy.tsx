@@ -129,7 +129,6 @@ const Step6_PPreviousTherapy = ({
         className={`feelora-card transition-colors ${errors.selected ? 'border-destructive/50 bg-destructive/5' : ''}`}
       >
         <div className="grid grid-cols-1 gap-3">
-          
           {/* Map through the newly structured options */}
           {therapyOptions.map((option) => (
             <label

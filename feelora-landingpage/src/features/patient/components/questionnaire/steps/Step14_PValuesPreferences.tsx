@@ -29,7 +29,9 @@ const Step14_PValuesPreferences = ({
   const step14Schema = useMemo(() => {
     return z
       .object({
-        selected: z.array(z.string()).min(1, t('q.p.valuesPreferences.error', 'Bitte wähle mindestens eine Option aus')),
+        selected: z
+          .array(z.string())
+          .min(1, t('q.p.valuesPreferences.error', 'Bitte wähle mindestens eine Option aus')),
         other: z.string().optional(),
       })
       .refine(
@@ -49,17 +51,47 @@ const Step14_PValuesPreferences = ({
 
   // 3. Map stable IDs to translated labels
   const valueOptions = [
-    { id: 'LGBTQ+ freundlich / affirmativ', label: t('q.p.values.lgbtq', 'LGBTQ+ freundlich / affirmativ') },
+    {
+      id: 'LGBTQ+ freundlich / affirmativ',
+      label: t('q.p.values.lgbtq', 'LGBTQ+ freundlich / affirmativ'),
+    },
     { id: 'Kulturell sensibel', label: t('q.p.values.cultural', 'Kulturell sensibel') },
-    { id: 'Erfahrung mit leistungsorientierten Personen / Führungskräften', label: t('q.p.values.performance', 'Erfahrung mit leistungsorientierten Personen / Führungskräften') },
-    { id: 'Expertise in Beziehungs- oder Familienthemen', label: t('q.p.values.relationships', 'Expertise in Beziehungs- oder Familienthemen') },
-    { id: 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing', label: t('q.p.values.workplace', 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing') },
-    { id: 'Erfahrung mit Expatriates oder internationalen Klient:innen', label: t('q.p.values.expats', 'Erfahrung mit Expatriates oder internationalen Klient:innen') },
-    { id: 'Geschlechtersensibler oder feministischer Ansatz', label: t('q.p.values.feminist', 'Geschlechtersensibler oder feministischer Ansatz') },
-    { id: 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)', label: t('q.p.values.lifeChanges', 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)') },
-    { id: 'Jemand Älteres mit mehr Erfahrung', label: t('q.p.values.older', 'Jemand Älteres mit mehr Erfahrung') },
+    {
+      id: 'Erfahrung mit leistungsorientierten Personen / Führungskräften',
+      label: t(
+        'q.p.values.performance',
+        'Erfahrung mit leistungsorientierten Personen / Führungskräften',
+      ),
+    },
+    {
+      id: 'Expertise in Beziehungs- oder Familienthemen',
+      label: t('q.p.values.relationships', 'Expertise in Beziehungs- oder Familienthemen'),
+    },
+    {
+      id: 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing',
+      label: t('q.p.values.workplace', 'Expertise bei Konflikten am Arbeitsplatz oder Mobbing'),
+    },
+    {
+      id: 'Erfahrung mit Expatriates oder internationalen Klient:innen',
+      label: t('q.p.values.expats', 'Erfahrung mit Expatriates oder internationalen Klient:innen'),
+    },
+    {
+      id: 'Geschlechtersensibler oder feministischer Ansatz',
+      label: t('q.p.values.feminist', 'Geschlechtersensibler oder feministischer Ansatz'),
+    },
+    {
+      id: 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)',
+      label: t('q.p.values.lifeChanges', 'Erfahrung mit Lebensübergängen (Karriere, Umzug usw.)'),
+    },
+    {
+      id: 'Jemand Älteres mit mehr Erfahrung',
+      label: t('q.p.values.older', 'Jemand Älteres mit mehr Erfahrung'),
+    },
     { id: 'Jemand Jüngeres', label: t('q.p.values.younger', 'Jemand Jüngeres') },
-    { id: 'Ich bin offen für eine/n Therapeut:in in Supervision', label: t('q.p.values.supervision', 'Ich bin offen für eine/n Therapeut:in in Supervision') },
+    {
+      id: 'Ich bin offen für eine/n Therapeut:in in Supervision',
+      label: t('q.p.values.supervision', 'Ich bin offen für eine/n Therapeut:in in Supervision'),
+    },
   ];
 
   // Initialize validation hook

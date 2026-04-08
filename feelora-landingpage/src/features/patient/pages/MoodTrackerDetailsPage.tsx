@@ -38,7 +38,9 @@ const MoodTrackerDetailsPage = () => {
 
       <div className="feelora-card mb-8 bg-primary/5 border-primary/20">
         <h1 className="text-2xl font-bold text-foreground">Mood Tracker Details</h1>
-        <p className="text-muted-foreground mt-1">{t('app.patient.moodTrackerDetails.createdAt')} {date}</p>
+        <p className="text-muted-foreground mt-1">
+          {t('app.patient.moodTrackerDetails.createdAt')} {date}
+        </p>
       </div>
 
       {/* Answers Loop */}

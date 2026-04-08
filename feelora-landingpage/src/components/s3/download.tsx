@@ -9,7 +9,13 @@ interface Props {
   className?: string;
 }
 
-export const S3DownloadButton = ({ imageId, visibility, ownerSub, label = 'Download', className }: Props) => {
+export const S3DownloadButton = ({
+  imageId,
+  visibility,
+  ownerSub,
+  label = 'Download',
+  className,
+}: Props) => {
   const { download, imageUrl } = useS3Download();
 
   return (

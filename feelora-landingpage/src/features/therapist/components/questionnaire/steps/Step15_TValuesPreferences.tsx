@@ -43,7 +43,7 @@ const Step15_TValuesPreferences = ({
         {
           message: t('q.common.specifyDetails'),
           path: ['other'],
-        }
+        },
       );
   }, [t]);
 
@@ -128,8 +128,8 @@ const Step15_TValuesPreferences = ({
         <p
           className={`text-sm ${errors.selected ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
         >
-          {errors.selected 
-            ? t('q.t.valuesPreferences.error', 'Bitte wähle mindestens eine Option aus') 
+          {errors.selected
+            ? t('q.t.valuesPreferences.error', 'Bitte wähle mindestens eine Option aus')
             : t('q.t.valuesPreferences.multiSelect')}
         </p>
       </div>
@@ -201,10 +201,7 @@ const Step15_TValuesPreferences = ({
           {/* Exclusive Option: None / No further details */}
           {noneOption && (
             <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-              <Checkbox
-                checked={hasNoneSelected}
-                onCheckedChange={handleNoneToggle}
-              />
+              <Checkbox checked={hasNoneSelected} onCheckedChange={handleNoneToggle} />
               <span className="text-foreground font-medium">{noneOption.label}</span>
             </label>
           )}

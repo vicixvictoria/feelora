@@ -36,7 +36,7 @@ const TherapistChat = () => {
 
   // Helper function to scroll to the anchor
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }); 
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
     // Note: Using 'auto' instead of 'smooth' so it snaps instantly when loading a chat with 100+ messages
   };
 
@@ -286,15 +286,15 @@ const TherapistChat = () => {
                   onKeyDown={(e) => {
                     // Send message on Enter, but allow a new line if they hold Shift!
                     if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
+                      e.preventDefault();
+                      handleSendMessage();
                     }
                   }}
                   placeholder={t('patient.chat.placeholder')}
                   disabled={isSending}
                   rows={1}
                   className="flex-1 w-full min-w-0 px-4 py-3 rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 resize-none overflow-y-auto max-h-32"
-                  />
+                />
                 <button
                   type="submit"
                   disabled={!newMessage.trim() || isSending}

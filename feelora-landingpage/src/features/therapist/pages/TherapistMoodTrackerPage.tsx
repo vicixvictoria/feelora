@@ -152,15 +152,21 @@ const TherapistMoodTrackerPage = () => {
                   <div className="flex items-center gap-8 flex-1">
                     <div className="text-center">
                       <span className="text-2xl">{entry.mood}</span>
-                      <p className="text-xs text-muted-foreground mt-1">{t('moodTracker.overview.stimmung', 'Mood')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('moodTracker.overview.stimmung', 'Mood')}
+                      </p>
                     </div>
                     <div className="text-center">
                       <span className="text-2xl">{entry.outdoor}</span>
-                      <p className="text-xs text-muted-foreground mt-1">{t('moodTracker.overview.activity', 'Activity')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('moodTracker.overview.activity', 'Activity')}
+                      </p>
                     </div>
                     <div className="text-center">
                       <span className="text-2xl">{entry.physical}</span>
-                      <p className="text-xs text-muted-foreground mt-1">{t('moodTracker.overview.physical', 'Physical')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('moodTracker.overview.physical', 'Physical')}
+                      </p>
                     </div>
                   </div>
 

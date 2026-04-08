@@ -22,7 +22,9 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
   const step7Schema = useMemo(() => {
     return z
       .object({
-        selected: z.array(z.string()).min(1, t('q.t.languages.selectError', 'Please select at least one language')),
+        selected: z
+          .array(z.string())
+          .min(1, t('q.t.languages.selectError', 'Please select at least one language')),
         other: z.array(z.string()).optional(),
       })
       .refine(
@@ -107,7 +109,11 @@ const Step7_TLanguages = ({ onNext, onBack, data, onDataChange }: LanguagesStepP
     clearError('other');
 
     if (data.selected.includes(OTHER_VALUE)) {
-      onDataChange({ ...data, selected: data.selected.filter((l) => l !== OTHER_VALUE), other: [] });
+      onDataChange({
+        ...data,
+        selected: data.selected.filter((l) => l !== OTHER_VALUE),
+        other: [],
+      });
     } else {
       onDataChange({ ...data, selected: [...data.selected, OTHER_VALUE], other: data.other || [] });
     }
