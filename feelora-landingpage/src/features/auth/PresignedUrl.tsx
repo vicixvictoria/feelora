@@ -2,7 +2,7 @@ const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-
 
 export const presignedUrlService = {
   upload: async (
-    accessToken: string,
+    idToken: string,
     fileName: string,
     contentType: string,
     visibility: string,
@@ -11,7 +11,7 @@ export const presignedUrlService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: idToken,
       },
       body: JSON.stringify({ fileName, contentType, visibility }),
     });
@@ -19,11 +19,11 @@ export const presignedUrlService = {
     if (!response.ok) throw new Error(`Upload presign failed: ${response.status}`);
 
     const data = await response.json();
-    return data.body.uploadUrl;
+    return data.uploadUrl;
   },
 
   download: async (
-    accessToken: string,
+    idToken: string,
     imageId: string,
     visibility: string,
     ownerSub?: string,
@@ -34,13 +34,13 @@ export const presignedUrlService = {
     const response = await fetch(`${AUTH_API_URL}/presigned/download?${params}`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: idToken,
       },
     });
 
     if (!response.ok) throw new Error(`Download presign failed: ${response.status}`);
 
     const data = await response.json();
-    return data.body.downloadUrl;
+    return data.downloadUrl;
   },
 };

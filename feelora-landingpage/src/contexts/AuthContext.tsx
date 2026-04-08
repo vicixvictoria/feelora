@@ -34,6 +34,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   accessToken: string | null;
+  idToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -88,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const value: AuthContextType = {
       user: mockUser,
       accessToken: testToken,
+      idToken: testToken,
       isAuthenticated: true,
       isLoading: false,
       error: null,
@@ -104,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearAuthState = useCallback(() => {
     setUser(null);
     setAccessToken(null);
+    setIdToken(null);
     setApolloAccessToken(null); // Clear Apollo token
     if (refreshTimerRef.current) {
       clearInterval(refreshTimerRef.current);
@@ -123,10 +127,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Helper function to set auth state from tokens
-  const setAuthState = useCallback((access: string, idToken: string) => {
+  const setAuthState = useCallback((access: string, idTokenStr: string) => {
     setAccessToken(access);
     setApolloAccessToken(access); // Sync token to Apollo Client
-    const parsedUser = parseUserFromToken(idToken); // Decode ID token for user info
+    const parsedUser = parseUserFromToken(idTokenStr); // Decode ID token for user info
     setUser(parsedUser);
 
     // --- UPDATED: Treat BOTH 'type:T' and 'type:P' as therapists ---
@@ -307,6 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     accessToken,
+    idToken,
     isAuthenticated: !!user,
     isLoading,
     error,

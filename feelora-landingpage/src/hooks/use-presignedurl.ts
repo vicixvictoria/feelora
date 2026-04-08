@@ -2,14 +2,14 @@ import { useAuth } from '@/contexts/AuthContext'; // adjust path
 import { presignedUrlService } from '@/features/auth/PresignedUrl';
 
 export const usePresignedUrl = () => {
-  const { accessToken } = useAuth();
-  if (!accessToken) throw new Error('No access token available');
+  const { idToken } = useAuth();
+  if (!idToken) throw new Error('No id token available');
 
   return {
     upload: (fileName: string, contentType: string, visibility: string) =>
-      presignedUrlService.upload(accessToken, fileName, contentType, visibility),
+      presignedUrlService.upload(idToken, fileName, contentType, visibility),
 
     download: (imageId: string, visibility: string, ownerSub?: string) =>
-      presignedUrlService.download(accessToken, imageId, visibility, ownerSub),
+      presignedUrlService.download(idToken, imageId, visibility, ownerSub),
   };
 };
