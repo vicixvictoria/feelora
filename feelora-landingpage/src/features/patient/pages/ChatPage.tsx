@@ -1,19 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
-//import feeloraLogo from '@/assets/logo.png';
-import avatar from '@/assets/avatar-Placeholder.png';
+import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { patientService } from '../api/patient-service';
+import { useS3Download } from '@/hooks/use-s3-download';
 
-// --- New Interface for the Sidebar ---
+// --- Interface for the Sidebar ---
 interface SidebarChat {
   contactId: string;
   name: string;
-  avatar: string;
-  conversationId: string | null; // Null if the backend hasn't created it yet
+  conversationId: string | null;
   lastMessage: string;
 }
 
@@ -30,6 +29,31 @@ interface WebsocketMessage {
   type?: string;
   data?: IncomingNotification['data'];
 }
+
+// --- Smart S3 Avatar Component (Used ONLY for the Sidebar now) ---
+const S3Avatar = ({
+  userId,
+  fallbackSrc,
+  className,
+  alt = '',
+}: {
+  userId?: string;
+  fallbackSrc: string;
+  className: string;
+  alt?: string;
+}) => {
+  const { download, imageUrl } = useS3Download();
+
+  useEffect(() => {
+    if (userId) {
+      download('profile.jpg', 'public', userId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
+};
+
 
 const ChatPage = () => {
   const { t } = useTranslation();
@@ -50,18 +74,36 @@ const ChatPage = () => {
   const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
   const processedMessageCountRef = useRef(0);
 
-  //Create a reference to the bottom of the chat
+  // Create a reference to the bottom of the chat
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  //Helper function to scroll to the anchor
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    // Note: Using 'auto' instead of 'smooth' so it snaps instantly when loading a chat with 100+ messages
   };
 
-  const extractIncomingNotification = (
-    rawMessage: WebsocketMessage,
-  ): IncomingNotification | null => {
+  // ==========================================
+  // HIGH-PERFORMANCE AVATAR FETCHING
+  // ==========================================
+  
+  // 1. Fetch MY avatar exactly once when the component mounts
+  const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
+  useEffect(() => {
+    // No ownerSub passed = fetches logged-in user's image
+    downloadMyAvatar('profile.jpg', 'public').catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 2. Fetch THEIR avatar exactly once whenever the selected chat changes
+  const { download: downloadTheirAvatar, imageUrl: theirAvatarUrl } = useS3Download();
+  useEffect(() => {
+    if (selectedChat?.contactId) {
+      downloadTheirAvatar('profile.jpg', 'public', selectedChat.contactId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChat?.contactId]);
+
+
+  const extractIncomingNotification = (rawMessage: WebsocketMessage): IncomingNotification | null => {
     if (rawMessage.type !== 'notification') return null;
     if (rawMessage.data?.type !== 'new_message') return null;
     if (!rawMessage.data.conversationId) return null;
@@ -76,52 +118,39 @@ const ChatPage = () => {
 
     setUnreadByConversation((previous) => {
       const next = { ...previous };
-
       for (const rawMessage of newMessages) {
         const incoming = extractIncomingNotification(rawMessage);
         if (!incoming?.data?.conversationId) continue;
-
         const conversationId = incoming.data.conversationId;
         const fallbackCount = (next[conversationId] ?? 0) + 1;
         const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
         next[conversationId] = Math.max(0, count);
       }
-
       return next;
     });
   }, [websocketMessages]);
 
-  // 1. Fetch Matches AND Conversations on Load
+  // Fetch Matches AND Conversations on Load
   useEffect(() => {
     const fetchContactsAndChats = async () => {
       try {
         setIsLoadingChats(true);
-
-        // A. Get the Patient's Matches
         const profile = await patientService.getProfile();
         const therapists = await patientService.getMatchedTherapists(profile.Matches || []);
-
-        // B. Get the active Conversations
         const conversations = await chatService.getChatConversations();
 
-        // C. Combine them into our Sidebar List!
         const sidebarItems: SidebarChat[] = therapists.map((therapist) => {
-          // Check if a conversation already exists for this therapist
           const existingChat = conversations.find((c) => c.participantIds.includes(therapist.Id));
-
           return {
             contactId: therapist.Id,
             name: `${therapist.Name} ${therapist.Surname}`,
-            avatar: avatar, // Will replace with therapist profile pic when S3 images work
             conversationId: existingChat ? existingChat.conversationId : null,
-            lastMessage:
-              existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
+            lastMessage: existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
           };
         });
 
         setChatList(sidebarItems);
 
-        // Auto-select the first chat on desktop
         if (sidebarItems.length > 0 && window.innerWidth >= 768) {
           handleSelectChat(sidebarItems[0]);
         }
@@ -135,16 +164,15 @@ const ChatPage = () => {
     fetchContactsAndChats();
   }, [t]);
 
-  //Trigger the scroll whenever the messages array updates
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // 2. Fetch Messages when a contact is clicked
+  // Fetch Messages when a contact is clicked
   const handleSelectChat = async (chat: SidebarChat) => {
     setSelectedChat(chat);
     setMobileShowChat(true);
-    setMessages([]); // Clear previous messages while loading
+    setMessages([]);
 
     if (chat.conversationId) {
       const conversationId = chat.conversationId;
@@ -156,7 +184,6 @@ const ChatPage = () => {
       });
     }
 
-    // If they have no conversationId yet, there are no messages to fetch
     if (!chat.conversationId) return;
 
     setIsLoadingMessages(true);
@@ -170,46 +197,19 @@ const ChatPage = () => {
     }
   };
 
-  // 3. Send Message
+  // Send Message
   const handleSendMessage = async () => {
-    // Console log for debugging
-    console.log('Send button triggered. Checking state...');
-    console.log('1. Message text:', newMessage);
-    console.log('2. Selected Chat:', selectedChat);
-    console.log('3. User object:', user);
-    console.log('4. isSending status:', isSending);
-
-    if (!newMessage.trim()) return; // Don't send empty spaces
-    if (isSending) return; // Don't double-send
-
-    if (!user) {
-      alert('Fehler: Benutzerdaten konnten nicht geladen werden (User ist null).');
-      return;
-    }
-
-    if (!selectedChat) {
-      alert('Fehler: Kein Chat ausgewählt.');
-      return;
-    }
-
-    if (!selectedChat.conversationId) {
-      alert(
-        'Fehler: Konversation wurde noch nicht generiert. Bitte lade die Seite neu oder kontaktiere den Support.',
-      );
-      return;
-    }
+    if (!newMessage.trim() || isSending) return;
+    if (!user || !selectedChat || !selectedChat.conversationId) return;
 
     const messageText = newMessage.trim();
     setIsSending(true);
 
     try {
-      console.log('Attempting to send message to AWS...');
       const realMessage = await chatService.sendChatMessage(
         selectedChat.conversationId,
         messageText,
       );
-      console.log('Message sent successfully!', realMessage);
-
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
     } catch (error) {
@@ -249,10 +249,11 @@ const ChatPage = () => {
                   onClick={() => handleSelectChat(chat)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : unreadCount > 0 ? 'bg-primary/10 hover:bg-primary/15 ring-1 ring-primary/30' : 'hover:bg-muted/50'}`}
                 >
-                  <img
-                    src={chat.avatar}
-                    alt={chat.name}
+                  <S3Avatar
+                    userId={chat.contactId}
+                    fallbackSrc={avatarPlaceholder}
                     className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    alt={chat.name}
                   />
                   <div className="flex-1 text-left overflow-hidden">
                     <p className="font-medium text-foreground truncate">{chat.name}</p>
@@ -286,8 +287,9 @@ const ChatPage = () => {
                 >
                   <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                 </button>
+                {/* Use the pre-fetched therapist URL */}
                 <img
-                  src={selectedChat.avatar}
+                  src={theirAvatarUrl || avatarPlaceholder}
                   alt={selectedChat.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -312,13 +314,11 @@ const ChatPage = () => {
                 <div className="space-y-6">
                   {messages.map((message) => {
                     const isMe = message.from === user?.id;
-
-                    // Determine the correct avatar:
-                    // If isMe: Use user.picture (if it exists in auth object), otherwise use the avatar placeholder
-                    // If not isMe: Use the selectedChat.avatar (which already falls back to the placeholder in the sidebar logic)
-                    const profileImage = isMe
-                      ? (user as any)?.picture || avatar
-                      : selectedChat.avatar;
+                    
+                    // Assign the correct pre-fetched image instantly!
+                    const currentAvatar = isMe 
+                      ? (myAvatarUrl || avatarPlaceholder) 
+                      : (theirAvatarUrl || avatarPlaceholder);
 
                     return (
                       <div
@@ -326,7 +326,7 @@ const ChatPage = () => {
                         className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : ''}`}
                       >
                         <img
-                          src={profileImage}
+                          src={currentAvatar}
                           alt=""
                           className="w-10 h-10 rounded-full object-cover"
                         />
@@ -338,7 +338,6 @@ const ChatPage = () => {
                       </div>
                     );
                   })}
-                  {/* The invisible anchor div for scrolling to last message */}
                   <div ref={messagesEndRef} />
                 </div>
               )}
@@ -346,7 +345,6 @@ const ChatPage = () => {
 
             {/* Input */}
             <div className="p-4 border-t border-border">
-              {/* Wrap in a form so the mobile keyboard "Send" button triggers the submit! */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -358,7 +356,6 @@ const ChatPage = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
-                    // Send message on Enter, but allow a new line if they hold Shift
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       handleSendMessage();

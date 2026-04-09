@@ -17,7 +17,7 @@ const INSERT_QUESTIONNAIRE_MUTATION = gql`
 `;
 
 // match the Therapist Query to get existing Therapist Data
-const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
+export const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
   query GetOwnTherapistProfile {
     getOwnTherapistProfile {
       Id
@@ -47,6 +47,26 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
       Surname
       Address
       LicenseVerified
+    }
+  }
+`;
+
+//update existing profile data 
+export const UPDATE_OWN_THERAPIST_PROFILE_MUTATION = gql`
+  mutation UpdateOwnTherapistProfile($input: TherapistProfileInput!) {
+    updateOwnTherapistProfile(input: $input) {
+      Id
+      Name
+      Surname
+      Gender
+      BirthDate
+      City
+      Address
+      Languages
+      Availability
+      Specialties
+      Title
+      JobTitle
     }
   }
 `;
@@ -210,6 +230,46 @@ export const therapistService = {
       return data.deleteData; // Returns true if successful
     } catch (error) {
       console.error('Error deleting therapist profile data:', error);
+      throw error;
+    }
+  },
+
+  // -- Update Therapist Profile API call --
+  updateProfile: async (data: {
+    Name?: string;
+    Surname?: string;
+    Gender?: string;
+    BirthDate?: number | null;
+    City?: string;
+    Address?: string;
+    Languages?: string[];
+    Availability?: string[];
+    Specialties?: string[];
+    Title?: string;
+    JobTitle?: string;
+  }) => {
+    console.log('🟢 [SERVICE] 2. Received variables for Apollo Mutation:', { input: data });
+    try {
+      const { data: responseData } = await apolloClient.mutate({
+        mutation: UPDATE_OWN_THERAPIST_PROFILE_MUTATION,
+        variables: { input: data },
+        refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
+      });
+      
+      console.log('🟢 [SERVICE] 3. Success! Backend returned:', responseData);
+      return responseData.updateOwnTherapistProfile;
+      
+    } catch (error: any) {
+      console.error('🔴 [SERVICE] Apollo Mutation Failed!');
+      
+      // Apollo buries the actual backend complaints in these two objects:
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        console.error('🔴 [SERVICE] GraphQL Schema/Validation Errors:', error.graphQLErrors);
+      }
+      if (error.networkError) {
+        console.error('🔴 [SERVICE] Network Error (e.g. 400/500):', error.networkError);
+      }
+      
       throw error;
     }
   },
