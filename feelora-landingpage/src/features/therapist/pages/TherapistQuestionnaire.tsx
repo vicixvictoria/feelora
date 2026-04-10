@@ -17,6 +17,7 @@ import TherapyDurationStep from '../components/questionnaire/steps/Step12_TThera
 import SessionFrequencyStep from '../components/questionnaire/steps/Step13_TSessionFrequency';
 import PatientGenderStep from '../components/questionnaire/steps/Step14_TPatientGender';
 import ValuesPreferencesStep from '../components/questionnaire/steps/Step15_TValuesPreferences';
+import PriceRangeStep from '../components/questionnaire/steps/Step15-1-TPriceRange';
 import AdditionalInfoStep from '../components/questionnaire/steps/Step16_TAdditionalInfo';
 import AvailabilityStep from '../components/questionnaire/steps/Step17_TAvailability';
 import SummaryStep from '../components/questionnaire/steps/Step18_TSummary';
@@ -46,6 +47,7 @@ const initialData: TherapistQuestionnaireData = {
   sessionFrequency: [],
   patientGender: [],
   valuesPreferences: { selected: [], other: '' },
+  priceRange: { kassenvertrag: false, hasPrice: false, priceDetails: '' },
   additionalInfo: '',
   availability: [],
 };
@@ -58,7 +60,7 @@ const TherapistQuestionnaire = () => {
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
     usePersistedQuestionnaire<TherapistQuestionnaireData>('feelora_therapist_v1', initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
 
-  const totalSteps = 18; // Welcome + 17 questions
+  const totalSteps = 19; // Welcome + 18 questions
 
   // Allow going to the next step
   const goNext = () => {
@@ -260,7 +262,16 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => updateField('valuesPreferences', newData)}
           />
         );
-      case 15:
+        case 15:
+        return (
+          <PriceRangeStep
+            onNext={goNext}
+            onBack={goBack}
+            data={data.priceRange || {}}
+            onDataChange={(newData) => updateField('priceRange', newData)}
+          />
+        );
+      case 16:
         return (
           <AdditionalInfoStep
             onNext={goNext}
@@ -269,7 +280,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => updateField('additionalInfo', newData)}
           />
         );
-      case 16:
+      case 17:
         return (
           <AvailabilityStep
             onNext={handleCreateTherapistProfile} // Intermediate submission to create profile before final questionnaire submission
@@ -278,7 +289,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => updateField('availability', newData)}
           />
         );
-      case 17:
+      case 18:
         return (
           <SummaryStep
             onNext={handleSubmit} // This will handle the final submission of the questionnaire
@@ -288,7 +299,7 @@ const TherapistQuestionnaire = () => {
             isLoading={isSubmitting} // Passes loading state to UI
           />
         );
-      case 18:
+      case 19:
         return <CompletionStep onRestart={restart} />;
       default:
         return null;
@@ -304,7 +315,7 @@ const TherapistQuestionnaire = () => {
         <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
       <div className="flex justify-end p-6">
-        <img src={FeeloraLogo} alt="Feelora Logo" className="h-21 w-28" />
+        <img src={FeeloraLogo} alt="Feelora Logo" className="h-16 w-50" />
       </div>
     </div>
   );

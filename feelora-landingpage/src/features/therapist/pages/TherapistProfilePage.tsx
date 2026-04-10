@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import { ExternalLink, Loader2 } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
-import { therapistService } from '../api/therapist-service';
-import { TherapistProfile } from '../types/profiles';
+import { useQuery } from '@apollo/client'; // 1. Import useQuery
+import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service'; // 2. Import the query
 import { useS3Download } from '@/hooks/use-s3-download'; 
 
-// 3. S3 Avatar Component
+// --- Smart S3 Avatar Component ---
 const S3Avatar = ({
   userId,
   fallbackSrc,
@@ -25,7 +25,6 @@ const S3Avatar = ({
     if (userId) {
       download('profile.jpg', 'public', userId).catch(() => {});
     } else {
-      // Missing ownerSub means it automatically fetches the logged-in user!
       download('profile.jpg', 'public').catch(() => {});
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -36,28 +35,17 @@ const S3Avatar = ({
 
 const TherapistProfilePage = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate(); 
-  const [profile, setProfile] = useState<TherapistProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  
+  // 3. Replace useEffect and useState with the reactive useQuery hook!
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
 
-  // Fetch therapist profile on component mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setIsLoading(true);
-        const data = await therapistService.getProfile();
-        setProfile(data);
-      } catch (err) {
-        console.error('Failed to load profile', err);
-        setError(t('app.therapist.profile.loadError'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [t]);
+  // Extract the profile from the query result
+  const profile = data?.getOwnTherapistProfile;
 
   if (isLoading) {
     return (
@@ -70,7 +58,7 @@ const TherapistProfilePage = () => {
   if (error || !profile) {
     return (
       <div className="text-center text-red-500 mt-10">
-        {error || t('app.therapist.profile.noProfile')}
+        {error ? t('app.therapist.profile.loadError') : t('app.therapist.profile.noProfile')}
       </div>
     );
   }
@@ -87,7 +75,6 @@ const TherapistProfilePage = () => {
 
       <div className="feelora-card">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mb-6">
-          {/* Use the S3Avatar for the therapist */}
           <S3Avatar
             fallbackSrc={avatarPlaceholder}
             className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
@@ -133,7 +120,6 @@ const TherapistProfilePage = () => {
               <p className="font-semibold">{t('app.therapist.profile.availability')}</p>
               <p>{profile.Availability?.join(', ') || t('app.therapist.profile.notSpecified')}</p>
             </div>
-            {/* Edit button navigation */}
             <button 
               onClick={() => navigate('edit')}
               className="feelora-btn-primary flex items-center justify-center"

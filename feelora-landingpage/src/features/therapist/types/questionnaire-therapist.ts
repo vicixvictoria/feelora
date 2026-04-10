@@ -55,6 +55,7 @@ export interface TherapistQuestionnaireData {
 
   patientGender: string[];
   valuesPreferences: SelectionWithOther;
+  priceRange: { kassenvertrag: boolean; hasPrice: boolean; priceDetails: string };
   additionalInfo: string;
   availability: string[];
 }

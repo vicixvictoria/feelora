@@ -59,7 +59,7 @@ const TherapistEditProfilePage = () => {
     { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
     { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
     { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
-    // Add more as needed...
+    //add the rest of the languages later
   ], [t]);
 
   const dayOptions = useMemo(() => [

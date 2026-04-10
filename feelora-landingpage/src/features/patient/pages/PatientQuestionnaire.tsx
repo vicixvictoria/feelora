@@ -353,7 +353,7 @@ const PatientQuestionnaire = () => {
         <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
       <div className="flex justify-end p-6">
-        <img src={FeeloraLogo} alt="Feelora Logo" className="h-21 w-28" />
+        <img src={FeeloraLogo} alt="Feelora Logo" className="h-16 w-50" />
       </div>
     </div>
   );

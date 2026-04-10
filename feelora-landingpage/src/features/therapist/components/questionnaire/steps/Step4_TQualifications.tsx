@@ -1,4 +1,5 @@
-import { Upload, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Upload, Check, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,6 +7,7 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
+import { useS3Upload } from '@/hooks/use-s3-upload'; 
 
 interface QualificationsStepProps {
   onNext: () => void;
@@ -14,7 +16,7 @@ interface QualificationsStepProps {
   onDataChange: (data: Record<string, string>) => void;
 }
 
-// Define Vaidation Schema
+// Define Validation Schema
 const step4Schema = z
   .object({
     titlePrefix: z.string().optional(),
@@ -50,6 +52,10 @@ const step4Schema = z
 
 const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: QualificationsStepProps) => {
   const { t } = useTranslation();
+  
+  // local uploading state and initialize hook
+  const [isUploading, setIsUploading] = useState(false);
+  const { upload } = useS3Upload();
 
   // Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
@@ -68,6 +74,33 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
     }
 
     onDataChange({ ...data, [field]: value });
+  };
+
+  // async upload handler
+ const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      
+      // 1. Force the filename to be exactly "license" to pass backend validation
+      const fileToUpload = new File([file], 'license', { type: file.type });
+
+      // 2. Upload using 'private' visibility (which is allowed for 'license')
+      await upload(fileToUpload, 'private');
+
+      clearError('idFileName'); 
+      // 3. Save the original file name in the form data so the UI still looks nice for the user
+      handleChange('idFileName', file.name); 
+      
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert(t('q.t.qualifications.uploadError', 'Fehler beim Hochladen der Datei. Bitte versuche es erneut.'));
+    } finally {
+      setIsUploading(false);
+      e.target.value = ''; 
+    }
   };
 
   return (
@@ -196,18 +229,25 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
           <div className="flex items-center gap-4">
             <label
               htmlFor="idUpload"
-              // Added dynamic error styling to the dropzone border
-              className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors bg-background ${
+              className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg transition-colors bg-background ${
+                isUploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+              } ${
                 errors.idFileName
                   ? 'border-destructive/50 hover:border-destructive bg-destructive/5'
                   : 'border-muted-foreground/30 hover:border-primary/50'
               }`}
             >
-              {data.idFileName ? (
-                <div className="flex flex-col items-center gap-1 text-foreground/80">
+              {/* Dropzone UI to handle the uploading state */}
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-2 text-primary">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <span className="text-sm font-medium">{t('q.t.qualifications.uploading', 'Wird hochgeladen...')}</span>
+                </div>
+              ) : data.idFileName ? (
+                <div className="flex flex-col items-center gap-1 text-foreground/80 p-4 text-center">
                   <Check className="w-6 h-6 text-green-500" />
-                  <span className="text-sm">{data.idFileName}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm break-all">{data.idFileName}</span>
+                  <span className="text-xs text-muted-foreground mt-1">
                     {t('q.t.qualifications.clickToChange')}
                   </span>
                 </div>
@@ -225,13 +265,8 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                 type="file"
                 accept="image/*,.pdf"
                 className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    clearError('idFileName'); // Clear error when file is uploaded
-                    handleChange('idFileName', file.name);
-                  }
-                }}
+                disabled={isUploading}
+                onChange={handleFileUpload}
               />
             </label>
           </div>
@@ -241,8 +276,10 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
         </div>
       </div>
 
-      {/* Use validateAndNext */}
-      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      {/* Disable "Next" if a file is currently uploading to prevent skipped steps */}
+      <div className={isUploading ? 'pointer-events-none opacity-50' : ''}>
+        <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      </div>
     </div>
   );
 };

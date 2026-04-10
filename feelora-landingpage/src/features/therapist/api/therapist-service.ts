@@ -34,6 +34,7 @@ export const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
       LicenseData
       LicenseVerified
       Matches
+      JobTitle
     }
   }
 `;
