@@ -32,12 +32,14 @@ const TherapistChat = () => {
   const [isSending, setIsSending] = useState(false);
 
   // Create a reference to the bottom of the chat
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Helper function to scroll to the anchor
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    // Note: Using 'auto' instead of 'smooth' so it snaps instantly when loading a chat with 100+ messages
+  if (scrollContainerRef.current) {
+    const container = scrollContainerRef.current;
+    container.scrollTop = container.scrollHeight;
+  }
   };
 
   // 1. Fetch Matches AND Conversations on Load
@@ -227,7 +229,7 @@ const TherapistChat = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex-1 p-6 overflow-y-auto" ref={scrollContainerRef}>
               {isLoadingMessages ? (
                 <div className="flex justify-center h-full items-center">
                   <Loader2 className="animate-spin text-primary w-8 h-8" />
@@ -265,8 +267,6 @@ const TherapistChat = () => {
                       </div>
                     );
                   })}
-                  {/* The invisible anchor div for scrolling to last message */}
-                  <div ref={messagesEndRef} />
                 </div>
               )}
             </div>

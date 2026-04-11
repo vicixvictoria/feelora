@@ -73,7 +73,7 @@ const ProfilePage = () => {
   if (!patient) return null;
 
   return (
-    <div className="max-w-4xl animate-fade-in">
+    <div className="w-full max-w-8xl mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('patient.profile.yourProfile')}
       </h1>
@@ -92,23 +92,23 @@ const ProfilePage = () => {
             </h2>
             <div className="space-y-1 text-foreground">
               <p>
-                {t('patient.profile.age')}: {calculateAge(patient.BirthDate)}
+                <strong>{t('patient.profile.age')}</strong>: {calculateAge(patient.BirthDate)}
               </p>
               <p>
-                {t('patient.profile.city')}: {patient.City || t('patient.profile.notSpecified')}
+                <strong>{t('patient.profile.city')}</strong>: {patient.City || t('patient.profile.notSpecified')}
               </p>
               <p className="mt-3">
-                {t('patient.profile.role')}: {t('patient.profile.rolePatient')}
+                <strong>{t('patient.profile.role')}</strong>: {t('patient.profile.rolePatient')}
               </p>
               <div className="flex items-center gap-4 mt-4">
                 <p>
-                  {t('patient.profile.therapistMatch')}:{' '}
+                  <strong>{t('patient.profile.therapistMatch')}</strong>:{' '}
                   {therapist ? therapist.Name : t('patient.profile.noMatch')}
                 </p>
               </div>
             </div>
           </div>
-          <div className="self-center">
+          <div className="right-0 bottom-0 mt-4 sm:mt-0">
             <button 
               onClick={() => navigate('edit')}
               className="feelora-btn-primary flex items-center gap-2">
@@ -138,36 +138,39 @@ const ProfilePage = () => {
               </h2>
               <div className="space-y-1 text-foreground">
                 <p>
-                  {t('patient.profile.age')}: {calculateAge(therapist.BirthDate)}
+                  <strong>{t('patient.profile.age')}</strong>: {calculateAge(therapist.BirthDate)}
                 </p>
                 <p>
-                  {t('patient.profile.city')}: {therapist.City || t('patient.profile.notSpecified')}
+                  <strong>{t('patient.profile.city')}</strong>: {therapist.City || t('patient.profile.notSpecified')}
                 </p>
                 <p className="mt-3">
-                  {t('patient.profile.role')}: {t('patient.profile.roleTherapist')}
+                  <strong>{t('patient.profile.role')}</strong>: {t('patient.profile.roleTherapist')}
                 </p>
                 <p>
-                  {t('patient.profile.specialization')}:{' '}
+                  <strong>{t('patient.profile.specialization')}</strong>:{' '}
                   {therapist?.Specialties?.join(', ') || t('patient.profile.noSpecialization')}
                 </p>
                 <p className="mt-1">
-                  {t('patient.profile.availability')}:{' '}
+                  <strong>{t('patient.profile.availability')}</strong>:{' '}
                   {therapist.Availability?.join(', ') || t('patient.profile.notSpecified')}
                 </p>
                 {therapist.Address && (
                   <p className="mt-3">
-                    {t('patient.profile.practice')}:{' '}
+                    <strong>{t('patient.profile.practice')}</strong>:{' '}
                     {therapist.Address || t('patient.profile.noPractice')}
                   </p>
                 )}
               </div>
             </div>
             <div className="flex flex-row sm:flex-col gap-3 self-start">
-              <button className="feelora-btn-primary flex items-center gap-2 justify-center">
-                {t('patient.profile.profileBtn')}
-                <Search className="w-4 h-4" />
-              </button>
-              <button className="feelora-btn-primary flex items-center gap-2 justify-center">
+              <button
+                className="feelora-btn-primary flex items-center gap-2 justify-center"
+                onClick={() => {
+                  if (therapist?.Id) {
+                    navigate(`/patient?chatWith=${therapist.Id}`);
+                  }
+                }}
+              >
                 {t('patient.profile.message')}
                 <Send className="w-4 h-4" />
               </button>

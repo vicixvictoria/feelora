@@ -68,36 +68,36 @@ const TherapistProfilePage = () => {
     : 'k.A.';
 
   return (
-    <div className="max-w-4xl animate-fade-in">
+    <div className="w-full max-w-8xl mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('app.therapist.profile.title')}
       </h1>
 
-      <div className="feelora-card">
+      <div className="feelora-card w-full">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mb-6">
           <S3Avatar
             fallbackSrc={avatarPlaceholder}
             className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
             alt={`${profile.Name} ${profile.Surname}`}
           />
-          <div className="flex-1">
+          <div className="flex-1 pl-1 sm:pl-0">
             <h2 className="text-2xl font-semibold text-primary mb-1">
               {profile.Title ? `${profile.Title} ` : ''}{profile.Name} {profile.Surname}
             </h2>
             <div className="space-y-0.5 text-foreground">
               <p>
-                {t('app.therapist.profile.age')} {age}
+                <strong>{t('app.therapist.profile.age')}</strong> {age}
               </p>
               <p>
-                {t('app.therapist.profile.city')} {profile.City}
+                <strong>{t('app.therapist.profile.city')}</strong> {profile.City}
               </p>
               {profile.Address && (
                 <p>
-                  {t('app.therapist.profile.address')} {profile.Address}
+                  <strong>{t('app.therapist.profile.address')}</strong> {profile.Address}
                 </p>
               )}
               <p>
-                {t('app.therapist.profile.role')} {profile.JobTitle || t('app.therapist.profile.therapist')}
+                <strong>{t('app.therapist.profile.role')}</strong> {profile.JobTitle || t('app.therapist.profile.therapist')}
               </p>
             </div>
           </div>
@@ -106,27 +106,27 @@ const TherapistProfilePage = () => {
         <div className="space-y-4 text-foreground">
           <div>
             <p>
-              <span className="font-semibold">{t('app.therapist.profile.specializedIn')}</span>{' '}
+              <span className="font-bold">{t('app.therapist.profile.specializedIn')}</span>{' '}
               {profile.Specialties?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
             <p>
-              <span className="font-semibold">{t('app.therapist.profile.languages')}</span>{' '}
+              <span className="font-bold">{t('app.therapist.profile.languages')}</span>{' '}
               {profile.Languages?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mt-6">
-            <div>
-              <p className="font-semibold">{t('app.therapist.profile.availability')}</p>
-              <p>{profile.Availability?.join(', ') || t('app.therapist.profile.notSpecified')}</p>
+            <div className="flex items-end gap-4 mt-2">
+              <p className="mb-0">
+                <span className="font-bold">{t('app.therapist.profile.availability')}</span>{' '}
+                {profile.Availability?.join(', ') || t('app.therapist.profile.noInfo')}
+              </p>
+              <div className="flex-1"></div>
+              <button 
+                onClick={() => navigate('edit')}
+                className="feelora-btn-primary flex items-center justify-center"
+              >
+                {t('app.therapist.profile.edit')}
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </button>
             </div>
-            <button 
-              onClick={() => navigate('edit')}
-              className="feelora-btn-primary flex items-center justify-center"
-            >
-              {t('app.therapist.profile.edit')}
-              <ExternalLink className="w-4 h-4 ml-2" />
-            </button>
           </div>
         </div>
       </div>

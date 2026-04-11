@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useState } from 'react';
-import { HeartIcon, CalendarIcon, BrainIcon, GlobeIcon } from 'lucide-react';
+import { HeartIcon, CalendarIcon, BrainIcon, HandshakeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
 import forPatientsImg from '@/assets/for_patients.png';
@@ -37,7 +37,7 @@ export function ForPatientsSection() {
       hasMiniature: false,
     },
     {
-      icon: GlobeIcon,
+      icon: HandshakeIcon,
       title: t('patients.feature3.title'),
       description: t('patients.feature3.desc'),
       hasMiniature: false,
