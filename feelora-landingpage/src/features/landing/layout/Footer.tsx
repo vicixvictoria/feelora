@@ -110,8 +110,7 @@ export function Footer() {
                   {t('footer.about.story')}
                 </button>
               </li>
-              <li>
-              </li>
+              <li></li>
               <li>
                 <button className="text-gray-600 hover:text-primary transition-colors">
                   {t('footer.about.contact')}

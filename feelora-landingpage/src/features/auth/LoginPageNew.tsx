@@ -136,7 +136,9 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             className="w-full flex items-center justify-center gap-3 bg-primary text-white hover:bg-primary/90 py-6"
           >
             <span className="font-medium">
-              {isTherapist ? t('login.continueSignIn.therapist') : t('login.continueSignIn.patient')}
+              {isTherapist
+                ? t('login.continueSignIn.therapist')
+                : t('login.continueSignIn.patient')}
             </span>
           </Button>
 

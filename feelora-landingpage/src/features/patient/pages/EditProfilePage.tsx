@@ -49,33 +49,39 @@ const EditProfilePage = () => {
   const { download, imageUrl } = useS3Download();
 
   // --- TRANSLATED ARRAYS ---
-  const languageOptions = useMemo(() => [
-    { id: 'Deutsch', label: t('q.p.languages.options.german', 'Deutsch') },
-    { id: 'Englisch', label: t('q.p.languages.options.english', 'Englisch') },
-    { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
-    { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
-    { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
-    { id: 'Polnisch', label: t('q.p.languages.options.polish', 'Polnisch') },
-    { id: 'Serbisch', label: t('q.p.languages.options.serbian', 'Serbisch') },
-    { id: 'Italienisch', label: t('q.p.languages.options.italian', 'Italienisch') },
-    { id: 'Ungarisch', label: t('q.p.languages.options.hungarian', 'Ungarisch') },
-    { id: 'Farsi / Persisch', label: t('q.p.languages.options.farsi', 'Farsi / Persisch') },
-    { id: 'Rumänisch', label: t('q.p.languages.options.romanian', 'Rumänisch') },
-    { id: 'Spanisch', label: t('q.p.languages.options.spanish', 'Spanisch') },
-    { id: 'Französisch', label: t('q.p.languages.options.french', 'Französisch') },
-    { id: 'Ukrainisch', label: t('q.p.languages.options.ukrainian', 'Ukrainisch') },
-    { id: 'Russisch', label: t('q.p.languages.options.russian', 'Russisch') },
-  ], [t]);
+  const languageOptions = useMemo(
+    () => [
+      { id: 'Deutsch', label: t('q.p.languages.options.german', 'Deutsch') },
+      { id: 'Englisch', label: t('q.p.languages.options.english', 'Englisch') },
+      { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
+      { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
+      { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
+      { id: 'Polnisch', label: t('q.p.languages.options.polish', 'Polnisch') },
+      { id: 'Serbisch', label: t('q.p.languages.options.serbian', 'Serbisch') },
+      { id: 'Italienisch', label: t('q.p.languages.options.italian', 'Italienisch') },
+      { id: 'Ungarisch', label: t('q.p.languages.options.hungarian', 'Ungarisch') },
+      { id: 'Farsi / Persisch', label: t('q.p.languages.options.farsi', 'Farsi / Persisch') },
+      { id: 'Rumänisch', label: t('q.p.languages.options.romanian', 'Rumänisch') },
+      { id: 'Spanisch', label: t('q.p.languages.options.spanish', 'Spanisch') },
+      { id: 'Französisch', label: t('q.p.languages.options.french', 'Französisch') },
+      { id: 'Ukrainisch', label: t('q.p.languages.options.ukrainian', 'Ukrainisch') },
+      { id: 'Russisch', label: t('q.p.languages.options.russian', 'Russisch') },
+    ],
+    [t],
+  );
 
-  const dayOptions = useMemo(() => [
-    { id: 'mo', label: t('q.t.availability.mon', 'Montag') },
-    { id: 'di', label: t('q.t.availability.tue', 'Dienstag') },
-    { id: 'mi', label: t('q.t.availability.wed', 'Mittwoch') },
-    { id: 'do', label: t('q.t.availability.thu', 'Donnerstag') },
-    { id: 'fr', label: t('q.t.availability.fri', 'Freitag') },
-    { id: 'sa', label: t('q.t.availability.sat', 'Samstag') },
-    { id: 'so', label: t('q.t.availability.sun', 'Sonntag') },
-  ], [t]);
+  const dayOptions = useMemo(
+    () => [
+      { id: 'mo', label: t('q.t.availability.mon', 'Montag') },
+      { id: 'di', label: t('q.t.availability.tue', 'Dienstag') },
+      { id: 'mi', label: t('q.t.availability.wed', 'Mittwoch') },
+      { id: 'do', label: t('q.t.availability.thu', 'Donnerstag') },
+      { id: 'fr', label: t('q.t.availability.fri', 'Freitag') },
+      { id: 'sa', label: t('q.t.availability.sat', 'Samstag') },
+      { id: 'so', label: t('q.t.availability.sun', 'Sonntag') },
+    ],
+    [t],
+  );
 
   // Populate form when data loads
   useEffect(() => {
@@ -127,7 +133,7 @@ const EditProfilePage = () => {
       setIsUploading(true);
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
-      
+
       try {
         const fileToUpload = new File([file], 'profile', { type: 'image/jpeg' });
         await upload(fileToUpload, 'public');
@@ -171,12 +177,16 @@ const EditProfilePage = () => {
   }
 
   if (error || !patient) {
-    return <div className="text-red-500 text-center">{t('patient.profile.loadError', 'Fehler beim Laden des Profils')}</div>;
+    return (
+      <div className="text-red-500 text-center">
+        {t('patient.profile.loadError', 'Fehler beim Laden des Profils')}
+      </div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto animate-fade-in pb-10">
-      <button 
+      <button
         onClick={() => navigate('/patient/profile')}
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
@@ -190,7 +200,6 @@ const EditProfilePage = () => {
 
       <div className="feelora-card">
         <form onSubmit={handleSubmit} className="space-y-8">
-          
           {/* Avatar Upload Section */}
           <div className="flex flex-col items-center gap-4 mb-4">
             <div className="relative group">
@@ -221,7 +230,10 @@ const EditProfilePage = () => {
               className="hidden"
             />
             <p className="text-sm text-muted-foreground">
-              {t('patient.profile.uploadPhoto', 'Klicke auf das Kamera-Icon, um ein Bild hochzuladen')}
+              {t(
+                'patient.profile.uploadPhoto',
+                'Klicke auf das Kamera-Icon, um ein Bild hochzuladen',
+              )}
             </p>
           </div>
 
@@ -229,7 +241,9 @@ const EditProfilePage = () => {
 
           {/* Personal Data Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('patient.profile.personalData', 'Persönliche Daten')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('patient.profile.personalData', 'Persönliche Daten')}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
@@ -298,7 +312,9 @@ const EditProfilePage = () => {
                   <option value="">{t('common.select', 'Bitte wählen...')}</option>
                   <option value="männlich">{t('q.t.patientGender.male', 'Männlich')}</option>
                   <option value="weiblich">{t('q.t.patientGender.female', 'Weiblich')}</option>
-                  <option value="non-binary / divers">{t('q.t.patientGender.nonBinary', 'Non-binary / divers')}</option>
+                  <option value="non-binary / divers">
+                    {t('q.t.patientGender.nonBinary', 'Non-binary / divers')}
+                  </option>
                 </select>
               </div>
             </div>
@@ -308,7 +324,9 @@ const EditProfilePage = () => {
 
           {/* Languages Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('patient.profile.languages', 'Sprachen')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('patient.profile.languages', 'Sprachen')}
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {languageOptions.map((lang) => (
                 <label
@@ -329,7 +347,9 @@ const EditProfilePage = () => {
 
           {/* Availability Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('patient.profile.availability', 'Verfügbarkeit')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('patient.profile.availability', 'Verfügbarkeit')}
+            </h3>
             <div className="flex flex-wrap gap-3">
               {dayOptions.map((day) => {
                 const isSelected = formData.Availability.includes(day.id);
@@ -358,7 +378,11 @@ const EditProfilePage = () => {
               disabled={isSaving || isUploading}
               className="feelora-btn-primary flex items-center gap-2"
             >
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               {t('common.save', 'Speichern')}
             </button>
           </div>

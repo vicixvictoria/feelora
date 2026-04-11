@@ -54,7 +54,7 @@ const SAVE_THERAPIST_PROFILE_MUTATION = gql`
   }
 `;
 
-//update existing profile data 
+//update existing profile data
 export const UPDATE_OWN_THERAPIST_PROFILE_MUTATION = gql`
   mutation UpdateOwnTherapistProfile($input: TherapistProfileInput!) {
     updateOwnTherapistProfile(input: $input) {
@@ -254,8 +254,8 @@ export const therapistService = {
     Specialties?: string[];
     Title?: string;
     JobTitle?: string;
-    HasInsurance?: boolean; 
-    PriceRange?: string; 
+    HasInsurance?: boolean;
+    PriceRange?: string;
   }) => {
     console.log('🟢 [SERVICE] 2. Received variables for Apollo Mutation:', { input: data });
     try {
@@ -264,13 +264,12 @@ export const therapistService = {
         variables: { input: data },
         refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
       });
-      
+
       console.log('🟢 [SERVICE] 3. Success! Backend returned:', responseData);
       return responseData.updateOwnTherapistProfile;
-      
     } catch (error: any) {
       console.error('🔴 [SERVICE] Apollo Mutation Failed!');
-      
+
       // Apollo buries the actual backend complaints in these two objects:
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         console.error('🔴 [SERVICE] GraphQL Schema/Validation Errors:', error.graphQLErrors);
@@ -278,7 +277,7 @@ export const therapistService = {
       if (error.networkError) {
         console.error('🔴 [SERVICE] Network Error (e.g. 400/500):', error.networkError);
       }
-      
+
       throw error;
     }
   },

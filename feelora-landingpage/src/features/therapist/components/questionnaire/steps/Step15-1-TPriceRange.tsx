@@ -18,20 +18,22 @@ interface PriceRangeStepProps {
 }
 
 // Validation Schema
-const stepSchema = z.object({
-  kassenvertrag: z.boolean().optional(),
-  hasPrice: z.boolean().optional(),
-  priceDetails: z.string().optional(),
-}).superRefine((data, ctx) => {
-  // If they check the box to provide a price, make sure they actually typed something
-  if (data.hasPrice && (!data.priceDetails || data.priceDetails.trim() === '')) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Bitte gib einen Preis oder eine Preisspanne an.',
-      path: ['priceDetails'],
-    });
-  }
-});
+const stepSchema = z
+  .object({
+    kassenvertrag: z.boolean().optional(),
+    hasPrice: z.boolean().optional(),
+    priceDetails: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // If they check the box to provide a price, make sure they actually typed something
+    if (data.hasPrice && (!data.priceDetails || data.priceDetails.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Bitte gib einen Preis oder eine Preisspanne an.',
+        path: ['priceDetails'],
+      });
+    }
+  });
 
 const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRangeStepProps) => {
   const { t } = useTranslation();
@@ -44,7 +46,7 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
   const handleCheckboxChange = (field: 'kassenvertrag' | 'hasPrice', checked: boolean) => {
     onDataChange({ ...data, [field]: checked });
     clearError(field);
-    
+
     // Clear price details error if they uncheck the price option
     if (field === 'hasPrice' && !checked) {
       clearError('priceDetails');
@@ -64,24 +66,34 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
           {t('q.t.price.title', 'Preise und Kosten')}
         </h1>
         <p className="text-muted-foreground">
-          {t('q.t.price.subtitle1', 'Bitte teile uns die ungefähren Kosten pro Therapiestunde mit und ob du auch Kassenverträge hast.')}
+          {t(
+            'q.t.price.subtitle1',
+            'Bitte teile uns die ungefähren Kosten pro Therapiestunde mit und ob du auch Kassenverträge hast.',
+          )}
           <br />
-          {t('q.t.price.subtitle2', 'Diese Information wird in deinem Profil angezeigt. Du kannst es jederzeit ändern.')}
+          {t(
+            'q.t.price.subtitle2',
+            'Diese Information wird in deinem Profil angezeigt. Du kannst es jederzeit ändern.',
+          )}
         </p>
       </div>
 
       {/* Form Card */}
       <div className="feelora-card">
         <div className="space-y-6">
-          
           {/* Kassenvertrag Checkbox */}
           <div className="flex items-center space-x-3">
             <Checkbox
               id="kassenvertrag"
               checked={data.kassenvertrag || false}
-              onCheckedChange={(checked) => handleCheckboxChange('kassenvertrag', checked as boolean)}
+              onCheckedChange={(checked) =>
+                handleCheckboxChange('kassenvertrag', checked as boolean)
+              }
             />
-            <Label htmlFor="kassenvertrag" className="text-base font-normal cursor-pointer text-foreground">
+            <Label
+              htmlFor="kassenvertrag"
+              className="text-base font-normal cursor-pointer text-foreground"
+            >
               {t('q.t.price.kassenvertrag', 'Kassenvertrag')}
             </Label>
           </div>
@@ -94,11 +106,14 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
                 checked={data.hasPrice || false}
                 onCheckedChange={(checked) => handleCheckboxChange('hasPrice', checked as boolean)}
               />
-              <Label htmlFor="hasPrice" className="text-base font-normal cursor-pointer text-muted-foreground">
+              <Label
+                htmlFor="hasPrice"
+                className="text-base font-normal cursor-pointer text-muted-foreground"
+              >
                 {t('q.t.price.priceOption', 'entweder fixen Preis oder Preispanne angeben (in €)')}
               </Label>
             </div>
-            
+
             {/* Textarea is always visible, regardless of checkbox state */}
             <div className="pl-7 animate-fade-in">
               <Textarea

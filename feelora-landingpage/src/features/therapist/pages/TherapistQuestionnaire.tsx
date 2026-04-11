@@ -262,7 +262,7 @@ const TherapistQuestionnaire = () => {
             onDataChange={(newData) => updateField('valuesPreferences', newData)}
           />
         );
-        case 15:
+      case 15:
         return (
           <PriceRangeStep
             onNext={goNext}

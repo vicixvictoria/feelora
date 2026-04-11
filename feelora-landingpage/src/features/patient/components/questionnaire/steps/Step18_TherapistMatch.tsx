@@ -77,13 +77,14 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
               </p>
               <p className="text-foreground text-sm">
                 <span className="text-muted-foreground">{t('q.p.therapistMatch.city')}:</span>{' '}
-                {therapist.HasInsurance ? t('q.p.therapistMatch.hasInsurance') : t('q.p.therapistMatch.noInsurance')}
+                {therapist.HasInsurance
+                  ? t('q.p.therapistMatch.hasInsurance')
+                  : t('q.p.therapistMatch.noInsurance')}
               </p>
               <p className="text-foreground text-sm">
                 <span className="text-muted-foreground">{t('q.p.therapistMatch.priceRange')}:</span>{' '}
                 {therapist.PriceRange || t('q.p.therapistMatch.noPriceRange')}
               </p>
-              
 
               <div className="flex gap-3 mt-4 pt-2">
                 <Button

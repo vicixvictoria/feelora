@@ -155,7 +155,7 @@ const router = createBrowserRouter([
               { path: 'homework', element: <HomeworkPage /> },
               { path: 'account', element: <AccountPage /> },
               { path: 'dashboard/details', element: <MoodTrackerDetailsPage /> },
-              { path: 'profile/edit', element: <EditProfilePage />}
+              { path: 'profile/edit', element: <EditProfilePage /> },
             ],
           },
         ],
@@ -177,7 +177,7 @@ const router = createBrowserRouter([
               { path: 'calendar', element: <TherapistCalendarPage /> },
               { path: 'account', element: <TherapistAccountPage /> },
               { path: 'mood-tracker/details', element: <TherapistMoodTrackerDetailsPage /> },
-              { path: 'profile/edit', element: <TherapistEditProfilePage />}
+              { path: 'profile/edit', element: <TherapistEditProfilePage /> },
             ],
           },
         ],

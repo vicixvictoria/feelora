@@ -7,7 +7,7 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
-import { useS3Upload } from '@/hooks/use-s3-upload'; 
+import { useS3Upload } from '@/hooks/use-s3-upload';
 
 interface QualificationsStepProps {
   onNext: () => void;
@@ -52,7 +52,7 @@ const step4Schema = z
 
 const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: QualificationsStepProps) => {
   const { t } = useTranslation();
-  
+
   // local uploading state and initialize hook
   const [isUploading, setIsUploading] = useState(false);
   const { upload } = useS3Upload();
@@ -77,29 +77,33 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
   };
 
   // async upload handler
- const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setIsUploading(true);
-      
+
       // 1. Force the filename to be exactly "license" to pass backend validation
       const fileToUpload = new File([file], 'license', { type: file.type });
 
       // 2. Upload using 'private' visibility (which is allowed for 'license')
       await upload(fileToUpload, 'private');
 
-      clearError('idFileName'); 
+      clearError('idFileName');
       // 3. Save the original file name in the form data so the UI still looks nice for the user
-      handleChange('idFileName', file.name); 
-      
+      handleChange('idFileName', file.name);
     } catch (error) {
       console.error('Upload failed:', error);
-      alert(t('q.t.qualifications.uploadError', 'Fehler beim Hochladen der Datei. Bitte versuche es erneut.'));
+      alert(
+        t(
+          'q.t.qualifications.uploadError',
+          'Fehler beim Hochladen der Datei. Bitte versuche es erneut.',
+        ),
+      );
     } finally {
       setIsUploading(false);
-      e.target.value = ''; 
+      e.target.value = '';
     }
   };
 
@@ -241,7 +245,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
               {isUploading ? (
                 <div className="flex flex-col items-center gap-2 text-primary">
                   <Loader2 className="w-8 h-8 animate-spin" />
-                  <span className="text-sm font-medium">{t('q.t.qualifications.uploading', 'Wird hochgeladen...')}</span>
+                  <span className="text-sm font-medium">
+                    {t('q.t.qualifications.uploading', 'Wird hochgeladen...')}
+                  </span>
                 </div>
               ) : data.idFileName ? (
                 <div className="flex flex-col items-center gap-1 text-foreground/80 p-4 text-center">

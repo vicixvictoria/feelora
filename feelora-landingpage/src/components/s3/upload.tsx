@@ -9,7 +9,13 @@ interface Props {
   onSuccess?: () => void;
 }
 
-export const S3UploadButton = ({ visibility, label = 'Upload', className, fileName, onSuccess }: Props) => {
+export const S3UploadButton = ({
+  visibility,
+  label = 'Upload',
+  className,
+  fileName,
+  onSuccess,
+}: Props) => {
   const { upload } = useS3Upload();
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
@@ -95,7 +95,8 @@ const ProfilePage = () => {
                 <strong>{t('patient.profile.age')}</strong>: {calculateAge(patient.BirthDate)}
               </p>
               <p>
-                <strong>{t('patient.profile.city')}</strong>: {patient.City || t('patient.profile.notSpecified')}
+                <strong>{t('patient.profile.city')}</strong>:{' '}
+                {patient.City || t('patient.profile.notSpecified')}
               </p>
               <p className="mt-3">
                 <strong>{t('patient.profile.role')}</strong>: {t('patient.profile.rolePatient')}
@@ -109,9 +110,10 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="right-0 bottom-0 mt-4 sm:mt-0">
-            <button 
+            <button
               onClick={() => navigate('edit')}
-              className="feelora-btn-primary flex items-center gap-2">
+              className="feelora-btn-primary flex items-center gap-2"
+            >
               {t('patient.profile.edit')}
               <ExternalLink className="w-4 h-4" />
             </button>
@@ -141,7 +143,8 @@ const ProfilePage = () => {
                   <strong>{t('patient.profile.age')}</strong>: {calculateAge(therapist.BirthDate)}
                 </p>
                 <p>
-                  <strong>{t('patient.profile.city')}</strong>: {therapist.City || t('patient.profile.notSpecified')}
+                  <strong>{t('patient.profile.city')}</strong>:{' '}
+                  {therapist.City || t('patient.profile.notSpecified')}
                 </p>
                 <p className="mt-3">
                   <strong>{t('patient.profile.role')}</strong>: {t('patient.profile.roleTherapist')}
@@ -150,13 +153,15 @@ const ProfilePage = () => {
                   <strong>{t('patient.profile.specialization')}</strong>:{' '}
                   {therapist?.Specialties?.join(', ') || t('patient.profile.noSpecialization')}
                 </p>
-                  <p>
+                <p>
                   <strong>{t('patient.profile.priceRange')}</strong>:{' '}
                   {therapist?.PriceRange || t('patient.profile.noPriceRange')}
                 </p>
                 <p>
                   <strong>{t('patient.profile.hasInsurance')}</strong>:{' '}
-                  {therapist?.HasInsurance ? t('patient.profile.insuranceYes') : t('patient.profile.insuranceNo')}
+                  {therapist?.HasInsurance
+                    ? t('patient.profile.insuranceYes')
+                    : t('patient.profile.insuranceNo')}
                 </p>
                 <p className="mt-1">
                   <strong>{t('patient.profile.availability')}</strong>:{' '}

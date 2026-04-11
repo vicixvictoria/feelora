@@ -21,7 +21,7 @@ const menuItems = [
     icon: Smile,
     path: '/patient/mood-tracker',
   },
-   {
+  {
     titleKey: 'patient.sidebar.calendar',
     descKey: 'patient.sidebar.calendarDesc',
     icon: Calendar,

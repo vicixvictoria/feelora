@@ -53,38 +53,47 @@ const TherapistEditProfilePage = () => {
   const { download, imageUrl } = useS3Download();
 
   // --- TRANSLATED ARRAYS ---
-  const languageOptions = useMemo(() => [
-    { id: 'Deutsch', label: t('q.p.languages.options.german', 'Deutsch') },
-    { id: 'Englisch', label: t('q.p.languages.options.english', 'Englisch') },
-    { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
-    { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
-    { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
-    //add the rest of the languages later
-  ], [t]);
+  const languageOptions = useMemo(
+    () => [
+      { id: 'Deutsch', label: t('q.p.languages.options.german', 'Deutsch') },
+      { id: 'Englisch', label: t('q.p.languages.options.english', 'Englisch') },
+      { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
+      { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
+      { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
+      //add the rest of the languages later
+    ],
+    [t],
+  );
 
-  const dayOptions = useMemo(() => [
-    { id: 'mo', label: t('q.t.availability.mon', 'Montag') },
-    { id: 'di', label: t('q.t.availability.tue', 'Dienstag') },
-    { id: 'mi', label: t('q.t.availability.wed', 'Mittwoch') },
-    { id: 'do', label: t('q.t.availability.thu', 'Donnerstag') },
-    { id: 'fr', label: t('q.t.availability.fri', 'Freitag') },
-    { id: 'sa', label: t('q.t.availability.sat', 'Samstag') },
-    { id: 'so', label: t('q.t.availability.sun', 'Sonntag') },
-  ], [t]);
+  const dayOptions = useMemo(
+    () => [
+      { id: 'mo', label: t('q.t.availability.mon', 'Montag') },
+      { id: 'di', label: t('q.t.availability.tue', 'Dienstag') },
+      { id: 'mi', label: t('q.t.availability.wed', 'Mittwoch') },
+      { id: 'do', label: t('q.t.availability.thu', 'Donnerstag') },
+      { id: 'fr', label: t('q.t.availability.fri', 'Freitag') },
+      { id: 'sa', label: t('q.t.availability.sat', 'Samstag') },
+      { id: 'so', label: t('q.t.availability.sun', 'Sonntag') },
+    ],
+    [t],
+  );
 
-  const specialtyOptions = useMemo(() => [
-    { id: 'Depression', label: t('q.t.specialties.depression', 'Depression') },
-    { id: 'Angststörungen', label: t('q.t.specialties.anxiety', 'Angststörungen') },
-    { id: 'Trauma', label: t('q.t.specialties.trauma', 'Trauma') },
-    { id: 'Stress', label: t('q.t.specialties.stress', 'Stress & Burnout') },
-    { id: 'Psychosomatik', label: t('q.options.psychosomatics') },
-    { id: 'Sucht', label: t('q.options.addiction') },
-    { id: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
-    { id: 'Zwang', label: t('q.options.compulsion') },
-    { id: 'Gewalterfahrungen', label: t('q.options.violence') },
-    { id: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
-    { id: 'Essverhalten', label: t('q.options.eatingBehavior') },
-  ], [t]);
+  const specialtyOptions = useMemo(
+    () => [
+      { id: 'Depression', label: t('q.t.specialties.depression', 'Depression') },
+      { id: 'Angststörungen', label: t('q.t.specialties.anxiety', 'Angststörungen') },
+      { id: 'Trauma', label: t('q.t.specialties.trauma', 'Trauma') },
+      { id: 'Stress', label: t('q.t.specialties.stress', 'Stress & Burnout') },
+      { id: 'Psychosomatik', label: t('q.options.psychosomatics') },
+      { id: 'Sucht', label: t('q.options.addiction') },
+      { id: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
+      { id: 'Zwang', label: t('q.options.compulsion') },
+      { id: 'Gewalterfahrungen', label: t('q.options.violence') },
+      { id: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
+      { id: 'Essverhalten', label: t('q.options.eatingBehavior') },
+    ],
+    [t],
+  );
 
   // Populate form when data loads
   useEffect(() => {
@@ -107,7 +116,7 @@ const TherapistEditProfilePage = () => {
         console.debug('No existing profile image found.', err);
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   useEffect(() => {
@@ -120,7 +129,10 @@ const TherapistEditProfilePage = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleArrayToggle = (field: 'Languages' | 'Availability' | 'Specialties', value: string) => {
+  const handleArrayToggle = (
+    field: 'Languages' | 'Availability' | 'Specialties',
+    value: string,
+  ) => {
     setFormData((prev) => {
       const currentArray = prev[field];
       if (currentArray.includes(value)) {
@@ -137,7 +149,7 @@ const TherapistEditProfilePage = () => {
       setIsUploading(true);
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
-      
+
       try {
         const fileToUpload = new File([file], 'profile', { type: 'image/jpeg' });
         await upload(fileToUpload, 'public');
@@ -191,12 +203,16 @@ const TherapistEditProfilePage = () => {
   }
 
   if (error || !profile) {
-    return <div className="text-red-500 text-center">{t('app.therapist.profile.loadError', 'Fehler beim Laden des Profils')}</div>;
+    return (
+      <div className="text-red-500 text-center">
+        {t('app.therapist.profile.loadError', 'Fehler beim Laden des Profils')}
+      </div>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in pb-10">
-      <button 
+      <button
         onClick={() => navigate('/therapist/profile')}
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
@@ -210,7 +226,6 @@ const TherapistEditProfilePage = () => {
 
       <div className="feelora-card">
         <form onSubmit={handleSubmit} className="space-y-8">
-          
           {/* Avatar Upload */}
           <div className="flex flex-col items-center gap-4 mb-4">
             <div className="relative group">
@@ -233,22 +248,45 @@ const TherapistEditProfilePage = () => {
                 <Camera className="w-5 h-5" />
               </button>
             </div>
-            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+            />
           </div>
 
           <div className="my-6 border-t border-border"></div>
 
           {/* Professional Data Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('app.therapist.profile.professionalData', 'Berufliche Daten')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('app.therapist.profile.professionalData', 'Berufliche Daten')}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Title</label>
-                <input type="text" name="Title" value={formData.Title} onChange={handleChange} className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <input
+                  type="text"
+                  name="Title"
+                  value={formData.Title}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Job Title *</label>
-                <input type="text" name="JobTitle" value={formData.JobTitle} onChange={handleChange} required className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Job Title *
+                </label>
+                <input
+                  type="text"
+                  name="JobTitle"
+                  value={formData.JobTitle}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
             </div>
           </div>
@@ -257,31 +295,74 @@ const TherapistEditProfilePage = () => {
 
           {/* Personal Data Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('app.therapist.profile.personalData', 'Persönliche Daten')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('app.therapist.profile.personalData', 'Persönliche Daten')}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Vorname *</label>
-                <input type="text" name="Name" value={formData.Name} onChange={handleChange} required className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <input
+                  type="text"
+                  name="Name"
+                  value={formData.Name}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Nachname *</label>
-                <input type="text" name="Surname" value={formData.Surname} onChange={handleChange} required className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <input
+                  type="text"
+                  name="Surname"
+                  value={formData.Surname}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Stadt</label>
-                <input type="text" name="City" value={formData.City} onChange={handleChange} className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <input
+                  type="text"
+                  name="City"
+                  value={formData.City}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Adresse / Praxis</label>
-                <input type="text" name="Address" value={formData.Address} onChange={handleChange} className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Adresse / Praxis
+                </label>
+                <input
+                  type="text"
+                  name="Address"
+                  value={formData.Address}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Geburtsdatum</label>
-                <input type="date" name="BirthDate" value={formData.BirthDate} onChange={handleChange} className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none" />
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Geburtsdatum
+                </label>
+                <input
+                  type="date"
+                  name="BirthDate"
+                  value={formData.BirthDate}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Geschlecht</label>
-                <select name="Gender" value={formData.Gender} onChange={handleChange} className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none">
+                <select
+                  name="Gender"
+                  value={formData.Gender}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                >
                   <option value="">Bitte wählen...</option>
                   <option value="männlich">Männlich</option>
                   <option value="weiblich">Weiblich</option>
@@ -295,11 +376,19 @@ const TherapistEditProfilePage = () => {
 
           {/* Specialties Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('app.therapist.profile.specialties', 'Spezialisierungen')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('app.therapist.profile.specialties', 'Spezialisierungen')}
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {specialtyOptions.map((spec) => (
-                <label key={spec.id} className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
-                  <Checkbox checked={formData.Specialties.includes(spec.id)} onCheckedChange={() => handleArrayToggle('Specialties', spec.id)} />
+                <label
+                  key={spec.id}
+                  className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer"
+                >
+                  <Checkbox
+                    checked={formData.Specialties.includes(spec.id)}
+                    onCheckedChange={() => handleArrayToggle('Specialties', spec.id)}
+                  />
                   <span className="text-sm text-foreground">{spec.label}</span>
                 </label>
               ))}
@@ -310,11 +399,19 @@ const TherapistEditProfilePage = () => {
 
           {/* Languages Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('app.therapist.profile.languages', 'Sprachen')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('app.therapist.profile.languages', 'Sprachen')}
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {languageOptions.map((lang) => (
-                <label key={lang.id} className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
-                  <Checkbox checked={formData.Languages.includes(lang.id)} onCheckedChange={() => handleArrayToggle('Languages', lang.id)} />
+                <label
+                  key={lang.id}
+                  className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer"
+                >
+                  <Checkbox
+                    checked={formData.Languages.includes(lang.id)}
+                    onCheckedChange={() => handleArrayToggle('Languages', lang.id)}
+                  />
                   <span className="text-sm text-foreground">{lang.label}</span>
                 </label>
               ))}
@@ -325,7 +422,9 @@ const TherapistEditProfilePage = () => {
 
           {/* Availability Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary">{t('app.therapist.profile.availability', 'Verfügbarkeit')}</h3>
+            <h3 className="text-lg font-semibold text-primary">
+              {t('app.therapist.profile.availability', 'Verfügbarkeit')}
+            </h3>
             <div className="flex flex-wrap gap-3">
               {dayOptions.map((day) => {
                 const isSelected = formData.Availability.includes(day.id);
@@ -345,8 +444,16 @@ const TherapistEditProfilePage = () => {
 
           {/* Submit Button */}
           <div className="pt-6 flex justify-end">
-            <button type="submit" disabled={isSaving || isUploading} className="feelora-btn-primary flex items-center gap-2">
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            <button
+              type="submit"
+              disabled={isSaving || isUploading}
+              className="feelora-btn-primary flex items-center gap-2"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               {t('common.save', 'Speichern')}
             </button>
           </div>

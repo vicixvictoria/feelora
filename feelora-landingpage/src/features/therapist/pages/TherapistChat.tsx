@@ -32,14 +32,14 @@ const TherapistChat = () => {
   const [isSending, setIsSending] = useState(false);
 
   // Create a reference to the bottom of the chat
-const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Helper function to scroll to the anchor
   const scrollToBottom = () => {
-  if (scrollContainerRef.current) {
-    const container = scrollContainerRef.current;
-    container.scrollTop = container.scrollHeight;
-  }
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
   // 1. Fetch Matches AND Conversations on Load

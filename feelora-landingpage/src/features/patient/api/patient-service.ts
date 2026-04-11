@@ -267,7 +267,7 @@ export const patientService = {
     return responseData.getOwnUserProfile;
   },
 
-// -- Update Patient Profile API call --
+  // -- Update Patient Profile API call --
   updateProfile: async (data: {
     Name?: string;
     Surname?: string;
@@ -290,7 +290,6 @@ export const patientService = {
       throw error;
     }
   },
-
 
   // -- Update Mood Tracker Sharing Consent --
   updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {

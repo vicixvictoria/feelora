@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client'; // 1. Import useQuery
 import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service'; // 2. Import the query
-import { useS3Download } from '@/hooks/use-s3-download'; 
+import { useS3Download } from '@/hooks/use-s3-download';
 
 // --- Smart S3 Avatar Component ---
 const S3Avatar = ({
@@ -27,7 +27,7 @@ const S3Avatar = ({
     } else {
       download('profile.jpg', 'public').catch(() => {});
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
@@ -36,13 +36,9 @@ const S3Avatar = ({
 const TherapistProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
+
   // 3. Replace useEffect and useState with the reactive useQuery hook!
-  const {
-    data,
-    loading: isLoading,
-    error,
-  } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
+  const { data, loading: isLoading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
 
   // Extract the profile from the query result
   const profile = data?.getOwnTherapistProfile;
@@ -82,7 +78,8 @@ const TherapistProfilePage = () => {
           />
           <div className="flex-1 pl-1 sm:pl-0">
             <h2 className="text-2xl font-semibold text-primary mb-1">
-              {profile.Title ? `${profile.Title} ` : ''}{profile.Name} {profile.Surname}
+              {profile.Title ? `${profile.Title} ` : ''}
+              {profile.Name} {profile.Surname}
             </h2>
             <div className="space-y-0.5 text-foreground">
               <p>
@@ -97,7 +94,8 @@ const TherapistProfilePage = () => {
                 </p>
               )}
               <p>
-                <strong>{t('app.therapist.profile.role')}</strong> {profile.JobTitle || t('app.therapist.profile.therapist')}
+                <strong>{t('app.therapist.profile.role')}</strong>{' '}
+                {profile.JobTitle || t('app.therapist.profile.therapist')}
               </p>
             </div>
           </div>
@@ -117,9 +115,11 @@ const TherapistProfilePage = () => {
               <span className="font-bold">{t('app.therapist.profile.priceRange')}</span>{' '}
               {profile.PriceRange || t('app.therapist.profile.noPriceRange')}
             </p>
-             <p>
+            <p>
               <span className="font-bold">{t('app.therapist.profile.hasInsurance')}</span>{' '}
-              {profile.HasInsurance ? t('app.therapist.profile.insuranceYes') : t('app.therapist.profile.insuranceNo')}
+              {profile.HasInsurance
+                ? t('app.therapist.profile.insuranceYes')
+                : t('app.therapist.profile.insuranceNo')}
             </p>
             <div className="flex items-end gap-4 mt-2">
               <p className="mb-0">
@@ -127,7 +127,7 @@ const TherapistProfilePage = () => {
                 {profile.Availability?.join(', ') || t('app.therapist.profile.noInfo')}
               </p>
               <div className="flex-1"></div>
-              <button 
+              <button
                 onClick={() => navigate('edit')}
                 className="feelora-btn-primary flex items-center justify-center"
               >

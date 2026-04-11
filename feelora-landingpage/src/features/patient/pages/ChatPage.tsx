@@ -54,7 +54,6 @@ const S3Avatar = ({
   return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
 };
 
-
 const ChatPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -78,15 +77,15 @@ const ChatPage = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-  if (scrollContainerRef.current) {
-    const container = scrollContainerRef.current;
-    container.scrollTop = container.scrollHeight;
-  }
-};
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollTop = container.scrollHeight;
+    }
+  };
   // ==========================================
   // HIGH-PERFORMANCE AVATAR FETCHING
   // ==========================================
-  
+
   // 1. Fetch MY avatar exactly once when the component mounts
   const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
   useEffect(() => {
@@ -104,8 +103,9 @@ const ChatPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?.contactId]);
 
-
-  const extractIncomingNotification = (rawMessage: WebsocketMessage): IncomingNotification | null => {
+  const extractIncomingNotification = (
+    rawMessage: WebsocketMessage,
+  ): IncomingNotification | null => {
     if (rawMessage.type !== 'notification') return null;
     if (rawMessage.data?.type !== 'new_message') return null;
     if (!rawMessage.data.conversationId) return null;
@@ -147,7 +147,8 @@ const ChatPage = () => {
             contactId: therapist.Id,
             name: `${therapist.Name} ${therapist.Surname}`,
             conversationId: existingChat ? existingChat.conversationId : null,
-            lastMessage: existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
+            lastMessage:
+              existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
           };
         });
 
@@ -303,9 +304,7 @@ const ChatPage = () => {
             </div>
 
             {/* Messages */}
-            <div 
-            ref={scrollContainerRef}
-            className="flex-1 p-6 overflow-y-auto">
+            <div ref={scrollContainerRef} className="flex-1 p-6 overflow-y-auto">
               {isLoadingMessages ? (
                 <div className="flex justify-center h-full items-center">
                   <Loader2 className="animate-spin text-primary w-8 h-8" />
@@ -318,11 +317,11 @@ const ChatPage = () => {
                 <div className="space-y-6">
                   {messages.map((message) => {
                     const isMe = message.from === user?.id;
-                    
+
                     // Assign the correct pre-fetched image instantly!
-                    const currentAvatar = isMe 
-                      ? (myAvatarUrl || avatarPlaceholder) 
-                      : (theirAvatarUrl || avatarPlaceholder);
+                    const currentAvatar = isMe
+                      ? myAvatarUrl || avatarPlaceholder
+                      : theirAvatarUrl || avatarPlaceholder;
 
                     return (
                       <div
