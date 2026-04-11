@@ -32,7 +32,7 @@ export function WhyFeeloraSection() {
       value: 100,
       suffix: '%',
       label: t('why.stat3.label'),
-      description: t('why.stat2.desc'),
+      description: t('why.stat3.desc'),
     },
   ];
 

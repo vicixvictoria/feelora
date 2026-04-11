@@ -4,12 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 const menuItems = [
   {
-    titleKey: 'patient.sidebar.calendar',
-    descKey: 'patient.sidebar.calendarDesc',
-    icon: Calendar,
-    path: '/patient/calendar',
-  },
-  {
     titleKey: 'patient.sidebar.profile',
     descKey: 'patient.sidebar.profileDesc',
     icon: User,
@@ -26,6 +20,12 @@ const menuItems = [
     descKey: 'patient.sidebar.moodTrackerDesc',
     icon: Smile,
     path: '/patient/mood-tracker',
+  },
+   {
+    titleKey: 'patient.sidebar.calendar',
+    descKey: 'patient.sidebar.calendarDesc',
+    icon: Calendar,
+    path: '/patient/calendar',
   },
   {
     titleKey: 'patient.sidebar.homework',

@@ -113,6 +113,14 @@ const TherapistProfilePage = () => {
               <span className="font-bold">{t('app.therapist.profile.languages')}</span>{' '}
               {profile.Languages?.join(', ') || t('app.therapist.profile.noInfo')}
             </p>
+            <p>
+              <span className="font-bold">{t('app.therapist.profile.priceRange')}</span>{' '}
+              {profile.PriceRange || t('app.therapist.profile.noPriceRange')}
+            </p>
+             <p>
+              <span className="font-bold">{t('app.therapist.profile.hasInsurance')}</span>{' '}
+              {profile.HasInsurance ? t('app.therapist.profile.insuranceYes') : t('app.therapist.profile.insuranceNo')}
+            </p>
             <div className="flex items-end gap-4 mt-2">
               <p className="mb-0">
                 <span className="font-bold">{t('app.therapist.profile.availability')}</span>{' '}

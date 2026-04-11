@@ -35,6 +35,8 @@ export const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
       LicenseVerified
       Matches
       JobTitle
+      HasInsurance
+      PriceRange
     }
   }
 `;
@@ -68,6 +70,8 @@ export const UPDATE_OWN_THERAPIST_PROFILE_MUTATION = gql`
       Specialties
       Title
       JobTitle
+      HasInsurance
+      PriceRange
     }
   }
 `;
@@ -180,6 +184,8 @@ export const therapistService = {
       Specialties: data.specialties?.selected || [],
       Title: data.personalData?.title || '',
       JobTitle: data.personalData?.jobTitle || '',
+      HasInsurance: data.priceRange?.kassenvertrag || false,
+      PriceRange: data.priceRange?.priceDetails || '',
     };
     console.log('2. Formatted GraphQL Payload (input):', input);
 
@@ -248,6 +254,8 @@ export const therapistService = {
     Specialties?: string[];
     Title?: string;
     JobTitle?: string;
+    HasInsurance?: boolean; 
+    PriceRange?: string; 
   }) => {
     console.log('🟢 [SERVICE] 2. Received variables for Apollo Mutation:', { input: data });
     try {

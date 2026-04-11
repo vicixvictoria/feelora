@@ -76,7 +76,9 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
-          <p className="text-gray-600">{t('login.subtitle')}</p>
+          <p className="text-gray-600">
+            {isTherapist ? t('login.subtitle.therapist') : t('login.subtitle.patient')}
+          </p>
         </div>
 
         {/* Error Display */}
@@ -133,7 +135,9 @@ function LoginPage({ userType = 'user' }: LoginPageProps) {
             onClick={handleLogin}
             className="w-full flex items-center justify-center gap-3 bg-primary text-white hover:bg-primary/90 py-6"
           >
-            <span className="font-medium">{t('login.continueSignIn')}</span>
+            <span className="font-medium">
+              {isTherapist ? t('login.continueSignIn.therapist') : t('login.continueSignIn.patient')}
+            </span>
           </Button>
 
           <p className="mt-4 text-center text-xs text-gray-500">{t('login.signInHint')}</p>

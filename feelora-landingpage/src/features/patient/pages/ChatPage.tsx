@@ -75,12 +75,14 @@ const ChatPage = () => {
   const processedMessageCountRef = useRef(0);
 
   // Create a reference to the bottom of the chat
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  };
-
+  if (scrollContainerRef.current) {
+    const container = scrollContainerRef.current;
+    container.scrollTop = container.scrollHeight;
+  }
+};
   // ==========================================
   // HIGH-PERFORMANCE AVATAR FETCHING
   // ==========================================
@@ -301,7 +303,9 @@ const ChatPage = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-6 overflow-y-auto">
+            <div 
+            ref={scrollContainerRef}
+            className="flex-1 p-6 overflow-y-auto">
               {isLoadingMessages ? (
                 <div className="flex justify-center h-full items-center">
                   <Loader2 className="animate-spin text-primary w-8 h-8" />
@@ -338,7 +342,6 @@ const ChatPage = () => {
                       </div>
                     );
                   })}
-                  <div ref={messagesEndRef} />
                 </div>
               )}
             </div>

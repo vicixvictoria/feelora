@@ -78,4 +78,6 @@ export interface AlgorithmMatch {
   Title?: string;
   JobTitle: string;
   Ranking?: number;
+  HasInsurance?: boolean;
+  PriceRange?: string;
 }

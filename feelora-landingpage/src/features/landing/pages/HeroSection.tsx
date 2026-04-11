@@ -47,15 +47,15 @@ export function HeroSection() {
             onClick={() => navigate('/login')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
-            {t('hero.cta.regsiter.alt')}
+            {t('hero.cta.register.alt')} {/* change later to hero.cta.register */}
           </Button>
           <Button
             size="lg"
             variant="outline"
-            onClick={() => scrollToSection('for-patients')}
+            onClick={() => navigate('/loginTherapist')}
             className="bg-white/80 backdrop-blur-sm text-gray-800 border-gray-300 hover:bg-white hover:border-gray-400 font-normal text-base px-8 py-6"
           >
-            {t('hero.cta.info')}
+            {t('hero.cta.therapistsReg')}
           </Button>
         </motion.div>
       </div>

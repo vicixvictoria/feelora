@@ -150,6 +150,14 @@ const ProfilePage = () => {
                   <strong>{t('patient.profile.specialization')}</strong>:{' '}
                   {therapist?.Specialties?.join(', ') || t('patient.profile.noSpecialization')}
                 </p>
+                  <p>
+                  <strong>{t('patient.profile.priceRange')}</strong>:{' '}
+                  {therapist?.PriceRange || t('patient.profile.noPriceRange')}
+                </p>
+                <p>
+                  <strong>{t('patient.profile.hasInsurance')}</strong>:{' '}
+                  {therapist?.HasInsurance ? t('patient.profile.insuranceYes') : t('patient.profile.insuranceNo')}
+                </p>
                 <p className="mt-1">
                   <strong>{t('patient.profile.availability')}</strong>:{' '}
                   {therapist.Availability?.join(', ') || t('patient.profile.notSpecified')}
