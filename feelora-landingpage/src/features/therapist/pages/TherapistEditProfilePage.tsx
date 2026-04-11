@@ -104,7 +104,7 @@ const TherapistEditProfilePage = () => {
       });
       // Fetch own image
       download('profile.jpg', 'public').catch((err) => {
-        console.debug('No existing profile image found.');
+        console.debug('No existing profile image found.', err);
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
