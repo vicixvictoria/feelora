@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom'; 
-import { ExternalLink, Search, Send, Loader2 } from 'lucide-react';
+import { ExternalLink, Send, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
 import { useEffect } from 'react';
