@@ -1,19 +1,60 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
-import avatar from '@/assets/avatar-Placeholder.png'; // Only using the placeholder now
+import { Send, Info, ChevronRight, ArrowLeft, Loader2, X } from 'lucide-react';
+import avatar from '@/assets/avatar-Placeholder.png'; 
 import { useAuth } from '@/contexts/AuthContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { therapistService } from '../api/therapist-service';
+import { useS3Download } from '@/hooks/use-s3-download';
 
 // --- Interface for the Sidebar ---
 interface SidebarChat {
   contactId: string;
   name: string;
+  firstName: string;
+  lastName: string;
+  age: string;
+  gender: string;
+  city: string;
   avatar: string;
   conversationId: string | null;
   lastMessage: string;
 }
+
+// --- S3 Avatar Component (Used ONLY for the Sidebar now) ---
+const S3Avatar = ({
+  userId,
+  fallbackSrc,
+  className,
+  alt = '',
+}: {
+  userId?: string;
+  fallbackSrc: string;
+  className: string;
+  alt?: string;
+}) => {
+  const { download, imageUrl } = useS3Download();
+
+  useEffect(() => {
+    if (userId) {
+      download('profile.jpg', 'public', userId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
+};
+
+// Helper to calculate age from Unix Seconds or Date String
+const calculateAge = (birthDate: string | number | null | undefined): string => {
+  if (!birthDate) return 'N/A';
+  const dob = typeof birthDate === 'number' ? new Date(birthDate * 1000) : new Date(birthDate);
+  if (isNaN(dob.getTime())) return 'N/A';
+  
+  const diffMs = Date.now() - dob.getTime();
+  const ageDt = new Date(diffMs);
+  return Math.abs(ageDt.getUTCFullYear() - 1970).toString();
+};
 
 const TherapistChat = () => {
   const { t } = useTranslation();
@@ -30,6 +71,9 @@ const TherapistChat = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  
+  // Modal State
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   // Create a reference to the bottom of the chat
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -42,25 +86,43 @@ const TherapistChat = () => {
     }
   };
 
-  // 1. Fetch Matches AND Conversations on Load
+
+  // Fetch Therapist avatar exactly once when the component mounts
+  const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
+  useEffect(() => {
+    // No ownerSub passed = fetches logged-in user's image
+    downloadMyAvatar('profile.jpg', 'public').catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch Patient avatar exactly once whenever the selected chat changes
+  const { download: downloadTheirAvatar, imageUrl: theirAvatarUrl } = useS3Download();
+  useEffect(() => {
+    if (selectedChat?.contactId) {
+      downloadTheirAvatar('profile.jpg', 'public', selectedChat.contactId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChat?.contactId]);
+
+  // Fetch Matches and Conversations on Load
   useEffect(() => {
     const fetchContactsAndChats = async () => {
       try {
         setIsLoadingChats(true);
 
-        // A. Get the Therapist's Profile
+        // Get the Therapist's Profile
         const profile = await therapistService.getProfile();
 
-        // B. Get the Therapist's matched Patients
+        // Get the Therapist's matched Patients
         const patients =
           profile?.Matches && profile.Matches.length > 0
             ? await therapistService.getMatchedPatients(profile.Matches)
             : [];
 
-        // C. Get the active Conversations
+        // Get the active Conversations
         const conversations = await chatService.getChatConversations();
 
-        // D. Combine them into Sidebar List!
+        // Combine them into Sidebar List!
         const sidebarItems: SidebarChat[] = patients.map((patient: any) => {
           // Check if a conversation already exists for this patient
           const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
@@ -68,7 +130,12 @@ const TherapistChat = () => {
           return {
             contactId: patient.Id,
             name: `${patient.Name} ${patient.Surname}`,
-            avatar: avatar, // Placeholder avatar for the patient
+            firstName: patient.Name || '',
+            lastName: patient.Surname || '',
+            age: calculateAge(patient.BirthDate),
+            gender: patient.Gender || 'N/A',
+            city: patient.city || [],
+            avatar: avatar, // Fallback avatar string
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
               existingChat?.lastMessage || t('app.therapist.chat.startChat', 'Beginne den Chat...'),
@@ -96,7 +163,7 @@ const TherapistChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // 2. Fetch Messages when a contact is clicked
+  // Fetch Messages when a contact is clicked
   const handleSelectChat = async (chat: SidebarChat) => {
     setSelectedChat(chat);
     setMobileShowChat(true);
@@ -115,7 +182,7 @@ const TherapistChat = () => {
     }
   };
 
-  // 3. Send Message
+  // Send Message
   const handleSendMessage = async () => {
     console.log('Send button triggered. Checking state...');
 
@@ -160,13 +227,13 @@ const TherapistChat = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
+    <div className="flex h-[calc(100vh-10rem)] animate-fade-in relative">
       {/* --- CHAT LIST SIDEBAR --- */}
       <div
         className={`w-full md:w-72 bg-card rounded-l-xl border border-border md:border-r-0 p-4 ${mobileShowChat ? 'hidden md:block' : 'block'}`}
       >
         <h2 className="text-2xl font-semibold text-primary mb-6">
-          {t('app.therapist.chat.title')}
+          {t('app.therapist.chat.title', 'Chats')}
         </h2>
 
         {isLoadingChats ? (
@@ -175,7 +242,7 @@ const TherapistChat = () => {
           </div>
         ) : chatList.length === 0 ? (
           <div className="text-center text-muted-foreground p-4">
-            {t('app.therapist.chat.noMessages')}
+            {t('app.therapist.chat.noMessages', 'Keine Chats vorhanden')}
           </div>
         ) : (
           <div className="space-y-2">
@@ -185,10 +252,12 @@ const TherapistChat = () => {
                 onClick={() => handleSelectChat(chat)}
                 className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : 'hover:bg-muted/50'}`}
               >
-                <img
-                  src={chat.avatar}
-                  alt={chat.name}
+                {/* Dynamically Load Sidebar Avatars */}
+                <S3Avatar
+                  userId={chat.contactId}
+                  fallbackSrc={avatar}
                   className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  alt={chat.name}
                 />
                 <div className="flex-1 text-left overflow-hidden">
                   <p className="font-medium text-foreground truncate">{chat.name}</p>
@@ -216,14 +285,18 @@ const TherapistChat = () => {
                 >
                   <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                 </button>
+                {/* Use the pre-fetched Patient URL */}
                 <img
-                  src={selectedChat.avatar}
+                  src={theirAvatarUrl || avatar}
                   alt={selectedChat.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
               </div>
-              <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
+              <button 
+                onClick={() => setIsInfoModalOpen(true)}
+                className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity"
+              >
                 <Info className="w-5 h-5" />
               </button>
             </div>
@@ -243,11 +316,10 @@ const TherapistChat = () => {
                   {messages.map((message) => {
                     const isMe = message.from === user?.id;
 
-                    // Use the user's profile picture if available, otherwise fallback to placeholder.
-                    // For the patient, use the sidebar placeholder.
-                    const profileImage = isMe
-                      ? (user as any)?.picture || avatar
-                      : selectedChat.avatar;
+                    // Assign the correct pre-fetched image instantly
+                    const currentAvatar = isMe
+                      ? myAvatarUrl || avatar
+                      : theirAvatarUrl || avatar;
 
                     return (
                       <div
@@ -255,7 +327,7 @@ const TherapistChat = () => {
                         className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : ''}`}
                       >
                         <img
-                          src={profileImage}
+                          src={currentAvatar}
                           alt=""
                           className="w-10 h-10 rounded-full object-cover"
                         />
@@ -284,13 +356,12 @@ const TherapistChat = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
-                    // Send message on Enter, but allow a new line if they hold Shift!
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       handleSendMessage();
                     }
                   }}
-                  placeholder={t('patient.chat.placeholder')}
+                  placeholder={t('patient.chat.placeholder', 'Nachricht schreiben...')}
                   disabled={isSending}
                   rows={1}
                   className="flex-1 w-full min-w-0 px-4 py-3 rounded-2xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 resize-none overflow-y-auto max-h-32"
@@ -311,10 +382,69 @@ const TherapistChat = () => {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            {t('app.therapist.chat.chooseChat')}
+            {t('app.therapist.chat.chooseChat', 'Wähle einen Chat aus')}
           </div>
         )}
       </div>
+
+      {/* --- PROFILE INFO MODAL --- */}
+      {isInfoModalOpen && selectedChat && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border chat-bubble-received">
+              <h3 className="text-lg font-semibold text-foreground">
+                {t('app.therapist.chat.patientProfile', 'Patientenprofil')}
+              </h3>
+              <button 
+                onClick={() => setIsInfoModalOpen(false)}
+                className="p-1 rounded-md text-muted-foreground hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-6">
+              {/* Avatar & Name */}
+              <div className="flex items-center gap-4">
+                {/* Dynamically load the specific chat's image */}
+                <img 
+                  src={theirAvatarUrl || avatar} 
+                  alt={selectedChat.name} 
+                  className="w-16 h-16 rounded-full object-cover border border-border"
+                />
+                <div>
+                  <h4 className="text-xl font-bold text-foreground">{selectedChat.name}</h4>
+                  <p className="text-muted-foreground">
+                    {selectedChat.age !== 'N/A' ? `${selectedChat.age} Jahre` : 'Alter unbekannt'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.firstName', 'Vorname')}</p>
+                  <p className="font-medium text-foreground">{selectedChat.firstName || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.lastName', 'Nachname')}</p>
+                  <p className="font-medium text-foreground">{selectedChat.lastName || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.gender', 'Geschlecht')}</p>
+                  <p className="font-medium text-foreground capitalize">{selectedChat.gender || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.city', 'Stadt')}</p>
+                  <p className="font-medium text-foreground capitalize">{selectedChat.city || '-'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

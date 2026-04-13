@@ -649,6 +649,7 @@
   "app.therapist.chat.placeholder": "Type here to write a message...",
   "app.therapist.chat.noMessages": "You don't have any messages yet. Start a conversation with your patients!",
   "app.therapist.chat.chooseChat": "Choose a chat to start messaging",
+  "app.therapist.chat.patientProfile": "Patient Profile",
   "app.therapist.homework.comingSoon": "Coming Soon",
   "app.therapist.homework.createTasks": "Create New Tasks",
   "app.therapist.homework.assignTask": "Assign Task",
@@ -934,6 +935,8 @@
   "moodTracker.overview.activity": "Activity",
   "moodTracker.overview.physical": "Physical",
   "moodTracker.overview.stimmung": "Mood",
+  "moodTracker.overview.noConsent": "Patient didn't give consent to share mood tracker data.",
+  "moodTracker.overview.noEntries": "No entries yet",
 
   "patient.notFound.message": "Oops! Page not found",
   "patient.notFound.returnHome": "Return to Home",

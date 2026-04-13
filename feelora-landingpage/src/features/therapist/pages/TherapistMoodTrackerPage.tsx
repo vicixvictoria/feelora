@@ -5,6 +5,32 @@ import { useNavigate } from 'react-router-dom';
 import placeholderAvatar from '@/assets/avatar-Placeholder.png';
 import { therapistService } from '../api/therapist-service';
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
+import { useS3Download } from '@/hooks/use-s3-download';
+
+// --- S3 Avatar Component ---
+const S3Avatar = ({
+  userId,
+  fallbackSrc,
+  className,
+  alt = '',
+}: {
+  userId?: string;
+  fallbackSrc: string;
+  className: string;
+  alt?: string;
+}) => {
+  const { download, imageUrl } = useS3Download();
+
+  useEffect(() => {
+    if (userId) {
+      // Pass the userId to fetch that specific patient's profile picture
+      download('profile.jpg', 'public', userId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
+};
 
 // helper for date format
 const formatDate = (isoString: string) => {
@@ -29,7 +55,7 @@ const TherapistMoodTrackerPage = () => {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
-        // 1. Get the therapist's matches --> maybe if we use the "patients tab later we can use the cache data for less API calls?
+        // Get the therapist's matches
         const profile = await therapistService.getProfile();
         const patientIds = profile.Matches || [];
 
@@ -39,26 +65,25 @@ const TherapistMoodTrackerPage = () => {
           return;
         }
 
-        // 2. Get the patient profiles (to get their names)
+        // Get the patient profiles to get their names
         const patients = await therapistService.getMatchedPatients(patientIds);
 
-        // 3. Fetch mood trackers for each patient and combine them
+        // Fetch mood trackers for each patient and combine them
         const allTrackers = [];
         for (const patient of patients) {
-          // Destructure the new object format from our service
           const { trackers, hasConsent } = await therapistService.getPatientMoodTrackers(
             patient.Id,
           );
           const patientFullName = `${patient.Name} ${patient.Surname || ''}`.trim();
 
-          // If they denied consent, push a special locked entry and skip to the next patient
+          // If they denied consent, push a special locked entry
           if (!hasConsent) {
             allTrackers.push({
-              isLocked: true, // <-- Special flag!
+              isLocked: true, 
+              patientId: patient.Id, 
               patientName: patientFullName,
-              avatar: placeholderAvatar,
-              date: 'Keine Freigabe',
-              rawDate: 0, // 0 ensures they appear at the very bottom of the sorted list
+              date: '---',
+              rawDate: 0, 
             });
             continue;
           }
@@ -68,8 +93,8 @@ const TherapistMoodTrackerPage = () => {
             const questionnaire = JSON.parse(item.Questionnaire);
             return {
               isLocked: false,
+              patientId: patient.Id, 
               patientName: patientFullName,
-              avatar: placeholderAvatar,
               date: formatDate(item.CreatedAt),
               rawDate: new Date(item.CreatedAt).getTime(),
               mood: emojiDictionary[questionnaire[0]?.[0]] || '❓',
@@ -82,7 +107,7 @@ const TherapistMoodTrackerPage = () => {
           allTrackers.push(...mappedTrackers);
         }
 
-        // 4. Sort everything by newest first
+        // Sort everything by newest first
         allTrackers.sort((a, b) => b.rawDate - a.rawDate);
         setCombinedTrackers(allTrackers);
       } catch (error) {
@@ -114,7 +139,7 @@ const TherapistMoodTrackerPage = () => {
       ) : combinedTrackers.length === 0 ? (
         <div className="feelora-card text-center p-8 border-dashed border-2">
           <p className="text-muted-foreground text-lg">
-            Noch keine Einträge von Patienten vorhanden.
+            {t('app.therapist.moodTracker.noEntries', 'Noch keine Einträge von Patient:innen vorhanden.')}
           </p>
         </div>
       ) : (
@@ -124,12 +149,14 @@ const TherapistMoodTrackerPage = () => {
               key={index}
               className={`feelora-card flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 ${entry.isLocked ? 'opacity-70 bg-muted/30' : ''}`}
             >
-              {/* Patient Info Column (Always visible) */}
+              {/* Patient Info Column */}
               <div className="flex items-center gap-4 sm:gap-6">
-                <img
-                  src={entry.avatar}
+                {/* Replaced standard img tag with S3Avatar component */}
+                <S3Avatar
+                  userId={entry.patientId}
+                  fallbackSrc={placeholderAvatar}
                   alt={entry.patientName}
-                  className="w-14 h-14 rounded-full object-cover"
+                  className="w-14 h-14 rounded-full object-cover flex-shrink-0"
                 />
                 <div className="min-w-[120px]">
                   <p className="font-semibold text-foreground">{entry.patientName}</p>
@@ -145,7 +172,7 @@ const TherapistMoodTrackerPage = () => {
               {entry.isLocked ? (
                 <div className="flex items-center justify-end flex-1 gap-2 text-muted-foreground pr-4">
                   <Lock className="w-4 h-4" />
-                  <span className="text-sm italic">Patient hat der Freigabe nicht zugestimmt</span>
+                  <span className="text-sm italic">{t('moodTracker.overview.noConsent', 'Patient hat der Freigabe nicht zugestimmt')}</span>
                 </div>
               ) : (
                 <>

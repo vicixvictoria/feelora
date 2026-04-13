@@ -593,6 +593,7 @@
   "app.therapist.chat.placeholder": "tippe hier, um eine Nachricht zu schreiben...",
   "app.therapist.chat.noMessages": "Du hast noch keine Nachrichten.",
   "app.therapist.chat.chooseChat": "Wähle einen Chat aus, um eine Nachricht zu senden.",
+  "app.therapist.chat.patientProfile": "Patientenprofil",
   "app.therapist.homework.comingSoon": "Coming Soon",
   "app.therapist.homework.createTasks": "Neue Aufgaben erstellen",
   "app.therapist.homework.assignTask": "Aufgabe geben",
@@ -929,6 +930,9 @@
   "moodTracker.overview.activity": "Aktivität",
   "moodTracker.overview.physical": "Körperlich",
   "moodTracker.overview.stimmung": "Stimmung",
+  "moodTracker.overview.noConsent": "Patient hat der Freigabe nicht zugestimmt",
+  "moodTracker.overview.noEntries": "Noch keine Einträge von Patient:innen vorhanden.",
+
 
   "patient.notFound.message": "Oops! Seite nicht gefunden",
   "patient.notFound.returnHome": "Zurück zur Startseite",
