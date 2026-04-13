@@ -79,11 +79,11 @@ const TherapistMoodTrackerPage = () => {
           // If they denied consent, push a special locked entry
           if (!hasConsent) {
             allTrackers.push({
-              isLocked: true, 
-              patientId: patient.Id, 
+              isLocked: true,
+              patientId: patient.Id,
               patientName: patientFullName,
               date: '---',
-              rawDate: 0, 
+              rawDate: 0,
             });
             continue;
           }
@@ -93,7 +93,7 @@ const TherapistMoodTrackerPage = () => {
             const questionnaire = JSON.parse(item.Questionnaire);
             return {
               isLocked: false,
-              patientId: patient.Id, 
+              patientId: patient.Id,
               patientName: patientFullName,
               date: formatDate(item.CreatedAt),
               rawDate: new Date(item.CreatedAt).getTime(),
@@ -139,7 +139,10 @@ const TherapistMoodTrackerPage = () => {
       ) : combinedTrackers.length === 0 ? (
         <div className="feelora-card text-center p-8 border-dashed border-2">
           <p className="text-muted-foreground text-lg">
-            {t('app.therapist.moodTracker.noEntries', 'Noch keine Einträge von Patient:innen vorhanden.')}
+            {t(
+              'app.therapist.moodTracker.noEntries',
+              'Noch keine Einträge von Patient:innen vorhanden.',
+            )}
           </p>
         </div>
       ) : (
@@ -172,7 +175,12 @@ const TherapistMoodTrackerPage = () => {
               {entry.isLocked ? (
                 <div className="flex items-center justify-end flex-1 gap-2 text-muted-foreground pr-4">
                   <Lock className="w-4 h-4" />
-                  <span className="text-sm italic">{t('moodTracker.overview.noConsent', 'Patient hat der Freigabe nicht zugestimmt')}</span>
+                  <span className="text-sm italic">
+                    {t(
+                      'moodTracker.overview.noConsent',
+                      'Patient hat der Freigabe nicht zugestimmt',
+                    )}
+                  </span>
                 </div>
               ) : (
                 <>

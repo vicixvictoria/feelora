@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2, X } from 'lucide-react';
-import avatar from '@/assets/avatar-Placeholder.png'; 
+import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { therapistService } from '../api/therapist-service';
@@ -50,7 +50,7 @@ const calculateAge = (birthDate: string | number | null | undefined): string => 
   if (!birthDate) return 'N/A';
   const dob = typeof birthDate === 'number' ? new Date(birthDate * 1000) : new Date(birthDate);
   if (isNaN(dob.getTime())) return 'N/A';
-  
+
   const diffMs = Date.now() - dob.getTime();
   const ageDt = new Date(diffMs);
   return Math.abs(ageDt.getUTCFullYear() - 1970).toString();
@@ -71,7 +71,7 @@ const TherapistChat = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  
+
   // Modal State
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
@@ -85,7 +85,6 @@ const TherapistChat = () => {
       container.scrollTop = container.scrollHeight;
     }
   };
-
 
   // Fetch Therapist avatar exactly once when the component mounts
   const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
@@ -293,7 +292,7 @@ const TherapistChat = () => {
                 />
                 <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setIsInfoModalOpen(true)}
                 className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity"
               >
@@ -317,9 +316,7 @@ const TherapistChat = () => {
                     const isMe = message.from === user?.id;
 
                     // Assign the correct pre-fetched image instantly
-                    const currentAvatar = isMe
-                      ? myAvatarUrl || avatar
-                      : theirAvatarUrl || avatar;
+                    const currentAvatar = isMe ? myAvatarUrl || avatar : theirAvatarUrl || avatar;
 
                     return (
                       <div
@@ -396,7 +393,7 @@ const TherapistChat = () => {
               <h3 className="text-lg font-semibold text-foreground">
                 {t('app.therapist.chat.patientProfile', 'Patientenprofil')}
               </h3>
-              <button 
+              <button
                 onClick={() => setIsInfoModalOpen(false)}
                 className="p-1 rounded-md text-muted-foreground hover:bg-muted transition-colors"
               >
@@ -409,9 +406,9 @@ const TherapistChat = () => {
               {/* Avatar & Name */}
               <div className="flex items-center gap-4">
                 {/* Dynamically load the specific chat's image */}
-                <img 
-                  src={theirAvatarUrl || avatar} 
-                  alt={selectedChat.name} 
+                <img
+                  src={theirAvatarUrl || avatar}
+                  alt={selectedChat.name}
                   className="w-16 h-16 rounded-full object-cover border border-border"
                 />
                 <div>
@@ -425,20 +422,32 @@ const TherapistChat = () => {
               {/* Info Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.firstName', 'Vorname')}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {t('app.therapist.profile.firstName', 'Vorname')}
+                  </p>
                   <p className="font-medium text-foreground">{selectedChat.firstName || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.lastName', 'Nachname')}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {t('app.therapist.profile.lastName', 'Nachname')}
+                  </p>
                   <p className="font-medium text-foreground">{selectedChat.lastName || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.gender', 'Geschlecht')}</p>
-                  <p className="font-medium text-foreground capitalize">{selectedChat.gender || '-'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {t('app.therapist.profile.gender', 'Geschlecht')}
+                  </p>
+                  <p className="font-medium text-foreground capitalize">
+                    {selectedChat.gender || '-'}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{t('app.therapist.profile.city', 'Stadt')}</p>
-                  <p className="font-medium text-foreground capitalize">{selectedChat.city || '-'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {t('app.therapist.profile.city', 'Stadt')}
+                  </p>
+                  <p className="font-medium text-foreground capitalize">
+                    {selectedChat.city || '-'}
+                  </p>
                 </div>
               </div>
             </div>

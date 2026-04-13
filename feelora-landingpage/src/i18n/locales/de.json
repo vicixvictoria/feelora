@@ -549,7 +549,7 @@
   "patient.profile.availability": "Verfügbarkeit",
 
   "common.save": "Speichern",
-   "common.choose": "Bitte wählen",
+  "common.choose": "Bitte wählen",
   "common.cancel": "Abbrechen",
   "common.logout": "Abmelden",
   "common.backToHomepage": "Zurück zur Homepage",
@@ -932,7 +932,6 @@
   "moodTracker.overview.stimmung": "Stimmung",
   "moodTracker.overview.noConsent": "Patient hat der Freigabe nicht zugestimmt",
   "moodTracker.overview.noEntries": "Noch keine Einträge von Patient:innen vorhanden.",
-
 
   "patient.notFound.message": "Oops! Seite nicht gefunden",
   "patient.notFound.returnHome": "Zurück zur Startseite",

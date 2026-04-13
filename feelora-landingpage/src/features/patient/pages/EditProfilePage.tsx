@@ -128,7 +128,7 @@ const EditProfilePage = () => {
       // Auto-open "Andere" if they have another language saved
       let loadedLanguages = patient.Languages || [];
       const hasOtherLanguage = loadedLanguages.some((lang: string) =>
-        otherLanguages.some((other: LanguageOption) => other.id === lang)
+        otherLanguages.some((other: LanguageOption) => other.id === lang),
       );
 
       if (hasOtherLanguage && !loadedLanguages.includes(OTHER_VALUE)) {
@@ -421,7 +421,9 @@ const EditProfilePage = () => {
                     checked={formData.Languages.includes(OTHER_VALUE)}
                     onCheckedChange={handleOtherLanguagesToggle}
                   />
-                  <span className="text-sm text-foreground font-medium">{t('q.common.otherLanguages')}</span>
+                  <span className="text-sm text-foreground font-medium">
+                    {t('q.common.otherLanguages')}
+                  </span>
                 </label>
 
                 {formData.Languages.includes(OTHER_VALUE) && (

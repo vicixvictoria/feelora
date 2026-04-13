@@ -148,7 +148,7 @@ const TherapistEditProfilePage = () => {
       // 3. Check if user already has an "other" language saved so we can auto-open the panel
       let loadedLanguages = profile.Languages || [];
       const hasOtherLanguage = loadedLanguages.some((lang: string) =>
-        otherLanguages.some((other: LanguageOption) => other.id === lang)
+        otherLanguages.some((other: LanguageOption) => other.id === lang),
       );
 
       if (hasOtherLanguage && !loadedLanguages.includes(OTHER_VALUE)) {
@@ -240,7 +240,7 @@ const TherapistEditProfilePage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    
+
     // Build the payload first to log it
     const payload = {
       Name: formData.Name,
@@ -252,7 +252,7 @@ const TherapistEditProfilePage = () => {
       Gender: formData.Gender,
       BirthDate: toUnixSeconds(formData.BirthDate),
       // 5. Make sure to filter out the utility 'Andere' string before sending it to the DB
-      Languages: formData.Languages.filter(l => l !== OTHER_VALUE),
+      Languages: formData.Languages.filter((l) => l !== OTHER_VALUE),
       Availability: formData.Availability,
       Specialties: formData.Specialties,
     };
@@ -343,7 +343,9 @@ const TherapistEditProfilePage = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.title.academic', 'Titel (wird im Profil angezeigt)')}</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('app.therapist.profile.title.academic', 'Titel (wird im Profil angezeigt)')}
+                </label>
                 <input
                   type="text"
                   name="Title"
@@ -354,7 +356,7 @@ const TherapistEditProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                 {t('app.therapist.profile.jobTitle', 'Berufsbezeichnung')}
+                  {t('app.therapist.profile.jobTitle', 'Berufsbezeichnung')}
                 </label>
                 <input
                   type="text"
@@ -377,7 +379,9 @@ const TherapistEditProfilePage = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.firstName', 'Vorname')} *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('app.therapist.profile.firstName', 'Vorname')} *
+                </label>
                 <input
                   type="text"
                   name="Name"
@@ -388,7 +392,9 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.lastName', 'Nachname')} *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('app.therapist.profile.lastName', 'Nachname')} *
+                </label>
                 <input
                   type="text"
                   name="Surname"
@@ -399,7 +405,9 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.city', 'Stadt')}</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('app.therapist.profile.city', 'Stadt')}
+                </label>
                 <input
                   type="text"
                   name="City"
@@ -433,7 +441,9 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.gender', 'Geschlecht')}</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('app.therapist.profile.gender', 'Geschlecht')}
+                </label>
                 <select
                   name="Gender"
                   value={formData.Gender}
@@ -479,7 +489,7 @@ const TherapistEditProfilePage = () => {
             <h3 className="text-lg font-semibold text-primary">
               {t('app.therapist.profile.languages', 'Sprachen')}
             </h3>
-            
+
             {/* 6. Updated Grid identical to Step7 */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {languageOptions.map((lang) => (
@@ -506,7 +516,9 @@ const TherapistEditProfilePage = () => {
                     checked={formData.Languages.includes(OTHER_VALUE)}
                     onCheckedChange={handleOtherLanguagesToggle}
                   />
-                  <span className="text-sm text-foreground font-medium">{t('q.common.otherLanguages')}</span>
+                  <span className="text-sm text-foreground font-medium">
+                    {t('q.common.otherLanguages')}
+                  </span>
                 </label>
 
                 {formData.Languages.includes(OTHER_VALUE) && (

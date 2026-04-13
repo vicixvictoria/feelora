@@ -34,14 +34,14 @@ const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
         {t('q.t.completion.restart')}
       </Button>
       {/* Logout Button */}
-        <Button 
-          onClick={handleLogout} 
-          variant="ghost" 
-          className="text-muted-foreground hover:text-foreground w-full max-w-xs"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          {t('common.backToHomepage', 'Zurück zur Homepage')}
-        </Button>
+      <Button
+        onClick={handleLogout}
+        variant="ghost"
+        className="text-muted-foreground hover:text-foreground w-full max-w-xs"
+      >
+        <LogOut className="w-4 h-4 mr-2" />
+        {t('common.backToHomepage', 'Zurück zur Homepage')}
+      </Button>
     </div>
   );
 };
