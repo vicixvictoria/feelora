@@ -9,6 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useS3Upload } from '@/hooks/use-s3-upload';
 import { useS3Download } from '@/hooks/use-s3-download';
 
+interface LanguageOption {
+  id: string;
+  label: string;
+}
+
 // Helpers for Date conversions
 const toDateString = (unixSeconds?: number | null) => {
   if (!unixSeconds) return '';
@@ -20,6 +25,8 @@ const toUnixSeconds = (dateStr: string) => {
   if (!dateStr) return null;
   return new Date(dateStr).getTime() / 1000;
 };
+
+const OTHER_VALUE = 'Andere';
 
 const TherapistEditProfilePage = () => {
   const { t } = useTranslation();
@@ -60,7 +67,47 @@ const TherapistEditProfilePage = () => {
       { id: 'Kroatisch', label: t('q.p.languages.options.croatian', 'Kroatisch') },
       { id: 'Arabisch', label: t('q.p.languages.options.arabic', 'Arabisch') },
       { id: 'Türkisch', label: t('q.p.languages.options.turkish', 'Türkisch') },
-      //add the rest of the languages later
+      { id: 'Polnisch', label: t('q.p.languages.options.polish', 'Polnisch') },
+      { id: 'Serbisch', label: t('q.p.languages.options.serbian', 'Serbisch') },
+      { id: 'Italienisch', label: t('q.p.languages.options.italian', 'Italienisch') },
+      { id: 'Ungarisch', label: t('q.p.languages.options.hungarian', 'Ungarisch') },
+      { id: 'Farsi / Persisch', label: t('q.p.languages.options.farsi', 'Farsi / Persisch') },
+      { id: 'Rumänisch', label: t('q.p.languages.options.romanian', 'Rumänisch') },
+      { id: 'Spanisch', label: t('q.p.languages.options.spanish', 'Spanisch') },
+      { id: 'Französisch', label: t('q.p.languages.options.french', 'Französisch') },
+      { id: 'Ukrainisch', label: t('q.p.languages.options.ukrainian', 'Ukrainisch') },
+      { id: 'Russisch', label: t('q.p.languages.options.russian', 'Russisch') },
+    ],
+    [t],
+  );
+
+  const otherLanguages = useMemo(
+    () => [
+      { id: 'Albanisch', label: t('q.p.languages.other.albanian', 'Albanisch') },
+      { id: 'Portugiesisch', label: t('q.p.languages.other.portuguese', 'Portugiesisch') },
+      { id: 'Chinesisch', label: t('q.p.languages.other.chinese', 'Chinesisch') },
+      { id: 'Japanisch', label: t('q.p.languages.other.japanese', 'Japanisch') },
+      { id: 'Koreanisch', label: t('q.p.languages.other.korean', 'Koreanisch') },
+      { id: 'Niederländisch', label: t('q.p.languages.other.dutch', 'Niederländisch') },
+      { id: 'Schwedisch', label: t('q.p.languages.other.swedish', 'Schwedisch') },
+      { id: 'Dänisch', label: t('q.p.languages.other.danish', 'Dänisch') },
+      { id: 'Norwegisch', label: t('q.p.languages.other.norwegian', 'Norwegisch') },
+      { id: 'Finnisch', label: t('q.p.languages.other.finnish', 'Finnisch') },
+      { id: 'Griechisch', label: t('q.p.languages.other.greek', 'Griechisch') },
+      { id: 'Hebräisch', label: t('q.p.languages.other.hebrew', 'Hebräisch') },
+      { id: 'Tschechisch', label: t('q.p.languages.other.czech', 'Tschechisch') },
+      { id: 'Slowakisch', label: t('q.p.languages.other.slovak', 'Slowakisch') },
+      { id: 'Bulgarisch', label: t('q.p.languages.other.bulgarian', 'Bulgarisch') },
+      { id: 'Slowenisch', label: t('q.p.languages.other.slovenian', 'Slowenisch') },
+      { id: 'Hindi', label: t('q.p.languages.other.hindi', 'Hindi') },
+      { id: 'Bengalisch', label: t('q.p.languages.other.bengali', 'Bengalisch') },
+      { id: 'Vietnamesisch', label: t('q.p.languages.other.vietnamese', 'Vietnamesisch') },
+      { id: 'Thailändisch', label: t('q.p.languages.other.thai', 'Thailändisch') },
+      { id: 'Urdu', label: t('q.p.languages.other.urdu', 'Urdu') },
+      { id: 'Paschtu', label: t('q.p.languages.other.pashto', 'Paschtu') },
+      { id: 'Kurdisch', label: t('q.p.languages.other.kurdish', 'Kurdisch') },
+      { id: 'Dari', label: t('q.p.languages.other.dari', 'Dari') },
+      { id: 'Indonesisch', label: t('q.p.languages.other.indonesian', 'Indonesisch') },
     ],
     [t],
   );
@@ -80,17 +127,17 @@ const TherapistEditProfilePage = () => {
 
   const specialtyOptions = useMemo(
     () => [
-      { id: 'Depression', label: t('q.t.specialties.depression', 'Depression') },
-      { id: 'Angststörungen', label: t('q.t.specialties.anxiety', 'Angststörungen') },
-      { id: 'Trauma', label: t('q.t.specialties.trauma', 'Trauma') },
-      { id: 'Stress', label: t('q.t.specialties.stress', 'Stress & Burnout') },
-      { id: 'Psychosomatik', label: t('q.options.psychosomatics') },
-      { id: 'Sucht', label: t('q.options.addiction') },
-      { id: 'Sexuelle Identität', label: t('q.options.sexualIdentity') },
-      { id: 'Zwang', label: t('q.options.compulsion') },
-      { id: 'Gewalterfahrungen', label: t('q.options.violence') },
-      { id: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
-      { id: 'Essverhalten', label: t('q.options.eatingBehavior') },
+      { id: 'Depression', label: t('q.options.depression', 'Depression') },
+      { id: 'Angststörungen', label: t('q.options.anxiety', 'Angststörungen') },
+      { id: 'Trauma', label: t('q.options.trauma', 'Trauma') },
+      { id: 'Stress', label: t('q.options.stress', 'Stress & Burnout') },
+      { id: 'Psychosomatik', label: t('q.options.psychosomatics', 'Psychosomatik') },
+      { id: 'Sucht', label: t('q.options.addiction', 'Sucht') },
+      { id: 'Sexuelle Identität', label: t('q.options.sexualIdentity', 'Sexuelle Identität') },
+      { id: 'Zwang', label: t('q.options.compulsion', 'Zwang') },
+      { id: 'Gewalterfahrungen', label: t('q.options.violence', 'Gewalterfahrungen') },
+      { id: 'Chronische Schmerzen', label: t('q.options.chronicPain', 'Chronische Schmerzen') },
+      { id: 'Essverhalten', label: t('q.options.eatingBehavior', 'Essverhalten') },
     ],
     [t],
   );
@@ -98,6 +145,16 @@ const TherapistEditProfilePage = () => {
   // Populate form when data loads
   useEffect(() => {
     if (profile) {
+      // 3. Check if user already has an "other" language saved so we can auto-open the panel
+      let loadedLanguages = profile.Languages || [];
+      const hasOtherLanguage = loadedLanguages.some((lang: string) =>
+        otherLanguages.some((other: LanguageOption) => other.id === lang)
+      );
+
+      if (hasOtherLanguage && !loadedLanguages.includes(OTHER_VALUE)) {
+        loadedLanguages = [...loadedLanguages, OTHER_VALUE];
+      }
+
       setFormData({
         Name: profile.Name || '',
         Surname: profile.Surname || '',
@@ -107,7 +164,7 @@ const TherapistEditProfilePage = () => {
         Address: profile.Address || '',
         Gender: profile.Gender || '',
         BirthDate: toDateString(profile.BirthDate),
-        Languages: profile.Languages || [],
+        Languages: loadedLanguages,
         Availability: profile.Availability || [],
         Specialties: profile.Specialties || [],
       });
@@ -143,6 +200,24 @@ const TherapistEditProfilePage = () => {
     });
   };
 
+  // 4. Special handler for toggling the "Andere" checkbox group
+  const handleOtherLanguagesToggle = () => {
+    if (formData.Languages.includes(OTHER_VALUE)) {
+      // Uncheck: Remove "Andere" and clear all selected "other" languages
+      const otherIds = otherLanguages.map((l) => l.id);
+      setFormData((prev) => ({
+        ...prev,
+        Languages: prev.Languages.filter((l) => l !== OTHER_VALUE && !otherIds.includes(l)),
+      }));
+    } else {
+      // Check: Just add "Andere" to trigger the dropdown
+      setFormData((prev) => ({
+        ...prev,
+        Languages: [...prev.Languages, OTHER_VALUE],
+      }));
+    }
+  };
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -165,6 +240,7 @@ const TherapistEditProfilePage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    
     // Build the payload first to log it
     const payload = {
       Name: formData.Name,
@@ -175,7 +251,8 @@ const TherapistEditProfilePage = () => {
       Address: formData.Address,
       Gender: formData.Gender,
       BirthDate: toUnixSeconds(formData.BirthDate),
-      Languages: formData.Languages,
+      // 5. Make sure to filter out the utility 'Andere' string before sending it to the DB
+      Languages: formData.Languages.filter(l => l !== OTHER_VALUE),
       Availability: formData.Availability,
       Specialties: formData.Specialties,
     };
@@ -217,7 +294,7 @@ const TherapistEditProfilePage = () => {
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        {t('common.back', 'Zurück')}
+        {t('q.common.back', 'Zurück')}
       </button>
 
       <h1 className="text-2xl font-bold text-foreground mb-6">
@@ -266,7 +343,7 @@ const TherapistEditProfilePage = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Title</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.title.academic', 'Titel (wird im Profil angezeigt)')}</label>
                 <input
                   type="text"
                   name="Title"
@@ -277,7 +354,7 @@ const TherapistEditProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  Job Title *
+                 {t('app.therapist.profile.jobTitle', 'Berufsbezeichnung')}
                 </label>
                 <input
                   type="text"
@@ -300,7 +377,7 @@ const TherapistEditProfilePage = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Vorname *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.firstName', 'Vorname')} *</label>
                 <input
                   type="text"
                   name="Name"
@@ -311,7 +388,7 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Nachname *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.lastName', 'Nachname')} *</label>
                 <input
                   type="text"
                   name="Surname"
@@ -322,7 +399,7 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Stadt</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.city', 'Stadt')}</label>
                 <input
                   type="text"
                   name="City"
@@ -333,7 +410,7 @@ const TherapistEditProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  Adresse / Praxis
+                  {t('app.therapist.profile.address', 'Praxisadresse')}
                 </label>
                 <input
                   type="text"
@@ -345,7 +422,7 @@ const TherapistEditProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  Geburtsdatum
+                  {t('app.therapist.profile.birthday', 'Geburtsdatum')}
                 </label>
                 <input
                   type="date"
@@ -356,17 +433,17 @@ const TherapistEditProfilePage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Geschlecht</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t('app.therapist.profile.gender', 'Geschlecht')}</label>
                 <select
                   name="Gender"
                   value={formData.Gender}
                   onChange={handleChange}
                   className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
                 >
-                  <option value="">Bitte wählen...</option>
-                  <option value="männlich">Männlich</option>
-                  <option value="weiblich">Weiblich</option>
-                  <option value="non-binary / divers">Non-binary / divers</option>
+                  <option value="">{t('common.choose')}</option>
+                  <option value="male">{t('q.t.personal.male')}</option>
+                  <option value="female">{t('q.t.personal.female')}</option>
+                  <option value="divers">{t('q.t.personal.diverse')}</option>
                 </select>
               </div>
             </div>
@@ -377,7 +454,7 @@ const TherapistEditProfilePage = () => {
           {/* Specialties Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary">
-              {t('app.therapist.profile.specialties', 'Spezialisierungen')}
+              {t('app.therapist.profile.specializedIn', 'Spezialisierungen')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {specialtyOptions.map((spec) => (
@@ -402,11 +479,13 @@ const TherapistEditProfilePage = () => {
             <h3 className="text-lg font-semibold text-primary">
               {t('app.therapist.profile.languages', 'Sprachen')}
             </h3>
+            
+            {/* 6. Updated Grid identical to Step7 */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {languageOptions.map((lang) => (
                 <label
                   key={lang.id}
-                  className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
                 >
                   <Checkbox
                     checked={formData.Languages.includes(lang.id)}
@@ -415,6 +494,44 @@ const TherapistEditProfilePage = () => {
                   <span className="text-sm text-foreground">{lang.label}</span>
                 </label>
               ))}
+
+              {/* "Andere" Option spanning entire columns */}
+              <div className="col-span-full space-y-3">
+                <label
+                  htmlFor="t-languages-other"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                >
+                  <Checkbox
+                    id="t-languages-other"
+                    checked={formData.Languages.includes(OTHER_VALUE)}
+                    onCheckedChange={handleOtherLanguagesToggle}
+                  />
+                  <span className="text-sm text-foreground font-medium">{t('q.common.otherLanguages')}</span>
+                </label>
+
+                {formData.Languages.includes(OTHER_VALUE) && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-4 rounded-lg border bg-muted/20 border-border">
+                    <p className="text-sm font-medium mb-3 text-foreground">
+                      {t('q.common.selectMoreLanguages')}
+                    </p>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      {otherLanguages.map((lang) => (
+                        <label
+                          key={lang.id}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-background/50 p-1 rounded"
+                        >
+                          <Checkbox
+                            checked={formData.Languages.includes(lang.id)}
+                            onCheckedChange={() => handleArrayToggle('Languages', lang.id)}
+                          />
+                          <span className="text-sm text-foreground">{lang.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

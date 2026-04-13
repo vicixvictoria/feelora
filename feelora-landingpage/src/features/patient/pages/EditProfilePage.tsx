@@ -21,6 +21,14 @@ const toUnixSeconds = (dateStr: string) => {
   return new Date(dateStr).getTime() / 1000;
 };
 
+// Interface for clean TypeScript
+interface LanguageOption {
+  id: string;
+  label: string;
+}
+
+const OTHER_VALUE = 'Andere';
+
 const EditProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -70,6 +78,37 @@ const EditProfilePage = () => {
     [t],
   );
 
+  const otherLanguages = useMemo(
+    () => [
+      { id: 'Albanisch', label: t('q.p.languages.other.albanian', 'Albanisch') },
+      { id: 'Portugiesisch', label: t('q.p.languages.other.portuguese', 'Portugiesisch') },
+      { id: 'Chinesisch', label: t('q.p.languages.other.chinese', 'Chinesisch') },
+      { id: 'Japanisch', label: t('q.p.languages.other.japanese', 'Japanisch') },
+      { id: 'Koreanisch', label: t('q.p.languages.other.korean', 'Koreanisch') },
+      { id: 'Niederländisch', label: t('q.p.languages.other.dutch', 'Niederländisch') },
+      { id: 'Schwedisch', label: t('q.p.languages.other.swedish', 'Schwedisch') },
+      { id: 'Dänisch', label: t('q.p.languages.other.danish', 'Dänisch') },
+      { id: 'Norwegisch', label: t('q.p.languages.other.norwegian', 'Norwegisch') },
+      { id: 'Finnisch', label: t('q.p.languages.other.finnish', 'Finnisch') },
+      { id: 'Griechisch', label: t('q.p.languages.other.greek', 'Griechisch') },
+      { id: 'Hebräisch', label: t('q.p.languages.other.hebrew', 'Hebräisch') },
+      { id: 'Tschechisch', label: t('q.p.languages.other.czech', 'Tschechisch') },
+      { id: 'Slowakisch', label: t('q.p.languages.other.slovak', 'Slowakisch') },
+      { id: 'Bulgarisch', label: t('q.p.languages.other.bulgarian', 'Bulgarisch') },
+      { id: 'Slowenisch', label: t('q.p.languages.other.slovenian', 'Slowenisch') },
+      { id: 'Hindi', label: t('q.p.languages.other.hindi', 'Hindi') },
+      { id: 'Bengalisch', label: t('q.p.languages.other.bengali', 'Bengalisch') },
+      { id: 'Vietnamesisch', label: t('q.p.languages.other.vietnamese', 'Vietnamesisch') },
+      { id: 'Thailändisch', label: t('q.p.languages.other.thai', 'Thailändisch') },
+      { id: 'Urdu', label: t('q.p.languages.other.urdu', 'Urdu') },
+      { id: 'Paschtu', label: t('q.p.languages.other.pashto', 'Paschtu') },
+      { id: 'Kurdisch', label: t('q.p.languages.other.kurdish', 'Kurdisch') },
+      { id: 'Dari', label: t('q.p.languages.other.dari', 'Dari') },
+      { id: 'Indonesisch', label: t('q.p.languages.other.indonesian', 'Indonesisch') },
+    ],
+    [t],
+  );
+
   const dayOptions = useMemo(
     () => [
       { id: 'mo', label: t('q.t.availability.mon', 'Montag') },
@@ -86,13 +125,23 @@ const EditProfilePage = () => {
   // Populate form when data loads
   useEffect(() => {
     if (patient) {
+      // Auto-open "Andere" if they have another language saved
+      let loadedLanguages = patient.Languages || [];
+      const hasOtherLanguage = loadedLanguages.some((lang: string) =>
+        otherLanguages.some((other: LanguageOption) => other.id === lang)
+      );
+
+      if (hasOtherLanguage && !loadedLanguages.includes(OTHER_VALUE)) {
+        loadedLanguages = [...loadedLanguages, OTHER_VALUE];
+      }
+
       setFormData({
         Name: patient.Name || '',
         Surname: patient.Surname || '',
         City: patient.City || '',
         Gender: patient.Gender || '',
         BirthDate: toDateString(patient.BirthDate),
-        Languages: patient.Languages || [],
+        Languages: loadedLanguages,
         Availability: patient.Availability || [],
       });
       // Try to download the existing profile picture
@@ -100,6 +149,7 @@ const EditProfilePage = () => {
         console.error('Could not download profile image:', err);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient]);
 
   // Update preview when S3 image is loaded
@@ -124,6 +174,24 @@ const EditProfilePage = () => {
         return { ...prev, [field]: [...currentArray, value] };
       }
     });
+  };
+
+  // handler for toggling the "Andere" checkbox group
+  const handleOtherLanguagesToggle = () => {
+    if (formData.Languages.includes(OTHER_VALUE)) {
+      // Uncheck: Remove "Andere" and clear all selected "other" languages
+      const otherIds = otherLanguages.map((l) => l.id);
+      setFormData((prev) => ({
+        ...prev,
+        Languages: prev.Languages.filter((l) => l !== OTHER_VALUE && !otherIds.includes(l)),
+      }));
+    } else {
+      // Check: Just add "Andere" to trigger the dropdown
+      setFormData((prev) => ({
+        ...prev,
+        Languages: [...prev.Languages, OTHER_VALUE],
+      }));
+    }
   };
 
   // Handle Real Image Upload
@@ -157,7 +225,8 @@ const EditProfilePage = () => {
         City: formData.City,
         Gender: formData.Gender,
         BirthDate: toUnixSeconds(formData.BirthDate),
-        Languages: formData.Languages,
+        // 6. Filter out the utility 'Andere' string before sending it to the DB
+        Languages: formData.Languages.filter((l) => l !== OTHER_VALUE),
         Availability: formData.Availability,
       });
       navigate('/patient/profile');
@@ -328,10 +397,10 @@ const EditProfilePage = () => {
               {t('patient.profile.languages', 'Sprachen')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {languageOptions.map((lang) => (
+              {languageOptions.map((lang: LanguageOption) => (
                 <label
                   key={lang.id}
-                  className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
                 >
                   <Checkbox
                     checked={formData.Languages.includes(lang.id)}
@@ -340,6 +409,44 @@ const EditProfilePage = () => {
                   <span className="text-sm text-foreground">{lang.label}</span>
                 </label>
               ))}
+
+              {/* "Andere" Option spanning entire columns */}
+              <div className="col-span-full space-y-3">
+                <label
+                  htmlFor="p-languages-other"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                >
+                  <Checkbox
+                    id="p-languages-other"
+                    checked={formData.Languages.includes(OTHER_VALUE)}
+                    onCheckedChange={handleOtherLanguagesToggle}
+                  />
+                  <span className="text-sm text-foreground font-medium">{t('q.common.otherLanguages')}</span>
+                </label>
+
+                {formData.Languages.includes(OTHER_VALUE) && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-4 rounded-lg border bg-muted/20 border-border">
+                    <p className="text-sm font-medium mb-3 text-foreground">
+                      {t('q.common.selectMoreLanguages')}
+                    </p>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      {otherLanguages.map((lang: LanguageOption) => (
+                        <label
+                          key={lang.id}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-background/50 p-1 rounded"
+                        >
+                          <Checkbox
+                            checked={formData.Languages.includes(lang.id)}
+                            onCheckedChange={() => handleArrayToggle('Languages', lang.id)}
+                          />
+                          <span className="text-sm text-foreground">{lang.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -351,7 +458,7 @@ const EditProfilePage = () => {
               {t('patient.profile.availability', 'Verfügbarkeit')}
             </h3>
             <div className="flex flex-wrap gap-3">
-              {dayOptions.map((day) => {
+              {dayOptions.map((day: LanguageOption) => {
                 const isSelected = formData.Availability.includes(day.id);
                 return (
                   <button

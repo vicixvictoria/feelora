@@ -76,7 +76,7 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
                 {therapist.Specialties?.join(', ') || t('q.p.therapistMatch.noInfo')}
               </p>
               <p className="text-foreground text-sm">
-                <span className="text-muted-foreground">{t('q.p.therapistMatch.city')}:</span>{' '}
+                <span className="text-muted-foreground">{t('q.p.therapistMatch.insurance')}:</span>{' '}
                 {therapist.HasInsurance
                   ? t('q.p.therapistMatch.hasInsurance')
                   : t('q.p.therapistMatch.noInsurance')}

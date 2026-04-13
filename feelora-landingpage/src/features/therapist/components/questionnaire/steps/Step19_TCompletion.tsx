@@ -1,12 +1,20 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CompletionStepProps {
   onRestart: () => void;
 }
+
 const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
   const { t } = useTranslation();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout('therapist');
+  };
+
   return (
     <div className="max-w-2xl mx-auto animate-fade-in text-center py-12">
       {/* Success Icon */}
@@ -25,6 +33,15 @@ const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
       <Button onClick={onRestart} className="feelora-btn-outline">
         {t('q.t.completion.restart')}
       </Button>
+      {/* Logout Button */}
+        <Button 
+          onClick={handleLogout} 
+          variant="ghost" 
+          className="text-muted-foreground hover:text-foreground w-full max-w-xs"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          {t('common.backToHomepage', 'Zurück zur Homepage')}
+        </Button>
     </div>
   );
 };
