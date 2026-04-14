@@ -30,7 +30,7 @@ interface WebsocketMessage {
   data?: IncomingNotification['data'];
 }
 
-// --- Smart S3 Avatar Component (Used ONLY for the Sidebar now) ---
+// --- Smart S3 Avatar Component (Used only for the Chat Sidebar) ---
 const S3Avatar = ({
   userId,
   fallbackSrc,
@@ -71,6 +71,7 @@ const ChatPage = () => {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
+  
   const processedMessageCountRef = useRef(0);
 
   // Create a reference to the bottom of the chat
@@ -82,19 +83,19 @@ const ChatPage = () => {
       container.scrollTop = container.scrollHeight;
     }
   };
+
   // ==========================================
-  // HIGH-PERFORMANCE AVATAR FETCHING
+  // AVATAR FETCHING
   // ==========================================
 
-  // 1. Fetch MY avatar exactly once when the component mounts
+  // Fetch patient avatar exactly once when the component mounts
   const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
   useEffect(() => {
-    // No ownerSub passed = fetches logged-in user's image
     downloadMyAvatar('profile.jpg', 'public').catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 2. Fetch THEIR avatar exactly once whenever the selected chat changes
+  // Fetch therapist avatar exactly once whenever the selected chat changes
   const { download: downloadTheirAvatar, imageUrl: theirAvatarUrl } = useS3Download();
   useEffect(() => {
     if (selectedChat?.contactId) {
@@ -103,6 +104,10 @@ const ChatPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?.contactId]);
 
+
+  // ==========================================
+  // WEBSOCKET NOTIFICATION LOGIC
+  // ==========================================
   const extractIncomingNotification = (
     rawMessage: WebsocketMessage,
   ): IncomingNotification | null => {
@@ -118,21 +123,51 @@ const ChatPage = () => {
     const newMessages = websocketMessages.slice(processedMessageCountRef.current);
     processedMessageCountRef.current = websocketMessages.length;
 
+    let activeChatNeedsUpdate = false;
+    
+    // Check if any of the new messages belong to the currently open chat
+    for (const rawMessage of newMessages) {
+      const incoming = extractIncomingNotification(rawMessage);
+      
+      if (incoming?.data?.conversationId && incoming.data.conversationId === selectedChat?.conversationId) {
+        activeChatNeedsUpdate = true;
+        break; 
+      }
+    }
+
+    // Update the unread badges for all other background chats
     setUnreadByConversation((previous) => {
       const next = { ...previous };
       for (const rawMessage of newMessages) {
         const incoming = extractIncomingNotification(rawMessage);
         if (!incoming?.data?.conversationId) continue;
+        
         const conversationId = incoming.data.conversationId;
+
+        // Skip adding an unread badge if the user is currently looking at this chat
+        if (selectedChat?.conversationId === conversationId) {
+          continue; 
+        }
+
         const fallbackCount = (next[conversationId] ?? 0) + 1;
         const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
         next[conversationId] = Math.max(0, count);
       }
       return next;
     });
-  }, [websocketMessages]);
 
-  // Fetch Matches AND Conversations on Load
+    // Silently fetch the latest chat history if the active chat got a message
+    if (activeChatNeedsUpdate && selectedChat?.conversationId) {
+      chatService.getChatMessages(selectedChat?.conversationId)
+        .then((latestMessages) => {
+          setMessages(latestMessages);
+        })
+        .catch((err) => console.error('Failed to auto-update active chat messages:', err));
+    }
+  }, [websocketMessages, selectedChat]);
+  
+
+  // Fetch Matches and Conversations on Load
   useEffect(() => {
     const fetchContactsAndChats = async () => {
       try {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2, X } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
@@ -21,7 +22,22 @@ interface SidebarChat {
   lastMessage: string;
 }
 
-// --- S3 Avatar Component (Used ONLY for the Sidebar now) ---
+// --- WebSocket Interfaces ---
+interface IncomingNotification {
+  type?: string;
+  data?: {
+    type?: string;
+    conversationId?: string;
+    count?: number;
+  };
+}
+
+interface WebsocketMessage {
+  type?: string;
+  data?: IncomingNotification['data'];
+}
+
+// --- S3 Avatar Component (Used only for the Sidebar) ---
 const S3Avatar = ({
   userId,
   fallbackSrc,
@@ -59,6 +75,7 @@ const calculateAge = (birthDate: string | number | null | undefined): string => 
 const TherapistChat = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { messages: websocketMessages } = useWebsocket();
 
   // State
   const [chatList, setChatList] = useState<SidebarChat[]>([]);
@@ -71,6 +88,10 @@ const TherapistChat = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  // WebSocket State
+  const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
+  const processedMessageCountRef = useRef(0);
 
   // Modal State
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
@@ -88,6 +109,7 @@ const TherapistChat = () => {
 
   // Fetch Therapist avatar exactly once when the component mounts
   const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
+
   useEffect(() => {
     // No ownerSub passed = fetches logged-in user's image
     downloadMyAvatar('profile.jpg', 'public').catch(() => {});
@@ -102,6 +124,70 @@ const TherapistChat = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?.contactId]);
+
+
+  // ==========================================
+  // WEBSOCKET NOTIFICATION LOGIC
+  // ==========================================
+  const extractIncomingNotification = (
+    rawMessage: WebsocketMessage,
+  ): IncomingNotification | null => {
+    if (rawMessage.type !== 'notification') return null;
+    if (rawMessage.data?.type !== 'new_message') return null;
+    if (!rawMessage.data.conversationId) return null;
+    return rawMessage as IncomingNotification;
+  };
+
+  useEffect(() => {
+    if (websocketMessages.length <= processedMessageCountRef.current) return;
+
+    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+    processedMessageCountRef.current = websocketMessages.length;
+
+    let activeChatNeedsUpdate = false;
+
+    // Check if any of the new messages belong to the currently open chat
+    for (const rawMessage of newMessages) {
+      const incoming = extractIncomingNotification(rawMessage);
+      if (incoming?.data?.conversationId && incoming.data.conversationId === selectedChat?.conversationId) {
+        activeChatNeedsUpdate = true;
+        break; // found one, no need to keep checking the rest for this flag
+      }
+    }
+
+    // Update the unread badges for all other background chats
+    setUnreadByConversation((previous) => {
+      const next = { ...previous };
+      for (const rawMessage of newMessages) {
+        const incoming = extractIncomingNotification(rawMessage);
+        if (!incoming?.data?.conversationId) continue;
+        
+        const conversationId = incoming.data.conversationId;
+
+        // Skip adding an unread badge if the user is currently looking at this chat
+        if (selectedChat?.conversationId === conversationId) {
+          continue; 
+        }
+
+        // Increment the badge for background chats
+        const fallbackCount = (next[conversationId] ?? 0) + 1;
+        const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
+        next[conversationId] = Math.max(0, count);
+      }
+      return next;
+    });
+
+    // Silently fetch the latest chat history if the active chat got a message
+    if (activeChatNeedsUpdate && selectedChat?.conversationId) {
+      chatService.getChatMessages(selectedChat.conversationId)
+        .then((latestMessages) => {
+          setMessages(latestMessages);
+        })
+        .catch((err) => console.error('Failed to auto-update active chat messages:', err));
+    }
+
+  }, [websocketMessages, selectedChat]);
+
 
   // Fetch Matches and Conversations on Load
   useEffect(() => {
@@ -168,6 +254,17 @@ const TherapistChat = () => {
     setMobileShowChat(true);
     setMessages([]);
 
+    // Clear unread count for this conversation when opened
+    if (chat.conversationId) {
+      const conversationId = chat.conversationId;
+      setUnreadByConversation((previous) => {
+        if (!(conversationId in previous)) return previous;
+        const next = { ...previous };
+        delete next[conversationId];
+        return next;
+      });
+    }
+
     if (!chat.conversationId) return;
 
     setIsLoadingMessages(true);
@@ -183,8 +280,6 @@ const TherapistChat = () => {
 
   // Send Message
   const handleSendMessage = async () => {
-    console.log('Send button triggered. Checking state...');
-
     if (!newMessage.trim() || isSending) return;
 
     if (!user) {
@@ -208,13 +303,10 @@ const TherapistChat = () => {
     setIsSending(true);
 
     try {
-      console.log('Attempting to send message to AWS...');
       const realMessage = await chatService.sendChatMessage(
         selectedChat.conversationId,
         messageText,
       );
-      console.log('Message sent successfully!', realMessage);
-
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
     } catch (error) {
@@ -245,26 +337,41 @@ const TherapistChat = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            {chatList.map((chat) => (
-              <button
-                key={chat.contactId}
-                onClick={() => handleSelectChat(chat)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : 'hover:bg-muted/50'}`}
-              >
-                {/* Dynamically Load Sidebar Avatars */}
-                <S3Avatar
-                  userId={chat.contactId}
-                  fallbackSrc={avatar}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                  alt={chat.name}
-                />
-                <div className="flex-1 text-left overflow-hidden">
-                  <p className="font-medium text-foreground truncate">{chat.name}</p>
-                  <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              </button>
-            ))}
+            {chatList.map((chat) => {
+              // Calculate unread count for the UI
+              const unreadCount = chat.conversationId
+                ? (unreadByConversation[chat.conversationId] ?? 0)
+                : 0;
+
+              return (
+                <button
+                  key={chat.contactId}
+                  onClick={() => handleSelectChat(chat)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${selectedChat?.contactId === chat.contactId ? 'bg-muted' : unreadCount > 0 ? 'bg-primary/10 hover:bg-primary/15 ring-1 ring-primary/30' : 'hover:bg-muted/50'}`}
+                >
+                  {/* Dynamically Load Sidebar Avatars */}
+                  <S3Avatar
+                    userId={chat.contactId}
+                    fallbackSrc={avatar}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    alt={chat.name}
+                  />
+                  <div className="flex-1 text-left overflow-hidden">
+                    <p className="font-medium text-foreground truncate">{chat.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
+                  </div>
+                  
+                  {/* Unread Message Badge */}
+                  {unreadCount > 0 && (
+                    <span className="mr-1 inline-flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-destructive px-1 text-xs font-medium text-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                  
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
