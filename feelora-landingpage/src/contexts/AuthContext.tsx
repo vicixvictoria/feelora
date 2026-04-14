@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { jwtDecode } from 'jwt-decode';
 import { Amplify } from 'aws-amplify';
 import { amplifyConfig, therapistAmplifyConfig } from '@/config/amplify';
+import i18n from '@/i18n/config';
 import { setApolloAccessToken } from '@/lib/apollo-client';
 
 // --- CONFIGURATION ---
@@ -156,9 +157,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig); // Ensure correct Amplify config is set before login
 
     const currentPath = redirectPath || window.location.pathname;
+    const lang = (i18n.resolvedLanguage || i18n.language || 'de').slice(0, 2);
 
     // Redirect to backend login endpoint - for testing use fullRedirectUrl, otheriwse use currentPath
-    window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}`;
+    window.location.href = `${AUTH_API_URL}/auth/login?type=${type}&redirect=${encodeURIComponent(currentPath)}&lang=${encodeURIComponent(lang)}`;
   }, []);
 
   // 2. EXCHANGE: Swaps Session ID (from URL) for Tokens
