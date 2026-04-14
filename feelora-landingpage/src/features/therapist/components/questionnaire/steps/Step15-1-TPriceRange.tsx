@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { useStepValidation } from '@/hooks/use-step-validation';
 
@@ -11,29 +11,26 @@ interface PriceRangeStepProps {
   onBack: () => void;
   data: {
     kassenvertrag?: boolean;
-    hasPrice?: boolean;
-    priceDetails?: string;
+    minPrice?: number;
+    maxPrice?: number;
   };
   onDataChange: (data: any) => void;
 }
 
 // Validation Schema
-const stepSchema = z
-  .object({
-    kassenvertrag: z.boolean().optional(),
-    hasPrice: z.boolean().optional(),
-    priceDetails: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    // If they check the box to provide a price, make sure they actually typed something
-    if (data.hasPrice && (!data.priceDetails || data.priceDetails.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Bitte gib einen Preis oder eine Preisspanne an.',
-        path: ['priceDetails'],
-      });
-    }
-  });
+const stepSchema = z.object({
+  kassenvertrag: z.boolean().optional(),
+  minPrice: z.number().min(0, 'Bitte gib einen Mindestpreis an.'),
+  maxPrice: z.number().min(0, 'Bitte gib einen Höchstpreis an.'),
+}).superRefine((data, ctx) => {
+  if (data.minPrice > data.maxPrice) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Der Mindestpreis darf nicht größer als der Höchstpreis sein.',
+      path: ['minPrice'],
+    });
+  }
+});
 
 const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRangeStepProps) => {
   const { t } = useTranslation();
@@ -43,19 +40,21 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
     onNext,
   });
 
-  const handleCheckboxChange = (field: 'kassenvertrag' | 'hasPrice', checked: boolean) => {
-    onDataChange({ ...data, [field]: checked });
-    clearError(field);
-
-    // Clear price details error if they uncheck the price option
-    if (field === 'hasPrice' && !checked) {
-      clearError('priceDetails');
-    }
+  const handleCheckboxChange = (checked: boolean) => {
+    onDataChange({ ...data, kassenvertrag: checked });
+    clearError('kassenvertrag');
   };
 
-  const handleTextChange = (value: string) => {
-    onDataChange({ ...data, priceDetails: value });
-    clearError('priceDetails');
+  const handleMinPriceChange = (value: string) => {
+    const num = value === '' ? undefined : Number(value);
+    onDataChange({ ...data, minPrice: num });
+    clearError('minPrice');
+  };
+
+  const handleMaxPriceChange = (value: string) => {
+    const num = value === '' ? undefined : Number(value);
+    onDataChange({ ...data, maxPrice: num });
+    clearError('maxPrice');
   };
 
   return (
@@ -78,6 +77,7 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
         </p>
       </div>
 
+
       {/* Form Card */}
       <div className="feelora-card">
         <div className="space-y-6">
@@ -86,9 +86,7 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
             <Checkbox
               id="kassenvertrag"
               checked={data.kassenvertrag || false}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange('kassenvertrag', checked as boolean)
-              }
+              onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)}
             />
             <Label
               htmlFor="kassenvertrag"
@@ -98,39 +96,57 @@ const Step15_1_TPriceRange = ({ onNext, onBack, data, onDataChange }: PriceRange
             </Label>
           </div>
 
-          {/* Price Range Section */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="hasPrice"
-                checked={data.hasPrice || false}
-                onCheckedChange={(checked) => handleCheckboxChange('hasPrice', checked as boolean)}
-              />
-              <Label
-                htmlFor="hasPrice"
-                className="text-base font-normal cursor-pointer text-muted-foreground"
-              >
-                {t('q.t.price.priceOption', 'entweder fixen Preis oder Preispanne angeben (in €)')}
+          {/* Price Range Numeric Inputs */}
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <Label htmlFor="minPrice" className="block mb-1">
+                {t('q.t.price.min', 'Mindestpreis (€)')}
               </Label>
-            </div>
-
-            {/* Textarea is always visible, regardless of checkbox state */}
-            <div className="pl-7 animate-fade-in">
-              <Textarea
-                value={data.priceDetails || ''}
-                onChange={(e) => handleTextChange(e.target.value)}
-                placeholder={t('q.t.price.placeholder', 'hier tippen...')}
-                className={`min-h-[100px] resize-y bg-background ${errors.priceDetails ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              <Input
+                id="minPrice"
+                type="number"
+                min={0}
+                value={data.minPrice ?? ''}
+                onChange={(e) => handleMinPriceChange(e.target.value)}
+                className={errors.minPrice ? 'border-destructive focus-visible:ring-destructive' : ''}
               />
-              {errors.priceDetails && (
-                <p className="text-xs text-destructive mt-1">{errors.priceDetails}</p>
+              {errors.minPrice && (
+                <p className="text-xs text-destructive mt-1">{errors.minPrice}</p>
+              )}
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="maxPrice" className="block mb-1">
+                {t('q.t.price.max', 'Höchstpreis (€)')}
+              </Label>
+              <Input
+                id="maxPrice"
+                type="number"
+                min={0}
+                value={data.maxPrice ?? ''}
+                onChange={(e) => handleMaxPriceChange(e.target.value)}
+                className={errors.maxPrice ? 'border-destructive focus-visible:ring-destructive' : ''}
+              />
+              {errors.maxPrice && (
+                <p className="text-xs text-destructive mt-1">{errors.maxPrice}</p>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      <NavigationButtons
+        onNext={() => {
+          // Convert min/max to string for saving
+          if (typeof data.minPrice === 'number' && typeof data.maxPrice === 'number') {
+            onDataChange({
+              ...data,
+              priceDetails: `${data.minPrice}-${data.maxPrice}`,
+            });
+          }
+          validateAndNext();
+        }}
+        onBack={onBack}
+      />
     </div>
   );
 };

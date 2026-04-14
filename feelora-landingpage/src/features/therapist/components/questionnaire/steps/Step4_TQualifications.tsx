@@ -162,7 +162,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
           <div className="space-y-2">
             <Label htmlFor="titleFromPrefix" className="text-foreground">
-              {t('q.t.qualifications.titleFrom')}
+              {t('q.t.qualifications.titleFromPrefix')}
             </Label>
             <Input
               id="titleFromPrefix"
@@ -175,7 +175,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
           <div className="space-y-2">
             <Label htmlFor="titleFromSuffix" className="text-foreground">
-              {t('q.t.qualifications.titleFrom')}
+              {t('q.t.qualifications.titleFromSuffix')}
             </Label>
             <Input
               id="titleFromSuffix"

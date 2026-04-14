@@ -167,7 +167,7 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     },
     {
       step: 14,
-      title: t('q.t.summary.valuesPreferences'),
+      title: t('q.t.summary.values'),
       content: (
         <p className="text-foreground/80">
           {formatArrayWithOther(data.valuesPreferences?.selected, data.valuesPreferences?.other)}
