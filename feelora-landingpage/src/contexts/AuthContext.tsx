@@ -8,6 +8,7 @@ import { setApolloAccessToken } from '@/lib/apollo-client';
 // --- CONFIGURATION ---
 // Must Point to backend URL
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
+const AUTH_TYPE_STORAGE_KEY = 'feelora_auth_type';
 
 // Refresh token before it expires (e.g., at 55 minutes of a 60 min token)
 const TOKEN_REFRESH_INTERVAL = 55 * 60 * 1000;
@@ -45,6 +46,8 @@ interface AuthContextType {
   clearError: () => void;
 }
 
+type AuthType = 'user' | 'therapist';
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function parseUserFromToken(token: string): User | null {
@@ -62,6 +65,21 @@ function parseUserFromToken(token: string): User | null {
     console.error('Failed to decode token', e);
     return null;
   }
+}
+
+function getAuthTypeFromGroups(groups?: string[]): AuthType {
+  const isTherapist = groups?.includes('type:T') || groups?.includes('type:P');
+  return isTherapist ? 'therapist' : 'user';
+}
+
+function getAuthTypeFromPath(pathname: string): AuthType | null {
+  if (pathname.startsWith('/therapist') || pathname === '/loginTherapist') {
+    return 'therapist';
+  }
+  if (pathname.startsWith('/patient') || pathname === '/login') {
+    return 'user';
+  }
+  return null;
 }
 
 const IS_LOCAL_AUTH = import.meta.env.VITE_AUTH_MODE === 'local';
@@ -113,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const initRef = useRef(false);
+  const authTypeRef = useRef<AuthType>('user');
 
   // --- ACTIONS ---
 
@@ -135,6 +154,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const parsedUser = parseUserFromToken(idTokenStr); // Decode ID token for user info
     setUser(parsedUser);
 
+    const authType = getAuthTypeFromGroups(parsedUser?.groups);
+    authTypeRef.current = authType;
+    sessionStorage.setItem(AUTH_TYPE_STORAGE_KEY, authType);
+
     // --- UPDATED: Treat BOTH 'type:T' and 'type:P' as therapists ---
     // Check if the user is a confirmed therapist (type:T) OR a pending therapist (type:P)
     const isTherapist =
@@ -153,6 +176,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 1. LOGIN: Redirects browser to Backend -> Cognito
   const login = useCallback((type: 'user' | 'therapist', redirectPath?: string) => {
+    authTypeRef.current = type;
+    sessionStorage.setItem(AUTH_TYPE_STORAGE_KEY, type);
+
     // Pre-configure ammplify so that the logout/login flow matches the intended client
     Amplify.configure(type === 'therapist' ? therapistAmplifyConfig : amplifyConfig); // Ensure correct Amplify config is set before login
 
@@ -199,6 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: authTypeRef.current }),
       });
 
       if (!response.ok) {
@@ -231,12 +258,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 4. LOGOUT
   const logout = useCallback(
     async (type: 'user' | 'therapist') => {
+      authTypeRef.current = type;
+      sessionStorage.setItem(AUTH_TYPE_STORAGE_KEY, type);
+
       try {
         // 1. Call Backend to clear the 'refreshToken' cookie
         await fetch(`${AUTH_API_URL}/auth/logout`, {
           method: 'POST',
           credentials: 'include', // Sends the cookie to be deleted
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type }),
         });
       } catch (err) {
         console.error('Logout failed error:', err);
@@ -268,6 +299,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function initAuth() {
       setIsLoading(true);
+
+      const authTypeFromStorage = sessionStorage.getItem(AUTH_TYPE_STORAGE_KEY) as AuthType | null;
+      const authTypeFromPath = getAuthTypeFromPath(window.location.pathname);
+      if (authTypeFromStorage === 'user' || authTypeFromStorage === 'therapist') {
+        authTypeRef.current = authTypeFromStorage;
+      } else if (authTypeFromPath) {
+        authTypeRef.current = authTypeFromPath;
+      }
 
       // Check URL for session (Callback from Cognito)
       const searchParams = new URLSearchParams(window.location.search);
