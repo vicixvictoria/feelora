@@ -56,6 +56,7 @@ import TherapistAccountPage from './features/therapist/pages/TherapistAccountPag
 import TherapistMoodTrackerDetailsPage from './features/therapist/pages/TherapistMoodTrackerDetailsPage';
 import TherapistEditProfilePage from './features/therapist/pages/TherapistEditProfilePage';
 import { WebsocketProvider } from './contexts/WebsocketContext';
+import AdminPage from './features/admin/pages/AdminPage';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
@@ -182,6 +183,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+      // Admin (access control handled inside the page)
+      { path: '/admin', element: <AdminPage /> },
       // 404
       { path: '*', element: <NotFound /> },
     ],
