@@ -25,6 +25,7 @@ import CompletionStep from '../components/questionnaire/steps/Step19_TCompletion
 
 import { therapistService } from '../api/therapist-service';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Initial empty data structure for the questionnaire
 const initialData: TherapistQuestionnaireData = {
@@ -55,6 +56,7 @@ const initialData: TherapistQuestionnaireData = {
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setIsIntermediateLoading] = useState(false);
+  const { logout } = useAuth();
 
   // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
@@ -300,7 +302,15 @@ const TherapistQuestionnaire = () => {
           />
         );
       case 19:
-        return <CompletionStep onRestart={restart} />;
+        return (
+          <CompletionStep
+            onRestart={restart}
+            onHome={async () => {
+              clearProgress();
+              await logout('therapist');
+            }}
+          />
+        );
       default:
         return null;
     }

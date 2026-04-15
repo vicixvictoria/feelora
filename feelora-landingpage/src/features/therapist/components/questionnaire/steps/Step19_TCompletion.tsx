@@ -5,14 +5,20 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface CompletionStepProps {
   onRestart: () => void;
+  onHome?: () => void;
 }
 
-const Step19_TCompletion = ({ onRestart }: CompletionStepProps) => {
+const Step19_TCompletion = ({ onRestart, onHome }: CompletionStepProps) => {
   const { t } = useTranslation();
   const { logout } = useAuth();
 
+
   const handleLogout = () => {
-    logout('therapist');
+    if (onHome) {
+      onHome();
+    } else {
+      logout('therapist');
+    }
   };
 
   return (

@@ -288,6 +288,7 @@
   "q.t.personal.male": "Male",
   "q.t.personal.female": "Female",
   "q.t.personal.diverse": "Diverse",
+  "q.t.personal.profilePicture": "If you wish, you can upload a profile picture now",
   "q.t.contact.title": "Contact Information",
   "q.t.contact.cardTitle": "Contact Information",
   "q.t.contact.subtitle1": "Provide your contact details so your patients can reach you. We cannot validate these, please check your entries carefully. If no email is provided, your Feelora login email will be used.",
