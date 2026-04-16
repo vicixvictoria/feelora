@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
@@ -56,7 +56,7 @@ const initialData: TherapistQuestionnaireData = {
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
@@ -64,6 +64,18 @@ const TherapistQuestionnaire = () => {
 
   const totalSteps = 19; // Welcome + 18 questions
 
+  // -- FORCE COMPLETION STEP FOR PENDING THERAPISTS ---
+  // If the backend says this user is a Pending Therapist (type:P), 
+  // force them directly to the completion step, regardless of what localStorage says.
+  useEffect(() => {
+    const isPendingTherapist = user?.groups?.includes('type:P');
+    
+    if (isPendingTherapist && currentStep !== 19) {
+      setCurrentStep(19);
+    }
+  }, [user, currentStep, setCurrentStep]);
+
+  
   // Allow going to the next step
   const goNext = () => {
     if (currentStep < totalSteps) {
