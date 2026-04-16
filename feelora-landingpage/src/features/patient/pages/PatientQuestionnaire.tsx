@@ -69,7 +69,7 @@ const PatientQuestionnaire = () => {
   const [data, setData] = useState<QuestionnaireData>(initialData);*/
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [, setIsIntermediateLoading] = useState(false);
+  const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
   const [matchedProfiles, setMatchedProfiles] = useState<AlgorithmMatch[]>([]); // Store matched therapist profiles returned from the backend
 
   const navigate = useNavigate(); // For navigating to dashboard after completeion --> lets see if backend does it after acceptin?
@@ -312,6 +312,7 @@ const PatientQuestionnaire = () => {
             onBack={goBack}
             data={data.availability}
             onDataChange={(newData) => updateField('availability', newData)}
+            isLoading={isIntermediateLoading} 
           />
         );
       case 15:

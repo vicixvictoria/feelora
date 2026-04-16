@@ -16,16 +16,19 @@ export interface TherapistPersonalData {
   lastName?: string;
   gender?: string;
   bday?: string; // ISO date string
-  phone?: string;
+  jobtitle?: string;
+  title?: string;
   // This allows the object to be treated as Record<string, string> by your React components
   [key: string]: any;
 }
 
 export interface TherapistContactInfo {
+  country?: string; // ISO country code
   city?: string;
   street?: string;
   zip?: string;
   [key: string]: any;
+  phone?: string;
 }
 
 export interface Qualifications {

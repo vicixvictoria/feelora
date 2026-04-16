@@ -25,34 +25,6 @@ interface PersonalDataStepProps {
 // Define which fields are optional
 const optionalFields = ['title', 'profilePictureName'];
 
-// Predefined Lists --> still needs translations
-const predefinedJobs = [
-  'Psychologische/r Psychotherapeut:in',
-  'Ärztliche/r Psychotherapeut:in',
-  'Psychiater:in',
-  'Kinder- und Jugendlichenpsychotherapeut:in (KJP)',
-  'Fachärzt:in für Psychosomatische Medizin und Psychotherapie',
-  'Fachärzt:in für Psychiatrie und Psychotherapie',
-  'Heilpraktiker:in für Psychotherapie',
-  'Psychologische/r Berater:in',
-  'Gestalttherapeut:in (ohne HP-Zulassung)',
-  'Kunsttherapeut:in / Musiktherapeut:in',
-];
-
-//still needs translattions
-const predefinedTitles = [
-  'Dr. med.',
-  'Dr. rer. nat.',
-  'Dr. phil.',
-  'Dr.',
-  'Prof. Dr.',
-  'Dipl.-Psych.',
-  'Dipl.-Päd.',
-  'M.Sc.',
-  'B.Sc.',
-  'M.A.',
-];
-
 // Define the Validation Schema
 const step2Schema = z.object({
   firstName: z.string().min(1, 'Required'),
@@ -62,7 +34,13 @@ const step2Schema = z.object({
     .min(1, 'Required')
     .refine(
       (val) => {
+        // Ensure all 3 parts of the date exist before validating age
+        const parts = val.split('-');
+        if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
+
         const birthDate = new Date(val);
+        if (isNaN(birthDate.getTime())) return false;
+
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
@@ -76,7 +54,7 @@ const step2Schema = z.object({
 
         return age >= 15;
       },
-      { message: 'Underage' },
+      { message: 'Underage or Incomplete' },
     ),
   gender: z.string().min(1, 'Required'),
   job: z.string().min(1, 'Required'),
@@ -86,6 +64,33 @@ const step2Schema = z.object({
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
   const { t } = useTranslation();
+
+  // Predefined Lists
+  const predefinedJobs = [
+    t('q.t.personal.jobs.psych_pt', 'Psychologische/r Psychotherapeut:in'),
+    t('q.t.personal.jobs.med_pt', 'Ärztliche/r Psychotherapeut:in'),
+    t('q.t.personal.jobs.psychiatrist', 'Psychiater:in'),
+    t('q.t.personal.jobs.kjp', 'Kinder- und Jugendlichenpsychotherapeut:in (KJP)'),
+    t('q.t.personal.jobs.fachaerzt_psychosomatik', 'Fachärzt:in für Psychosomatische Medizin und Psychotherapie'),
+    t('q.t.personal.jobs.fachaerzt_psychiatrie', 'Fachärzt:in für Psychiatrie und Psychotherapie'),
+    t('q.t.personal.jobs.hp_psych', 'Heilpraktiker:in für Psychotherapie'),
+    t('q.t.personal.jobs.psych_berater', 'Psychologische/r Berater:in'),
+    t('q.t.personal.jobs.gestalttherapeut', 'Gestalttherapeut:in (ohne HP-Zulassung)'),
+    t('q.t.personal.jobs.kunst_musiktherapeut', 'Kunsttherapeut:in / Musiktherapeut:in'),
+  ];
+
+  const predefinedTitles = [
+    t('q.t.personal.titles.dr_med', 'Dr. med.'),
+    t('q.t.personal.titles.dr_rer_nat', 'Dr. rer. nat.'),
+    t('q.t.personal.titles.dr_phil', 'Dr. phil.'),
+    t('q.t.personal.titles.dr', 'Dr.'),
+    t('q.t.personal.titles.prof_dr', 'Prof. Dr.'),
+    t('q.t.personal.titles.dipl_psych', 'Dipl.-Psych.'),
+    t('q.t.personal.titles.dipl_paed', 'Dipl.-Päd.'),
+    t('q.t.personal.titles.m_sc', 'M.Sc.'),
+    t('q.t.personal.titles.b_sc', 'B.Sc.'),
+    t('q.t.personal.titles.m_a', 'M.A.'),
+  ];
 
   // Local uploading state
   const [isUploading, setIsUploading] = useState(false);
@@ -108,7 +113,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     { value: 'diverse', label: t('q.t.personal.diverse') },
   ];
 
-  // ORDER MATTERS: Job is 5th (Left), Title is 6th (Right)
   const fieldLabels: Record<string, string> = {
     firstName: t('q.t.personal.firstName'),
     lastName: t('q.t.personal.lastName'),
@@ -152,6 +156,16 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
       setIsUploading(false);
       e.target.value = '';
     }
+  };
+
+  // Helper to calculate exact days in a month 
+  const getDaysInMonth = (yearStr: string, monthStr: string) => {
+    const y = parseInt(yearStr);
+    const m = parseInt(monthStr);
+    if (y && m) {
+      return new Date(y, m, 0).getDate(); 
+    }
+    return 31; // Default to 31 if year/month aren't selected yet
   };
 
   return (
@@ -205,6 +219,73 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       ))}
                     </SelectContent>
                   </Select>
+                ) : field === 'bday' ? (
+                  // --- BIRTHDAY PICKER (3 DROPDOWNS) ---
+                  (() => {
+                    const bdayParts = (data[field] || '').split('-');
+                    const year = bdayParts[0] || '';
+                    const month = bdayParts[1] || '';
+                    const day = bdayParts[2] || '';
+
+                    const handleDateChange = (type: 'year' | 'month' | 'day', val: string) => {
+                      let newY = year;
+                      let newM = month;
+                      let newD = day;
+
+                      if (type === 'year') newY = val;
+                      if (type === 'month') newM = val;
+                      if (type === 'day') newD = val;
+
+                      handleChange(field, `${newY}-${newM}-${newD}`);
+                    };
+
+                    const daysInMonth = getDaysInMonth(year, month);
+                    const currentYear = new Date().getFullYear();
+                    // Generate array of valid birth years (from 15 years ago, down to 100 years ago)
+                    const yearsList = Array.from({ length: 86 }, (_, i) => (currentYear - 15 - i).toString());
+
+                    return (
+                      <div className="flex gap-2">
+                        {/* Day */}
+                        <Select value={day} onValueChange={(val) => handleDateChange('day', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="TT" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {Array.from({ length: daysInMonth }, (_, i) => {
+                              const d = (i + 1).toString().padStart(2, '0');
+                              return <SelectItem key={d} value={d}>{d}</SelectItem>;
+                            })}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Month */}
+                        <Select value={month} onValueChange={(val) => handleDateChange('month', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="MM" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const m = (i + 1).toString().padStart(2, '0');
+                              return <SelectItem key={m} value={m}>{m}</SelectItem>;
+                            })}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Year */}
+                        <Select value={year} onValueChange={(val) => handleDateChange('year', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="JJJJ" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {yearsList.map((y) => (
+                              <SelectItem key={y} value={y}>{y}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  })()
                 ) : field === 'job' ? (
                   <>
                     <Select
@@ -306,7 +387,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                 ) : (
                   <Input
                     id={field}
-                    type={field === 'bday' ? 'date' : 'text'}
+                    type="text" // Removed type="date"
                     value={data[field] || ''}
                     onChange={(e) => handleChange(field, e.target.value)}
                     className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
@@ -316,8 +397,10 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                 {/* Error message mapping */}
                 {errors[field] && !isOptional && (
                   <p className="text-xs text-destructive font-medium mt-1">
-                    {field === 'bday' && data[field]
-                      ? t('q.t.personal.ageError', 'You must be at least 15 years old.')
+                    {field === 'bday' 
+                      ? (data[field]?.length === 10 // If length is exactly 10 (YYYY-MM-DD), but fails validation, it's the age error
+                          ? t('q.t.personal.ageError', 'You must be at least 15 years old.')
+                          : t('q.t.personal.incompleteDate', 'Bitte vollständiges Datum eingeben.'))
                       : t('q.common.required')}
                   </p>
                 )}

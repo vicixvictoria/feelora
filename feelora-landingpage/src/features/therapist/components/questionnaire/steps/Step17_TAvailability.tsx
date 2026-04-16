@@ -3,16 +3,18 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
+import { Loader2 } from 'lucide-react';
 
 interface AvailabilityStepProps {
   onNext: () => void;
   onBack: () => void;
   data: string[];
   onDataChange: (data: string[]) => void;
+  isLoading?: boolean;
 }
 
 // Step Component
-const Step17_Availability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
+const Step17_Availability = ({ onNext, onBack, data, onDataChange, isLoading = false }: AvailabilityStepProps) => {
   const { t, i18n } = useTranslation(); // Brought in i18n to track language changes
   const safeData = data || [];
 
@@ -21,9 +23,9 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
     return z.object({
       selection: z.array(z.string()).min(1, t('q.common.selectAtLeastOne')),
     });
-  }, [t, i18n.language]); // i18n.language forces Zod to update the error text on language switch!
+  }, [t, i18n.language]); // i18n.language forces Zod to update the error text on language switch
 
-  // 2. Initialize validation hook
+  // Initialize validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { selection: safeData },
     schema: step17Schema,
@@ -51,7 +53,18 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
   };
 
   return (
-    <div className="max-w-2xl mx-auto animate-fade-in">
+    <div className="max-w-2xl mx-auto animate-fade-in relative">
+     
+      {/* --- LOADING OVERLAY --- */}
+      {isLoading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-2xl animate-in fade-in duration-200">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="mt-4 text-foreground font-medium text-lg">
+            {t('q.common.creatingProfile', 'Profil wird erstellt...')}
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.availability.title')}</h1>
@@ -77,6 +90,7 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
                 key={day.id}
                 type="button"
                 onClick={() => handleToggle(day.id)}
+                disabled={isLoading} // Prevent toggling while loading
                 className={`w-16 h-16 rounded-xl text-lg font-medium transition-all duration-200 ${
                   isSelected
                     ? 'bg-purple-100 text-purple border-2 border-purple-600 shadow-md' // Brighter bg, purple border
@@ -92,8 +106,10 @@ const Step17_Availability = ({ onNext, onBack, data, onDataChange }: Availabilit
         </div>
       </div>
 
-      {/* Swap onNext for validateAndNext */}
-      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+     {/* Fade out buttons slightly and block clicks while loading */}
+      <div className={isLoading ? 'pointer-events-none opacity-50' : ''}>
+        <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      </div>
     </div>
   );
 };

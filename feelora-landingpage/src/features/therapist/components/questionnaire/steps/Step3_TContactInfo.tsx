@@ -1,9 +1,18 @@
+import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
+import { Country, City } from 'country-state-city';
 
 interface ContactInfoStepProps {
   onNext: () => void;
@@ -33,13 +42,37 @@ const step3Schema = z.object({
 const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
   const { t } = useTranslation();
 
+  // Load all countries once
+  const countries = useMemo(() => Country.getAllCountries(), []);
+
+  // Dynamically load cities based on the currently selected country ISO code
+  const availableCities = useMemo(() => {
+    if (!data.country) return [];
+    
+    const allCities = City.getCitiesOfCountry(data.country) || [];
+    
+    // Filter out duplicate city names using a Set
+    const uniqueCities = [];
+    const seenNames = new Set();
+
+    for (const city of allCities) {
+      if (!seenNames.has(city.name)) {
+        seenNames.add(city.name);
+        uniqueCities.push(city);
+      }
+    }
+
+    return uniqueCities;
+  }, [data.country]);
+
+  // Order matters for the layout
   const fieldLabels: Record<string, string> = {
     phone: t('q.t.contact.phone'),
     email: t('q.t.contact.email'),
+    country: t('q.t.contact.country'), // Moved up so it sits before City
     city: t('q.t.contact.city'),
     address: t('q.t.contact.address'),
     postalCode: t('q.t.contact.postalCode'),
-    country: t('q.t.contact.country'),
   };
 
   // Initialize the validation hook
@@ -52,6 +85,12 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
   const handleChange = (field: string, value: string) => {
     clearError(field);
     onDataChange({ ...data, [field]: value });
+  };
+
+  const handleCountryChange = (isoCode: string) => {
+    clearError('country');
+    // If the country changes, wipe the previously selected 
+    onDataChange({ ...data, country: isoCode, city: '' });
   };
 
   return (
@@ -80,7 +119,6 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   htmlFor={field}
                   className={errors[field] ? 'text-destructive' : 'text-foreground'}
                 >
-                  {/* Show asterisk if required and errored, show (optional) text if optional */}
                   {fieldLabels[field]} {!isOptional && errors[field] && '*'}
                   {isOptional && (
                     <span className="text-muted-foreground font-normal text-xs ml-1">
@@ -89,19 +127,71 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   )}
                 </Label>
 
-                <Input
-                  id={field}
-                  type={field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
-                  value={data[field] || ''}
-                  onChange={(e) => handleChange(field, e.target.value)}
-                  className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                />
+                {/* Conditional Rendering for Country and City Dropdowns */}
+                {field === 'country' ? (
+                  <Select
+                    value={data[field] || ''}
+                    onValueChange={handleCountryChange}
+                  >
+                    <SelectTrigger
+                      className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                    >
+                      <SelectValue placeholder={t('q.common.pleaseSelect', 'Bitte auswählen')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50 max-h-64">
+                      {countries.map((country) => (
+                        <SelectItem key={country.isoCode} value={country.isoCode}>
+                          {country.flag} {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : field === 'city' ? (
+                  <Select
+                    value={data[field] || ''}
+                    onValueChange={(val) => handleChange(field, val)}
+                    disabled={!data.country} // Disabled until a country is selected
+                  >
+                    <SelectTrigger
+                      className={`bg-background disabled:opacity-50 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                    >
+                      <SelectValue
+                        placeholder={
+                          data.country
+                            ? t('q.common.pleaseSelect', 'Bitte auswählen')
+                            : t('q.t.contact.selectCountryFirst', 'Zuerst Land wählen')
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50 max-h-64">
+                      {availableCities.length > 0 ? (
+                        availableCities.map((city) => (
+                          <SelectItem key={city.name} value={city.name}>
+                            {city.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground text-center">
+                          Keine Städte gefunden
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={field}
+                    type={field === 'email' ? 'email' : field === 'phone' ? 'tel' : 'text'}
+                    value={data[field] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                )}
 
                 {/* Error messages */}
                 {errors[field] && field === 'email' && (
                   <p className="text-[0.8rem] text-destructive">{t('q.common.invalidEmail')}</p>
                 )}
-                {errors[field] && !isOptional && (
+                {errors[field] && !isOptional && field !== 'email' && (
                   <p className="text-[0.8rem] text-destructive">{t('q.common.required')}</p>
                 )}
               </div>

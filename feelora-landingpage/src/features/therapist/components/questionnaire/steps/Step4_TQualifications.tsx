@@ -3,6 +3,13 @@ import { Upload, Check, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
@@ -53,9 +60,34 @@ const step4Schema = z
 const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: QualificationsStepProps) => {
   const { t } = useTranslation();
 
-  // local uploading state and initialize hook
+  // --- Predefined Titles ---
+  const predefinedTitles = [
+    t('q.t.personal.titles.dr_med', 'Dr. med.'),
+    t('q.t.personal.titles.dr_rer_nat', 'Dr. rer. nat.'),
+    t('q.t.personal.titles.dr_phil', 'Dr. phil.'),
+    t('q.t.personal.titles.dr', 'Dr.'),
+    t('q.t.personal.titles.prof_dr', 'Prof. Dr.'),
+    t('q.t.personal.titles.dipl_psych', 'Dipl.-Psych.'),
+    t('q.t.personal.titles.dipl_paed', 'Dipl.-Päd.'),
+    t('q.t.personal.titles.m_sc', 'M.Sc.'),
+    t('q.t.personal.titles.b_sc', 'B.Sc.'),
+    t('q.t.personal.titles.m_a', 'M.A.'),
+  ];
+
+  // Local uploading state and initialize hook
   const [isUploading, setIsUploading] = useState(false);
   const { upload } = useS3Upload();
+
+  // --- Track custom inputs for BOTH Prefix and Suffix ---
+  const [isCustomPrefix, setIsCustomPrefix] = useState(() => {
+    if (!data.titlePrefix) return false;
+    return !predefinedTitles.includes(data.titlePrefix);
+  });
+
+  const [isCustomSuffix, setIsCustomSuffix] = useState(() => {
+    if (!data.titleSuffix) return false;
+    return !predefinedTitles.includes(data.titleSuffix);
+  });
 
   // Initialize Validation Hook
   const { errors, validateAndNext, clearError } = useStepValidation({
@@ -65,7 +97,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
   });
 
   const handleChange = (field: string, value: string) => {
-    // If user types in either title, clear errors for BOTH titles since the condition is met
+    // If user types in either title, clear errors for both titles since the condition is met
     if (field === 'titlePrefix' || field === 'titleSuffix') {
       clearError('titlePrefix');
       clearError('titleSuffix');
@@ -83,15 +115,9 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
 
     try {
       setIsUploading(true);
-
-      // 1. Force the filename to be exactly "license" to pass backend validation
       const fileToUpload = new File([file], 'license', { type: file.type });
-
-      // 2. Upload using 'private' visibility (which is allowed for 'license')
       await upload(fileToUpload, 'private');
-
       clearError('idFileName');
-      // 3. Save the original file name in the form data so the UI still looks nice for the user
       handleChange('idFileName', file.name);
     } catch (error) {
       console.error('Upload failed:', error);
@@ -122,26 +148,70 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="space-y-2">
+          
+          {/* --- TITLE PREFIX DROPDOWN --- */}
+          <div className="space-y-2 flex flex-col">
             <Label
               htmlFor="titlePrefix"
               className={errors.titlePrefix ? 'text-destructive' : 'text-foreground'}
             >
               {t('q.t.qualifications.titlePrefix')} {errors.titlePrefix && '*'}
             </Label>
-            <Input
-              id="titlePrefix"
-              type="text"
-              value={data.titlePrefix || ''}
-              onChange={(e) => handleChange('titlePrefix', e.target.value)}
-              className={`bg-background ${errors.titlePrefix ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
+            
+            <Select
+              value={isCustomPrefix ? 'other' : data.titlePrefix ? data.titlePrefix : 'none'}
+              onValueChange={(value) => {
+                if (value === 'other') {
+                  setIsCustomPrefix(true);
+                  handleChange('titlePrefix', ''); // Clear so they can type
+                } else if (value === 'none') {
+                  setIsCustomPrefix(false);
+                  handleChange('titlePrefix', ''); // Clear string in data
+                } else {
+                  setIsCustomPrefix(false);
+                  handleChange('titlePrefix', value);
+                }
+              }}
+            >
+              <SelectTrigger
+                className={`bg-background ${errors.titlePrefix && !isCustomPrefix ? 'border-destructive ring-destructive' : ''}`}
+              >
+                <SelectValue placeholder={t('q.t.personal.titlePlaceholder', 'Titel auswählen')} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="none">
+                  {t('q.t.personal.noTitle', '(Keinen Titel angeben)')}
+                </SelectItem>
+                {predefinedTitles.map((tItem) => (
+                  <SelectItem key={tItem} value={tItem}>
+                    {tItem}
+                  </SelectItem>
+                ))}
+                <SelectItem value="other">
+                  {t('q.t.personal.titleOther', 'Sonstiges (Eigene Eingabe)')}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Custom Input for Prefix */}
+            {isCustomPrefix && (
+              <Input
+                id="titlePrefix-custom"
+                type="text"
+                value={data.titlePrefix || ''}
+                onChange={(e) => handleChange('titlePrefix', e.target.value)}
+                placeholder={t('q.t.personal.customTitlePlaceholder', 'Bitte Titel eingeben...')}
+                className={`mt-2 bg-background ${errors.titlePrefix ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
+            )}
+
             {errors.titlePrefix && (
               <p className="text-xs text-destructive">{t('q.t.qualifications.titleRequired')}</p>
             )}
           </div>
 
-          <div className="space-y-2">
+          {/* --- TITLE SUFFIX DROPDOWN --- */}
+          <div className="space-y-2 flex flex-col">
             <Label
               htmlFor="titleSuffix"
               className={errors.titleSuffix ? 'text-destructive' : 'text-foreground'}
@@ -151,15 +221,56 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                 ({t('q.common.optional')})
               </span>
             </Label>
-            <Input
-              id="titleSuffix"
-              type="text"
-              value={data.titleSuffix || ''}
-              onChange={(e) => handleChange('titleSuffix', e.target.value)}
-              className={`bg-background ${errors.titleSuffix ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
+
+            <Select
+              value={isCustomSuffix ? 'other' : data.titleSuffix ? data.titleSuffix : 'none'}
+              onValueChange={(value) => {
+                if (value === 'other') {
+                  setIsCustomSuffix(true);
+                  handleChange('titleSuffix', ''); 
+                } else if (value === 'none') {
+                  setIsCustomSuffix(false);
+                  handleChange('titleSuffix', ''); 
+                } else {
+                  setIsCustomSuffix(false);
+                  handleChange('titleSuffix', value);
+                }
+              }}
+            >
+              <SelectTrigger
+                className={`bg-background ${errors.titleSuffix && !isCustomSuffix ? 'border-destructive ring-destructive' : ''}`}
+              >
+                <SelectValue placeholder={t('q.t.personal.titlePlaceholder', 'Titel auswählen')} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="none">
+                  {t('q.t.personal.noTitle', '(Keinen Titel angeben)')}
+                </SelectItem>
+                {predefinedTitles.map((tItem) => (
+                  <SelectItem key={tItem} value={tItem}>
+                    {tItem}
+                  </SelectItem>
+                ))}
+                <SelectItem value="other">
+                  {t('q.t.personal.titleOther', 'Sonstiges (Eigene Eingabe)')}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Custom Input for Suffix */}
+            {isCustomSuffix && (
+              <Input
+                id="titleSuffix-custom"
+                type="text"
+                value={data.titleSuffix || ''}
+                onChange={(e) => handleChange('titleSuffix', e.target.value)}
+                placeholder={t('q.t.personal.customTitlePlaceholder', 'Bitte Titel eingeben...')}
+                className={`mt-2 bg-background ${errors.titleSuffix ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
+            )}
           </div>
 
+          {/* Default Inputs for Title From */}
           <div className="space-y-2">
             <Label htmlFor="titleFromPrefix" className="text-foreground">
               {t('q.t.qualifications.titleFromPrefix')}
@@ -241,7 +352,6 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
                   : 'border-muted-foreground/30 hover:border-primary/50'
               }`}
             >
-              {/* Dropzone UI to handle the uploading state */}
               {isUploading ? (
                 <div className="flex flex-col items-center gap-2 text-primary">
                   <Loader2 className="w-8 h-8 animate-spin" />
@@ -282,7 +392,6 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
         </div>
       </div>
 
-      {/* Disable "Next" if a file is currently uploading to prevent skipped steps */}
       <div className={isUploading ? 'pointer-events-none opacity-50' : ''}>
         <NavigationButtons onNext={validateAndNext} onBack={onBack} />
       </div>

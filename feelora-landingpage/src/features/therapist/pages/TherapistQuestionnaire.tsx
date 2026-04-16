@@ -55,7 +55,7 @@ const initialData: TherapistQuestionnaireData = {
 
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [, setIsIntermediateLoading] = useState(false);
+  const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
   const { logout } = useAuth();
 
   // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
@@ -285,10 +285,11 @@ const TherapistQuestionnaire = () => {
       case 17:
         return (
           <AvailabilityStep
-            onNext={handleCreateTherapistProfile} // Intermediate submission to create profile before final questionnaire submission
+            onNext={handleCreateTherapistProfile} // This step creates the therapist profile with the current data before moving to summary
             onBack={goBack}
             data={data.availability}
             onDataChange={(newData) => updateField('availability', newData)}
+            isLoading={isIntermediateLoading} 
           />
         );
       case 18:
