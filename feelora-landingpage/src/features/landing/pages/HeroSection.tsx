@@ -52,7 +52,7 @@ export function HeroSection() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => navigate('/loginTherapist')}
+            onClick={() => navigate('/login')}
             className="bg-white/80 backdrop-blur-sm text-gray-800 border-gray-300 hover:bg-white hover:border-gray-400 font-normal text-base px-8 py-6"
           >
             {t('hero.cta.therapistsReg')}

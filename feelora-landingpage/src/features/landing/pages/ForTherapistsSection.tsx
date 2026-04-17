@@ -16,7 +16,7 @@ export function ForTherapistsSection() {
   });
 
   const handleLoginClickTherapist = () => {
-    navigate('/loginTherapist');
+    navigate('/login');
   };
 
   const features = [

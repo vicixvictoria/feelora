@@ -27,6 +27,7 @@ import { AboutUsPage } from './features/landing/pages/AboutUsPage';
 import { PrivacyPolicyPage } from './features/landing/pages/PrivacyPolicyPage';
 import { SupportPage } from './features/landing/pages/SupportPage';
 import LoginPage from './features/auth/LoginPageNew';
+import UnifiedLoginPage from './features/auth/UnifiedLoginPage';
 import AuthCallback from './features/auth/AuthCallback';
 
 // --- PATIENT DASHBOARD Imports ---
@@ -129,7 +130,7 @@ const router = createBrowserRouter([
         children: [
           { path: '/', element: <HomePage /> },
           { path: '/about', element: <AboutUsPage /> },
-          { path: '/login', element: <LoginPage userType="user" /> },
+          { path: '/login', element: <UnifiedLoginPage /> },
           { path: '/loginTherapist', element: <LoginPage userType="therapist" /> },
           { path: '/auth/callback', element: <AuthCallback /> },
           { path: '/privacy', element: <PrivacyPolicyPage /> },
