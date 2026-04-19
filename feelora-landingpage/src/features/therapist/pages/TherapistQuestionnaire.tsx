@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
@@ -56,7 +56,7 @@ const initialData: TherapistQuestionnaireData = {
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
