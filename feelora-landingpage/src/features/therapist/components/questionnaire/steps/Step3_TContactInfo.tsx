@@ -1,13 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
@@ -41,29 +34,49 @@ const step3Schema = z.object({
 
 const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
   const { t } = useTranslation();
+  const [countryQuery, setCountryQuery] = useState(() => {
+    if (!data.country) return '';
+    return Country.getCountryByCode(data.country)?.name || '';
+  });
+  const [isCountryFocused, setIsCountryFocused] = useState(false);
+  const [isCityFocused, setIsCityFocused] = useState(false);
 
-  // Load all countries once
-  const countries = useMemo(() => Country.getAllCountries(), []);
+  const availableCountries = useMemo(() => {
+    const query = countryQuery.trim().toLowerCase();
+    if (query.length < 2) return [];
 
-  // Dynamically load cities based on the currently selected country ISO code
+    const allCountries = Country.getAllCountries();
+    return allCountries
+      .filter((country) => country.name.toLowerCase().startsWith(query))
+      .slice(0, 20);
+  }, [countryQuery]);
+
+  // Lazily load and filter cities only when the user has typed enough characters.
   const availableCities = useMemo(() => {
     if (!data.country) return [];
-    
+
+    const query = (data.city || '').trim().toLowerCase();
+    if (query.length < 2) return [];
+
     const allCities = City.getCitiesOfCountry(data.country) || [];
-    
-    // Filter out duplicate city names using a Set
-    const uniqueCities = [];
-    const seenNames = new Set();
+    const uniqueCities: string[] = [];
+    const seenNames = new Set<string>();
 
     for (const city of allCities) {
-      if (!seenNames.has(city.name)) {
-        seenNames.add(city.name);
-        uniqueCities.push(city);
+      const name = city.name?.trim();
+      if (!name || seenNames.has(name)) continue;
+
+      seenNames.add(name);
+      if (name.toLowerCase().startsWith(query)) {
+        uniqueCities.push(name);
       }
+
+      // Keep rendering cheap even for very large countries.
+      if (uniqueCities.length >= 50) break;
     }
 
     return uniqueCities;
-  }, [data.country]);
+  }, [data.country, data.city]);
 
   // Order matters for the layout
   const fieldLabels: Record<string, string> = {
@@ -89,6 +102,7 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
 
   const handleCountryChange = (isoCode: string) => {
     clearError('country');
+    clearError('city');
     // If the country changes, wipe the previously selected 
     onDataChange({ ...data, country: isoCode, city: '' });
   };
@@ -129,54 +143,99 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
 
                 {/* Conditional Rendering for Country and City Dropdowns */}
                 {field === 'country' ? (
-                  <Select
-                    value={data[field] || ''}
-                    onValueChange={handleCountryChange}
-                  >
-                    <SelectTrigger
-                      className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
-                    >
-                      <SelectValue placeholder={t('q.common.pleaseSelect', 'Bitte auswählen')} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50 max-h-64">
-                      {countries.map((country) => (
-                        <SelectItem key={country.isoCode} value={country.isoCode}>
-                          {country.flag} {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <Input
+                      id={field}
+                      type="text"
+                      value={countryQuery}
+                      placeholder={t('q.common.pleaseSelect', 'Bitte auswählen')}
+                      onChange={(e) => {
+                        const nextQuery = e.target.value;
+                        setCountryQuery(nextQuery);
+
+                        // User is typing a new country, so clear selected country and city.
+                        clearError('country');
+                        clearError('city');
+                        onDataChange({ ...data, country: '', city: '' });
+                      }}
+                      onFocus={() => setIsCountryFocused(true)}
+                      onBlur={() => {
+                        setTimeout(() => setIsCountryFocused(false), 100);
+                      }}
+                      className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    />
+
+                    {isCountryFocused && countryQuery.trim().length >= 2 && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-56 overflow-auto">
+                        {availableCountries.length > 0 ? (
+                          availableCountries.map((country) => (
+                            <button
+                              key={country.isoCode}
+                              type="button"
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setCountryQuery(country.name);
+                                handleCountryChange(country.isoCode);
+                                setIsCountryFocused(false);
+                              }}
+                            >
+                              {country.flag} {country.name}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-muted-foreground text-center">
+                            Keine Länder gefunden
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : field === 'city' ? (
-                  <Select
-                    value={data[field] || ''}
-                    onValueChange={(val) => handleChange(field, val)}
-                    disabled={!data.country} // Disabled until a country is selected
-                  >
-                    <SelectTrigger
-                      className={`bg-background disabled:opacity-50 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
-                    >
-                      <SelectValue
-                        placeholder={
-                          data.country
-                            ? t('q.common.pleaseSelect', 'Bitte auswählen')
-                            : t('q.t.contact.selectCountryFirst', 'Zuerst Land wählen')
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50 max-h-64">
-                      {availableCities.length > 0 ? (
-                        availableCities.map((city) => (
-                          <SelectItem key={city.name} value={city.name}>
-                            {city.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="p-2 text-sm text-muted-foreground text-center">
-                          Keine Städte gefunden
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <Input
+                      id={field}
+                      type="text"
+                      value={data[field] || ''}
+                      disabled={!data.country}
+                      placeholder={
+                        data.country
+                          ? t('q.common.pleaseSelect', 'Bitte auswählen')
+                          : t('q.t.contact.selectCountryFirst', 'Zuerst Land wählen')
+                      }
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      onFocus={() => setIsCityFocused(true)}
+                      onBlur={() => {
+                        setTimeout(() => setIsCityFocused(false), 100);
+                      }}
+                      className={`bg-background disabled:opacity-50 ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    />
+
+                    {isCityFocused && data.country && (data.city || '').trim().length >= 2 && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-56 overflow-auto">
+                        {availableCities.length > 0 ? (
+                          availableCities.map((cityName) => (
+                            <button
+                              key={cityName}
+                              type="button"
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleChange(field, cityName);
+                                setIsCityFocused(false);
+                              }}
+                            >
+                              {cityName}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-muted-foreground text-center">
+                            Keine Städte gefunden
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <Input
                     id={field}
