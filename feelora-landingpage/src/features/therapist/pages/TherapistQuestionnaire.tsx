@@ -67,6 +67,7 @@ const TherapistQuestionnaire = () => {
   // -- FORCE COMPLETION STEP FOR PENDING THERAPISTS ---
   // If the backend says this user is a Pending Therapist (type:P), 
   // force them directly to the completion step, regardless of what localStorage says.
+  /*
   useEffect(() => {
     const isPendingTherapist = user?.groups?.includes('type:P');
     
@@ -74,7 +75,7 @@ const TherapistQuestionnaire = () => {
       setCurrentStep(19);
     }
   }, [user, currentStep, setCurrentStep]);
-
+  */
   
   // Allow going to the next step
   const goNext = () => {
