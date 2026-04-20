@@ -111,6 +111,17 @@ const THERAPIST_GET_MOOD_TRACKERS_QUERY = gql`
   }
 `;
 
+// -- Get full questionnaire data for a therapist 
+const GET_QUESTIONNAIRE_QUERY = gql`
+  query GetQuestionnaire {
+    getQuestionnaire {
+      Id
+      Type
+      Questionnaire
+    }
+  }
+`;
+
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
@@ -307,4 +318,21 @@ export const therapistService = {
       return { trackers: [], hasConsent: true }; // Return true for standard network drops to avoid false locked states
     }
   },
+
+  // -- Fetch the full questionnaire data for the therapist --
+  getQuestionnaire: async (): Promise<{ Id: string; Type: string; Questionnaire: string } | null> => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_QUESTIONNAIRE_QUERY,
+        fetchPolicy: 'network-only', // Important to get the latest status from DB
+      });
+      return data.getQuestionnaire;
+    } catch (error) {
+      // If the user hasn't submitted yet, the backend might throw an error 
+      // or return null depending on your AppSync resolver setup.
+      console.log('No questionnaire found or error fetching:', error);
+      return null;
+    }
+  },
+
 };

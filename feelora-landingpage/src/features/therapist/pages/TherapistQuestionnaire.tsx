@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
@@ -22,6 +22,7 @@ import AdditionalInfoStep from '../components/questionnaire/steps/Step16_TAdditi
 import AvailabilityStep from '../components/questionnaire/steps/Step17_TAvailability';
 import SummaryStep from '../components/questionnaire/steps/Step18_TSummary';
 import CompletionStep from '../components/questionnaire/steps/Step19_TCompletion';
+import { Loader2 } from 'lucide-react'; // Added Loader2 for the initial check
 
 import { therapistService } from '../api/therapist-service';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
@@ -56,27 +57,47 @@ const initialData: TherapistQuestionnaireData = {
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
+  
+  // State to block rendering while checking backend status
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true); 
+  
   const { logout } = useAuth();
 
-  // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
-    usePersistedQuestionnaire<TherapistQuestionnaireData>('feelora_therapist_v1', initialData); // The storage key "feelora_therapist_v1" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
+    usePersistedQuestionnaire<TherapistQuestionnaireData>('feelora_therapist_v1', initialData); 
 
   const totalSteps = 19; // Welcome + 18 questions
 
-  // -- FORCE COMPLETION STEP FOR PENDING THERAPISTS ---
-  // If the backend says this user is a Pending Therapist (type:P), 
-  // force them directly to the completion step, regardless of what localStorage says.
-  /*
+  // --- CHECK EXISTING QUESTIONNAIRE STATUS ON MOUNT ---
   useEffect(() => {
-    const isPendingTherapist = user?.groups?.includes('type:P');
-    
-    if (isPendingTherapist && currentStep !== 19) {
-      setCurrentStep(19);
-    }
-  }, [user, currentStep, setCurrentStep]);
-  */
-  
+    let mounted = true;
+
+    const checkQuestionnaireStatus = async () => {
+      try {
+        const existingData = await therapistService.getQuestionnaire();
+        
+        // If the backend returned a questionnaire, they already completed it. --> Jump directly to the completion step
+        if (mounted && existingData && existingData.Questionnaire) {
+          setCurrentStep(19);
+        }
+      } catch (error) {
+        // If it fails or returns null, they haven't finished. 
+        // Do nothing and let local storage / currentStep handle where they left off.
+        console.log('No existing questionnaire found, starting fresh or from local cache.');
+      } finally {
+        if (mounted) {
+          setIsCheckingStatus(false);
+        }
+      }
+    };
+
+    checkQuestionnaireStatus();
+
+    return () => {
+      mounted = false; // Cleanup to prevent state updates if unmounted
+    };
+  }, [setCurrentStep]);
+
   // Allow going to the next step
   const goNext = () => {
     if (currentStep < totalSteps) {
@@ -97,9 +118,8 @@ const TherapistQuestionnaire = () => {
   };
 
   const restart = () => {
-    clearProgress(); // Clear local storage AND state
+    clearProgress(); 
     setCurrentStep(0);
-    // Since state is tied to localStorage, reload to reset everything
     window.location.reload();
   };
 
@@ -145,6 +165,15 @@ const TherapistQuestionnaire = () => {
       setIsIntermediateLoading(false);
     }
   };
+
+  // --- Show full-page loader while checking backend status ---
+  if (isCheckingStatus) {
+    return (
+      <div className="min-h-screen bg-question-bg flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   // Render the current step based on currentStep state
   const renderStep = () => {
@@ -298,7 +327,7 @@ const TherapistQuestionnaire = () => {
       case 17:
         return (
           <AvailabilityStep
-            onNext={handleCreateTherapistProfile} // This step creates the therapist profile with the current data before moving to summary
+            onNext={handleCreateTherapistProfile} 
             onBack={goBack}
             data={data.availability}
             onDataChange={(newData) => updateField('availability', newData)}
@@ -308,11 +337,11 @@ const TherapistQuestionnaire = () => {
       case 18:
         return (
           <SummaryStep
-            onNext={handleSubmit} // This will handle the final submission of the questionnaire
+            onNext={handleSubmit} 
             onBack={goBack}
             onEdit={goToStep}
             data={data}
-            isLoading={isSubmitting} // Passes loading state to UI
+            isLoading={isSubmitting} 
           />
         );
       case 19:
