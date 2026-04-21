@@ -65,7 +65,7 @@ function UnifiedLoginPage() {
       </div>
 
       <p className="mt-12 text-gray-500 text-sm">
-        {t('login.termsAndConditions.start')} <a href="/terms" className="underline">{t('login.termsAndConditions.terms')}</a> {t('login.termsAndConditions.and')} <a href="/privacy" className="underline">{t('login.termsAndConditions.conditions')}</a>.
+        {t('login.termsAndConditions.start')} <a href="/privacy" className="underline">{t('login.termsAndConditions.terms')}</a> {t('login.termsAndConditions.and')} <a href="/privacy" className="underline">{t('login.termsAndConditions.conditions')}</a>.
       </p>
     </div>
   );

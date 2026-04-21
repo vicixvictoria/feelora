@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { patientService } from '../api/patient-service';
+import { notificationService } from '../../notifications/api/notification-service';
 import { useS3Download } from '@/hooks/use-s3-download';
 
 // --- Interface for the Sidebar ---
@@ -163,6 +164,12 @@ const ChatPage = () => {
           setMessages(latestMessages);
         })
         .catch((err) => console.error('Failed to auto-update active chat messages:', err));
+
+        //  Instantly mark incoming messages in the active chat as read ---
+      notificationService.readNotification({
+        notificationType: 'new_message',
+        notificationId: selectedChat.conversationId,
+      }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
   }, [websocketMessages, selectedChat]);
   
@@ -220,6 +227,15 @@ const ChatPage = () => {
         delete next[conversationId];
         return next;
       });
+      // Tell the backend we read the messages when opening the chat ---
+      try {
+        await notificationService.readNotification({
+          notificationType: 'new_message',
+          notificationId: conversationId,
+        });
+      } catch (err) {
+        console.error('Failed to mark messages as read on the server:', err);
+      }
     }
 
     if (!chat.conversationId) return;

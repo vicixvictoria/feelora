@@ -868,6 +868,8 @@
   "patient.dashboard.outdoor": "Aktivität",
   "patient.dashboard.physical": "Körperlich",
   "patient.dashboard.details": "Details",
+  "patient.dashboard.noMoodData": "Keine Mood Tracker Daten verfügbar",
+  "patient.dashboard.newMoodData": "Erstelle den ersten Mood Tracker Eintrag",
   "patient.calendar.sun": "SO",
   "patient.calendar.mon": "MO",
   "patient.calendar.tue": "DI",

@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { ArrowLeftIcon, ShieldIcon, FileTextIcon, CookieIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -8,10 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 export function PrivacyPolicyPage() {
   const { t } = useTranslation();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
 
   const [activeSection, setActiveSection] = useState<'privacy' | 'terms' | 'cookies'>('privacy');
 
@@ -60,12 +55,12 @@ export function PrivacyPolicyPage() {
         </div>
       </section>
 
-      <section ref={ref} className="py-12 px-8 bg-background">
+      <section className="py-12 px-8 bg-background">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
             {activeSection === 'privacy' && <PrivacySection />}
             {activeSection === 'terms' && <TermsSection />}

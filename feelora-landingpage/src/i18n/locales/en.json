@@ -869,6 +869,8 @@
   "patient.dashboard.outdoor": "Activity",
   "patient.dashboard.physical": "Physical",
   "patient.dashboard.details": "Details",
+  "patient.dashboard.noMoodData": "No mood tracker data available",
+  "patient.dashboard.newMoodData": "Create first Mood Tracker entry",
   "patient.calendar.sun": "SUN",
   "patient.calendar.mon": "MON",
   "patient.calendar.tue": "TUE",

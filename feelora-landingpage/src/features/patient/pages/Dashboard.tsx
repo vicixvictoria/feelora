@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Calendar, Send, Smile, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useMemo } from 'react';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { patientService } from '../api/patient-service';
+import { notificationService } from '../../notifications/api/notification-service'; // <-- Imported Notification Service
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
 
 interface IncomingNotification {
@@ -32,69 +32,59 @@ const formatDate = (isoString: string) => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { messages } = useWebsocket();
+  const { messages: websocketMessages } = useWebsocket();
 
-  const unreadChatCount = useMemo(() => {
-    const unreadByConversation = new Map<string, number>();
-
-    for (const message of messages) {
-      const parsed = message as IncomingNotification;
-      if (parsed.type !== 'notification' || parsed.data?.type !== 'new_message') continue;
-
-      const conversationId = parsed.data.conversationId;
-      if (!conversationId) continue;
-
-      const fallbackCount = (unreadByConversation.get(conversationId) ?? 0) + 1;
-      const count = typeof parsed.data.count === 'number' ? parsed.data.count : fallbackCount;
-      unreadByConversation.set(conversationId, Math.max(0, count));
-    }
-
-    return Array.from(unreadByConversation.values()).reduce((total, count) => total + count, 0);
-  }, [messages]);
-
-  const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
-    count: unreadChatCount,
-    defaultValue: unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
-  });
+  // --- Notification State ---
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [isMarkingRead, setIsMarkingRead] = useState(false);
+  const processedMessageCountRef = useRef(0);
 
   // State for dynamically loaded mood trackers
   const [moodDiary, setMoodDiary] = useState<any[]>([]);
   const [isLoadingMoods, setIsLoadingMoods] = useState(true);
 
-  //State for the mood tracker consent toggle
+  // State for the mood tracker consent toggle
   const [isShared, setIsShared] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  // Fetch data on load
+  // --- Fetch True Data on Load (Profile, Moods, and Notifications) ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoadingMoods(true);
       try {
-        // Fetch Profile to get initial consent status
-        const profile = await patientService.getProfile();
-        // Fallback to false if undefined
+        // Run all API calls in parallel for better performance
+        const [profile, trackers, notifs] = await Promise.all([
+          patientService.getProfile(),
+          patientService.getMoodTrackers(),
+          notificationService.getNotifications({ notificationType: 'new_message' }) // Get real unread count
+        ]);
+
+        // Set Consent
         setIsShared(profile.MoodTracker ?? false);
 
-        // Fetch mood trackers
-        const trackers = await patientService.getMoodTrackers();
-
-        // Map backend data to the format our UI needs
+        // Format & Set Moods
         const formattedTrackers = trackers.map((item: any) => {
           const questionnaire = JSON.parse(item.Questionnaire);
           return {
             date: formatDate(item.CreatedAt),
             status: t('patient.dashboard.statusSeen', 'Gespeichert'),
-            // Look up the emoji using the first selected answer for that category, or provide a fallback
-            mood: emojiDictionary[questionnaire[0]?.[0]] || '❓', // Category 0: Mood
-            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '❓', // Category 3: Activity
-            physical: emojiDictionary[questionnaire[4]?.[0]] || '❓', // Category 4: Physical
+            mood: emojiDictionary[questionnaire[0]?.[0]] || '❓', 
+            outdoor: emojiDictionary[questionnaire[3]?.[0]] || '❓', 
+            physical: emojiDictionary[questionnaire[4]?.[0]] || '❓', 
             fullQuestionnaire: questionnaire,
           };
         });
-
         setMoodDiary(formattedTrackers);
+
+        // Set Accurate Unread Notifications
+        let totalUnread = 0;
+        notifs.notifications.forEach((n) => {
+          totalUnread += n.count || 1;
+        });
+        setUnreadChatCount(totalUnread);
+
       } catch (error) {
-        console.error('Failed to load dashboard moods', error);
+        console.error('Failed to load dashboard data', error);
       } finally {
         setIsLoadingMoods(false);
       }
@@ -103,24 +93,76 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [t]);
 
-  //Handler for clicking the mood tracker consent toggle switch
+  // --- Listen to Websocket for Live Updates ---
+  useEffect(() => {
+    // Only process new messages we haven't seen yet
+    if (websocketMessages.length <= processedMessageCountRef.current) return;
+
+    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+    processedMessageCountRef.current = websocketMessages.length;
+
+    let newIncomingCount = 0;
+    for (const msg of newMessages) {
+      const parsed = msg as IncomingNotification;
+      if (parsed.type === 'notification' && parsed.data?.type === 'new_message') {
+        newIncomingCount += 1;
+      }
+    }
+
+    if (newIncomingCount > 0) {
+      setUnreadChatCount((prev) => prev + newIncomingCount);
+    }
+  }, [websocketMessages]);
+
+  // --- Mark All as Read Logic ---
+  const handleMarkAllAsRead = async () => {
+    if (unreadChatCount === 0 || isMarkingRead) return;
+    
+    setIsMarkingRead(true);
+    try {
+      // Fetch all unread message notifications
+      const { notifications } = await notificationService.getNotifications({ notificationType: 'new_message' });
+      
+      // Delete them all from the backend simultaneously
+      await Promise.all(
+        notifications.map((n) =>
+          notificationService.readNotification({
+            notificationType: 'new_message',
+            notificationId: n.conversationId || '', 
+          })
+        )
+      );
+
+      // Instantly reset the UI
+      setUnreadChatCount(0);
+    } catch (error) {
+      console.error('Failed to mark all as read', error);
+      alert('Fehler beim Markieren als gelesen.');
+    } finally {
+      setIsMarkingRead(false);
+    }
+  };
+
+  // Handler for clicking the mood tracker consent toggle switch
   const handleToggleShare = async () => {
     setIsToggling(true);
     const newConsentState = !isShared;
     try {
-      // Optimistically update the UI instantly - then save it
       setIsShared(newConsentState);
-      // Save it to the backend
       await patientService.updateMoodTrackerConsent(newConsentState);
     } catch (error) {
       console.error('Failed to update consent', error);
-      // If it fails, revert the switch back to its original state
       setIsShared(!newConsentState);
       alert('Fehler beim Speichern der Freigabe. Bitte versuche es erneut.');
     } finally {
       setIsToggling(false);
     }
   };
+
+  const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
+    count: unreadChatCount,
+    defaultValue: unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
+  });
 
   const notificationCards = [
     {
@@ -189,7 +231,14 @@ const Dashboard = () => {
 
       {/* Mark all as read button */}
       <div className="flex justify-center mb-10">
-        <button className="feelora-btn-primary px-8">{t('patient.dashboard.allRead')}</button>
+        <button 
+          onClick={handleMarkAllAsRead}
+          disabled={unreadChatCount === 0 || isMarkingRead}
+          className="feelora-btn-primary px-8 flex items-center gap-2 disabled:opacity-50 transition-opacity"
+        >
+          {isMarkingRead && <Loader2 className="w-4 h-4 animate-spin" />}
+          {t('patient.dashboard.allRead')}
+        </button>
       </div>
 
       {/* --- Mood Tracker Diary Header with Flexbox Toggle --- */}
@@ -209,13 +258,11 @@ const Dashboard = () => {
             aria-checked={isShared}
             onClick={handleToggleShare}
             disabled={isToggling || isLoadingMoods}
-            // Tailwind classes to build the animated pill shape
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               isShared ? 'bg-primary' : 'bg-border'
             } ${isToggling || isLoadingMoods ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className="sr-only">Toggle data sharing</span>
-            {/* The little sliding circle inside the pill */}
             <span
               aria-hidden="true"
               className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
@@ -233,9 +280,9 @@ const Dashboard = () => {
         </div>
       ) : moodDiary.length === 0 ? (
         <div className="feelora-card text-center p-8 border-dashed border-2">
-          <p className="text-muted-foreground text-lg mb-4">Noch keine Mood Tracker Einträge.</p>
-          <button onClick={() => navigate('/mood-tracker')} className="feelora-btn-outline">
-            Ersten Eintrag erstellen
+          <p className="text-muted-foreground text-lg mb-4">{t('patient.dashboard.noMoodData')}</p>
+          <button onClick={() => navigate('../mood-tracker')} className="feelora-btn-outline">
+            {t('patient.dashboard.newMoodData')}
           </button>
         </div>
       ) : (
