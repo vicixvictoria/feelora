@@ -138,8 +138,8 @@ const router = createBrowserRouter([
         ],
       },
       // Test routes
-      { path: '/test-therapist', element: <TherapistQuestionnaire /> },
-      { path: '/test-patient', element: <PatientQuestionnaire /> },
+     //{ path: '/test-therapist', element: <TherapistQuestionnaire /> },
+     //{ path: '/test-patient', element: <PatientQuestionnaire /> },
       // Patient protected routes
       {
         element: <RequireAuth allowedType="user" />,

@@ -7,6 +7,7 @@ import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
+import { notificationService } from '../../notifications/api/notification-service'; 
 
 // --- Interface for the Sidebar ---
 interface SidebarChat {
@@ -184,6 +185,12 @@ const TherapistChat = () => {
           setMessages(latestMessages);
         })
         .catch((err) => console.error('Failed to auto-update active chat messages:', err));
+
+        // Immediately mark incoming messages in the active chat as read ---
+      notificationService.readNotification({
+        notificationType: 'new_message',
+        notificationId: selectedChat.conversationId,
+      }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
 
   }, [websocketMessages, selectedChat]);
@@ -263,6 +270,14 @@ const TherapistChat = () => {
         delete next[conversationId];
         return next;
       });
+      try {
+        await notificationService.readNotification({
+          notificationType: 'new_message',
+          notificationId: conversationId, // Schema expects conversationId
+        });
+      } catch (err) {
+        console.error('Failed to mark messages as read on the server:', err);
+      }
     }
 
     if (!chat.conversationId) return;
