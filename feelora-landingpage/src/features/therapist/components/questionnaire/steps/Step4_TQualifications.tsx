@@ -72,6 +72,7 @@ const Step4_TQualifications = ({ onNext, onBack, data, onDataChange }: Qualifica
     t('q.t.personal.titles.m_sc', 'M.Sc.'),
     t('q.t.personal.titles.b_sc', 'B.Sc.'),
     t('q.t.personal.titles.m_a', 'M.A.'),
+    t('q.t.personal.titles.b_a', 'B.A.'),
   ];
 
   // Local uploading state and initialize hook

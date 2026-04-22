@@ -26,7 +26,6 @@ import { TestimonialsSection } from './features/landing/pages/TestimonialsSectio
 import { AboutUsPage } from './features/landing/pages/AboutUsPage';
 import { PrivacyPolicyPage } from './features/landing/pages/PrivacyPolicyPage';
 import { SupportPage } from './features/landing/pages/SupportPage';
-import LoginPage from './features/auth/LoginPageNew';
 import UnifiedLoginPage from './features/auth/UnifiedLoginPage';
 import AuthCallback from './features/auth/AuthCallback';
 
@@ -131,7 +130,7 @@ const router = createBrowserRouter([
           { path: '/', element: <HomePage /> },
           { path: '/about', element: <AboutUsPage /> },
           { path: '/login', element: <UnifiedLoginPage /> },
-          { path: '/loginTherapist', element: <LoginPage userType="therapist" /> },
+          { path: '/loginTherapist', element: <UnifiedLoginPage /> },
           { path: '/auth/callback', element: <AuthCallback /> },
           { path: '/privacy', element: <PrivacyPolicyPage /> },
           { path: '/support', element: <SupportPage /> },

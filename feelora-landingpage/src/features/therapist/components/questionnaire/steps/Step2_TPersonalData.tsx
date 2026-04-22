@@ -67,16 +67,12 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
 
   // Predefined Lists
   const predefinedJobs = [
-    t('q.t.personal.jobs.psych_pt', 'Psychologische/r Psychotherapeut:in'),
-    t('q.t.personal.jobs.med_pt', 'Ärztliche/r Psychotherapeut:in'),
-    t('q.t.personal.jobs.psychiatrist', 'Psychiater:in'),
-    t('q.t.personal.jobs.kjp', 'Kinder- und Jugendlichenpsychotherapeut:in (KJP)'),
-    t('q.t.personal.jobs.fachaerzt_psychosomatik', 'Fachärzt:in für Psychosomatische Medizin und Psychotherapie'),
-    t('q.t.personal.jobs.fachaerzt_psychiatrie', 'Fachärzt:in für Psychiatrie und Psychotherapie'),
-    t('q.t.personal.jobs.hp_psych', 'Heilpraktiker:in für Psychotherapie'),
-    t('q.t.personal.jobs.psych_berater', 'Psychologische/r Berater:in'),
-    t('q.t.personal.jobs.gestalttherapeut', 'Gestalttherapeut:in (ohne HP-Zulassung)'),
-    t('q.t.personal.jobs.kunst_musiktherapeut', 'Kunsttherapeut:in / Musiktherapeut:in'),
+    t('q.t.personal.jobs.psych_pt', 'Psychotherapist'),
+    t('q.t.personal.jobs.clinicalPsych', 'Clinical Psychologist'),
+    t('q.t.personal.jobs.kjp', 'Child and Adolescent Psychotherapist'),
+    t('q.t.personal.jobs.fachaerzt_psychiatrie', 'Specialist in Psychiatry and Psychotherapy'),
+    t('q.t.personal.jobs.psych_berater', 'Life and Social Counselor'),
+    t('q.t.personal.jobs.gesundheitsPsych', 'Health Psychologist'),
   ];
 
   const predefinedTitles = [
@@ -90,6 +86,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     t('q.t.personal.titles.m_sc', 'M.Sc.'),
     t('q.t.personal.titles.b_sc', 'B.Sc.'),
     t('q.t.personal.titles.m_a', 'M.A.'),
+    t('q.t.personal.titles.b_a', 'B.A.'),
   ];
 
   // Local uploading state
