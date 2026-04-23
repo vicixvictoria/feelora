@@ -46,7 +46,7 @@ const Step6_TSpecialties = ({ onNext, onBack, data, onDataChange }: SpecialtiesS
     { value: 'Zwang', label: t('q.options.compulsion') },
     { value: 'Gewalterfahrungen', label: t('q.options.violence') },
     { value: 'Chronische Schmerzen', label: t('q.options.chronicPain') },
-    { value: 'Essverhalten', label: t('q.options.eatingBehavior') },
+    { value: 'Essverhalten', label: t('q.options.eatingDisorder') },
   ];
 
   // Initialize hook

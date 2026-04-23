@@ -74,6 +74,13 @@ const TherapistQuestionnaire = () => {
 
     const checkQuestionnaireStatus = async () => {
       try {
+
+        // check if user clicked restart questionnaire - if yes, skip backend check and start fresh
+        if (localStorage.getItem('feelora_force_restart') === 'true') {
+          if (mounted) setIsCheckingStatus(false);
+          return; // Überspringe den Backend-Check und bleibe bei Step 0!
+        }
+
         const existingData = await therapistService.getQuestionnaire();
         
         // If the backend returned a questionnaire, they already completed it. --> Jump directly to the completion step
@@ -119,6 +126,7 @@ const TherapistQuestionnaire = () => {
 
   const restart = () => {
     clearProgress(); 
+    localStorage.setItem('feelora_force_restart', 'true'); // Set a flag to indicate that we want to force restart the questionnaire on next load
     setCurrentStep(0);
     window.location.reload();
   };
@@ -140,6 +148,7 @@ const TherapistQuestionnaire = () => {
       console.log('Final Submission successful!', result.savedData);
 
       clearProgress();
+      localStorage.removeItem('feelora_force_restart'); // Clear the force restart flag on successful submission
       goNext();
     } catch (error: unknown) {
       if (error instanceof Error) {
