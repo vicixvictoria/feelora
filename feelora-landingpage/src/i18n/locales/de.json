@@ -585,6 +585,7 @@
   "common.save": "Speichern",
   "common.choose": "Bitte wählen",
   "common.cancel": "Abbrechen",
+  "common.unmatch": "Entfernen",
   "common.logout": "Abmelden",
   "common.backToHomepage": "Zurück zur Homepage",
 
@@ -628,6 +629,9 @@
   "app.therapist.chat.noMessages": "Du hast noch keine Nachrichten.",
   "app.therapist.chat.chooseChat": "Wähle einen Chat aus, um eine Nachricht zu senden.",
   "app.therapist.chat.patientProfile": "Patientenprofil",
+  "app.therapist.chat.unmatchButton": "Patient:in entmatchen",
+  "app.therapist.chat.unmatchConfirmTitle":"Patient:in entmatchen?",
+  "app.therapist.chat.unmatchConfirmText": "Bist du sicher, dass du die Verbindung zu diesem Patienten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf und weitere Daten werden gelöscht",
   "app.therapist.homework.comingSoon": "Coming Soon",
   "app.therapist.homework.createTasks": "Neue Aufgaben erstellen",
   "app.therapist.homework.assignTask": "Aufgabe geben",

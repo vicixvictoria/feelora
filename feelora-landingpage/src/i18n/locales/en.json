@@ -642,6 +642,7 @@
   "common.save": "Save",
   "common.choose": "Choose",
   "common.cancel": "Cancel",
+  "common.unmatch": "Unmatch",
   "common.logout": "Log Out",
   "common.backToHomepage": "Back to Homepage",
 
@@ -685,6 +686,9 @@
   "app.therapist.chat.noMessages": "You don't have any messages yet. Start a conversation with your patients!",
   "app.therapist.chat.chooseChat": "Choose a chat to start messaging",
   "app.therapist.chat.patientProfile": "Patient Profile",
+  "app.therapist.chat.unmatchButton": "Unmatch Patient",
+  "app.therapist.chat.unmatchConfirmTitle":"Unmatch Patient?",
+  "app.therapist.chat.unmatchConfirmText": "Are you sure you want to unmatch this patient? This action cannot be undone and all chat history and additional data will be deleted",
   "app.therapist.homework.comingSoon": "Coming Soon",
   "app.therapist.homework.createTasks": "Create New Tasks",
   "app.therapist.homework.assignTask": "Assign Task",

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Info, ChevronRight, ArrowLeft, Loader2, X } from 'lucide-react';
+import { Send, Info, ChevronRight, ArrowLeft, Loader2, X, UserMinus, AlertTriangle } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -96,6 +96,8 @@ const TherapistChat = () => {
 
   // Modal State
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isConfirmUnmatchOpen, setIsConfirmUnmatchOpen] = useState(false);
+  const [isUnmatching, setIsUnmatching] = useState(false);
 
   // Create a reference to the bottom of the chat
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -186,7 +188,7 @@ const TherapistChat = () => {
         })
         .catch((err) => console.error('Failed to auto-update active chat messages:', err));
 
-        // Immediately mark incoming messages in the active chat as read ---
+      // Immediately mark incoming messages in the active chat as read
       notificationService.readNotification({
         notificationType: 'new_message',
         notificationId: selectedChat.conversationId,
@@ -226,7 +228,7 @@ const TherapistChat = () => {
             lastName: patient.Surname || '',
             age: calculateAge(patient.BirthDate),
             gender: patient.Gender || 'N/A',
-            city: patient.city || [],
+            city: patient.City || patient.city || [],
             avatar: avatar, // Fallback avatar string
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
@@ -270,10 +272,11 @@ const TherapistChat = () => {
         delete next[conversationId];
         return next;
       });
+      
       try {
         await notificationService.readNotification({
           notificationType: 'new_message',
-          notificationId: conversationId, // Schema expects conversationId
+          notificationId: conversationId, 
         });
       } catch (err) {
         console.error('Failed to mark messages as read on the server:', err);
@@ -331,6 +334,28 @@ const TherapistChat = () => {
       setIsSending(false);
     }
   };
+
+  // --- Handle Unmatching Patient ---
+  const handleConfirmUnmatch = async () => {
+    if (!selectedChat) return;
+    setIsUnmatching(true);
+    try {
+      await therapistService.deleteMatch(selectedChat.contactId);
+      
+      setChatList((prev) => prev.filter((chat) => chat.contactId !== selectedChat.contactId));
+      setSelectedChat(null);
+      setIsInfoModalOpen(false);
+      setIsConfirmUnmatchOpen(false);
+      setMobileShowChat(false); 
+      
+    } catch (error) {
+      console.error('Unmatch failed', error);
+      alert(t('app.therapist.chat.unmatchError', 'Fehler beim Auflösen der Verbindung. Bitte versuche es erneut.'));
+    } finally {
+      setIsUnmatching(false);
+    }
+  };
+
 
   return (
     <div className="flex h-[calc(100vh-10rem)] animate-fade-in relative">
@@ -572,6 +597,51 @@ const TherapistChat = () => {
                   </p>
                 </div>
               </div>
+
+              {/* UNMATCH BUTTON */}
+              <div className="pt-4 border-t border-border mt-4">
+                <button
+                  onClick={() => setIsConfirmUnmatchOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-destructive bg-destructive/10 hover:bg-destructive/20 rounded-xl transition-colors font-medium"
+                >
+                  <UserMinus className="w-4 h-4" />
+                  {t('app.therapist.chat.unmatchButton', 'Patienten entfernen')}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- CONFIRM UNMATCH OVERLAY --- */}
+      {isConfirmUnmatchOpen && selectedChat && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-sm rounded-2xl border border-destructive/20 shadow-xl p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              {t('app.therapist.chat.unmatchConfirmTitle', 'Patienten entfernen?')}
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              {t('app.therapist.chat.unmatchConfirmText', 'Bist du sicher, dass du die Verbindung zu diesem Patienten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf wird gelöscht.')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsConfirmUnmatchOpen(false)}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl transition-colors font-medium disabled:opacity-50"
+              >
+                {t('common.cancel', 'Abbrechen')}
+              </button>
+              <button
+                onClick={handleConfirmUnmatch}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-destructive text-white hover:bg-destructive/90 rounded-xl transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isUnmatching ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.unmatch', 'Entfernen')}
+              </button>
             </div>
           </div>
         </div>

@@ -122,6 +122,13 @@ const GET_QUESTIONNAIRE_QUERY = gql`
   }
 `;
 
+// delete specific match with a patient
+const DELETE_MATCH_MUTATION = gql`
+  mutation DeleteMatch($match: ID!) {
+    deleteMatch(match: $match)
+  }
+`;
+
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
@@ -332,6 +339,23 @@ export const therapistService = {
       // or return null depending on your AppSync resolver setup.
       console.log('No questionnaire found or error fetching:', error);
       return null;
+    }
+  },
+
+
+  // -- Delete a patient match --
+  deleteMatch: async (patientId: string): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_MATCH_MUTATION,
+        variables: { match: patientId },
+        // Refetch the profile so the "Matches" array stays in sync locally
+        refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
+      });
+      return data.deleteMatch;
+    } catch (error) {
+      console.error('Error unmatching patient:', error);
+      throw error;
     }
   },
 
