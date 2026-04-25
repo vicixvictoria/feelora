@@ -480,7 +480,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                     <span className="text-sm font-medium">
                       {t('q.t.personal.selectImage', 'Bild auswählen')}
                     </span>
-                    <span className="text-xs opacity-70">JPG, PNG</span>
+                    <span className="text-xs opacity-70">JPG</span>
                   </div>
                 )}
                 <input
