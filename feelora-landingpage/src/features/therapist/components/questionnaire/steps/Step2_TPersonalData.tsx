@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, Check, Loader2 } from 'lucide-react';
+import { Upload, Check, Loader2, User } from 'lucide-react';
 import { Input } from '@/components/ui/questionnaire/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -23,7 +23,7 @@ interface PersonalDataStepProps {
 }
 
 // Define which fields are optional
-const optionalFields = ['title', 'profilePictureName'];
+const optionalFields = ['title', 'profilePictureName', 'profilePictureUrl'];
 
 // Define the Validation Schema
 const step2Schema = z.object({
@@ -60,6 +60,7 @@ const step2Schema = z.object({
   job: z.string().min(1, 'Required'),
   title: z.string().optional(),
   profilePictureName: z.string().optional(),
+  profilePictureUrl: z.string().optional(), // Added for the local preview URL
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
@@ -131,18 +132,40 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     onDataChange({ ...data, [field]: value });
   };
 
-  // Async upload handler for profile picture
+  // Instant Local Preview of proifile picture Upload Handler 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Create an instant local browser URL for the preview
+    const localPreviewUrl = URL.createObjectURL(file);
+
+    // Immediately update the form data so the image appears instantly on the left
+    onDataChange({
+      ...data,
+      profilePictureName: file.name,
+      profilePictureUrl: localPreviewUrl,
+    });
+    clearError('profilePictureName');
+
     try {
+      // Start the UI spinner on the right side
       setIsUploading(true);
+
+      // Perform the actual S3 upload in the background
       const fileToUpload = new File([file], 'profile', { type: file.type });
       await upload(fileToUpload, 'public');
-      handleChange('profilePictureName', file.name);
+
     } catch (error) {
       console.error('Upload failed:', error);
+      
+      // Revert preview on failure
+      onDataChange({
+        ...data,
+        profilePictureName: '',
+        profilePictureUrl: '',
+      });
+      
       alert(
         t(
           'q.t.personal.uploadError',
@@ -179,13 +202,13 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
           {t('q.t.personal.cardTitle')}
         </h2>
 
+        {/* --- Standard Form Fields --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
             const isOptional = optionalFields.includes(field);
 
             return (
               <div key={field} className="space-y-2 flex flex-col">
-                {/* Dynamic Label */}
                 <Label
                   htmlFor={field}
                   className={errors[field] ? 'text-destructive' : 'text-foreground'}
@@ -217,7 +240,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                     </SelectContent>
                   </Select>
                 ) : field === 'bday' ? (
-                  // --- BIRTHDAY PICKER (3 DROPDOWNS) ---
                   (() => {
                     const bdayParts = (data[field] || '').split('-');
                     const year = bdayParts[0] || '';
@@ -238,12 +260,10 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
 
                     const daysInMonth = getDaysInMonth(year, month);
                     const currentYear = new Date().getFullYear();
-                    // Generate array of valid birth years (from 15 years ago, down to 100 years ago)
                     const yearsList = Array.from({ length: 86 }, (_, i) => (currentYear - 15 - i).toString());
 
                     return (
                       <div className="flex gap-2">
-                        {/* Day */}
                         <Select value={day} onValueChange={(val) => handleDateChange('day', val)}>
                           <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
                             <SelectValue placeholder="TT" />
@@ -256,7 +276,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                           </SelectContent>
                         </Select>
 
-                        {/* Month */}
                         <Select value={month} onValueChange={(val) => handleDateChange('month', val)}>
                           <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
                             <SelectValue placeholder="MM" />
@@ -269,7 +288,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                           </SelectContent>
                         </Select>
 
-                        {/* Year */}
                         <Select value={year} onValueChange={(val) => handleDateChange('year', val)}>
                           <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
                             <SelectValue placeholder="JJJJ" />
@@ -290,7 +308,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       onValueChange={(value) => {
                         if (value === 'other') {
                           setIsCustomJob(true);
-                          handleChange(field, ''); // Clear the value so they have to type it
+                          handleChange(field, '');
                         } else {
                           setIsCustomJob(false);
                           handleChange(field, value);
@@ -314,7 +332,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       </SelectContent>
                     </Select>
 
-                    {/* Custom Input for Job */}
                     {isCustomJob && (
                       <Input
                         id={`${field}-custom`}
@@ -336,10 +353,10 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       onValueChange={(value) => {
                         if (value === 'other') {
                           setIsCustomTitle(true);
-                          handleChange(field, ''); // Clear so they can type
+                          handleChange(field, '');
                         } else if (value === 'none') {
                           setIsCustomTitle(false);
-                          handleChange(field, ''); // Clear string in data
+                          handleChange(field, '');
                         } else {
                           setIsCustomTitle(false);
                           handleChange(field, value);
@@ -366,7 +383,6 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       </SelectContent>
                     </Select>
 
-                    {/* Custom Input for Title */}
                     {isCustomTitle && (
                       <Input
                         id={`${field}-custom`}
@@ -384,18 +400,17 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                 ) : (
                   <Input
                     id={field}
-                    type="text" // Removed type="date"
+                    type="text"
                     value={data[field] || ''}
                     onChange={(e) => handleChange(field, e.target.value)}
                     className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                 )}
 
-                {/* Error message mapping */}
                 {errors[field] && !isOptional && (
                   <p className="text-xs text-destructive font-medium mt-1">
                     {field === 'bday' 
-                      ? (data[field]?.length === 10 // If length is exactly 10 (YYYY-MM-DD), but fails validation, it's the age error
+                      ? (data[field]?.length === 10
                           ? t('q.t.personal.ageError', 'You must be at least 15 years old.')
                           : t('q.t.personal.incompleteDate', 'Bitte vollständiges Datum eingeben.'))
                       : t('q.common.required')}
@@ -406,56 +421,81 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
           })}
         </div>
 
-        {/* --- Profile Picture Upload (Optional) --- */}
-        <div className="space-y-2 mt-6 border-t border-border pt-6">
+        {/* --- Profile Picture Preview Section --- */}
+        <div className="space-y-3 mt-8 pt-8 border-t border-border">
           <Label htmlFor="profileUpload" className="text-foreground">
             {t('q.t.personal.profilePicture', 'Profilbild')}{' '}
             <span className="text-muted-foreground font-normal text-xs ml-1">
               ({t('q.common.optional')})
             </span>
           </Label>
-          <div className="flex items-center gap-4">
-            <label
-              htmlFor="profileUpload"
-              className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg transition-colors bg-background ${
-                isUploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
-              } border-muted-foreground/30 hover:border-primary/50`}
-            >
-              {isUploading ? (
-                <div className="flex flex-col items-center gap-2 text-primary">
-                  <Loader2 className="w-8 h-8 animate-spin" />
-                  <span className="text-sm font-medium">
-                    {t('q.common.uploading', 'Wird hochgeladen...')}
-                  </span>
-                </div>
-              ) : data.profilePictureName ? (
-                <div className="flex flex-col items-center gap-1 text-foreground/80 p-4 text-center">
-                  <Check className="w-6 h-6 text-green-500" />
-                  <span className="text-sm break-all">{data.profilePictureName}</span>
-                  <span className="text-xs text-muted-foreground mt-1">
-                    {t('q.common.clickToChange', 'Klicken zum Ändern')}
-                  </span>
-                </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+            {/* Image Preview Area */}
+            <div className="flex justify-center sm:justify-start">
+              {data.profilePictureUrl ? (
+                <img
+                  src={data.profilePictureUrl}
+                  alt={data.profilePictureName || t('patient.profile.therapistAvatar')}
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover ring-2 ring-primary/20"
+                />
               ) : (
-                <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                  <Upload className="w-6 h-6" />
-                  <span className="text-sm">
-                    {t('q.t.personal.selectImage', 'Bild auswählen')}
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg bg-accent flex flex-col items-center justify-center text-muted-foreground gap-1 ring-2 ring-muted">
+                  <User className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/50" strokeWidth={1} />
+                  <span className="text-[0.7rem] sm:text-xs text-center px-1">
+                    {t('q.t.personal.noImage', 'Noch kein Bild')}
                   </span>
-                  <span className="text-xs">JPG, PNG</span>
                 </div>
               )}
-              <input
-                id="profileUpload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={isUploading}
-                onChange={handleFileUpload}
-              />
-            </label>
+            </div>
+
+            {/* Upload Area */}
+            <div className="flex-grow">
+              <label
+                htmlFor="profileUpload"
+                className={`flex items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed rounded-lg transition-colors bg-background ${
+                  isUploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                } border-muted-foreground/30 hover:border-primary/50 group`}
+              >
+                {isUploading ? (
+                  <div className="flex flex-col items-center gap-2 text-primary">
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <span className="text-xs font-medium text-center">
+                      {t('q.common.uploading', 'Wird hochgeladen...')}
+                    </span>
+                  </div>
+                ) : data.profilePictureName ? (
+                  <div className="flex flex-col items-center gap-1 text-center px-4">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="text-xs break-all text-muted-foreground font-medium">
+                      {data.profilePictureName}
+                    </span>
+                    <span className="text-[0.6rem] sm:text-xs text-primary font-medium mt-1 transition-opacity opacity-70 group-hover:opacity-100">
+                      {t('q.common.clickToChange', 'Klicken zum Ändern')}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5 text-muted-foreground px-4 text-center">
+                    <Upload className="w-5 h-5" />
+                    <span className="text-sm font-medium">
+                      {t('q.t.personal.selectImage', 'Bild auswählen')}
+                    </span>
+                    <span className="text-xs opacity-70">JPG, PNG</span>
+                  </div>
+                )}
+                <input
+                  id="profileUpload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={isUploading}
+                  onChange={handleFileUpload}
+                />
+              </label>
+            </div>
           </div>
         </div>
+
       </div>
 
       <div className={isUploading ? 'pointer-events-none opacity-50' : ''}>

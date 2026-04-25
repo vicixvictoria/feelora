@@ -28,7 +28,6 @@ interface SummaryStepProps {
   };
 }
 
-// Define a type for each section in the summary
 interface SummarySection {
   step: number;
   title: string;
@@ -46,29 +45,41 @@ const formatArray = (
   return mappedArr.join(', ');
 };
 
-//accept an optional label mapper to translate IDs
+// accept an optional label mapper to translate IDs (updated to apply to 'other' as well)
 const formatArrayWithOther = (
   selected: string[] | undefined, 
   other?: string | string[], 
   labelMapper?: (id: string) => string
 ) => {
   const items = selected || [];
-  const mappedItems = labelMapper ? items.map(labelMapper) : items;
-  
   const otherItems = Array.isArray(other) ? other : other ? [other] : [];
-  const combined = [...mappedItems, ...otherItems];
   
-  return combined.length > 0 ? combined.join(', ') : '—';
+  // Combine first, then map everything
+  const combined = [...items, ...otherItems];
+  const mappedItems = labelMapper ? combined.map(labelMapper) : combined;
+  
+  return mappedItems.length > 0 ? mappedItems.join(', ') : '—';
 };
-
 
 const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => {
   const { t } = useTranslation();
 
-  // --- MAPPING DICTIONARIES ---
+  // --- MAPPING DICTIONARIES & HELPERS ---
   
+  // Generic mapper to catch "no preference" values
+  const formatLabel = (val: string) => {
+    if (!val) return '';
+    if (val === 'keine-praeferenz' || val === 'keine Präferenz') {
+      return t('q.common.noPreference');
+    }
+    return val;
+  };
+
   // Mapper for Values & Preferences
   const getValueLabel = (id: string) => {
+    // Catch "no preference" first
+    if (id === 'keine-praeferenz' || id === 'keine Präferenz') return t('q.common.noPreference');
+
     const map: Record<string, string> = {
       lgbtq: t('q.t.valuesPreferences.lgbtq'),
       cultural: t('q.t.valuesPreferences.cultural'),
@@ -87,6 +98,9 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
 
   // Mapper for Availability 
   const getAvailabilityLabel = (id: string) => {
+    // Catch "no preference" first
+    if (id === 'keine-praeferenz' || id === 'keine Präferenz') return t('q.common.noPreference');
+
     const map: Record<string, string> = {
       mo: t('q.t.availability.mon'),
       di: t('q.t.availability.tue'),
@@ -98,8 +112,6 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     };
     return map[id] || id.toUpperCase();
   };
-
-
 
   const sections: SummarySection[] = [
     {
@@ -155,14 +167,14 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     {
       step: 4,
       title: t('q.t.summary.experienceSince'),
-      content: <p className="text-foreground/80">{formatArray(data.experience)}</p>,
+      content: <p className="text-foreground/80">{formatArray(data.experience, '—', formatLabel)}</p>,
     },
     {
       step: 5,
       title: t('q.t.summary.specialties'),
       content: (
         <p className="text-foreground/80">
-          {formatArrayWithOther(data.specialties?.selected, data.specialties?.other)}
+          {formatArrayWithOther(data.specialties?.selected, data.specialties?.other, formatLabel)}
         </p>
       ),
     },
@@ -171,7 +183,7 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
       title: t('q.t.summary.languages'),
       content: (
         <p className="text-foreground/80">
-          {formatArrayWithOther(data.languages?.selected, data.languages?.other)}
+          {formatArrayWithOther(data.languages?.selected, data.languages?.other, formatLabel)}
         </p>
       ),
     },
@@ -180,46 +192,45 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
       title: t('q.t.summary.therapySchool'),
       content: (
         <p className="text-foreground/80">
-          {formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other)}
+          {formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other, formatLabel)}
         </p>
       ),
     },
     {
       step: 8,
       title: t('q.t.summary.therapyMethods'),
-      content: <p className="text-foreground/80">{data.therapyMethods || '—'}</p>,
+      content: <p className="text-foreground/80">{formatLabel(data.therapyMethods) || '—'}</p>,
     },
     {
       step: 9,
       title: t('q.t.summary.therapySetting'),
-      content: <p className="text-foreground/80">{formatArray(data.therapySetting)}</p>,
+      content: <p className="text-foreground/80">{formatArray(data.therapySetting, '—', formatLabel)}</p>,
     },
     {
       step: 10,
       title: t('q.t.summary.therapyFormat'),
-      content: <p className="text-foreground/80">{formatArray(data.therapyFormat)}</p>,
+      content: <p className="text-foreground/80">{formatArray(data.therapyFormat, '—', formatLabel)}</p>,
     },
     {
       step: 11,
       title: t('q.t.summary.therapyDuration'),
-      content: <p className="text-foreground/80">{data.therapyDuration || '—'}</p>,
+      content: <p className="text-foreground/80">{formatLabel(data.therapyDuration) || '—'}</p>,
     },
     {
       step: 12,
       title: t('q.t.summary.sessionFrequency'),
-      content: <p className="text-foreground/80">{formatArray(data.sessionFrequency)}</p>,
+      content: <p className="text-foreground/80">{formatArray(data.sessionFrequency, '—', formatLabel)}</p>,
     },
     {
       step: 13,
       title: t('q.t.summary.patientGender'),
-      content: <p className="text-foreground/80">{formatArray(data.patientGender)}</p>,
+      content: <p className="text-foreground/80">{formatArray(data.patientGender, '—', formatLabel)}</p>,
     },
     {
       step: 14,
       title: t('q.t.summary.values'),
       content: (
         <p className="text-foreground/80">
-          {/* Passed the getValueLabel function here! */}
           {formatArrayWithOther(
             data.valuesPreferences?.selected, 
             data.valuesPreferences?.other, 
@@ -231,14 +242,13 @@ const Step18_TSummary = ({ onNext, onBack, onEdit, data }: SummaryStepProps) => 
     {
       step: 15,
       title: t('q.t.summary.additionalInfo'),
-      content: <p className="text-foreground/80">{data.additionalInfo || '—'}</p>,
+      content: <p className="text-foreground/80">{formatLabel(data.additionalInfo) || '—'}</p>,
     },
     {
       step: 16,
       title: t('q.t.summary.availability'),
       content: (
         <p className="text-foreground/80">
-          {/* Passed the getAvailabilityLabel function here! */}
           {formatArray(data.availability, '—', getAvailabilityLabel)}
         </p>
       ),
