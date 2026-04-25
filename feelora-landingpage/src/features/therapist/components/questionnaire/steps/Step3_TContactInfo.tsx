@@ -1,11 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
-import { Country, City } from 'country-state-city';
+import { City } from 'country-state-city';
+
+// import english and german langauge packages
+import countries from 'i18n-iso-countries';
+import deLocale from 'i18n-iso-countries/langs/de.json';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+
+// registers both languages 
+countries.registerLocale(deLocale);
+countries.registerLocale(enLocale);
 
 interface ContactInfoStepProps {
   onNext: () => void;
@@ -14,44 +23,95 @@ interface ContactInfoStepProps {
   onDataChange: (data: Record<string, string>) => void;
 }
 
-// Define which fields are optional
 const optionalFields = ['phone', 'email', 'address', 'postalCode'];
 
-// Define the Validation Schema
 const step3Schema = z.object({
-  // Required fields
   city: z.string().min(1, 'Required'),
   country: z.string().min(1, 'Required'),
-
-  // Optional fields (strictly remove .min(1))
   phone: z.string().optional(),
   address: z.string().optional(),
   postalCode: z.string().optional(),
-
-  // Email: Empty string, undefined, OR valid email
   email: z.union([z.literal(''), z.string().email('Invalid email')]).optional(),
 });
 
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
+};
+
+// Mapping specific cities in german 
+const deCityTranslationMap: Record<string, string> = {
+  "Vienna": "Wien",
+  "Munich": "München",
+  "Cologne": "Köln",
+  "Nuremberg": "Nürnberg",
+  "Prague": "Prag",
+  "Rome": "Rom",
+  "Milan": "Mailand",
+  "Venice": "Venedig",
+  "Florence": "Florenz",
+  "Geneva": "Genf",
+  "Zurich": "Zürich",
+  "Lucerne": "Luzern",
+  "Warsaw": "Warschau",
+  "Brussels": "Brüssel",
+  "Lisbon": "Lissabon",
+  "Athens": "Athen",
+  "Moscow": "Moskau",
+};
+
+// dynamic trannslation function for city names based on current language and mapping
+const translateCity = (cityName: string, currentLang: string) => {
+  if (currentLang === 'de') {
+    return deCityTranslationMap[cityName] || cityName;
+  }
+  return cityName; 
+};
+
 const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoStepProps) => {
-  const { t } = useTranslation();
+  // get current language
+  const { t, i18n } = useTranslation();
+  
+  // Set the lamguage code ('de' or 'en'). Fallback 'en'.
+  const currentLang = i18n.language?.startsWith('de') ? 'de' : 'en';
+
   const [countryQuery, setCountryQuery] = useState(() => {
     if (!data.country) return '';
-    return Country.getCountryByCode(data.country)?.name || '';
+    // get inital country name based on current language and stored ISO code
+    return countries.getName(data.country, currentLang, { select: 'official' }) || '';
   });
+
   const [isCountryFocused, setIsCountryFocused] = useState(false);
   const [isCityFocused, setIsCityFocused] = useState(false);
 
+  // Update search query if user changes language in between
+  useEffect(() => {
+    if (data.country) {
+      setCountryQuery(countries.getName(data.country, currentLang, { select: 'official' }) || '');
+    }
+  }, [currentLang, data.country]);
+
+  // load countries dynamically 
   const availableCountries = useMemo(() => {
     const query = countryQuery.trim().toLowerCase();
     if (query.length < 2) return [];
 
-    const allCountries = Country.getAllCountries();
-    return allCountries
+    // gets all countries basd on current language
+    const countryObj = countries.getNames(currentLang, { select: 'official' });
+    
+    const allLocalizedCountries = Object.entries(countryObj).map(([code, name]) => ({
+      isoCode: code,
+      name: name,
+      flag: getFlagEmoji(code),
+    }));
+
+    return allLocalizedCountries
       .filter((country) => country.name.toLowerCase().startsWith(query))
       .slice(0, 20);
-  }, [countryQuery]);
+  }, [countryQuery, currentLang]); // currentLang dependency
 
-  // Lazily load and filter cities only when the user has typed enough characters.
+  // map cities dynamically
   const availableCities = useMemo(() => {
     if (!data.country) return [];
 
@@ -63,32 +123,34 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
     const seenNames = new Set<string>();
 
     for (const city of allCities) {
-      const name = city.name?.trim();
-      if (!name || seenNames.has(name)) continue;
+      const rawName = city.name?.trim();
+      if (!rawName) continue;
 
-      seenNames.add(name);
-      if (name.toLowerCase().startsWith(query)) {
-        uniqueCities.push(name);
+      // translate city names
+      const translatedName = translateCity(rawName, currentLang);
+
+      if (seenNames.has(translatedName)) continue;
+
+      if (translatedName.toLowerCase().startsWith(query)) {
+        seenNames.add(translatedName);
+        uniqueCities.push(translatedName);
       }
 
-      // Keep rendering cheap even for very large countries.
       if (uniqueCities.length >= 50) break;
     }
 
     return uniqueCities;
-  }, [data.country, data.city]);
+  }, [data.country, data.city, currentLang]); // currentLang als Dependency hinzugefügt
 
-  // Order matters for the layout
   const fieldLabels: Record<string, string> = {
     phone: t('q.t.contact.phone'),
     email: t('q.t.contact.email'),
-    country: t('q.t.contact.country'), // Moved up so it sits before City
+    country: t('q.t.contact.country'),
     city: t('q.t.contact.city'),
     address: t('q.t.contact.address'),
     postalCode: t('q.t.contact.postalCode'),
   };
 
-  // Initialize the validation hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step3Schema,
@@ -103,13 +165,11 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
   const handleCountryChange = (isoCode: string) => {
     clearError('country');
     clearError('city');
-    // If the country changes, wipe the previously selected 
     onDataChange({ ...data, country: isoCode, city: '' });
   };
 
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.t.contact.title')}</h1>
         <p className="text-muted-foreground mb-2">{t('q.t.contact.subtitle1')}</p>
@@ -118,13 +178,11 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
         <p className="text-muted-foreground text-sm">{t('q.t.contact.subtitle4')}</p>
       </div>
 
-      {/* Form Card */}
       <div className="feelora-card">
         <h2 className="text-lg font-semibold text-foreground mb-6">{t('q.t.contact.cardTitle')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(fieldLabels).map((field) => {
-            // Check if this specific field is optional
             const isOptional = optionalFields.includes(field);
 
             return (
@@ -141,26 +199,23 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   )}
                 </Label>
 
-                {/* Conditional Rendering for Country and City Dropdowns */}
                 {field === 'country' ? (
                   <div className="relative">
                     <Input
                       id={field}
                       type="text"
                       value={countryQuery}
-                      placeholder={t('q.common.pleaseSelect', 'Bitte auswählen')}
+                      placeholder={t('q.common.searchPlaceholder')}
                       onChange={(e) => {
                         const nextQuery = e.target.value;
                         setCountryQuery(nextQuery);
-
-                        // User is typing a new country, so clear selected country and city.
                         clearError('country');
                         clearError('city');
                         onDataChange({ ...data, country: '', city: '' });
                       }}
                       onFocus={() => setIsCountryFocused(true)}
                       onBlur={() => {
-                        setTimeout(() => setIsCountryFocused(false), 100);
+                        setTimeout(() => setIsCountryFocused(false), 150);
                       }}
                       className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                     />
@@ -172,7 +227,7 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                             <button
                               key={country.isoCode}
                               type="button"
-                              className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-accent flex items-center gap-2"
                               onMouseDown={(e) => {
                                 e.preventDefault();
                                 setCountryQuery(country.name);
@@ -180,12 +235,13 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                                 setIsCountryFocused(false);
                               }}
                             >
-                              {country.flag} {country.name}
+                              <span>{country.flag}</span>
+                              <span>{country.name}</span>
                             </button>
                           ))
                         ) : (
                           <div className="p-2 text-sm text-muted-foreground text-center">
-                            Keine Länder gefunden
+                            {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
                           </div>
                         )}
                       </div>
@@ -200,13 +256,13 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                       disabled={!data.country}
                       placeholder={
                         data.country
-                          ? t('q.common.pleaseSelect', 'Bitte auswählen')
-                          : t('q.t.contact.selectCountryFirst', 'Zuerst Land wählen')
+                          ? t('q.common.searchPlaceholder')
+                          : t('q.t.contact.selectCountryFirst')
                       }
                       onChange={(e) => handleChange(field, e.target.value)}
                       onFocus={() => setIsCityFocused(true)}
                       onBlur={() => {
-                        setTimeout(() => setIsCityFocused(false), 100);
+                        setTimeout(() => setIsCityFocused(false), 150);
                       }}
                       className={`bg-background disabled:opacity-50 ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                     />
@@ -230,7 +286,7 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                           ))
                         ) : (
                           <div className="p-2 text-sm text-muted-foreground text-center">
-                            Keine Städte gefunden
+                            {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
                           </div>
                         )}
                       </div>
@@ -246,7 +302,6 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   />
                 )}
 
-                {/* Error messages */}
                 {errors[field] && field === 'email' && (
                   <p className="text-[0.8rem] text-destructive">{t('q.common.invalidEmail')}</p>
                 )}
@@ -259,7 +314,6 @@ const Step3_TContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
         </div>
       </div>
 
-      {/* Use validateAndNext */}
       <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );

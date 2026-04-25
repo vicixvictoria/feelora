@@ -145,6 +145,8 @@
 
   "q.common.next": "Next",
   "q.common.back": "Back",
+  "q.common.noResults": "No results found",
+  "q.common.searchPlaceholder": "Type to search...",
   "q.common.question": "Question {{current}} of {{total}}",
   "q.common.submit": "Submit",
   "q.common.sending": "Submitting...",
@@ -333,6 +335,7 @@
   "q.t.contact.postalCode": "Postal Code",
   "q.t.contact.country": "Country",
   "q.t.contact.country.placeholder": "Please type in...",
+  "q.t.contact.selectCountryFirst": "Choose a country first",
   "q.t.qualifications.title": "Titles and Qualifications",
   "q.t.qualifications.subtitle": "Provide your (professional) titles and where you obtained them, your official license number, and any other relevant qualifications.",
   "q.t.qualifications.cardTitle": "Titles and Qualifications",
