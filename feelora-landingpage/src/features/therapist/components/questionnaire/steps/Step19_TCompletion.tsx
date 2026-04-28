@@ -35,10 +35,6 @@ const Step19_TCompletion = ({ onRestart, onHome }: CompletionStepProps) => {
       <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
         {t('q.t.completion.description')}
       </p>
-      {/* Restart Button */}
-      <Button onClick={onRestart} className="feelora-btn-outline">
-        {t('q.t.completion.restart')}
-      </Button>
       {/* Logout Button */}
       <Button
         onClick={handleLogout}

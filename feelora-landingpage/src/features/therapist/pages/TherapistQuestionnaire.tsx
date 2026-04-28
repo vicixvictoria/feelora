@@ -127,6 +127,7 @@ const TherapistQuestionnaire = () => {
   const restart = () => {
     clearProgress(); 
     localStorage.setItem('feelora_force_restart', 'true'); // Set a flag to indicate that we want to force restart the questionnaire on next load
+    localStorage.removeItem('feelora_profile_created'); // Clear the profile creation flag on restart
     setCurrentStep(0);
     window.location.reload();
   };
@@ -149,6 +150,7 @@ const TherapistQuestionnaire = () => {
 
       clearProgress();
       localStorage.removeItem('feelora_force_restart'); // Clear the force restart flag on successful submission
+      localStorage.removeItem('feelora_profile_created'); // Clear the profile creation flag on successful submission
       goNext();
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -163,13 +165,51 @@ const TherapistQuestionnaire = () => {
   const handleCreateTherapistProfile = async () => {
     setIsIntermediateLoading(true);
     try {
-      console.log('Creating therapist profile...');
-      const response = await therapistService.createTherapistProfile(data);
-      console.log('Therapist profile created successfully!', response);
+      // Check if we've already created the profile in this session
+      const hasCreated = localStorage.getItem('feelora_profile_created') === 'true';
+
+      if (!hasCreated) {
+        console.log('Creating therapist profile...');
+        const response = await therapistService.createTherapistProfile(data);
+        
+        // Save the flag so we know it exists now
+        localStorage.setItem('feelora_profile_created', 'true');
+        console.log('Therapist profile created successfully!', response);
+      } else {
+        console.log('Updating existing therapist profile...');
+        
+        // Format the address to match the creation payload
+        const formattedAddress = [
+          data.contactInfo?.street,
+          data.contactInfo?.zip,
+          data.contactInfo?.city,
+        ]
+          .filter(Boolean)
+          .join(', ');
+
+        // Call the updateProfile mutation with the latest data
+        await therapistService.updateProfile({
+          Name: data.personalData?.firstName || '',
+          Surname: data.personalData?.lastName || '',
+          Gender: data.personalData?.gender || '',
+          BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
+          City: data.contactInfo?.city || '',
+          Address: formattedAddress || '',
+          Languages: data.languages?.selected || [],
+          Availability: data.availability || [],
+          Specialties: data.specialties?.selected || [],
+          Title: data.personalData?.title || '',
+          JobTitle: data.personalData?.job || '', 
+          HasInsurance: data.priceRange?.kassenvertrag || false,
+          PriceRange: data.priceRange?.priceDetails || '',
+        });
+        console.log('Therapist profile updated successfully!');
+      }
 
       goNext();
     } catch (error) {
-      console.error('Error creating therapist profile:', error);
+      console.error('Error creating/updating therapist profile:', error);
+      alert('Es gab einen Fehler beim Speichern deines Profils. Bitte versuche es erneut.');
     } finally {
       setIsIntermediateLoading(false);
     }
@@ -377,7 +417,7 @@ const TherapistQuestionnaire = () => {
         <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
       <div className="flex justify-end p-6">
-        <img src={FeeloraLogo} alt="Feelora Logo" className="h-16 w-50" />
+        <img src={FeeloraLogo} alt="Feelora Logo" className="h-15 w-58" />
       </div>
     </div>
   );
