@@ -8,7 +8,7 @@ interface CompletionStepProps {
   onHome?: () => void;
 }
 
-const Step19_TCompletion = ({ onRestart, onHome }: CompletionStepProps) => {
+const Step19_TCompletion = ({ onHome }: CompletionStepProps) => {
   const { t } = useTranslation();
   const { logout } = useAuth();
 
