@@ -65,37 +65,49 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
-              {t('footer.legal')}
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <button
-                  onClick={() => navigate('/privacy')}
-                  className="text-gray-600 hover:text-primary transition-colors"
-                >
-                  {t('footer.legal.privacy')}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => navigate('/privacy')}
-                  className="text-gray-600 hover:text-primary transition-colors"
-                >
-                  {t('footer.legal.terms')}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => navigate('/privacy')}
-                  className="text-gray-600 hover:text-primary transition-colors"
-                >
-                  {t('footer.legal.cookies')}
-                </button>
-              </li>
-            </ul>
-          </div>
+         {/* Legal Section: */}
+<div>
+  <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">
+    {t('footer.legal')}
+  </h3>
+  <ul className="space-y-3">
+    <li>
+      {/* Iubenda Privacy Policy Modal  EXCHANGE TO OUR ID*/}
+      <a
+        href="https://www.iubenda.com/privacy-policy/YOUR_POLICY_ID"
+        className="iubenda-nostyle iubenda-noiframe iubenda-embed text-gray-600 hover:text-primary transition-colors"
+      >
+        {t('footer.legal.privacy')}
+      </a>
+    </li>
+    <li>
+      {/* custom Terms of Service KEEP THE PAGE */}
+      <button
+        onClick={() => navigate('/privacy')} 
+        className="text-gray-600 hover:text-primary transition-colors"
+      >
+        {t('footer.legal.terms')}
+      </button>
+    </li>
+    <li>
+      {/* Iubenda Cookie Policy Modal EXCHANGE TO OUT ID*/}
+      <a
+        href="https://www.iubenda.com/privacy-policy/YOUR_POLICY_ID/cookie-policy"
+        className="iubenda-nostyle iubenda-noiframe iubenda-embed text-gray-600 hover:text-primary transition-colors"
+      >
+        {t('footer.legal.cookies')}
+      </a>
+    </li>
+    <li>
+      {/* Required by GDPR: A button to reopen the cookie banner settings */}
+      <button 
+        className="iubenda-cs-preferences-link text-gray-600 hover:text-primary transition-colors"
+      >
+        Cookie-Einstellungen
+      </button>
+    </li>
+  </ul>
+</div>
 
           <div>
             <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-6">

@@ -180,6 +180,21 @@ const GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY = gql`
   }
 `;
 
+// -- Invited Patient Flow Queries & Mutations --
+const GET_INVITER_DETAILS_QUERY = gql`
+  query GetInviterDetails($invitationId: ID!) {
+    getInviterDetails(invitationId: $invitationId) {
+      Id
+      Email
+      Name
+      Surname
+      Title
+      JobTitle
+      City
+    }
+  }
+`;
+
 // -- Delete Account Data Mutation --
 const DELETE_DATA_MUTATION = gql`
   mutation DeleteData {
@@ -487,4 +502,25 @@ export const patientService = {
         console.debug('Ping Lambda failed (ignored):', error);
       });
   },
+
+// -- Fetch Inviter (Therapist) Details from an Invitation ID --
+  getInviterDetails: async (invitationId: string) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_INVITER_DETAILS_QUERY,
+        variables: { invitationId },
+        fetchPolicy: 'network-only', // Always get fresh data for invitations
+      });
+      
+      if (!data || !data.getInviterDetails) {
+        throw new Error('Invitation details not found');
+      }
+      
+      return data.getInviterDetails;
+    } catch (error) {
+      console.error('Error fetching inviter details:', error);
+      throw error;
+    }
+  },
+
 };
