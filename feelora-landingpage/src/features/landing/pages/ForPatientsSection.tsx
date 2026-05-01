@@ -158,20 +158,14 @@ export function ForPatientsSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative flex justify-center"
+            className="relative flex justify-center w-full"
           >
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-              className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
-            >
-              <img
-                src={forPatientsImg}
-                alt="patient digital therapy concept"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </motion.div>
+            <img
+              src={forPatientsImg}
+              alt="patient digital therapy concept"
+              className="w-[150%] max-w-none -ml-[30%] h-auto object-contain"
+              loading="lazy"
+            />
           </motion.div>
         </motion.div>
       </div>

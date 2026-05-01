@@ -59,20 +59,14 @@ export function ForTherapistsSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative order-2 lg:order-1 flex justify-center"
+            className="relative order-2 lg:order-1 flex justify-center w-full"
           >
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-              className="rounded-3xl overflow-hidden shadow-2xl w-3/4"
-            >
-              <img
-                src={forTherapistsImg}
-                alt="therapist connection concept"
-                className="w-full h-auto object-cover"
-                loading="lazy"
-              />
-            </motion.div>
+            <img
+              src={forTherapistsImg}
+              alt="therapist connection concept"
+              className="w-[80%] max-w-none -ml-[10%] h-auto object-contain"
+              loading="lazy"
+            />
           </motion.div>
 
           <div className="order-1 lg:order-2">
