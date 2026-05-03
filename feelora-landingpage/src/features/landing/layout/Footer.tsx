@@ -72,16 +72,16 @@ export function Footer() {
   </h3>
   <ul className="space-y-3">
     <li>
-      {/* Iubenda Privacy Policy Modal  EXCHANGE TO OUR ID*/}
+      {/* Iubenda Privacy Policy Modal*/}
       <a
-        href="https://www.iubenda.com/privacy-policy/YOUR_POLICY_ID"
+        href="https://www.iubenda.com/privacy-policy/89492002"
         className="iubenda-nostyle iubenda-noiframe iubenda-embed text-gray-600 hover:text-primary transition-colors"
       >
         {t('footer.legal.privacy')}
       </a>
     </li>
     <li>
-      {/* custom Terms of Service KEEP THE PAGE */}
+      {/* custom Terms of Service */}
       <button
         onClick={() => navigate('/privacy')} 
         className="text-gray-600 hover:text-primary transition-colors"
@@ -90,9 +90,9 @@ export function Footer() {
       </button>
     </li>
     <li>
-      {/* Iubenda Cookie Policy Modal EXCHANGE TO OUT ID*/}
+      {/* Iubenda Cookie Policy Modal*/}
       <a
-        href="https://www.iubenda.com/privacy-policy/YOUR_POLICY_ID/cookie-policy"
+        href="https://www.iubenda.com/privacy-policy/89492002/cookie-policy"
         className="iubenda-nostyle iubenda-noiframe iubenda-embed text-gray-600 hover:text-primary transition-colors"
       >
         {t('footer.legal.cookies')}
@@ -100,11 +100,21 @@ export function Footer() {
     </li>
     <li>
       {/* Required by GDPR: A button to reopen the cookie banner settings */}
-      <button 
-        className="iubenda-cs-preferences-link text-gray-600 hover:text-primary transition-colors"
-      >
-        Cookie-Einstellungen
-      </button>
+     <button 
+    onClick={(e) => {
+      e.preventDefault();
+      // Wir rufen die Iubenda API direkt auf (mit ts-ignore, damit TypeScript nicht meckert, 
+      // weil _iub ein externes globales Objekt aus der index.html ist)
+      // @ts-ignore
+      if (window._iub?.cs?.api?.openPreferences) {
+        // @ts-ignore
+        window._iub.cs.api.openPreferences();
+      }
+    }}
+    className="text-gray-600 hover:text-primary transition-colors cursor-pointer bg-transparent border-none p-0"
+  >
+        {t('footer.legal.cookieSettings', 'Cookie-Einstellungen')}
+  </button>
     </li>
   </ul>
 </div>
