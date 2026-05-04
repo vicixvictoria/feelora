@@ -7,7 +7,8 @@ export const useS3Download = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const download = async (imageId: string, visibility: string, ownerSub?: string) => {
-    const presignedUrl = await getDownloadUrl(imageId, visibility, ownerSub);
+    const imageIdWithoutExt = imageId.replace(/\.[^/.]+$/, "");
+    const presignedUrl = await getDownloadUrl(imageIdWithoutExt, visibility, ownerSub);
     const localUrl = await s3Service.download(presignedUrl);
     setImageUrl(localUrl);
   };

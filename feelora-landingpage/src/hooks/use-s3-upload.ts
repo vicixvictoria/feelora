@@ -5,8 +5,9 @@ export const useS3Upload = () => {
   const { upload: getUploadUrl } = usePresignedUrl();
 
   const upload = async (file: File, visibility: string): Promise<void> => {
-    const presignedUrl = await getUploadUrl(file.name, file.type, visibility);
-    await s3Service.upload(presignedUrl, file);
+    const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+    const presignedPost = await getUploadUrl(fileNameWithoutExt, file.type, visibility);
+    await s3Service.upload(presignedPost, file);
   };
 
   return { upload };

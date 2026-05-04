@@ -6,7 +6,7 @@ export const presignedUrlService = {
     fileName: string,
     contentType: string,
     visibility: string,
-  ): Promise<string> => {
+  ): Promise<{ url: string; fields: Record<string, string> }> => {
     const response = await fetch(`${AUTH_API_URL}/presigned/upload`, {
       method: 'POST',
       headers: {
@@ -19,7 +19,7 @@ export const presignedUrlService = {
     if (!response.ok) throw new Error(`Upload presign failed: ${response.status}`);
 
     const data = await response.json();
-    return data.uploadUrl;
+    return data.uploadPost;
   },
 
   download: async (

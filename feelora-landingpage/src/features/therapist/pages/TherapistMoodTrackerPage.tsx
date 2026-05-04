@@ -24,7 +24,7 @@ const S3Avatar = ({
   useEffect(() => {
     if (userId) {
       // Pass the userId to fetch that specific patient's profile picture
-      download('profile.jpg', 'public', userId).catch(() => {});
+      download('profile', 'public', userId).catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);

@@ -169,7 +169,7 @@ const TherapistEditProfilePage = () => {
         Specialties: profile.Specialties || [],
       });
       // Fetch own image
-      download('profile.jpg', 'public').catch((err) => {
+      download('profile', 'public').catch((err) => {
         console.debug('No existing profile image found.', err);
       });
     }
@@ -226,7 +226,7 @@ const TherapistEditProfilePage = () => {
       setPreviewImage(objectUrl);
 
       try {
-        const fileToUpload = new File([file], 'profile', { type: 'image/jpeg' });
+        const fileToUpload = new File([file], 'profile', { type: file.type });
         await upload(fileToUpload, 'public');
       } catch (err) {
         console.error('Upload failed:', err);

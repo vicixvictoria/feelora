@@ -54,7 +54,7 @@ const S3Avatar = ({
 
   useEffect(() => {
     if (userId) {
-      download('profile.jpg', 'public', userId).catch(() => {});
+      download('profile', 'public', userId).catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -115,7 +115,7 @@ const TherapistChat = () => {
 
   useEffect(() => {
     // No ownerSub passed = fetches logged-in user's image
-    downloadMyAvatar('profile.jpg', 'public').catch(() => {});
+    downloadMyAvatar('profile', 'public').catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -123,7 +123,7 @@ const TherapistChat = () => {
   const { download: downloadTheirAvatar, imageUrl: theirAvatarUrl } = useS3Download();
   useEffect(() => {
     if (selectedChat?.contactId) {
-      downloadTheirAvatar('profile.jpg', 'public', selectedChat.contactId).catch(() => {});
+      downloadTheirAvatar('profile', 'public', selectedChat.contactId).catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?.contactId]);

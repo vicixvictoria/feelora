@@ -38,9 +38,9 @@ const S3Avatar = ({
 
   useEffect(() => {
     if (userId) {
-      download('profile.jpg', 'public', userId).catch(() => {});
+      download('profile', 'public', userId).catch(() => {});
     } else {
-      download('profile.jpg', 'public').catch(() => {});
+      download('profile', 'public').catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);

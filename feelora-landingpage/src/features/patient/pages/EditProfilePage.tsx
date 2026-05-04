@@ -145,7 +145,7 @@ const EditProfilePage = () => {
         Availability: patient.Availability || [],
       });
       // Try to download the existing profile picture
-      download('profile.jpg', 'public').catch((err) => {
+      download('profile', 'public').catch((err) => {
         console.error('Could not download profile image:', err);
       });
     }
@@ -203,7 +203,7 @@ const EditProfilePage = () => {
       setPreviewImage(objectUrl);
 
       try {
-        const fileToUpload = new File([file], 'profile', { type: 'image/jpeg' });
+        const fileToUpload = new File([file], 'profile', { type: file.type });
         await upload(fileToUpload, 'public');
       } catch (err) {
         console.error('Upload failed:', err);

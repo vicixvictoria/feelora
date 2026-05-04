@@ -43,7 +43,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (patient) {
-      download('profile.jpg', 'public').catch((err) => {
+      download('profile', 'public').catch((err) => {
         console.error('Could not download profile image:', err);
       });
     }
@@ -51,7 +51,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (therapist?.Id) {
-      downloadTherapist('profile.jpg', 'public', therapist.Id).catch((err) => {
+      downloadTherapist('profile', 'public', therapist.Id).catch((err) => {
         console.error('Could not download therapist profile image:', err);
       });
     }

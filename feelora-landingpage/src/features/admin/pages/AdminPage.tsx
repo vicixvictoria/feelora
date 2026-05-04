@@ -255,12 +255,12 @@ const TherapistDetail = ({
         <div className="flex flex-wrap gap-3">
           <DocumentDownloadButton
             label="Download License PDF"
-            filename="license.pdf"
+            filename="license"
             ownerSub={profile.Id}
           />
           <DocumentDownloadButton
             label="Download Passport"
-            filename="passport.jpg"
+            filename="passport"
             ownerSub={profile.Id}
           />
         </div>
