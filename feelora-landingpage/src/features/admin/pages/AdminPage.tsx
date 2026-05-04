@@ -88,8 +88,10 @@ const DocumentDownloadButton = ({
         disabled={loading}
         className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium border border-border text-foreground hover:bg-muted transition-colors disabled:opacity-50"
       >
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-        {label}
+        <span className="flex items-center justify-center w-4 h-4">
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+        </span>
+        <span>{label}</span>
       </button>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
