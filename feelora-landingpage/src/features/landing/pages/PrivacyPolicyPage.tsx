@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
 import { useTranslation } from 'react-i18next';
 
-
 //only T&C now
 export function PrivacyPolicyPage() {
   const { t } = useTranslation();
@@ -24,12 +23,12 @@ export function PrivacyPolicyPage() {
               className="mb-8 text-gray-700 hover:text-primary"
             >
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              {t('privacy.back')}
+              {t('privacy.back', 'Back')}
             </Button>
 
-            <h1 className="text-h1 font-headline font-bold text-[#4f378b] tracking-headline leading-headline mb-8 flex items-center gap-4">
+            <h1 className="text-h1 font-headline font-bold text-[#4f378b] tracking-headline leading-headline mb-8 flex items-center gap-4 uppercase">
               <FileTextIcon className="w-8 h-8 text-[#4f378b]" />
-              {t('privacy.tab.terms')}
+              {t('agb.terms.title')}
             </h1>
           </motion.div>
         </div>
@@ -52,70 +51,39 @@ export function PrivacyPolicyPage() {
 
 function TermsSection() {
   const { t } = useTranslation();
+
+  // Dynamically generate an array [1, 2, 3, ..., 33] so we don't have to write 33 blocks of code
+  const sectionNumbers = Array.from({ length: 33 }, (_, i) => i + 1);
+
   return (
     <Card className="p-12 bg-card border-border">
-      <h2 className="text-h2 font-headline font-semibold text-gray-800 mb-6">
-        {t('privacy.terms.title')}
-      </h2>
+      <div className="space-y-12 text-body leading-body" style={{ color: '#2F3E46' }}>
+        
+        {/* Header & Date */}
+        <p className="font-semibold text-gray-500">{t('agb.terms.lastUpdated')}</p>
 
-      <div className="space-y-8 text-body leading-body" style={{ color: '#2F3E46' }}>
-        <p className="font-semibold">{t('privacy.terms.asOf')}</p>
-
+        {/* Introduction Section */}
         <div>
           <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s1.title')}
+            {t('agb.terms.intro.title')}
           </h3>
-          <p>{t('privacy.terms.s1.text')}</p>
+          <p className="whitespace-pre-wrap leading-relaxed text-gray-700">
+            {t('agb.terms.intro.text')}
+          </p>
         </div>
 
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s2.title')}
-          </h3>
-          <p>{t('privacy.terms.s2.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s3.title')}
-          </h3>
-          <p>{t('privacy.terms.s3.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s4.title')}
-          </h3>
-          <p>{t('privacy.terms.s4.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s5.title')}
-          </h3>
-          <p>{t('privacy.terms.s5.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s6.title')}
-          </h3>
-          <p>{t('privacy.terms.s6.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s7.title')}
-          </h3>
-          <p>{t('privacy.terms.s7.text')}</p>
-        </div>
-
-        <div>
-          <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
-            {t('privacy.terms.s8.title')}
-          </h3>
-          <p>{t('privacy.terms.s8.text')}</p>
-        </div>
+        {/* Dynamic mapping of all 33 Terms & Conditions sections */}
+        {sectionNumbers.map((num) => (
+          <div key={num} className="pt-4 border-t border-gray-100">
+            <h3 className="text-h3 font-headline font-semibold text-gray-800 mb-4">
+              {t(`agb.terms.s${num}.title`)}
+            </h3>
+            <p className="whitespace-pre-wrap leading-relaxed text-gray-700">
+              {t(`agb.terms.s${num}.text`)}
+            </p>
+          </div>
+        ))}
+        
       </div>
     </Card>
   );

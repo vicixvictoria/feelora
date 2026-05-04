@@ -129,6 +129,17 @@ const DELETE_MATCH_MUTATION = gql`
   }
 `;
 
+// -- Save Consent for DB  --
+const CREATE_CONSENTS_MUTATION = gql`
+  mutation CreateConsents($input: ConsentInput!) {
+    createConsents(input: $input) {
+      id
+      timestamp
+      subject_id
+    }
+  }
+`;
+
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
@@ -356,6 +367,38 @@ export const therapistService = {
     } catch (error) {
       console.error('Error unmatching patient:', error);
       throw error;
+    }
+  },
+
+  // -- Log Therapist Consent to Consent-DB --
+  submitConsent: async (): Promise<boolean> => {
+    const input = {
+      preferences: [
+        { key: "terms_and_conditions", value: true },
+        { key: "ai_matching", value: true },
+        { key: "data_processing", value: true }
+      ],
+      legal_notices: [
+        { identifier: "terms_and_conditions" },
+        { identifier: "privacy_policy" }
+      ],
+      proofs: [
+        {
+          content: "Therapist actively checked the box agreeing to T&C, AI usage, and data processing on the Welcome Step.",
+          form: "therapist_welcome_step"
+        }
+      ]
+    };
+
+    try {
+      await apolloClient.mutate({
+        mutation: CREATE_CONSENTS_MUTATION,
+        variables: { input },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error saving therapist consent:', error);
+      return false;
     }
   },
 
