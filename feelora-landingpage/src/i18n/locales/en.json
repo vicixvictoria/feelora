@@ -351,7 +351,7 @@
   "q.t.qualifications.idUpload": "Upload ID",
   "q.t.qualifications.idUploadHint": "(required to verify identity and license number)",
   "q.t.qualifications.selectImage": "Select image",
-  "q.t.qualifications.fileTypes": "JPG",
+  "q.t.qualifications.fileTypes": "JPG, PNG or PDF",
   "q.t.qualifications.clickToChange": "Click to change",
   "q.t.qualifications.uploadRequired": "Please upload a document for verification",
   "q.t.qualifications.titleRequired": "Please fill in at least one title",
