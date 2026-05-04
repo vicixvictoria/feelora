@@ -132,6 +132,7 @@ const TherapistProfilePage = () => {
       });
 
       setGeneralNotifs((prev) => prev.filter((n) => n.sk !== notif.sk));
+      window.dispatchEvent(new Event('notificationsRead'));
     } catch (err) {
       console.error('Failed to dismiss notification:', err);
     }
@@ -158,6 +159,7 @@ const TherapistProfilePage = () => {
 
       // Setzt den Zähler sofort auf 0
       setUnreadChatCount(0);
+      window.dispatchEvent(new Event('notificationsRead'));
     } catch (err) {
       console.error('Failed to clear chat notifications:', err);
     } finally {
