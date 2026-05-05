@@ -702,6 +702,25 @@
   "app.therapist.notifications.newMatch": "Ein/e Patient:inhat dich als Therapeut:in akzeptiert!",
   "app.therapist.notifications.unmatch": "Ein/e Patient:inhat dich als Therapeut:in entmatcht.",
 
+
+      "app.emergency.title": "Notfallkontakte & Hilfe",
+      "app.emergency.subtitle": "Wenn du oder jemand anderes sich in einer akuten Krise befindet, zögere nicht, Hilfe in Anspruch zu nehmen. Diese Stellen sind für dich da.",
+      "app.emergency.acuteTitle": "Akute Notfälle",
+      "app.emergency.acuteDesc": "Für akute Notfälle wähle immer 144 (Rettung) oder 112 (Euro-Notruf).",
+      "app.emergency.hotlines.ts.name": "Telefonseelsorge",
+      "app.emergency.hotlines.ts.desc": "24/7 erreichbar",
+      "app.emergency.hotlines.psnd.name": "Sozialpsychiatrischer Notdienst",
+      "app.emergency.hotlines.psnd.desc": "24/7 erreichbar, Wien",
+      "app.emergency.hotlines.rad.name": "Rat auf Draht",
+      "app.emergency.hotlines.rad.desc": "24/7 erreichbar, für Kinder und Jugendliche",
+      "app.emergency.hotlines.rk.name": "Rotes Kreuz Kummernummer",
+      "app.emergency.hotlines.rk.desc": "Täglich von 16:00 bis 24:00 Uhr",
+      "app.emergency.hotlines.fh.name": "Frauenhelpline",
+      "app.emergency.hotlines.fh.desc": "24/7 erreichbar",
+      "app.emergency.hotlines.mn.name": "Männernotruf",
+      "app.emergency.hotlines.mn.desc": "24/7 erreichbar",
+
+
   "app.patient.moodTracker.happy": "Glücklich",
   "app.patient.moodTracker.content": "Zufrieden",
   "app.patient.moodTracker.neutral": "Neutral",

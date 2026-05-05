@@ -50,8 +50,10 @@ const Header = () => {
             {t('app.therapist.header.emergency')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>{t('app.therapist.header.emergencyNumbers')}</DropdownMenuItem>
-            <DropdownMenuItem>{t('app.therapist.header.crisisHotline')}</DropdownMenuItem>
+            {/* Added navigate to emergency page here */}
+            <DropdownMenuItem onClick={() => navigate('emergency')}>
+              {t('app.therapist.header.emergencyNumbers')}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -117,7 +119,16 @@ const Header = () => {
           </div>
 
           <div className="border-t border-border px-3 py-4 flex flex-col gap-2">
-            <button className="sidebar-item text-sm">{t('app.therapist.header.emergency')}</button>
+            {/* Added navigation to emergency and closed the sheet */}
+            <button 
+              className="sidebar-item text-sm"
+              onClick={() => {
+                navigate('emergency');
+                setSheetOpen(false);
+              }}
+            >
+              {t('app.therapist.header.emergency')}
+            </button>
             <button className="sidebar-item text-sm">{t('app.therapist.header.settings')}</button>
             <button
               className="sidebar-item text-sm"

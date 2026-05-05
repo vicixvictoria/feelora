@@ -55,6 +55,7 @@ import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarP
 import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
 import TherapistMoodTrackerDetailsPage from './features/therapist/pages/TherapistMoodTrackerDetailsPage';
 import TherapistEditProfilePage from './features/therapist/pages/TherapistEditProfilePage';
+import TherapistEmergencyPage from './features/therapist/pages/EmergencyPage';
 import { WebsocketProvider } from './contexts/WebsocketContext';
 import AdminPage from './features/admin/pages/AdminPage';
 
@@ -179,6 +180,7 @@ const router = createBrowserRouter([
               { path: 'account', element: <TherapistAccountPage /> },
               { path: 'mood-tracker/details', element: <TherapistMoodTrackerDetailsPage /> },
               { path: 'profile/edit', element: <TherapistEditProfilePage /> },
+              { path: 'emergency', element: <TherapistEmergencyPage /> },
             ],
           },
         ],
