@@ -34,6 +34,7 @@ export const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
       LicenseData
       LicenseVerified
       Matches
+      Title
       JobTitle
       HasInsurance
       PriceRange
@@ -86,6 +87,8 @@ const GET_MATCHED_USERS_QUERY = gql`
         Surname
         Gender
         City
+        BirthDate
+        Languages
       }
     }
   }

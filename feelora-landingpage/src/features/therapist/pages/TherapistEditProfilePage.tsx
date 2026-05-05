@@ -9,6 +9,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useS3Upload } from '@/hooks/use-s3-upload';
 import { useS3Download } from '@/hooks/use-s3-download';
 
+// --- Country/City Imports ---
+import { City } from 'country-state-city';
+import countries from 'i18n-iso-countries';
+import deLocale from 'i18n-iso-countries/langs/de.json';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+
+// Register languages
+countries.registerLocale(deLocale);
+countries.registerLocale(enLocale);
+
 interface LanguageOption {
   id: string;
   label: string;
@@ -28,13 +38,51 @@ const toUnixSeconds = (dateStr: string) => {
 
 const OTHER_VALUE = 'Andere';
 
+// --- City Translation Helpers ---
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
+};
+
+const deCityTranslationMap: Record<string, string> = {
+  "Vienna": "Wien",
+  "Munich": "München",
+  "Cologne": "Köln",
+  "Nuremberg": "Nürnberg",
+  "Prague": "Prag",
+  "Rome": "Rom",
+  "Milan": "Mailand",
+  "Venice": "Venedig",
+  "Florence": "Florenz",
+  "Geneva": "Genf",
+  "Zurich": "Zürich",
+  "Lucerne": "Luzern",
+  "Warsaw": "Warschau",
+  "Brussels": "Brüssel",
+  "Lisbon": "Lissabon",
+  "Athens": "Athen",
+  "Moscow": "Moskau",
+};
+
+const translateCity = (cityName: string, currentLang: string) => {
+  if (currentLang === 'de') {
+    return deCityTranslationMap[cityName] || cityName;
+  }
+  return cityName; 
+};
+
 const TherapistEditProfilePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load existing profile data
-  const { data, loading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
+  const currentLang = i18n.language?.startsWith('de') ? 'de' : 'en';
+
+  // Force Apollo to skip the cache to get fresh data including Title, Country, HasInsurance, etc.
+  const { data, loading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY, {
+    fetchPolicy: 'network-only',
+  });
   const profile = data?.getOwnTherapistProfile;
 
   // Form State
@@ -43,6 +91,7 @@ const TherapistEditProfilePage = () => {
     Surname: '',
     Title: '',
     JobTitle: '',
+    Country: '',
     City: '',
     Address: '',
     Gender: '',
@@ -50,14 +99,97 @@ const TherapistEditProfilePage = () => {
     Languages: [] as string[],
     Availability: [] as string[],
     Specialties: [] as string[],
+    // New Pricing Fields
+    HasInsurance: false,
+    MinPrice: '' as string | number,
+    MaxPrice: '' as string | number,
   });
 
   const [previewImage, setPreviewImage] = useState<string>(avatarPlaceholder);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // --- Custom Title & JobTitle State ---
+  const [isCustomJob, setIsCustomJob] = useState(false);
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+
+  // --- Country & City State ---
+  const [countryQuery, setCountryQuery] = useState('');
+  const [isCountryFocused, setIsCountryFocused] = useState(false);
+  const [isCityFocused, setIsCityFocused] = useState(false);
+
   const { upload } = useS3Upload();
   const { download, imageUrl } = useS3Download();
+
+  // --- PREDEFINED OPTIONS ---
+  const predefinedJobs = useMemo(() => [
+    t('q.t.personal.jobs.psych_pt', 'Psychotherapist'),
+    t('q.t.personal.jobs.clinicalPsych', 'Clinical Psychologist'),
+    t('q.t.personal.jobs.kjp', 'Child and Adolescent Psychotherapist'),
+    t('q.t.personal.jobs.fachaerzt_psychiatrie', 'Specialist in Psychiatry and Psychotherapy'),
+    t('q.t.personal.jobs.psych_berater', 'Life and Social Counselor'),
+    t('q.t.personal.jobs.gesundheitsPsych', 'Health Psychologist'),
+  ], [t]);
+
+  const predefinedTitles = useMemo(() => [
+    t('q.t.personal.titles.dr_med', 'Dr. med.'),
+    t('q.t.personal.titles.dr_rer_nat', 'Dr. rer. nat.'),
+    t('q.t.personal.titles.dr_phil', 'Dr. phil.'),
+    t('q.t.personal.titles.dr', 'Dr.'),
+    t('q.t.personal.titles.prof_dr', 'Prof. Dr.'),
+    t('q.t.personal.titles.dipl_psych', 'Dipl.-Psych.'),
+    t('q.t.personal.titles.dipl_paed', 'Dipl.-Päd.'),
+    t('q.t.personal.titles.m_sc', 'M.Sc.'),
+    t('q.t.personal.titles.b_sc', 'B.Sc.'),
+    t('q.t.personal.titles.m_a', 'M.A.'),
+    t('q.t.personal.titles.b_a', 'B.A.'),
+  ], [t]);
+
+  // --- Dynamic Search Options ---
+  const availableCountries = useMemo(() => {
+    const query = countryQuery.trim().toLowerCase();
+    if (query.length < 2) return [];
+
+    const countryObj = countries.getNames(currentLang, { select: 'official' });
+    const allLocalizedCountries = Object.entries(countryObj).map(([code, name]) => ({
+      isoCode: code,
+      name: name,
+      flag: getFlagEmoji(code),
+    }));
+
+    return allLocalizedCountries
+      .filter((country) => country.name.toLowerCase().startsWith(query))
+      .slice(0, 20);
+  }, [countryQuery, currentLang]);
+
+  const availableCities = useMemo(() => {
+    if (!formData.Country) return [];
+
+    const query = (formData.City || '').trim().toLowerCase();
+    if (query.length < 2) return [];
+
+    const allCities = City.getCitiesOfCountry(formData.Country) || [];
+    const uniqueCities: string[] = [];
+    const seenNames = new Set<string>();
+
+    for (const city of allCities) {
+      const rawName = city.name?.trim();
+      if (!rawName) continue;
+
+      const translatedName = translateCity(rawName, currentLang);
+
+      if (seenNames.has(translatedName)) continue;
+
+      if (translatedName.toLowerCase().startsWith(query)) {
+        seenNames.add(translatedName);
+        uniqueCities.push(translatedName);
+      }
+
+      if (uniqueCities.length >= 50) break;
+    }
+
+    return uniqueCities;
+  }, [formData.Country, formData.City, currentLang]);
 
   // --- TRANSLATED ARRAYS ---
   const languageOptions = useMemo(
@@ -142,10 +274,18 @@ const TherapistEditProfilePage = () => {
     [t],
   );
 
+  // Update country query if language changes
+  useEffect(() => {
+    if (formData.Country) {
+      setCountryQuery(countries.getName(formData.Country, currentLang, { select: 'official' }) || '');
+    }
+  }, [currentLang, formData.Country]);
+
   // Populate form when data loads
   useEffect(() => {
     if (profile) {
-      // 3. Check if user already has an "other" language saved so we can auto-open the panel
+      console.log('🔍 [DEBUG] Profile Data loaded from Backend:', profile);
+
       let loadedLanguages = profile.Languages || [];
       const hasOtherLanguage = loadedLanguages.some((lang: string) =>
         otherLanguages.some((other: LanguageOption) => other.id === lang),
@@ -155,11 +295,23 @@ const TherapistEditProfilePage = () => {
         loadedLanguages = [...loadedLanguages, OTHER_VALUE];
       }
 
+      // Parse the PriceRange string (e.g., "50-100") back to Min and Max
+      let minP: string | number = '';
+      let maxP: string | number = '';
+      if (profile.PriceRange) {
+        const parts = profile.PriceRange.split('-');
+        if (parts.length === 2) {
+          minP = Number(parts[0]);
+          maxP = Number(parts[1]);
+        }
+      }
+
       setFormData({
         Name: profile.Name || '',
         Surname: profile.Surname || '',
         Title: profile.Title || '',
         JobTitle: profile.JobTitle || '',
+        Country: profile.Country || '',
         City: profile.City || '',
         Address: profile.Address || '',
         Gender: profile.Gender || '',
@@ -167,14 +319,35 @@ const TherapistEditProfilePage = () => {
         Languages: loadedLanguages,
         Availability: profile.Availability || [],
         Specialties: profile.Specialties || [],
+        HasInsurance: profile.HasInsurance || false,
+        MinPrice: minP,
+        MaxPrice: maxP,
       });
+
+      // Handle custom selections
+      if (profile.JobTitle && !predefinedJobs.includes(profile.JobTitle)) {
+        setIsCustomJob(true);
+      } else {
+        setIsCustomJob(false);
+      }
+
+      if (profile.Title && !predefinedTitles.includes(profile.Title)) {
+        setIsCustomTitle(true);
+      } else {
+        setIsCustomTitle(false);
+      }
+
+      if (profile.Country) {
+        setCountryQuery(countries.getName(profile.Country, currentLang, { select: 'official' }) || '');
+      }
+
       // Fetch own image
       download('profile', 'public').catch((err) => {
         console.debug('No existing profile image found.', err);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, predefinedJobs, predefinedTitles]);
 
   useEffect(() => {
     if (imageUrl) {
@@ -200,17 +373,14 @@ const TherapistEditProfilePage = () => {
     });
   };
 
-  // 4. Special handler for toggling the "Andere" checkbox group
   const handleOtherLanguagesToggle = () => {
     if (formData.Languages.includes(OTHER_VALUE)) {
-      // Uncheck: Remove "Andere" and clear all selected "other" languages
       const otherIds = otherLanguages.map((l) => l.id);
       setFormData((prev) => ({
         ...prev,
         Languages: prev.Languages.filter((l) => l !== OTHER_VALUE && !otherIds.includes(l)),
       }));
     } else {
-      // Check: Just add "Andere" to trigger the dropdown
       setFormData((prev) => ({
         ...prev,
         Languages: [...prev.Languages, OTHER_VALUE],
@@ -241,7 +411,13 @@ const TherapistEditProfilePage = () => {
     e.preventDefault();
     setIsSaving(true);
 
-    // Build the payload first to log it
+    // Validate Pricing
+    if (formData.MinPrice !== '' && formData.MaxPrice !== '' && Number(formData.MinPrice) > Number(formData.MaxPrice)) {
+      alert(t('q.t.price.errorMinMax', 'Der Mindestpreis darf nicht größer als der Höchstpreis sein.'));
+      setIsSaving(false);
+      return;
+    }
+
     const payload = {
       Name: formData.Name,
       Surname: formData.Surname,
@@ -251,10 +427,11 @@ const TherapistEditProfilePage = () => {
       Address: formData.Address,
       Gender: formData.Gender,
       BirthDate: toUnixSeconds(formData.BirthDate),
-      // 5. Make sure to filter out the utility 'Andere' string before sending it to the DB
       Languages: formData.Languages.filter((l) => l !== OTHER_VALUE),
       Availability: formData.Availability,
       Specialties: formData.Specialties,
+      HasInsurance: formData.HasInsurance,
+      PriceRange: formData.MinPrice !== '' && formData.MaxPrice !== '' ? `${formData.MinPrice}-${formData.MaxPrice}` : '',
     };
 
     console.log('🟢 [COMPONENT] 1. Sending payload to Service:', payload);
@@ -346,26 +523,129 @@ const TherapistEditProfilePage = () => {
                 <label className="block text-sm font-medium text-foreground mb-1">
                   {t('app.therapist.profile.title.academic', 'Titel (wird im Profil angezeigt)')}
                 </label>
-                <input
-                  type="text"
-                  name="Title"
-                  value={formData.Title}
-                  onChange={handleChange}
+                <select
+                  value={isCustomTitle ? 'other' : (formData.Title || 'none')}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'other') {
+                      setIsCustomTitle(true);
+                      setFormData(prev => ({ ...prev, Title: '' }));
+                    } else if (val === 'none') {
+                      setIsCustomTitle(false);
+                      setFormData(prev => ({ ...prev, Title: '' }));
+                    } else {
+                      setIsCustomTitle(false);
+                      setFormData(prev => ({ ...prev, Title: val }));
+                    }
+                  }}
                   className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
-                />
+                >
+                  <option value="none">{t('q.t.personal.noTitle', '(Keinen Titel angeben)')}</option>
+                  {predefinedTitles.map(tItem => <option key={tItem} value={tItem}>{tItem}</option>)}
+                  <option value="other">{t('q.t.personal.titleOther', 'Sonstiges (Eigene Eingabe)')}</option>
+                </select>
+                {isCustomTitle && (
+                  <input
+                    type="text"
+                    name="Title"
+                    value={formData.Title}
+                    onChange={handleChange}
+                    placeholder={t('q.t.personal.customTitlePlaceholder', 'Bitte Titel eingeben...')}
+                    className="w-full p-3 mt-2 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                  />
+                )}
               </div>
+              
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  {t('app.therapist.profile.jobTitle', 'Berufsbezeichnung')}
+                  {t('app.therapist.profile.jobTitle', 'Berufsbezeichnung')} *
                 </label>
-                <input
-                  type="text"
-                  name="JobTitle"
-                  value={formData.JobTitle}
-                  onChange={handleChange}
-                  required
+                <select
+                  value={isCustomJob ? 'other' : formData.JobTitle}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'other') {
+                      setIsCustomJob(true);
+                      setFormData(prev => ({ ...prev, JobTitle: '' }));
+                    } else {
+                      setIsCustomJob(false);
+                      setFormData(prev => ({ ...prev, JobTitle: val }));
+                    }
+                  }}
+                  required={!isCustomJob}
                   className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                >
+                  <option value="" disabled>{t('q.common.pleaseSelect', 'Bitte auswählen')}</option>
+                  {predefinedJobs.map(job => <option key={job} value={job}>{job}</option>)}
+                  <option value="other">{t('q.t.personal.jobOther', 'Sonstiges (Eigene Eingabe)')}</option>
+                </select>
+                {isCustomJob && (
+                  <input
+                    type="text"
+                    name="JobTitle"
+                    value={formData.JobTitle}
+                    onChange={handleChange}
+                    required
+                    placeholder={t('q.t.personal.customJobPlaceholder', 'Bitte Berufsbezeichnung eingeben...')}
+                    className="w-full p-3 mt-2 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="my-6 border-t border-border"></div>
+
+          {/* Pricing & Costs Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-primary">
+              {t('q.t.price.title', 'Preise und Kosten')}
+            </h3>
+            
+            <div className="space-y-6">
+              {/* Kassenvertrag Checkbox */}
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="HasInsurance"
+                  checked={formData.HasInsurance}
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, HasInsurance: checked as boolean }))}
                 />
+                <label
+                  htmlFor="HasInsurance"
+                  className="text-sm font-medium cursor-pointer text-foreground"
+                >
+                  {t('q.t.price.kassenvertrag', 'Kassenvertrag')}
+                </label>
+              </div>
+
+              {/* Price Range Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    {t('q.t.price.min', 'Mindestpreis (€)')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    name="MinPrice"
+                    value={formData.MinPrice}
+                    onChange={handleChange}
+                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    {t('q.t.price.max', 'Höchstpreis (€)')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    name="MaxPrice"
+                    value={formData.MaxPrice}
+                    onChange={handleChange}
+                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -404,7 +684,58 @@ const TherapistEditProfilePage = () => {
                   className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
                 />
               </div>
-              <div>
+
+              {/* Country Selection */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  {t('q.t.contact.country', 'Land')}
+                </label>
+                <input
+                  type="text"
+                  value={countryQuery}
+                  placeholder={t('q.common.searchPlaceholder', 'Suchen...')}
+                  onChange={(e) => {
+                    const nextQuery = e.target.value;
+                    setCountryQuery(nextQuery);
+                    setFormData((prev) => ({ ...prev, Country: '', City: '' }));
+                  }}
+                  onFocus={() => setIsCountryFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsCountryFocused(false), 150);
+                  }}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                />
+
+                {isCountryFocused && countryQuery.trim().length >= 2 && (
+                  <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-56 overflow-auto">
+                    {availableCountries.length > 0 ? (
+                      availableCountries.map((country) => (
+                        <button
+                          key={country.isoCode}
+                          type="button"
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-accent flex items-center gap-2"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setCountryQuery(country.name);
+                            setFormData((prev) => ({ ...prev, Country: country.isoCode, City: '' }));
+                            setIsCountryFocused(false);
+                          }}
+                        >
+                          <span>{country.flag}</span>
+                          <span>{country.name}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-2 text-sm text-muted-foreground text-center">
+                        {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* City Selection */}
+              <div className="relative">
                 <label className="block text-sm font-medium text-foreground mb-1">
                   {t('app.therapist.profile.city', 'Stadt')}
                 </label>
@@ -412,10 +743,46 @@ const TherapistEditProfilePage = () => {
                   type="text"
                   name="City"
                   value={formData.City}
-                  onChange={handleChange}
-                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none"
+                  disabled={!formData.Country}
+                  placeholder={
+                    formData.Country
+                      ? t('q.common.searchPlaceholder', 'Suchen...')
+                      : t('q.t.contact.selectCountryFirst', 'Bitte zuerst Land wählen')
+                  }
+                  onChange={(e) => setFormData((prev) => ({ ...prev, City: e.target.value }))}
+                  onFocus={() => setIsCityFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsCityFocused(false), 150);
+                  }}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 outline-none disabled:opacity-50"
                 />
+
+                {isCityFocused && formData.Country && (formData.City || '').trim().length >= 2 && (
+                  <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-56 overflow-auto">
+                    {availableCities.length > 0 ? (
+                      availableCities.map((cityName) => (
+                        <button
+                          key={cityName}
+                          type="button"
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setFormData((prev) => ({ ...prev, City: cityName }));
+                            setIsCityFocused(false);
+                          }}
+                        >
+                          {cityName}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-2 text-sm text-muted-foreground text-center">
+                        {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
                   {t('app.therapist.profile.address', 'Praxisadresse')}
@@ -453,7 +820,7 @@ const TherapistEditProfilePage = () => {
                   <option value="">{t('common.choose')}</option>
                   <option value="male">{t('q.t.personal.male')}</option>
                   <option value="female">{t('q.t.personal.female')}</option>
-                  <option value="divers">{t('q.t.personal.diverse')}</option>
+                  <option value="diverse">{t('q.t.personal.diverse')}</option>
                 </select>
               </div>
             </div>
@@ -489,8 +856,6 @@ const TherapistEditProfilePage = () => {
             <h3 className="text-lg font-semibold text-primary">
               {t('app.therapist.profile.languages', 'Sprachen')}
             </h3>
-
-            {/* 6. Updated Grid identical to Step7 */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {languageOptions.map((lang) => (
                 <label
@@ -505,7 +870,6 @@ const TherapistEditProfilePage = () => {
                 </label>
               ))}
 
-              {/* "Andere" Option spanning entire columns */}
               <div className="col-span-full space-y-3">
                 <label
                   htmlFor="t-languages-other"
@@ -526,7 +890,6 @@ const TherapistEditProfilePage = () => {
                     <p className="text-sm font-medium mb-3 text-foreground">
                       {t('q.common.selectMoreLanguages')}
                     </p>
-
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                       {otherLanguages.map((lang) => (
                         <label

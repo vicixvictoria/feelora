@@ -18,6 +18,7 @@ interface SidebarChat {
   age: string;
   gender: string;
   city: string;
+  languages: string;
   avatar: string;
   conversationId: string | null;
   lastMessage: string;
@@ -192,6 +193,8 @@ const TherapistChat = () => {
       notificationService.readNotification({
         notificationType: 'new_message',
         notificationId: selectedChat.conversationId,
+        }).then(() => {
+          window.dispatchEvent(new Event('notificationsRead')); // Notify sidebar to refetch notifications and update badges
       }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
 
@@ -216,7 +219,7 @@ const TherapistChat = () => {
         // Get the active Conversations
         const conversations = await chatService.getChatConversations();
 
-        // Combine them into Sidebar List!
+        // Combine them into Sidebar List
         const sidebarItems: SidebarChat[] = patients.map((patient: any) => {
           // Check if a conversation already exists for this patient
           const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
@@ -229,6 +232,9 @@ const TherapistChat = () => {
             age: calculateAge(patient.BirthDate),
             gender: patient.Gender || 'N/A',
             city: patient.City || patient.city || [],
+            languages: Array.isArray(patient.Languages)
+              ? patient.Languages.join(', ')
+              : patient.Languages || patient.languages || 'N/A',
             avatar: avatar, // Fallback avatar string
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
@@ -278,6 +284,7 @@ const TherapistChat = () => {
           notificationType: 'new_message',
           notificationId: conversationId, 
         });
+        window.dispatchEvent(new Event('notificationsRead')); // Notify sidebar to refetch notifications and update badges
       } catch (err) {
         console.error('Failed to mark messages as read on the server:', err);
       }
@@ -563,6 +570,7 @@ const TherapistChat = () => {
                   <p className="text-muted-foreground">
                     {selectedChat.age !== 'N/A' ? `${selectedChat.age} Jahre` : 'Alter unbekannt'}
                   </p>
+                  <p className="text-muted-foreground"> {selectedChat.languages}</p>
                 </div>
               </div>
 
