@@ -202,6 +202,17 @@ const DELETE_DATA_MUTATION = gql`
   }
 `;
 
+// -- Save Consent Mutation --
+const CREATE_CONSENTS_MUTATION = gql`
+  mutation CreateConsents($input: ConsentInput!) {
+    createConsents(input: $input) {
+      id
+      timestamp
+      subject_id
+    }
+  }
+`;
+
 // For pinging algorithm
 const PING_LAMBDA_QUERY = gql`
   query PingLambda {
@@ -520,6 +531,38 @@ export const patientService = {
     } catch (error) {
       console.error('Error fetching inviter details:', error);
       throw error;
+    }
+  },
+
+  // -- Log Patient Consent --
+  submitConsent: async (): Promise<boolean> => {
+    const input = {
+      preferences: [
+        { key: "health_data_processing", value: true },
+        { key: "ai_usage", value: true },
+        { key: "terms_and_conditions", value: true }
+      ],
+      legal_notices: [
+        { identifier: "privacy_policy" },
+        { identifier: "terms_and_conditions" }
+      ],
+      proofs: [
+        {
+          content: "Patient actively checked the box agreeing to health data processing (Art. 9 GDPR), AI disclaimer, and T&C on the Welcome Step.",
+          form: "patient_welcome_step"
+        }
+      ]
+    };
+
+    try {
+      await apolloClient.mutate({
+        mutation: CREATE_CONSENTS_MUTATION,
+        variables: { input },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error saving patient consent:', error);
+      return false;
     }
   },
 

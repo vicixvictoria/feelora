@@ -205,7 +205,7 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                       id={field}
                       type="text"
                       value={countryQuery}
-                      placeholder={t('q.common.pleaseSelect', 'Please select')}
+                      placeholder={t('q.common.searchPlaceholder', 'Suchen...')}
                       onChange={(e) => {
                         const nextQuery = e.target.value;
                         setCountryQuery(nextQuery);
@@ -241,7 +241,7 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                           ))
                         ) : (
                           <div className="p-2 text-sm text-muted-foreground text-center">
-                            {t('q.common.noResults', 'No results found')}
+                            {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
                           </div>
                         )}
                       </div>
@@ -257,8 +257,8 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                       disabled={!data.country}
                       placeholder={
                         data.country
-                          ? t('q.common.pleaseSelect', 'Please select')
-                          : t('q.p.contact.selectCountryFirst', 'Select country first')
+                          ? t('q.common.searchPlaceholder', 'Suchen...')
+                          : t('q.p.contact.selectCountryFirst', 'Bitte zuerst Land wählen')
                       }
                       onChange={(e) => handleChange(field, e.target.value)}
                       onFocus={() => setIsCityFocused(true)}
@@ -287,7 +287,7 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                           ))
                         ) : (
                           <div className="p-2 text-sm text-muted-foreground text-center">
-                            {t('q.common.noResults', 'No results found')}
+                            {t('q.common.noResults', 'Keine Ergebnisse gefunden')}
                           </div>
                         )}
                       </div>
@@ -309,7 +309,7 @@ const Step3_PContactInfo = ({ onNext, onBack, data, onDataChange }: ContactInfoS
                   <p className="text-[0.8rem] text-destructive">{t('q.common.invalidEmail')}</p>
                 )}
                 {errors[field] && !isOptional && field !== 'email' && (
-                  <p className="text-[0.8rem] text-destructive">{t('q.common.required', 'Required')}</p>
+                  <p className="text-[0.8rem] text-destructive">{t('q.common.required')}</p>
                 )}
               </div>
             );

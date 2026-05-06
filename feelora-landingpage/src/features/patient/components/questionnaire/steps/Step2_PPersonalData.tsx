@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Upload, Check, Loader2, User } from 'lucide-react';
 import { Input } from '@/components/ui/questionnaire/input';
 import { Label } from '@/components/ui/label';
 import { useStepValidation } from '@/hooks/use-step-validation';
@@ -11,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { useTranslation } from 'react-i18next';
+import { useS3Upload } from '@/hooks/use-s3-upload';
 
 interface PersonalDataStepProps {
   onNext: () => void;
@@ -19,16 +22,51 @@ interface PersonalDataStepProps {
   onDataChange: (data: Record<string, string>) => void;
 }
 
+// Define which fields are optional
+const optionalFields = ['profilePictureName', 'profilePictureUrl'];
+
 // Define Rules specifically for THIS step
 const step2Schema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().min(1, 'Required'),
-  bday: z.string().min(1, 'Required'),
+  bday: z
+    .string()
+    .min(1, 'Required')
+    .refine(
+      (val) => {
+        // Ensure all 3 parts of the date exist before validating age
+        const parts = val.split('-');
+        if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
+
+        const birthDate = new Date(val);
+        if (isNaN(birthDate.getTime())) return false;
+
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+
+        if (
+          monthDifference < 0 ||
+          (monthDifference === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+
+        return age >= 15;
+      },
+      { message: 'Underage or Incomplete' },
+    ),
   gender: z.string().min(1, 'Required'),
+  profilePictureName: z.string().optional(),
+  profilePictureUrl: z.string().optional(), // Added for the local preview URL
 });
 
 const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalDataStepProps) => {
   const { t } = useTranslation();
+
+  // Local uploading state
+  const [isUploading, setIsUploading] = useState(false);
+  const { upload } = useS3Upload();
 
   const genderOptions = [
     { value: 'male', label: t('q.p.personal.male') },
@@ -43,7 +81,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     gender: t('q.p.personal.gender'),
   };
 
-  // Use the hook (One line of logic!)
+  // Use the hook
   const { errors, validateAndNext, clearError } = useStepValidation({
     data,
     schema: step2Schema,
@@ -53,6 +91,62 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
   const handleChange = (field: string, value: string) => {
     clearError(field); // Clears red border from error immediately
     onDataChange({ ...data, [field]: value });
+  };
+
+  // Instant Local Preview of profile picture Upload Handler 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Create an instant local browser URL for the preview
+    const localPreviewUrl = URL.createObjectURL(file);
+
+    // Immediately update the form data so the image appears instantly on the left
+    onDataChange({
+      ...data,
+      profilePictureName: file.name,
+      profilePictureUrl: localPreviewUrl,
+    });
+    clearError('profilePictureName');
+
+    try {
+      // Start the UI spinner on the right side
+      setIsUploading(true);
+
+      // Perform the actual S3 upload in the background
+      const fileToUpload = new File([file], 'profile', { type: file.type });
+      await upload(fileToUpload, 'public');
+
+    } catch (error) {
+      console.error('Upload failed:', error);
+      
+      // Revert preview on failure
+      onDataChange({
+        ...data,
+        profilePictureName: '',
+        profilePictureUrl: '',
+      });
+      
+      alert(
+        t(
+          'q.p.personal.uploadError',
+          'Fehler beim Hochladen der Datei. Bitte versuche es erneut.',
+        ),
+      );
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  // Helper to calculate exact days in a month 
+  const getDaysInMonth = (yearStr: string, monthStr: string) => {
+    const y = parseInt(yearStr);
+    const m = parseInt(monthStr);
+    if (y && m) {
+      return new Date(y, m, 0).getDate(); 
+    }
+    return 31; // Default to 31 if year/month aren't selected yet
   };
 
   return (
@@ -69,50 +163,209 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
           {t('q.p.personal.cardTitle')}
         </h2>
 
+        {/* --- Standard Form Fields --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.keys(fieldLabels).map((field) => (
-            <div key={field} className="space-y-2">
-              <Label
-                htmlFor={field}
-                className={errors[field] ? 'text-destructive' : 'text-foreground'}
-              >
-                {fieldLabels[field]}
-              </Label>
-              {field === 'gender' ? (
-                <Select
-                  value={data[field] || ''}
-                  onValueChange={(value) => handleChange(field, value)}
+          {Object.keys(fieldLabels).map((field) => {
+            const isOptional = optionalFields.includes(field);
+
+            return (
+              <div key={field} className="space-y-2 flex flex-col">
+                <Label
+                  htmlFor={field}
+                  className={errors[field] ? 'text-destructive' : 'text-foreground'}
                 >
-                  <SelectTrigger
-                    className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                  {fieldLabels[field]} {!isOptional && errors[field] && '*'}
+                  {isOptional && (
+                    <span className="text-muted-foreground font-normal text-xs ml-1">
+                      ({t('q.common.optional')})
+                    </span>
+                  )}
+                </Label>
+
+                {field === 'gender' ? (
+                  <Select
+                    value={data[field] || ''}
+                    onValueChange={(value) => handleChange(field, value)}
                   >
-                    <SelectValue placeholder={t('q.common.pleaseSelect')} />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    {genderOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id={field}
-                  name={field}
-                  type={field === 'bday' ? 'date' : 'text'}
-                  value={data[field] || ''}
-                  onChange={(e) => handleChange(field, e.target.value)}
-                  className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    <SelectTrigger
+                      className={`bg-background ${errors[field] ? 'border-destructive ring-destructive' : ''}`}
+                    >
+                      <SelectValue placeholder={t('q.common.pleaseSelect', 'Bitte auswählen')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      {genderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : field === 'bday' ? (
+                  (() => {
+                    const bdayParts = (data[field] || '').split('-');
+                    const year = bdayParts[0] || '';
+                    const month = bdayParts[1] || '';
+                    const day = bdayParts[2] || '';
+
+                    const handleDateChange = (type: 'year' | 'month' | 'day', val: string) => {
+                      let newY = year;
+                      let newM = month;
+                      let newD = day;
+
+                      if (type === 'year') newY = val;
+                      if (type === 'month') newM = val;
+                      if (type === 'day') newD = val;
+
+                      handleChange(field, `${newY}-${newM}-${newD}`);
+                    };
+
+                    const daysInMonth = getDaysInMonth(year, month);
+                    const currentYear = new Date().getFullYear();
+                    const yearsList = Array.from({ length: 86 }, (_, i) => (currentYear - 15 - i).toString());
+
+                    return (
+                      <div className="flex gap-2">
+                        <Select value={day} onValueChange={(val) => handleDateChange('day', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="TT" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {Array.from({ length: daysInMonth }, (_, i) => {
+                              const d = (i + 1).toString().padStart(2, '0');
+                              return <SelectItem key={d} value={d}>{d}</SelectItem>;
+                            })}
+                          </SelectContent>
+                        </Select>
+
+                        <Select value={month} onValueChange={(val) => handleDateChange('month', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="MM" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const m = (i + 1).toString().padStart(2, '0');
+                              return <SelectItem key={m} value={m}>{m}</SelectItem>;
+                            })}
+                          </SelectContent>
+                        </Select>
+
+                        <Select value={year} onValueChange={(val) => handleDateChange('year', val)}>
+                          <SelectTrigger className={`bg-background w-1/3 ${errors[field] ? 'border-destructive ring-destructive' : ''}`}>
+                            <SelectValue placeholder="JJJJ" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            {yearsList.map((y) => (
+                              <SelectItem key={y} value={y}>{y}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <Input
+                    id={field}
+                    name={field}
+                    type="text"
+                    value={data[field] || ''}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                    className={`bg-background ${errors[field] ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                )}
+
+                {errors[field] && !isOptional && (
+                  <p className="text-xs text-destructive font-medium mt-1">
+                    {field === 'bday' 
+                      ? (data[field]?.length === 10
+                          ? t('q.p.personal.ageError', 'You must be at least 15 years old.')
+                          : t('q.p.personal.incompleteDate', 'Bitte vollständiges Datum eingeben.'))
+                      : t('q.common.required')}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* --- Profile Picture Preview Section --- */}
+        <div className="space-y-3 mt-8 pt-8 border-t border-border">
+          <Label htmlFor="profileUpload" className="text-foreground">
+            {t('q.p.personal.profilePicture', 'Profilbild')}{' '}
+            <span className="text-muted-foreground font-normal text-xs ml-1">
+              ({t('q.common.optional')})
+            </span>
+          </Label>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+            {/* Image Preview Area */}
+            <div className="flex justify-center sm:justify-start">
+              {data.profilePictureUrl ? (
+                <img
+                  src={data.profilePictureUrl}
+                  alt={data.profilePictureName || t('patient.profile.avatar')}
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover ring-2 ring-primary/20"
                 />
+              ) : (
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg bg-accent flex flex-col items-center justify-center text-muted-foreground gap-1 ring-2 ring-muted">
+                  <User className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/50" strokeWidth={1} />
+                  <span className="text-[0.7rem] sm:text-xs text-center px-1">
+                    {t('q.p.personal.noImage', 'Noch kein Bild')}
+                  </span>
+                </div>
               )}
             </div>
-          ))}
+
+            {/* Upload Area */}
+            <div className="flex-grow">
+              <label
+                htmlFor="profileUpload"
+                className={`flex items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed rounded-lg transition-colors bg-background ${
+                  isUploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                } border-muted-foreground/30 hover:border-primary/50 group`}
+              >
+                {isUploading ? (
+                  <div className="flex flex-col items-center gap-2 text-primary">
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <span className="text-xs font-medium text-center">
+                      {t('q.common.uploading', 'Wird hochgeladen...')}
+                    </span>
+                  </div>
+                ) : data.profilePictureName ? (
+                  <div className="flex flex-col items-center gap-1 text-center px-4">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="text-xs break-all text-muted-foreground font-medium">
+                      {data.profilePictureName}
+                    </span>
+                    <span className="text-[0.6rem] sm:text-xs text-primary font-medium mt-1 transition-opacity opacity-70 group-hover:opacity-100">
+                      {t('q.common.clickToChange', 'Klicken zum Ändern')}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5 text-muted-foreground px-4 text-center">
+                    <Upload className="w-5 h-5" />
+                    <span className="text-sm font-medium">
+                      {t('q.p.personal.selectImage', 'Bild auswählen')}
+                    </span>
+                    <span className="text-xs opacity-70">JPG, PNG, WEBP</span>
+                  </div>
+                )}
+                <input
+                  id="profileUpload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={isUploading}
+                  onChange={handleFileUpload}
+                />
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      <div className={isUploading ? 'pointer-events-none opacity-50' : ''}>
+        <NavigationButtons onNext={validateAndNext} onBack={onBack} />
+      </div>
     </div>
   );
 };
