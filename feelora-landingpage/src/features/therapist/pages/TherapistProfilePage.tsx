@@ -279,7 +279,7 @@ const TherapistProfilePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Messages Notification Card */}
         <div
-          onClick={() => navigate('/therapist/chat')} 
+          onClick={() => navigate('../')} 
           className="feelora-card relative flex items-center gap-4 transition-shadow text-left cursor-pointer hover:shadow-md hover:border-primary/30"
         >
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">

@@ -51,8 +51,9 @@ const Header = () => {
             {t('patient.header.emergency')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>{t('patient.header.emergencyNumbers')}</DropdownMenuItem>
-            <DropdownMenuItem>{t('patient.header.crisisHotline')}</DropdownMenuItem>
+             <DropdownMenuItem onClick={() => navigate('emergency')}>
+              {t('patient.header.emergencyNumbers')}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

@@ -83,7 +83,7 @@ export function Footer() {
     <li>
       {/* custom Terms of Service */}
       <button
-        onClick={() => navigate('/privacy')} 
+        onClick={() => navigate('/termsandconditions')} 
         className="text-gray-600 hover:text-primary transition-colors"
       >
         {t('footer.legal.terms')}

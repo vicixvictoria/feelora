@@ -63,9 +63,15 @@ const Header = () => {
             {t('app.therapist.header.settings')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>{t('app.therapist.header.notifications')}</DropdownMenuItem>
-            <DropdownMenuItem>{t('app.therapist.header.privacy')}</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('account')}>{'Account'}</DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => window.open('/termsandconditions', '_blank', 'noopener,noreferrer')}
+            >
+            {t('app.therapist.header.privacy')}
+            </DropdownMenuItem>
+    
+            <DropdownMenuItem onClick={() => navigate('account')}>
+            {'Account'}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

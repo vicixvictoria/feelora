@@ -79,7 +79,7 @@ const Step1_TWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
 
         <ExpandableSection title={t('q.t.welcome.tac.title')}>
           {t('q.t.welcome.tac.text1')}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+          <a href="/termsandconditions" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
             {t('q.t.welcome.tac.link')}
           </a>
           {t('q.t.welcome.tac.text2')}
