@@ -773,7 +773,7 @@
   "app.therapist.notifications.unmatch": "A patient has unmatched you as their therapist.",
 
       "app.emergency.title": "Emergency Contacts & Help",
-      "app.emergency.subtitle.patient": "If you or someone else is in an acute crisis, do not hesitate to reach out for help. These services are here for you.",
+      "app.emergency.subtitle.patients": "If you or someone else is in an acute crisis, do not hesitate to reach out for help. These services are here for you:",
       "app.emergency.subtitle": "If someone is in an acute crisis, do not hesitate to reach out for additional help. These services are here for you.",
       "app.emergency.acuteTitle": "Acute Emergencies",
       "app.emergency.acuteDesc": "For acute emergencies always dial 144 (Ambulance) or 112 (European emergency number).",
@@ -785,7 +785,11 @@
       "app.emergency.hotlines.rad.desc": "Available 24/7, for children and adolescents",
       "app.emergency.hotlines.rk.name": "Red Cross Helpline",
       "app.emergency.hotlines.rk.desc": "Daily from 4 PM to 12 AM",
-      
+      "app.emergency.hotlines.fh.name": "Women Helpline",
+      "app.emergency.hotlines.fh.desc": "24/7 available",
+      "app.emergency.hotlines.mn.name": "Männernotruf",
+      "app.emergency.hotlines.mn.desc": "24/7 available",
+
   "privacy.back": "Back",
   "privacy.pageTitle": "Feelora – Legal Documents",
   "privacy.tab.privacy": "Privacy Policy",

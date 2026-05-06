@@ -24,6 +24,8 @@ const MATCHING_ALGORITHM_MUTATION = gql`
       Address
       Title
       JobTitle
+      PriceRange
+      HasInsurance
       Ranking
     }
   }
@@ -111,6 +113,10 @@ export const GET_MATCHED_THERAPISTS_QUERY = gql`
         Languages
         Availability
         Specialties
+        JobTitle
+        Title
+        PriceRange
+        HasInsurance
       }
     }
   }
@@ -322,7 +328,31 @@ export const patientService = {
     try {
       const { data } = await apolloClient.mutate({
         mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
-        variables: { allow: consent }, // <-- Using the dedicated 'allow' variable
+        variables: { allow: consent },
+        // Manually overwrite the cache so 'cache-first' queries always get the fresh state
+        update: (cache) => {
+          try {
+            // Read the current profile out of the local cache
+            const existingData: any = cache.readQuery({
+              query: GET_OWN_USER_PROFILE_QUERY,
+            });
+
+            // If it exists, write it back with the newly toggled MoodTracker value
+            if (existingData && existingData.getOwnUserProfile) {
+              cache.writeQuery({
+                query: GET_OWN_USER_PROFILE_QUERY,
+                data: {
+                  getOwnUserProfile: {
+                    ...existingData.getOwnUserProfile,
+                    MoodTracker: consent, // Force the cache to hold the new boolean
+                  },
+                },
+              });
+            }
+          } catch (cacheError) {
+            console.warn('Could not update Apollo cache locally:', cacheError);
+          }
+        },
       });
 
       console.log(

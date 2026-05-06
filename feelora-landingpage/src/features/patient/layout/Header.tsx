@@ -63,8 +63,11 @@ const Header = () => {
             {t('patient.header.settings')}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>{t('patient.header.notifications')}</DropdownMenuItem>
-            <DropdownMenuItem>{t('patient.header.privacy')}</DropdownMenuItem>
+             <DropdownMenuItem 
+              onClick={() => window.open('/termsandconditions', '_blank', 'noopener,noreferrer')}
+            >
+            {t('app.therapist.header.privacy')}
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('account')}>{'Account'}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

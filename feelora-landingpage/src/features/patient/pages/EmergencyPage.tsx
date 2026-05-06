@@ -51,7 +51,7 @@ const EmergencyPage = () => {
           {t('app.emergency.title')}
         </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          {t('app.emergency.subtitle.patient')}
+          {t('app.emergency.subtitle.patients')}
         </p>
       </div>
 

@@ -22,6 +22,12 @@ const menuItems = [
     path: '/patient/mood-tracker',
   },
   {
+    titleKey: 'patient.sidebar.dashboard',
+    descKey: 'patient.sidebar.dashboardDesc',
+    icon: LayoutDashboard,
+    path: '/patient/dashboard',
+  },
+  {
     titleKey: 'patient.sidebar.calendar',
     descKey: 'patient.sidebar.calendarDesc',
     icon: Calendar,
@@ -32,12 +38,6 @@ const menuItems = [
     descKey: 'patient.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/patient/homework',
-  },
-  {
-    titleKey: 'patient.sidebar.dashboard',
-    descKey: 'patient.sidebar.dashboardDesc',
-    icon: LayoutDashboard,
-    path: '/patient/dashboard',
   },
 ];
 
