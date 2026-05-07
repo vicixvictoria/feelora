@@ -1064,6 +1064,10 @@
   "patient.profile.message": "Message",
   "patient.profile.noTherapistAssigned": "You currently have no assigned therapist.",
   "patient.profile.loadError": "Error loading profile data.",
+  "patient.profile.unmatchButton": "Unmatch Therapist",
+  "patient.profile.unmatchConfirmTitle": "Unmatch Therapist?",
+  "patient.profile.unmatchConfirmText": "Are you sure you want to unmatch this therapist? This action cannot be undone and the entire chat history will be deleted.",
+
 
   "q.p.timeframe.lessThan3Months": "Less than 3 months",
   "q.p.timeframe.3to6Months": "3-6 months",

@@ -379,10 +379,10 @@ const EditProfilePage = () => {
                   className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 outline-none"
                 >
                   <option value="">{t('common.select', 'Bitte wählen...')}</option>
-                  <option value="männlich">{t('q.t.patientGender.male', 'Männlich')}</option>
-                  <option value="weiblich">{t('q.t.patientGender.female', 'Weiblich')}</option>
-                  <option value="non-binary / divers">
-                    {t('q.t.patientGender.nonBinary', 'Non-binary / divers')}
+                  <option value="male">{t('q.t.patientGender.male', 'Männlich')}</option>
+                  <option value="female">{t('q.t.patientGender.female', 'Weiblich')}</option>
+                  <option value="diverse">
+                    {t('q.t.patientGender.nonBinary', 'Non-binary / diverse')}
                   </option>
                 </select>
               </div>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDownIcon } from 'lucide-react';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
-import { patientService } from '../../../api/patient-service'; // Adjust path if needed
+import { patientService } from '../../../api/patient-service'; 
 
 interface WelcomeStepProps {
   onNext: () => void;

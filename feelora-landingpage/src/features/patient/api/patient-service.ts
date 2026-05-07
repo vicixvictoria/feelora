@@ -2,6 +2,7 @@ import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
 import { QuestionnaireData } from '../types/questionnaire';
 import { PatientProfile, MatchedTherapist, AlgorithmMatch } from '../types/profiles';
+import { FetchPolicy } from '@apollo/client';
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
 
@@ -201,6 +202,13 @@ const GET_INVITER_DETAILS_QUERY = gql`
   }
 `;
 
+// Delete Match Mutation
+const DELETE_MATCH_MUTATION = gql`
+  mutation DeleteMatch($match: ID!) {
+    deleteMatch(match: $match)
+  }
+`;
+
 // -- Delete Account Data Mutation --
 const DELETE_DATA_MUTATION = gql`
   mutation DeleteData {
@@ -291,10 +299,10 @@ export const patientService = {
   },
 
   //Get patient profile API call
-  getProfile: async (): Promise<PatientProfile> => {
+  getProfile: async (policy: FetchPolicy = 'cache-first'): Promise<PatientProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_USER_PROFILE_QUERY,
-      fetchPolicy: 'cache-first', // Ensure to not always hit the backend, but use cache when available for better performance
+      fetchPolicy: policy, // passed policy to avoid cache conflicts
     });
     return responseData.getOwnUserProfile;
   },
@@ -324,47 +332,20 @@ export const patientService = {
   },
 
   // -- Update Mood Tracker Sharing Consent --
-  updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
-        variables: { allow: consent },
-        // Manually overwrite the cache so 'cache-first' queries always get the fresh state
-        update: (cache) => {
-          try {
-            // Read the current profile out of the local cache
-            const existingData: any = cache.readQuery({
-              query: GET_OWN_USER_PROFILE_QUERY,
-            });
-
-            // If it exists, write it back with the newly toggled MoodTracker value
-            if (existingData && existingData.getOwnUserProfile) {
-              cache.writeQuery({
-                query: GET_OWN_USER_PROFILE_QUERY,
-                data: {
-                  getOwnUserProfile: {
-                    ...existingData.getOwnUserProfile,
-                    MoodTracker: consent, // Force the cache to hold the new boolean
-                  },
-                },
-              });
-            }
-          } catch (cacheError) {
-            console.warn('Could not update Apollo cache locally:', cacheError);
-          }
-        },
-      });
-
-      console.log(
-        `Security Firewall successfully updated! Therapist access: ${data.MoodTrackerShareConsent}`,
-      );
-
-      return data.MoodTrackerShareConsent;
-    } catch (error) {
-      console.error('❌ Error updating GDPR consent firewall:', error);
-      throw error;
-    }
-  },
+updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
+      variables: { allow: consent },
+      // refetchQueries removed temporarily for debugging
+    });
+    console.log('Raw mutation response:', data);
+    return consent;
+  } catch (error) {
+    console.error('Error updating GDPR consent firewall:', error);
+    throw error;
+  }
+},
 
   // Fetch matched therapist(s)
   getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
@@ -462,6 +443,22 @@ export const patientService = {
       throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
     }
   },*/
+
+  // Delete a therapist match
+  deleteMatch: async (therapistId: string): Promise<boolean> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_MATCH_MUTATION,
+        variables: { match: therapistId },
+        // Refetch the patient profile so the "Matches" array updates and the UI clears the therapist
+        refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
+      });
+      return data.deleteMatch;
+    } catch (error) {
+      console.error('Error unmatching therapist:', error);
+      throw error;
+    }
+  },
 
   // -- Delete User Profile and all associated data --
   deleteProfile: async (): Promise<boolean> => {

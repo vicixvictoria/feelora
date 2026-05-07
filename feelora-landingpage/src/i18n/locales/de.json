@@ -1061,6 +1061,9 @@
   "patient.profile.loadError": "Fehler beim Laden der Profildaten.",
   "patient.atleastOne": "Bitte wähle mindestens eine Option aus.",
   "patient.error.save": "Fehler beim Speichern der Daten. Bitte versuche es erneut.",
+  "patient.profile.unmatchButton": "Therapeut:in entmatchen",
+  "patient.profile.unmatchConfirmTitle": "Therapeut:in entmatchen?",
+  "patient.profile.unmatchConfirmText": "Bist du sicher, dass du die Verbindung zu diesem Therapeuten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf wird gelöscht.",
 
   "q.p.timeframe.lessThan3Months": "weniger als 3 Monate",
   "q.p.timeframe.3to6Months": "3-6 Monate",

@@ -49,16 +49,18 @@ const Dashboard = () => {
 
   // --- Fetch True Data on Load (Profile, Moods, and Notifications) ---
   useEffect(() => {
+    console.log('🔍 fetchDashboardData fired');
     const fetchDashboardData = async () => {
       setIsLoadingMoods(true);
       try {
         // Run all API calls in parallel for better performance
         const [profile, trackers, notifs] = await Promise.all([
-          patientService.getProfile(),
+          patientService.getProfile('network-only'),
           patientService.getMoodTrackers(),
           notificationService.getNotifications({ notificationType: 'new_message' }) // Get real unread count
         ]);
 
+        console.log('🔍 full profile object:', JSON.stringify(profile));
         // Set Consent
         setIsShared(profile.MoodTracker ?? false);
 
@@ -144,20 +146,21 @@ const Dashboard = () => {
   };
 
   // Handler for clicking the mood tracker consent toggle switch
-  const handleToggleShare = async () => {
-    setIsToggling(true);
-    const newConsentState = !isShared;
-    try {
-      setIsShared(newConsentState);
-      await patientService.updateMoodTrackerConsent(newConsentState);
-    } catch (error) {
-      console.error('Failed to update consent', error);
-      setIsShared(!newConsentState);
-      alert('Fehler beim Speichern der Freigabe. Bitte versuche es erneut.');
-    } finally {
-      setIsToggling(false);
-    }
-  };
+ const handleToggleShare = async () => {
+  setIsToggling(true);
+  const newConsentState = !isShared;
+  setIsShared(newConsentState);
+  try {
+    const result = await patientService.updateMoodTrackerConsent(newConsentState);
+    console.log('🔍 consent sent:', newConsentState);
+    console.log('🔍 result returned:', result);
+  } catch (error) {
+    console.error('Failed to update consent', error);
+    setIsShared(!newConsentState);
+  } finally {
+    setIsToggling(false);
+  }
+};
 
   const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
     count: unreadChatCount,

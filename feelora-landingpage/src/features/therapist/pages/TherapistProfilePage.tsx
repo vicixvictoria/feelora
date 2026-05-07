@@ -255,7 +255,20 @@ const TherapistProfilePage = () => {
             <div className="flex items-end gap-4 mt-2">
               <p className="mb-0">
                 <span className="font-bold">{t('app.therapist.profile.availability')}</span>{' '}
-                {profile.Availability?.join(', ') || t('app.therapist.profile.noInfo')}
+                {profile.Availability && profile.Availability.length > 0
+                ? profile.Availability.map((day: string) => {
+                    const dayMap: Record<string, string> = {
+                      mo: t('q.t.availability.mon'),
+                      di: t('q.t.availability.tue'),
+                      mi: t('q.t.availability.wed'),
+                      do: t('q.t.availability.thu'),
+                      fr: t('q.t.availability.fri'),
+                      sa: t('q.t.availability.sat'),
+                      so: t('q.t.availability.sun'),
+                    };
+                    return dayMap[day] || day.toUpperCase();
+                  }).join(', ')
+                : t('app.therapist.profile.noInfo')}
               </p>
               <div className="flex-1"></div>
               <button
