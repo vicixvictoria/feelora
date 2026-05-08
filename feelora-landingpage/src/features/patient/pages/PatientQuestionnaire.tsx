@@ -2,7 +2,7 @@ import { useState } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
+//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo.tsx';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
