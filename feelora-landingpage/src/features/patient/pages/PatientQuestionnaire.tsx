@@ -2,7 +2,7 @@ import { useState } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
+import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo.tsx';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
@@ -20,7 +20,7 @@ import AdditionalInfoStep from '../components/questionnaire/steps/Step16_PAdditi
 import AvailabilityStep from '../components/questionnaire/steps/Step15_PAvailability.tsx';
 import SummaryStep from '../components/questionnaire/steps/Step17_PSummary.tsx';
 import TherapistMatchStep from '../components/questionnaire/steps/Step18_TherapistMatch';
-import Preregistration from '../components/questionnaire/steps/Step_Preregsitration.tsx';
+//import Preregistration from '../components/questionnaire/steps/Step_Preregsitration.tsx';
 import { AlgorithmMatch } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
 
@@ -186,18 +186,18 @@ const PatientQuestionnaire = () => {
     }
   };
 
-  const handleLogout = () => {
+  /*const handleLogout = () => {
     // Clear the persisted questionnaire progress
     clearProgress();
     
     // Navigate to login page
     navigate('/login');
-  };
+  };*/
 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Pilot test change this back!!
+        return <WelcomeStep onNext={goNext} onBack={goBack} />;
       case 1:
         return (
           <PersonalDataStep

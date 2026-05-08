@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, Send, Smile, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
+import { Calendar, Send, Bell, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { patientService } from '../api/patient-service';
-import { notificationService } from '../../notifications/api/notification-service'; // <-- Imported Notification Service
+import { notificationService } from '../../notifications/api/notification-service'; 
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
 
 interface IncomingNotification {
@@ -29,6 +29,18 @@ const formatDate = (isoString: string) => {
   });
 };
 
+// Helper to extract the correct ID for deletion depending on the notification type
+const getNotificationId = (n: any) => {
+  if (n.conversationId) return n.conversationId;
+  if (n.unmatchedId) return n.unmatchedId;
+  if (n.matchedId) return n.matchedId;
+  if (n.sk) {
+    const parts = n.sk.split('#');
+    return parts.length > 1 ? parts[1] : n.sk;
+  }
+  return '';
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -36,6 +48,7 @@ const Dashboard = () => {
 
   // --- Notification State ---
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [generalNotifications, setGeneralNotifications] = useState<any[]>([]); // <-- Store full notification objects
   const [isMarkingRead, setIsMarkingRead] = useState(false);
   const processedMessageCountRef = useRef(0);
 
@@ -47,24 +60,39 @@ const Dashboard = () => {
   const [isShared, setIsShared] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  // --- Fetch True Data on Load (Profile, Moods, and Notifications) ---
+  // --- Helper to fetch and map notifications ---
+  const fetchAndProcessNotifications = async () => {
+    const notifsResponse = await notificationService.getNotifications({});
+    let chatUnread = 0;
+    const generalNotifs: any[] = [];
+    
+    const allNotifications = notifsResponse.notifications || [];
+    allNotifications.forEach((n: any) => {
+      if (n.type === 'new_message') {
+        chatUnread += n.count || 1;
+      } else {
+        // Collect everything else (new_match, new_unmatch, etc.)
+        generalNotifs.push(n);
+      }
+    });
+    
+    setUnreadChatCount(chatUnread);
+    setGeneralNotifications(generalNotifs);
+  };
+
+  // --- Fetch True Data on Load ---
   useEffect(() => {
-    console.log('🔍 fetchDashboardData fired');
     const fetchDashboardData = async () => {
       setIsLoadingMoods(true);
       try {
-        // Run all API calls in parallel for better performance
-        const [profile, trackers, notifs] = await Promise.all([
+        const [profile, trackers] = await Promise.all([
           patientService.getProfile('network-only'),
           patientService.getMoodTrackers(),
-          notificationService.getNotifications({ notificationType: 'new_message' }) // Get real unread count
+          fetchAndProcessNotifications() // Fetch notifications
         ]);
 
-        console.log('🔍 full profile object:', JSON.stringify(profile));
-        // Set Consent
         setIsShared(profile.MoodTracker ?? false);
 
-        // Format & Set Moods
         const formattedTrackers = trackers.map((item: any) => {
           const questionnaire = JSON.parse(item.Questionnaire);
           return {
@@ -78,13 +106,6 @@ const Dashboard = () => {
         });
         setMoodDiary(formattedTrackers);
 
-        // Set Accurate Unread Notifications
-        let totalUnread = 0;
-        notifs.notifications.forEach((n) => {
-          totalUnread += n.count || 1;
-        });
-        setUnreadChatCount(totalUnread);
-
       } catch (error) {
         console.error('Failed to load dashboard data', error);
       } finally {
@@ -97,46 +118,48 @@ const Dashboard = () => {
 
   // --- Listen to Websocket for Live Updates ---
   useEffect(() => {
-    // Only process new messages we haven't seen yet
     if (websocketMessages.length <= processedMessageCountRef.current) return;
 
     const newMessages = websocketMessages.slice(processedMessageCountRef.current);
     processedMessageCountRef.current = websocketMessages.length;
 
-    let newIncomingCount = 0;
+    let hasNewNotif = false;
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
-      if (parsed.type === 'notification' && parsed.data?.type === 'new_message') {
-        newIncomingCount += 1;
+      if (parsed.type === 'notification') {
+        hasNewNotif = true;
+        break;
       }
     }
 
-    if (newIncomingCount > 0) {
-      setUnreadChatCount((prev) => prev + newIncomingCount);
+    // If a new notification comes in, refetch to get the actual text for the UI
+    if (hasNewNotif) {
+      fetchAndProcessNotifications();
     }
   }, [websocketMessages]);
 
   // --- Mark All as Read Logic ---
   const handleMarkAllAsRead = async () => {
-    if (unreadChatCount === 0 || isMarkingRead) return;
+    if ((unreadChatCount === 0 && generalNotifications.length === 0) || isMarkingRead) return;
     
     setIsMarkingRead(true);
     try {
-      // Fetch all unread message notifications
-      const { notifications } = await notificationService.getNotifications({ notificationType: 'new_message' });
+      // Get fresh list of everything
+      const { notifications } = await notificationService.getNotifications({});
       
-      // Delete them all from the backend simultaneously
+      // Delete all notifications (both chat and general)
       await Promise.all(
-        notifications.map((n) =>
+        notifications.map((n: any) =>
           notificationService.readNotification({
-            notificationType: 'new_message',
-            notificationId: n.conversationId || '', 
+            notificationType: n.type,
+            notificationId: getNotificationId(n), 
           })
         )
       );
 
       // Instantly reset the UI
       setUnreadChatCount(0);
+      setGeneralNotifications([]);
     } catch (error) {
       console.error('Failed to mark all as read', error);
       alert('Fehler beim Markieren als gelesen.');
@@ -146,62 +169,92 @@ const Dashboard = () => {
   };
 
   // Handler for clicking the mood tracker consent toggle switch
- const handleToggleShare = async () => {
-  setIsToggling(true);
-  const newConsentState = !isShared;
-  setIsShared(newConsentState);
-  try {
-    const result = await patientService.updateMoodTrackerConsent(newConsentState);
-    console.log('🔍 consent sent:', newConsentState);
-    console.log('🔍 result returned:', result);
-  } catch (error) {
-    console.error('Failed to update consent', error);
-    setIsShared(!newConsentState);
-  } finally {
-    setIsToggling(false);
-  }
-};
+  const handleToggleShare = async () => {
+    setIsToggling(true);
+    const newConsentState = !isShared;
+    setIsShared(newConsentState);
+    try {
+      await patientService.updateMoodTrackerConsent(newConsentState);
+    } catch (error) {
+      console.error('Failed to update consent', error);
+      setIsShared(!newConsentState);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   const unreadChatLine = t('patient.dashboard.unreadMessagesCount', {
     count: unreadChatCount,
     defaultValue: unreadChatCount === 1 ? '1 unread message' : `${unreadChatCount} unread messages`,
   });
 
+  // Helper to translate backend notification types to human text
+  const getNotificationText = (n: any) => {
+    if (n.type === 'new_unmatch') return t('patient.dashboard.notifUnmatch', 'Ein Therapeut hat die Verbindung getrennt.');
+    if (n.type === 'new_match') return t('patient.dashboard.notifMatch', 'Ein neuer Therapeut wurde zugewiesen!');
+    return t('patient.dashboard.notifGeneral', 'Neue Benachrichtigung');
+  };
+
+  // --- FLEXIBLE CARDS ARRAY ---
+  // Using 'content' instead of 'lines' allows us to render actual HTML/Lists inside the boxes
   const notificationCards = [
     {
-      icon: Calendar,
+      icon: Bell,
       iconColor: 'text-purple',
-      title: t('patient.dashboard.calendar'),
-      lines: [
-        t('patient.dashboard.upcomingAppointments'),
-        t('patient.dashboard.appointmentRequest'),
-      ],
-      path: '/calendar',
-      isEnabled: false,
+      title: t('patient.dashboard.notifications', 'Benachrichtigungen'),
+      isGreyedOut: false,
+      onClick: undefined, // No navigation
+      content: (
+        <div className="mt-1">
+          {generalNotifications.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {t('patient.dashboard.noNewNotifications', 'Keine neuen Benachrichtigungen')}
+            </p>
+          ) : (
+            <ul className="text-sm text-foreground space-y-2 max-h-24 overflow-y-auto custom-scrollbar pr-2">
+              {generalNotifications.map((n, i) => (
+                <li key={i} className="flex gap-2 items-start border-b border-border/40 pb-1.5 last:border-0 last:pb-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                  <span className="leading-snug">{getNotificationText(n)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ),
     },
     {
       icon: Send,
       iconColor: 'text-purple',
       title: t('patient.dashboard.chat'),
-      lines: [unreadChatLine],
-      path: '/patient',
-      isEnabled: true,
+      isGreyedOut: false,
+      onClick: () => navigate('/patient'),
+      content: <p className="text-sm text-muted-foreground mt-1">{unreadChatLine}</p>,
     },
     {
-      icon: Smile,
+      icon: Calendar,
       iconColor: 'text-purple',
-      title: t('patient.dashboard.moodTracker'),
-      lines: [t('patient.dashboard.dailyReminder')],
-      path: '/mood-tracker',
-      isEnabled: false,
+      title: t('patient.dashboard.calendar'),
+      isGreyedOut: true,
+      onClick: undefined,
+      content: (
+        <div className="text-sm text-muted-foreground mt-1 space-y-1">
+          <p>{t('patient.dashboard.upcomingAppointments')}</p>
+          <p>{t('patient.dashboard.appointmentRequest')}</p>
+        </div>
+      ),
     },
     {
       icon: BookOpen,
       iconColor: 'text-purple',
       title: t('patient.dashboard.tasks'),
-      lines: [t('patient.dashboard.tasksWaiting')],
-      path: '/homework',
-      isEnabled: false,
+      isGreyedOut: true,
+      onClick: undefined,
+      content: (
+        <div className="text-sm text-muted-foreground mt-1 space-y-1">
+          <p>{t('patient.dashboard.tasksWaiting')}</p>
+        </div>
+      ),
     },
   ];
 
@@ -210,25 +263,20 @@ const Dashboard = () => {
       {/* Notification Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         {notificationCards.map((card, index) => (
-          <button
+          <div
             key={index}
-            className={`feelora-card relative flex items-center gap-4 transition-shadow text-left ${card.isEnabled ? 'cursor-pointer hover:shadow-md' : 'cursor-default opacity-70'}`}
-            onClick={() => {
-              if (card.isEnabled) navigate(card.path);
-            }}
-            type="button"
+            onClick={card.onClick}
+            className={`feelora-card relative flex items-start gap-4 transition-shadow text-left 
+              ${card.onClick ? 'cursor-pointer hover:shadow-md' : 'cursor-default'} 
+              ${card.isGreyedOut ? 'opacity-70' : ''}`}
           >
-            <card.icon className={`w-10 h-10 ${card.iconColor}`} />
-            <div className="flex-1">
+            <card.icon className={`w-10 h-10 flex-shrink-0 ${card.iconColor}`} />
+            <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground">{card.title}</h3>
-              {card.lines.map((line, i) => (
-                <p key={i} className="text-sm text-muted-foreground">
-                  {line}
-                </p>
-              ))}
+              {card.content}
             </div>
-            {card.isEnabled && <ChevronRight className="w-5 h-5 text-muted-foreground" />}
-          </button>
+            {card.onClick && <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0 self-center" />}
+          </div>
         ))}
       </div>
 
@@ -236,7 +284,7 @@ const Dashboard = () => {
       <div className="flex justify-center mb-10">
         <button 
           onClick={handleMarkAllAsRead}
-          disabled={unreadChatCount === 0 || isMarkingRead}
+          disabled={(unreadChatCount === 0 && generalNotifications.length === 0) || isMarkingRead}
           className="feelora-btn-primary px-8 flex items-center gap-2 disabled:opacity-50 transition-opacity"
         >
           {isMarkingRead && <Loader2 className="w-4 h-4 animate-spin" />}

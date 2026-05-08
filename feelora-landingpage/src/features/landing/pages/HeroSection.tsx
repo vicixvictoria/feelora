@@ -47,7 +47,7 @@ export function HeroSection() {
             onClick={() => navigate('/login')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
-            {t('hero.cta.register.alt')} {/* change later to hero.cta.register */}
+            {t('hero.cta.register')} {/* change later to hero.cta.register */}
           </Button>
           <Button
             size="lg"
