@@ -7,6 +7,7 @@ import { patientService } from '../../api/patient-service';
 interface WelcomeStepProps {
   onNext: () => void;
   onBack: () => void;
+  inviterName?: string | null;
 }
 
 // Helper component for the expandable sections
@@ -35,7 +36,7 @@ const ExpandableSection = ({ title, children }: { title: string; children: React
   );
 };
 
-const Step1_PWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
+const Step1_PWelcome = ({ onNext, onBack, inviterName }: WelcomeStepProps) => {
   const { t } = useTranslation();
   
   const [hasConsented, setHasConsented] = useState(false);
@@ -78,6 +79,11 @@ const Step1_PWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
       <div className="mb-8">
         <ExpandableSection title={t('q.p.welcome.sensibleData.title')}>
           {t('q.p.welcome.sensibleData.text')}
+          {inviterName && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {t('q.p.welcome.inviterMessage', { inviterName })}
+            </p>
+          )}
         </ExpandableSection>
 
         <ExpandableSection title={t('q.p.welcome.ai.title')}>
