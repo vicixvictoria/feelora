@@ -1212,6 +1212,12 @@
   "q.p.therapistMatch.chooseOther": "Choose other match",
   "q.p.therapistMatch.back": "back",
   "q.p.therapistMatch.toBestMatch": "to best match",
+
+  "q.p.prereg.title":"Thank you for yout interest in Feelora!",
+  "q.p.prereg.desc": "You are now in our waitlist and as soon as Feelora officially launches, we will send you an invitation.",
+  "q.p.prereg.questionCount": "If you have any questions or sugggestions in the meantime, feel free to reach out to us at info@feelora.com.",
+
+
   "q.t.therapyFormat.multiSelect": "Multiple selection possible",
   "q.t.therapyFormat.individual": "Individual",
   "q.t.therapyFormat.individualDesc": "One-on-one sessions",

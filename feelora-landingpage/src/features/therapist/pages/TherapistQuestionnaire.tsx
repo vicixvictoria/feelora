@@ -22,7 +22,7 @@ import AdditionalInfoStep from '../components/questionnaire/steps/Step16_TAdditi
 import AvailabilityStep from '../components/questionnaire/steps/Step17_TAvailability';
 import SummaryStep from '../components/questionnaire/steps/Step18_TSummary';
 import CompletionStep from '../components/questionnaire/steps/Step19_TCompletion';
-import { Loader2 } from 'lucide-react'; // Added Loader2 for the initial check
+import { Loader2 } from 'lucide-react';
 
 import { therapistService } from '../api/therapist-service';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
@@ -56,7 +56,6 @@ const initialData: TherapistQuestionnaireData = {
 
 const TherapistQuestionnaire = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
   
   // State to block rendering while checking backend status
   const [isCheckingStatus, setIsCheckingStatus] = useState(true); 
@@ -74,11 +73,10 @@ const TherapistQuestionnaire = () => {
 
     const checkQuestionnaireStatus = async () => {
       try {
-
         // check if user clicked restart questionnaire - if yes, skip backend check and start fresh
         if (localStorage.getItem('feelora_force_restart') === 'true') {
           if (mounted) setIsCheckingStatus(false);
-          return; // Überspringe den Backend-Check und bleibe bei Step 0!
+          return; 
         }
 
         const existingData = await therapistService.getQuestionnaire();
@@ -88,8 +86,6 @@ const TherapistQuestionnaire = () => {
           setCurrentStep(19);
         }
       } catch (error) {
-        // If it fails or returns null, they haven't finished. 
-        // Do nothing and let local storage / currentStep handle where they left off.
         console.log('No existing questionnaire found, starting fresh or from local cache.');
       } finally {
         if (mounted) {
@@ -126,8 +122,8 @@ const TherapistQuestionnaire = () => {
 
   const restart = () => {
     clearProgress(); 
-    localStorage.setItem('feelora_force_restart', 'true'); // Set a flag to indicate that we want to force restart the questionnaire on next load
-    localStorage.removeItem('feelora_profile_created'); // Clear the profile creation flag on restart
+    localStorage.setItem('feelora_force_restart', 'true'); 
+    localStorage.removeItem('feelora_profile_created'); 
     setCurrentStep(0);
     window.location.reload();
   };
@@ -149,8 +145,8 @@ const TherapistQuestionnaire = () => {
       console.log('Final Submission successful!', result.savedData);
 
       clearProgress();
-      localStorage.removeItem('feelora_force_restart'); // Clear the force restart flag on successful submission
-      localStorage.removeItem('feelora_profile_created'); // Clear the profile creation flag on successful submission
+      localStorage.removeItem('feelora_force_restart'); 
+      localStorage.removeItem('feelora_profile_created'); 
       goNext();
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -162,60 +158,60 @@ const TherapistQuestionnaire = () => {
   };
 
   // Intermediate Profile Creation Logic
-  const handleCreateTherapistProfile = async () => {
-    setIsIntermediateLoading(true);
-    try {
-      // Check if we've already created the profile in this session
-      const hasCreated = localStorage.getItem('feelora_profile_created') === 'true';
+  const handleCreateTherapistProfile = () => {
+    // 1. Instantly move to the next page so the user doesn't wait
+    goNext();
 
-      if (!hasCreated) {
-        console.log('Creating therapist profile...');
-        const response = await therapistService.createTherapistProfile(data);
-        
-        // Save the flag so we know it exists now
-        localStorage.setItem('feelora_profile_created', 'true');
-        console.log('Therapist profile created successfully!', response);
-      } else {
-        console.log('Updating existing therapist profile...');
-        
-        // Format the address to match the creation payload
-        const formattedAddress = [
-          data.contactInfo?.street,
-          data.contactInfo?.zip,
-          data.contactInfo?.city,
-        ]
-          .filter(Boolean)
-          .join(', ');
+    // 2. Perform the API call asynchronously in the background
+    const createProfileAsync = async () => {
+      try {
+        const hasCreated = localStorage.getItem('feelora_profile_created') === 'true';
 
-        // Call the updateProfile mutation with the latest data
-        await therapistService.updateProfile({
-          Name: data.personalData?.firstName || '',
-          Surname: data.personalData?.lastName || '',
-          Gender: data.personalData?.gender || '',
-          BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
-          City: data.contactInfo?.city || '',
-          Address: formattedAddress || '',
-          Languages: data.languages?.selected || [],
-          Availability: data.availability || [],
-          Specialties: data.specialties?.selected || [],
-          Title: data.personalData?.title || '',
-          JobTitle: data.personalData?.job || '', 
-          HasInsurance: data.priceRange?.kassenvertrag || false,
-          PriceRange: data.priceRange?.priceDetails || '',
-        });
-        console.log('Therapist profile updated successfully!');
+        if (!hasCreated) {
+          console.log('Creating therapist profile...');
+          const response = await therapistService.createTherapistProfile(data);
+          
+          localStorage.setItem('feelora_profile_created', 'true');
+          console.log('Therapist profile created successfully!', response);
+        } else {
+          console.log('Updating existing therapist profile...');
+          
+          const formattedAddress = [
+            data.contactInfo?.street,
+            data.contactInfo?.zip,
+            data.contactInfo?.city,
+          ]
+            .filter(Boolean)
+            .join(', ');
+
+          await therapistService.updateProfile({
+            Name: data.personalData?.firstName || '',
+            Surname: data.personalData?.lastName || '',
+            Gender: data.personalData?.gender || '',
+            BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
+            City: data.contactInfo?.city || '',
+            Address: formattedAddress || '',
+            Languages: data.languages?.selected || [],
+            Availability: data.availability || [],
+            Specialties: data.specialties?.selected || [],
+            Title: data.personalData?.title || '',
+            JobTitle: data.personalData?.job || '', 
+            HasInsurance: data.priceRange?.kassenvertrag || false,
+            PriceRange: data.priceRange?.priceDetails || '',
+          });
+          console.log('Therapist profile updated successfully!');
+        }
+      } catch (error) {
+        console.error('Error creating/updating therapist profile:', error);
+        alert('Es gab einen Fehler beim Speichern deines Profils. Bitte überprüfe deine Daten.');
+        // 3. If it fails, force them back to step 17 (Availability)
+        setCurrentStep(17);
       }
+    };
 
-      goNext();
-    } catch (error) {
-      console.error('Error creating/updating therapist profile:', error);
-      alert('Es gab einen Fehler beim Speichern deines Profils. Bitte versuche es erneut.');
-    } finally {
-      setIsIntermediateLoading(false);
-    }
+    createProfileAsync();
   };
 
-  // --- Show full-page loader while checking backend status ---
   if (isCheckingStatus) {
     return (
       <div className="min-h-screen bg-question-bg flex items-center justify-center">
@@ -224,11 +220,16 @@ const TherapistQuestionnaire = () => {
     );
   }
 
-  // Render the current step based on currentStep state
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} />;
+        return (
+          <WelcomeStep 
+            onNext={goNext} 
+            onBack={goBack} 
+            onConsentError={() => setCurrentStep(0)} 
+          />
+        );
       case 1:
         return (
           <PersonalDataStep
@@ -380,7 +381,6 @@ const TherapistQuestionnaire = () => {
             onBack={goBack}
             data={data.availability}
             onDataChange={(newData) => updateField('availability', newData)}
-            isLoading={isIntermediateLoading} 
           />
         );
       case 18:

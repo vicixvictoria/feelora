@@ -20,6 +20,7 @@ import AdditionalInfoStep from '../components/questionnaire/steps/Step16_PAdditi
 import AvailabilityStep from '../components/questionnaire/steps/Step15_PAvailability.tsx';
 import SummaryStep from '../components/questionnaire/steps/Step17_PSummary.tsx';
 import TherapistMatchStep from '../components/questionnaire/steps/Step18_TherapistMatch';
+import Preregistration from '../components/questionnaire/steps/Step_Preregsitration.tsx';
 import { AlgorithmMatch } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
 
@@ -103,6 +104,7 @@ const PatientQuestionnaire = () => {
     setCurrentStep(step);
   };
 
+
   // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
   const handleSubmit = async () => {
     if (isSubmitting) return;
@@ -184,10 +186,18 @@ const PatientQuestionnaire = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear the persisted questionnaire progress
+    clearProgress();
+    
+    // Navigate to login page
+    navigate('/login');
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} />;
+        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Pilot test change this back!!
       case 1:
         return (
           <PersonalDataStep

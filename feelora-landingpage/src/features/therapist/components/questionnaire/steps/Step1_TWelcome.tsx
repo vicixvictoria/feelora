@@ -7,6 +7,7 @@ import { therapistService } from '../../../api/therapist-service';
 interface WelcomeStepProps {
   onNext: () => void;
   onBack: () => void;
+  onConsentError: () => void; // force redirect on background error
 }
 
 // Helper component for the expandable sections
@@ -35,25 +36,32 @@ const ExpandableSection = ({ title, children }: { title: string; children: React
   );
 };
 
-const Step1_TWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
+const Step1_TWelcome = ({ onNext, onBack, onConsentError }: WelcomeStepProps) => {
   const { t } = useTranslation();
   
   const [hasConsented, setHasConsented] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNextWithConsent = async () => {
+  const handleNextWithConsent = () => {
     if (!hasConsented) return;
     
-    setIsLoading(true);
-    // Log the consent in AWS before moving to the next page
-    const success = await therapistService.submitConsent();
-    setIsLoading(false);
+    // Immediately move to the next page so the user doesn't wait
+    onNext();
 
-    if (success) {
-      onNext();
-    } else {
-      console.error("Failed to save consent");
-    }
+    // Fire the consent API call in the background (no await)
+    therapistService.submitConsent()
+      .then((success) => {
+        if (!success) {
+          console.error("Failed to save consent in the background.");
+          alert(t('q.t.welcome.consentError', 'Es gab ein Problem beim Speichern deiner Zustimmung zur Datenverarbeitung. Bitte bestätige diese erneut.'));
+          // If it fails, throw them back to the first page
+          onConsentError();
+        }
+      })
+      .catch((err) => {
+        console.error("Consent API error:", err);
+        alert(t('q.t.welcome.consentError', 'Es gab ein Problem beim Speichern deiner Zustimmung zur Datenverarbeitung. Bitte bestätige diese erneut.'));
+        onConsentError();
+      });
   };
 
   return (
@@ -100,19 +108,13 @@ const Step1_TWelcome = ({ onNext, onBack }: WelcomeStepProps) => {
         </label>
       </div>
 
-      <div className={!hasConsented || isLoading ? "opacity-50 pointer-events-none" : ""}>
+      <div className={!hasConsented ? "opacity-50 pointer-events-none" : ""}>
         <NavigationButtons 
           onBack={onBack} 
           onNext={handleNextWithConsent} 
           isFirstStep={true} 
         />
       </div>
-      
-      {isLoading && (
-        <p className="text-sm text-muted-foreground mt-4 animate-pulse">
-          {t('q.t.welcome.saving')}
-        </p>
-      )}
     </div>
   );
 };
