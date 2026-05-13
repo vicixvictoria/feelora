@@ -135,7 +135,15 @@ const Header = () => {
             >
               {t('app.therapist.header.emergency')}
             </button>
-            <button className="sidebar-item text-sm">{t('app.therapist.header.settings')}</button>
+            <button 
+              className="sidebar-item text-sm"
+              onClick={() => {
+                navigate('account');
+                setSheetOpen(false);
+              }}
+            >
+              {t('app.therapist.header.settings')}
+            </button>
             <button
               className="sidebar-item text-sm"
               onClick={() => switchLang(i18n.language === 'de' ? 'en' : 'de')}

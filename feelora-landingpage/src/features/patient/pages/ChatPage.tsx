@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Info, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Send, Info, ChevronRight, ArrowLeft, Loader2, X, UserMinus, AlertTriangle } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -13,6 +13,8 @@ import { useS3Download } from '@/hooks/use-s3-download';
 interface SidebarChat {
   contactId: string;
   name: string;
+  email: string; // <-- Added
+  availability: string[]; // <-- Added
   conversationId: string | null;
   lastMessage: string;
 }
@@ -30,6 +32,20 @@ interface WebsocketMessage {
   type?: string;
   data?: IncomingNotification['data'];
 }
+
+// --- Helper for translating availability ---
+const getAvailabilityLabel = (id: string, t: any) => {
+  const map: Record<string, string> = {
+    mo: t('q.t.availability.mon', 'Montag'),
+    di: t('q.t.availability.tue', 'Dienstag'),
+    mi: t('q.t.availability.wed', 'Mittwoch'),
+    do: t('q.t.availability.thu', 'Donnerstag'),
+    fr: t('q.t.availability.fri', 'Freitag'),
+    sa: t('q.t.availability.sat', 'Samstag'),
+    so: t('q.t.availability.sun', 'Sonntag'),
+  };
+  return map[id] || id.toUpperCase();
+};
 
 // --- Smart S3 Avatar Component (Used only for the Chat Sidebar) ---
 const S3Avatar = ({
@@ -72,6 +88,11 @@ const ChatPage = () => {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [unreadByConversation, setUnreadByConversation] = useState<Record<string, number>>({});
+  
+  // Modal State
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isConfirmUnmatchOpen, setIsConfirmUnmatchOpen] = useState(false);
+  const [isUnmatching, setIsUnmatching] = useState(false);
   
   const processedMessageCountRef = useRef(0);
 
@@ -187,7 +208,9 @@ const ChatPage = () => {
           const existingChat = conversations.find((c) => c.participantIds.includes(therapist.Id));
           return {
             contactId: therapist.Id,
-            name: `${therapist.Name} ${therapist.Surname}`,
+            name: `${therapist.Title ? therapist.Title + ' ' : ''}${therapist.Name} ${therapist.Surname}`,
+            email: therapist.Email || '—',
+            availability: therapist.Availability || [],
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
               existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
@@ -274,8 +297,29 @@ const ChatPage = () => {
     }
   };
 
+  // --- Handle Unmatching Therapist ---
+  const handleConfirmUnmatch = async () => {
+    if (!selectedChat) return;
+    setIsUnmatching(true);
+    try {
+      await patientService.deleteMatch(selectedChat.contactId);
+      
+      setChatList((prev) => prev.filter((chat) => chat.contactId !== selectedChat.contactId));
+      setSelectedChat(null);
+      setIsInfoModalOpen(false);
+      setIsConfirmUnmatchOpen(false);
+      setMobileShowChat(false); 
+      
+    } catch (error) {
+      console.error('Unmatch failed', error);
+      alert(t('patient.profile.unmatchError', 'Fehler beim Auflösen der Verbindung. Bitte versuche es erneut.'));
+    } finally {
+      setIsUnmatching(false);
+    }
+  };
+
   return (
-    <div className="flex h-[calc(100vh-10rem)] animate-fade-in">
+    <div className="flex h-[calc(100vh-10rem)] animate-fade-in relative">
       {/* --- CHAT LIST SIDEBAR --- */}
       <div
         className={`w-full md:w-72 bg-card rounded-l-xl border border-border md:border-r-0 p-4 ${mobileShowChat ? 'hidden md:block' : 'block'}`}
@@ -349,7 +393,10 @@ const ChatPage = () => {
                 />
                 <h3 className="text-xl font-semibold text-foreground">{selectedChat.name}</h3>
               </div>
-              <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
+              <button 
+                onClick={() => setIsInfoModalOpen(true)}
+                className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity"
+              >
                 <Info className="w-5 h-5" />
               </button>
             </div>
@@ -362,7 +409,7 @@ const ChatPage = () => {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex justify-center h-full items-center text-muted-foreground">
-                  {t('app.patient.chat.noMessages')}
+                  {t('app.patient.chat.noMessages', 'Noch keine Nachrichten. Sende ein "Hallo!"')}
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -435,10 +482,105 @@ const ChatPage = () => {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            {t('app.patient.chat.chooseChat')}
+            {t('app.patient.chat.chooseChat', 'Wähle einen Chat aus')}
           </div>
         )}
       </div>
+
+      {/* --- PROFILE INFO MODAL --- */}
+      {isInfoModalOpen && selectedChat && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border chat-bubble-received">
+              <h3 className="text-lg font-semibold text-foreground">
+                {t('patient.chat.therapistProfile', 'Therapeutenprofil')}
+              </h3>
+              <button
+                onClick={() => setIsInfoModalOpen(false)}
+                className="p-1 rounded-md text-muted-foreground hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-6">
+              {/* Avatar & Name */}
+              <div className="flex items-center gap-4">
+                <img
+                  src={theirAvatarUrl || avatarPlaceholder}
+                  alt={selectedChat.name}
+                  className="w-16 h-16 rounded-full object-cover border border-border"
+                />
+                <div>
+                  <h4 className="text-xl font-bold text-foreground">{selectedChat.name}</h4>
+                  <p className="text-muted-foreground text-sm">
+                    {selectedChat.email}
+                  </p>
+                </div>
+              </div>
+
+              {/* Info Block */}
+              <div className="bg-muted/30 p-4 rounded-xl border border-border">
+                <p className="text-sm text-muted-foreground mb-1">
+                  {t('patient.profile.availability', 'Verfügbarkeit')}
+                </p>
+                <p className="font-medium text-foreground">
+                  {selectedChat.availability.length > 0 
+                    ? selectedChat.availability.map((day) => getAvailabilityLabel(day, t)).join(', ') 
+                    : t('patient.profile.notSpecified', 'Keine Angabe')}
+                </p>
+              </div>
+
+              {/* UNMATCH BUTTON */}
+              <div className="pt-4 border-t border-border mt-4">
+                <button
+                  onClick={() => setIsConfirmUnmatchOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-destructive bg-destructive/10 hover:bg-destructive/20 rounded-xl transition-colors font-medium"
+                >
+                  <UserMinus className="w-4 h-4" />
+                  {t('patient.profile.unmatchButton', 'Verbindung trennen')}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- CONFIRM UNMATCH OVERLAY --- */}
+      {isConfirmUnmatchOpen && selectedChat && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-sm rounded-2xl border border-destructive/20 shadow-xl p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              {t('patient.profile.unmatchConfirmTitle', 'Verbindung trennen?')}
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              {t('patient.profile.unmatchConfirmText', 'Bist du sicher, dass du die Verbindung zu diesem Therapeuten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf wird gelöscht.')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsConfirmUnmatchOpen(false)}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl transition-colors font-medium disabled:opacity-50"
+              >
+                {t('common.cancel', 'Abbrechen')}
+              </button>
+              <button
+                onClick={handleConfirmUnmatch}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-destructive text-white hover:bg-destructive/90 rounded-xl transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isUnmatching ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.unmatch', 'Trennen')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

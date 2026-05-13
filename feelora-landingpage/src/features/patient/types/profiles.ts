@@ -61,6 +61,7 @@ export interface MatchedTherapist {
   Languages?: string[];
   Availability?: string[];
   Specialties?: string[];
+  Title?: string;
 }
 
 export interface AlgorithmMatch {

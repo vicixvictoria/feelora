@@ -92,7 +92,7 @@ const TherapistAccountPage = () => {
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium bg-destructive text-white hover:bg-destructive/90 transition-colors disabled:opacity-50 min-w-[120px]"
+                  className="px-4 py-2 rounded-lg font-medium border border-border text-foreground hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -103,7 +103,7 @@ const TherapistAccountPage = () => {
                 <button
                   onClick={() => setShowConfirm(false)}
                   disabled={isDeleting}
-                  className="px-4 py-2 rounded-lg font-medium border border-border text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium bg-destructive text-white hover:bg-destructive/90 transition-colors disabled:opacity-50 min-w-[120px]"
                 >
                   {t('settings.account.deleteAccount.cancel')}
                 </button>

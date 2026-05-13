@@ -97,7 +97,7 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange, isLoading = 
                 disabled={isLoading}
                 className={`w-16 h-16 rounded-xl text-lg font-medium transition-all duration-200 ${
                   isSelected
-                    ? 'bg-accent/90 text-purple border-2 border-accent/90'
+                    ? 'bg-purple-100 text-purple border-2 border-purple-600 shadow-md'
                     : errors.selection
                       ? 'bg-muted/90 text-destructive border-2 border-destructive/30 hover:bg-destructive/10' // Red styling for unselected buttons on error
                       : 'bg-muted/90 text-muted-foreground border-2 border-transparent hover:bg-muted'
