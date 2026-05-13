@@ -3,6 +3,7 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
+import { useMemo } from 'react';
 
 interface TherapySettingStepProps {
   onNext: () => void;
@@ -11,14 +12,8 @@ interface TherapySettingStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-// Separate the standard options from the exclusive option
-const getSettingOptions = (t: (key: string) => string) => [
-  t('q.p.therapySetting.options.onSite'),
-  t('q.p.therapySetting.options.online'),
-  t('q.p.therapySetting.options.phone'),
-];
-
-const NO_PREFERENCE = 'keine Präferenz';
+// English key for backend instead of German string
+const NO_PREFERENCE = 'no_preference';
 
 // Define validation schema expecting an object with a "selection" array
 const step9Schema = z.object({
@@ -27,7 +22,14 @@ const step9Schema = z.object({
 
 const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySettingStepProps) => {
   const { t } = useTranslation();
-  const settingOptions = getSettingOptions(t);
+  
+  // Use id/label pairs to separate the backend key from the UI text
+  const settingOptions = useMemo(() => [
+    { id: 'in_person', label: t('q.p.therapySetting.options.onSite', 'Vor Ort') },
+    { id: 'online', label: t('q.p.therapySetting.options.online', 'Online (Video)') },
+    { id: 'phone', label: t('q.p.therapySetting.options.phone', 'Telefonisch') },
+  ], [t]);
+
   // Initialize hook, wrapping the array `data` inside an object key called "selection"
   const { errors, validateAndNext, clearError } = useStepValidation({
     data: { selection: data },
@@ -37,16 +39,16 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
 
   const hasNoPreference = data.includes(NO_PREFERENCE);
 
-  const handleToggle = (setting: string) => {
+  const handleToggle = (settingId: string) => {
     clearError('selection');
 
-    // If they click a specific setting, ensure "keine Präferenz" is removed
+    // If they click a specific setting, ensure "no preference" is removed
     let currentSelection = data.filter((s) => s !== NO_PREFERENCE);
 
-    if (currentSelection.includes(setting)) {
-      currentSelection = currentSelection.filter((s) => s !== setting);
+    if (currentSelection.includes(settingId)) {
+      currentSelection = currentSelection.filter((s) => s !== settingId);
     } else {
-      currentSelection = [...currentSelection, setting];
+      currentSelection = [...currentSelection, settingId];
     }
     onDataChange(currentSelection);
   };
@@ -84,16 +86,16 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
         >
           {settingOptions.map((setting) => (
             <label
-              key={setting}
+              key={setting.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 hasNoPreference ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={data.includes(setting)}
-                onCheckedChange={() => handleToggle(setting)}
+                checked={data.includes(setting.id)}
+                onCheckedChange={() => handleToggle(setting.id)}
               />
-              <span className="text-foreground">{setting}</span>
+              <span className="text-foreground">{setting.label}</span>
             </label>
           ))}
 
@@ -103,13 +105,12 @@ const Step9_PTherapySetting = ({ onNext, onBack, data, onDataChange }: TherapySe
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
             <span className="text-foreground font-medium">
-              {t('q.p.therapySetting.noPreference')}
+              {t('q.p.therapySetting.noPreference', 'Keine Präferenz')}
             </span>
           </label>
         </div>
       </div>
 
-      {/* 5. Swap onNext for validateAndNext */}
       <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );

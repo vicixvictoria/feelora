@@ -716,11 +716,15 @@
   "app.therapist.notifications.noNew": "Keine neuen Benachrichtigungen",
   "app.therapist.notifications.newMatch": "Ein/e Patient:inhat dich als Therapeut:in akzeptiert!",
   "app.therapist.notifications.unmatch": "Ein/e Patient:inhat dich als Therapeut:in entmatcht.",
+  "app.therapist.notifications.unreadCount_one": "{{count}} ungelesene Nachricht",
+  "app.therapist.notifications.unreadCount_other": "{{count}} ungelesene Nachrichten",
+  "app.therapist.notifications.unreadCount_zerso": "Keine ungelesenen Nachrichten",
+
 
 
       "app.emergency.title": "Notfallkontakte & Hilfe",
       "app.emergency.subtitle.patients": "Wenn du oder jemand anderes sich in einer akuten Krise befindet, zögere nicht, Hilfe in Anspruch zu nehmen. Diese Stellen sind für dich da.",
-      "app.emergency.subtitle": "Wenn sich jemand in einer akuten Krise befindet, zögere nicht, extra Hilfe in Anspruch zu nehmen. Diese Stellen sind für dich da:",
+      "app.emergency.subtitle": "Wwenn sich deine Patient:innen in einer Krise befinden, teile diese nummern mit ihnen:",
       "app.emergency.acuteTitle": "Akute Notfälle",
       "app.emergency.acuteDesc": "Für akute Notfälle wähle immer 144 (Rettung) oder 112 (Euro-Notruf).",
       "app.emergency.hotlines.ts.name": "Telefonseelsorge",

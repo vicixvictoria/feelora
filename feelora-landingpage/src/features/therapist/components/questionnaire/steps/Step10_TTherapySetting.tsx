@@ -3,6 +3,7 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
+import { useMemo } from 'react';
 
 interface TherapySettingStepProps {
   onNext: () => void;
@@ -10,6 +11,9 @@ interface TherapySettingStepProps {
   data: string[];
   onDataChange: (data: string[]) => void;
 }
+
+// Fixed English key for backend instead of German string
+const NO_PREFERENCE = 'no_preference';
 
 // Define validation schema expecting an object with a "selection" array
 const step10Schema = z.object({
@@ -25,13 +29,12 @@ const Step10_TTherapySetting = ({
 }: TherapySettingStepProps) => {
   const { t } = useTranslation();
 
-  const NO_PREFERENCE = t('q.common.noPreference');
-
-  const settingOptions = [
-    { value: 'Vor Ort', label: t('q.options.onsite') },
-    { value: 'Online (Video Call)', label: t('q.options.online') },
-    { value: 'Telefon / Anruf', label: t('q.options.phone') },
-  ];
+  // Use id/label pairs to separate the backend key from the UI text
+  const settingOptions = useMemo(() => [
+    { id: 'in_person', label: t('q.options.onsite', 'Vor Ort') },
+    { id: 'online', label: t('q.options.online', 'Online (Video Call)') },
+    { id: 'phone', label: t('q.options.phone', 'Telefon / Anruf') },
+  ], [t]);
 
   const safeData = data || [];
 
@@ -42,18 +45,18 @@ const Step10_TTherapySetting = ({
     onNext,
   });
 
-  const hasNoPreference = safeData.includes('keine Präferenz');
+  const hasNoPreference = safeData.includes(NO_PREFERENCE);
 
-  const handleToggle = (value: string) => {
+  const handleToggle = (settingId: string) => {
     clearError('selection');
 
-    // Remove "keine Präferenz" if a specific setting is clicked
-    let currentSelection = safeData.filter((s) => s !== 'keine Präferenz');
+    // Remove "no preference" if a specific setting is clicked
+    let currentSelection = safeData.filter((s) => s !== NO_PREFERENCE);
 
-    if (currentSelection.includes(value)) {
-      currentSelection = currentSelection.filter((s) => s !== value);
+    if (currentSelection.includes(settingId)) {
+      currentSelection = currentSelection.filter((s) => s !== settingId);
     } else {
-      currentSelection = [...currentSelection, value];
+      currentSelection = [...currentSelection, settingId];
     }
 
     onDataChange(currentSelection);
@@ -65,7 +68,7 @@ const Step10_TTherapySetting = ({
     if (hasNoPreference) {
       onDataChange([]);
     } else {
-      onDataChange(['keine Präferenz']);
+      onDataChange([NO_PREFERENCE]);
     }
   };
 
@@ -91,14 +94,14 @@ const Step10_TTherapySetting = ({
           {/* Standard Options */}
           {settingOptions.map((setting) => (
             <label
-              key={setting.value}
+              key={setting.id}
               className={`flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors ${
                 hasNoPreference ? 'opacity-50 bg-muted/30' : ''
               }`}
             >
               <Checkbox
-                checked={safeData.includes(setting.value)}
-                onCheckedChange={() => handleToggle(setting.value)}
+                checked={safeData.includes(setting.id)}
+                onCheckedChange={() => handleToggle(setting.id)}
                 disabled={hasNoPreference}
               />
               <span className="text-foreground">{setting.label}</span>
@@ -110,7 +113,9 @@ const Step10_TTherapySetting = ({
           {/* Exclusive Option: Keine Präferenz */}
           <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox checked={hasNoPreference} onCheckedChange={handleNoPreferenceToggle} />
-            <span className="text-foreground font-medium">{NO_PREFERENCE}</span>
+            <span className="text-foreground font-medium">
+              {t('q.common.noPreference', 'Keine Präferenz')}
+            </span>
           </label>
         </div>
       </div>

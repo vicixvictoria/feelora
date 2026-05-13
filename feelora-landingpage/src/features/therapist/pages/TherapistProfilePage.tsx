@@ -188,9 +188,8 @@ const TherapistProfilePage = () => {
     ? Math.floor((Date.now() - profile.BirthDate * 1000) / 31557600000)
     : 'k.A.';
 
-  const unreadChatLine = t('app.therapist.notifications.unreadCount', {
-    count: unreadChatCount,
-    defaultValue: unreadChatCount === 1 ? '1 ungelesene Nachricht' : `${unreadChatCount} ungelesene Nachrichten`,
+  const unreadChatLine = t('app.therapist.notifications.unreadCount', { 
+  count: unreadChatCount 
   });
 
   return (
@@ -258,13 +257,13 @@ const TherapistProfilePage = () => {
                 {profile.Availability && profile.Availability.length > 0
                 ? profile.Availability.map((day: string) => {
                     const dayMap: Record<string, string> = {
-                      mo: t('q.t.availability.mon'),
-                      di: t('q.t.availability.tue'),
-                      mi: t('q.t.availability.wed'),
-                      do: t('q.t.availability.thu'),
-                      fr: t('q.t.availability.fri'),
-                      sa: t('q.t.availability.sat'),
-                      so: t('q.t.availability.sun'),
+                      mo: 'Mon',
+                      di: 'Tue',
+                      mi: 'Wed',
+                      do: 'Thu',
+                      fr: 'Fri',
+                      sa: 'Sat',
+                      so: 'Sun',
                     };
                     return dayMap[day] || day.toUpperCase();
                   }).join(', ')

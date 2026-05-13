@@ -41,12 +41,12 @@ const Step13_PTherapistGender = ({
 
   // Define gender options inside the component to access `t()`
   const genderOptions = [
-    { id: 'männlich', label: t('q.options.male', 'männlich') },
-    { id: 'weiblich', label: t('q.options.female', 'weiblich') },
-    { id: 'non-binary / divers', label: t('q.options.diverse', 'non-binary / divers') },
+    { id: 'male', label: t('q.options.male', 'männlich') },
+    { id: 'female', label: t('q.options.female', 'weiblich') },
+    { id: 'diverse', label: t('q.options.diverse', 'non-binary / divers') },
   ];
   const NO_PREFERENCE = {
-    id: 'keine Präferenz',
+    id: 'no_preference',
     label: t('q.common.noPreference', 'keine Präferenz'),
   };
 

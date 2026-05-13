@@ -39,6 +39,58 @@ interface WebsocketMessage {
   data?: IncomingNotification['data'];
 }
 
+// --- Language Translation Helper ---
+const translateLanguage = (langKey: string, t: any) => {
+  if (!langKey) return '';
+  const langMap: Record<string, string> = {
+    // Main Languages
+    german: 'q.p.languages.options.german',
+    english: 'q.p.languages.options.english',
+    croatian: 'q.p.languages.options.croatian',
+    arabic: 'q.p.languages.options.arabic',
+    turkish: 'q.p.languages.options.turkish',
+    polish: 'q.p.languages.options.polish',
+    serbian: 'q.p.languages.options.serbian',
+    italian: 'q.p.languages.options.italian',
+    hungarian: 'q.p.languages.options.hungarian',
+    farsi: 'q.p.languages.options.farsi',
+    romanian: 'q.p.languages.options.romanian',
+    spanish: 'q.p.languages.options.spanish',
+    french: 'q.p.languages.options.french',
+    ukrainian: 'q.p.languages.options.ukrainian',
+    russian: 'q.p.languages.options.russian',
+    // "Other" Languages
+    albanian: 'q.p.languages.other.albanian',
+    portuguese: 'q.p.languages.other.portuguese',
+    chinese: 'q.p.languages.other.chinese',
+    japanese: 'q.p.languages.other.japanese',
+    korean: 'q.p.languages.other.korean',
+    dutch: 'q.p.languages.other.dutch',
+    swedish: 'q.p.languages.other.swedish',
+    danish: 'q.p.languages.other.danish',
+    norwegian: 'q.p.languages.other.norwegian',
+    finnish: 'q.p.languages.other.finnish',
+    greek: 'q.p.languages.other.greek',
+    hebrew: 'q.p.languages.other.hebrew',
+    czech: 'q.p.languages.other.czech',
+    slovak: 'q.p.languages.other.slovak',
+    bulgarian: 'q.p.languages.other.bulgarian',
+    slovenian: 'q.p.languages.other.slovenian',
+    hindi: 'q.p.languages.other.hindi',
+    bengali: 'q.p.languages.other.bengali',
+    vietnamese: 'q.p.languages.other.vietnamese',
+    thai: 'q.p.languages.other.thai',
+    urdu: 'q.p.languages.other.urdu',
+    pashto: 'q.p.languages.other.pashto',
+    kurdish: 'q.p.languages.other.kurdish',
+    dari: 'q.p.languages.other.dari',
+    indonesian: 'q.p.languages.other.indonesian',
+  };
+
+  const translationPath = langMap[langKey.toLowerCase()];
+  return translationPath ? t(translationPath) : langKey.charAt(0).toUpperCase() + langKey.slice(1);
+};
+
 // --- S3 Avatar Component (Used only for the Sidebar) ---
 const S3Avatar = ({
   userId,
@@ -232,8 +284,9 @@ const TherapistChat = () => {
             age: calculateAge(patient.BirthDate),
             gender: patient.Gender || 'N/A',
             city: patient.City || patient.city || [],
+            // --- TRANSLATE LANGUAGES HERE ---
             languages: Array.isArray(patient.Languages)
-              ? patient.Languages.join(', ')
+              ? patient.Languages.map((l: string) => translateLanguage(l, t)).join(', ')
               : patient.Languages || patient.languages || 'N/A',
             avatar: avatar, // Fallback avatar string
             conversationId: existingChat ? existingChat.conversationId : null,

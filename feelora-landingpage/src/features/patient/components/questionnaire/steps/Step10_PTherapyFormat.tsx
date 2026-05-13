@@ -12,27 +12,27 @@ interface TherapyFormatStepProps {
 }
 
 // no preference always const
-const NO_PREFERENCE = 'keine-praeferenz';
+const NO_PREFERENCE = 'no_preference';
 
 // List of therapy format options - add more if needed
 const getFormatOptions = (t: (key: string) => string) => [
   {
-    id: 'einzel',
+    id: 'individual',
     label: t('q.p.therapyFormat.options.individual.label'),
     description: t('q.p.therapyFormat.options.individual.description'),
   },
   {
-    id: 'paar',
+    id: 'couple',
     label: t('q.p.therapyFormat.options.couple.label'),
     description: t('q.p.therapyFormat.options.couple.description'),
   },
   {
-    id: 'gruppe',
+    id: 'group',
     label: t('q.p.therapyFormat.options.group.label'),
     description: t('q.p.therapyFormat.options.group.description'),
   },
   {
-    id: 'familien',
+    id: 'families',
     label: t('q.p.therapyFormat.options.family.label'),
     description: t('q.p.therapyFormat.options.family.description'),
   },

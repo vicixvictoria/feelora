@@ -11,7 +11,7 @@ interface TherapyFormatStepProps {
   onDataChange: (data: string[]) => void;
 }
 
-const NO_PREFERENCE = 'keine-praeferenz';
+const no_preference = 'keine-praeferenz';
 
 // 1. Define schema expecting a "selection" array
 const step11Schema = z.object({
@@ -37,38 +37,38 @@ const Step11_TTherapyFormat = ({
 
   const formatOptions = [
     {
-      id: 'einzel',
+      id: 'individual',
       label: t('q.t.therapyFormat.individual'),
       description: t('q.t.therapyFormat.individualDesc'),
     },
     {
-      id: 'paar',
+      id: 'couple',
       label: t('q.t.therapyFormat.couple'),
       description: t('q.t.therapyFormat.coupleDesc'),
     },
     {
-      id: 'gruppe',
+      id: 'group',
       label: t('q.t.therapyFormat.group'),
       description: t('q.t.therapyFormat.groupDesc'),
     },
     {
-      id: 'familien',
+      id: 'families',
       label: t('q.t.therapyFormat.family'),
       description: t('q.t.therapyFormat.familyDesc'),
     },
-    { id: NO_PREFERENCE, label: t('q.t.therapyFormat.noPreference'), description: '' },
+    { id: no_preference, label: t('q.t.therapyFormat.noPreference'), description: '' },
   ];
 
   // 3. Split standard options from the exclusive option for rendering
-  const standardOptions = formatOptions.filter((opt) => opt.id !== NO_PREFERENCE);
-  const noPrefOption = formatOptions.find((opt) => opt.id === NO_PREFERENCE);
-  const hasNoPreference = safeData.includes(NO_PREFERENCE);
+  const standardOptions = formatOptions.filter((opt) => opt.id !== no_preference);
+  const noPrefOption = formatOptions.find((opt) => opt.id === no_preference);
+  const hasNoPreference = safeData.includes(no_preference);
 
   const handleToggle = (id: string) => {
     clearError('selection');
 
     // Remove "keine Präferenz" if a specific format is clicked
-    let currentSelection = safeData.filter((item) => item !== NO_PREFERENCE);
+    let currentSelection = safeData.filter((item) => item !== no_preference);
 
     if (currentSelection.includes(id)) {
       currentSelection = currentSelection.filter((item) => item !== id);
@@ -87,7 +87,7 @@ const Step11_TTherapyFormat = ({
       onDataChange([]);
     } else {
       // Check it -> wipe out all other selections
-      onDataChange([NO_PREFERENCE]);
+      onDataChange([no_preference]);
     }
   };
 
