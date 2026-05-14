@@ -19,7 +19,7 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
       <div className="absolute inset-0 z-0">
         <AnimatedWaves />
@@ -47,7 +47,7 @@ export function HeroSection() {
             onClick={() => navigate('/login')}
             className="bg-primary text-primary-foreground hover:bg-secondary font-normal text-base px-8 py-6"
           >
-            {t('hero.cta.register')} {/* change later to hero.cta.register */}
+            {t('hero.cta.register')} 
           </Button>
           <Button
             size="lg"

@@ -142,19 +142,19 @@ export function EvidenceBasedSection() {
               loading="lazy"
             />
           </motion.div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Card className="bg-background/95 backdrop-blur-sm p-10 shadow-2xl max-w-md">
+          <div className="absolute inset-0 flex items-center justify-center px-4">
+            <Card className="bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:p-10 shadow-2xl max-w-xs sm:max-w-sm md:max-w-md">
               <div className="text-center">
                 <div
-                  className="text-6xl font-headline font-bold text-tertiary-foreground mb-4"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-tertiary-foreground mb-2 sm:mb-3 md:mb-4"
                   aria-live="polite"
                 >
                   {effectiveness}st
                 </div>
-                <p className="text-h4 font-headline font-semibold text-gray-800 mb-3">
+                <p className="text-sm sm:text-base md:text-lg font-headline font-semibold text-gray-800 mb-2 sm:mb-3">
                   {t('evidence.effectiveness')}
                 </p>
-                <p className="text-body text-gray-600 leading-body">
+                <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-body">
                   {t('evidence.effectiveness.desc')}
                 </p>
               </div>

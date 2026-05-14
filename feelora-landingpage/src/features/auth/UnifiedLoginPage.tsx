@@ -21,10 +21,10 @@ function UnifiedLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4 pt-32 sm:pt-40">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('login.title')}</h1>
-        <p className="text-gray-600 text-lg">{t('login.subtitle')}</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t('login.title')}</h1>
+        <p className="text-sm sm:text-base md:text-lg text-gray-600">{t('login.subtitle')}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 w-full max-w-4xl">
