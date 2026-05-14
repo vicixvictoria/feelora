@@ -262,7 +262,7 @@ const TherapistProfilePage = () => {
           <div className="flex flex-col gap-2 shrink-0 sm:w-48">
             <button
               onClick={() => navigate('edit')}
-              className="feelora-btn-primary flex items-center justify-center w-full"
+              className="feelora-btn-primary flex items-center justify-center rounded-xl border w-full"
             >
               {t('app.therapist.profile.edit')}
               <ExternalLink className="w-4 h-4 ml-2" />

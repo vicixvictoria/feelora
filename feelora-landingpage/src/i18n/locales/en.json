@@ -769,6 +769,8 @@
   "app.therapist.profile.loadError": "Could not load profile.",
   "app.therapist.profile.noProfile": "No profile found.",
   "app.therapist.profile.ghostError": "Error occurred while changing visibility. Please try again later.",
+  "app.therapist.profile.ghostOn": "Ghost Mode: On",
+  "app.therapist.profile.ghostOff": "Ghost Mode: Off",
   "app.therapist.notifications.title": "Notifications & News",
   "app.therapist.notifications.messages": "Chat Messages",
   "app.therapist.notifications.noNew": "No new notifications",
@@ -1073,6 +1075,7 @@
   "patient.profile.unmatchButton": "Unmatch Therapist",
   "patient.profile.unmatchConfirmTitle": "Unmatch Therapist?",
   "patient.profile.unmatchConfirmText": "Are you sure you want to unmatch this therapist? This action cannot be undone and the entire chat history will be deleted.",
+  "patient.profile.retakeQuestionnaire": "Retake Questionnaire",
 
 
   "q.p.timeframe.lessThan3Months": "Less than 3 months",

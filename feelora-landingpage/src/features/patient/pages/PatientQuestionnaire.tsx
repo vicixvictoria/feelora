@@ -126,11 +126,14 @@ const PatientQuestionnaire = () => {
         clearProgress();
         goNext();
       } else {
-        // Fallback if the algorithm successfully ran but found 0 matches
-        throw new Error('Leider wurden keine passenden Therapeut*innen gefunden.');
+        // No matches found - redirect to profile so user can retake questionnaire
+        console.log('No matches found. Redirecting to profile...');
+        clearProgress();
+        navigate('/patient/profile');
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
+        console.error('Error during questionnaire submission:', error);
         alert(error.message);
       }
     } finally {

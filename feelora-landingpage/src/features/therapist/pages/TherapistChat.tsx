@@ -272,7 +272,10 @@ const TherapistChat = () => {
         const conversations = await chatService.getChatConversations();
 
         // Combine them into Sidebar List
-        const sidebarItems: SidebarChat[] = patients.map((patient: any) => {
+        const sidebarItems: SidebarChat[] = patients
+        .filter((patient: any) => patient && patient.Id) // Filter out any invalid patient entries that might cause crashes
+        .map((patient: any) => {
+          
           // Check if a conversation already exists for this patient
           const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
 

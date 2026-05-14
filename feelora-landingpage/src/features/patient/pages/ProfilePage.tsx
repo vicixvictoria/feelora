@@ -233,8 +233,22 @@ const ProfilePage = () => {
           </div>
         </div>
       ) : (
-        <div className="feelora-card p-6 text-center text-foreground">
-          <p>{t('patient.profile.noTherapistAssigned')}</p>
+        <div className="feelora-card p-6 text-center">
+          <p className="text-foreground mb-6">{t('patient.profile.noTherapistAssigned')}</p>
+          <button
+            onClick={() => {
+              // Clear questionnaire progress and navigate to retake questionnaire
+              try {
+                localStorage.removeItem('feelora_patient_v2');
+              } catch (err) {
+                console.error('Error clearing questionnaire progress:', err);
+              }
+              navigate('/patient/questionnaire');
+            }}
+            className="feelora-btn-primary inline-flex items-center gap-2"
+          >
+            {t('patient.profile.retakeQuestionnaire', 'Fragebogen erneut ausfüllen')}
+          </button>
         </div>
       )}
 

@@ -713,6 +713,8 @@
   "app.therapist.profile.loadError": "Profil konnte nicht geladen werden.",
   "app.therapist.profile.noProfile": "Kein Profil gefunden.",
   "app.therapist.profile.ghostError": "Fehler beim Ändern der Sichtbarkeit. Bitte versuche es später noch einmal.",
+  "app.therapist.profile.ghostOn": "Ghost Modus: An",
+  "app.therapist.profile.ghostOff": "Ghost Modus: Aus",
   "app.therapist.notifications.title": "Benachrichtigungen & Neuigkeiten",
   "app.therapist.notifications.messages": "Chat Nachrichten",
   "app.therapist.notifications.noNew": "Keine neuen Benachrichtigungen",
@@ -1071,6 +1073,7 @@
   "patient.profile.unmatchButton": "Therapeut:in entmatchen",
   "patient.profile.unmatchConfirmTitle": "Therapeut:in entmatchen?",
   "patient.profile.unmatchConfirmText": "Bist du sicher, dass du die Verbindung zu diesem Therapeuten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf wird gelöscht.",
+  "patient.profile.retakeQuestionnaire": "Fragebogen erneut ausfüllen",
 
   "q.p.timeframe.lessThan3Months": "weniger als 3 Monate",
   "q.p.timeframe.3to6Months": "3-6 Monate",
