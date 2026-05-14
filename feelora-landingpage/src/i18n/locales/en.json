@@ -768,6 +768,7 @@
   "app.therapist.profile.professionalData": "Professional Data",
   "app.therapist.profile.loadError": "Could not load profile.",
   "app.therapist.profile.noProfile": "No profile found.",
+  "app.therapist.profile.ghostError": "Error occurred while changing visibility. Please try again later.",
   "app.therapist.notifications.title": "Notifications & News",
   "app.therapist.notifications.messages": "Chat Messages",
   "app.therapist.notifications.noNew": "No new notifications",

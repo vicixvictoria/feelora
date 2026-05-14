@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ExternalLink, Loader2, Send, Bell, UserCheck, UserMinus, ChevronRight, Check } from 'lucide-react';
+import { ExternalLink, Loader2, Send, Bell, UserCheck, UserMinus, ChevronRight, Check, Ghost } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
-import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service';
+import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { notificationService, NotificationItem } from '../../notifications/api/notification-service';
@@ -55,6 +55,11 @@ const TherapistProfilePage = () => {
   // --- Profile Query ---
   const { data, loading: isLoading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
   const profile = data?.getOwnTherapistProfile;
+
+  // --- Ghost Mode State ---
+  // Initialize from local storage since backend doesn't return the flag currently - CHANGE LATER
+  const [isGhostMode, setIsGhostMode] = useState(() => localStorage.getItem('feelora_ghost_mode') === 'true');
+  const [isTogglingGhost, setIsTogglingGhost] = useState(false);
 
   // --- Notification & Websocket State ---
   const { messages: websocketMessages } = useWebsocket();
@@ -138,7 +143,6 @@ const TherapistProfilePage = () => {
     }
   };
 
-  
   const handleClearChats = async (e: React.MouseEvent) => {
     e.stopPropagation(); 
     if (unreadChatCount === 0 || isClearingChats) return;
@@ -167,6 +171,23 @@ const TherapistProfilePage = () => {
     }
   };
 
+  // --- Handle Ghost Mode Toggle ---
+  const handleToggleGhostMode = async () => {
+    setIsTogglingGhost(true);
+    const newGhostState = !isGhostMode;
+    
+    const success = await therapistService.toggleGhostMode(newGhostState);
+    
+    if (success) {
+      setIsGhostMode(newGhostState);
+      localStorage.setItem('feelora_ghost_mode', String(newGhostState));
+    } else {
+      alert(t('app.therapist.profile.ghostError', 'Fehler beim Ändern der Sichtbarkeit. Bitte versuche es später noch einmal.'));
+    }
+    
+    setIsTogglingGhost(false);
+  };
+
   // --- Render Handling ---
   if (isLoading) {
     return (
@@ -189,7 +210,7 @@ const TherapistProfilePage = () => {
     : 'k.A.';
 
   const unreadChatLine = t('app.therapist.notifications.unreadCount', { 
-  count: unreadChatCount 
+    count: unreadChatCount 
   });
 
   return (
@@ -200,37 +221,78 @@ const TherapistProfilePage = () => {
 
       {/* --- PROFILE CARD --- */}
       <div className="feelora-card w-full mb-8">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mb-6">
-          <S3Avatar
-            fallbackSrc={avatarPlaceholder}
-            className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
-            alt={`${profile.Name} ${profile.Surname}`}
-          />
-          <div className="flex-1 pl-1 sm:pl-0">
-            <h2 className="text-2xl font-semibold text-primary mb-1">
-              {profile.Title ? `${profile.Title} ` : ''}
-              {profile.Name} {profile.Surname}
-            </h2>
-            <div className="space-y-0.5 text-foreground">
-              <p>
-                <strong>{t('app.therapist.profile.age')}</strong> {age}
-              </p>
-              <p>
-                <strong>{t('app.therapist.profile.city')}</strong> {profile.City}
-              </p>
-              {profile.Address && (
+        
+        {/* TOP SECTION: Avatar, Basic Info, and Buttons */}
+        <div className="flex flex-col sm:flex-row justify-between gap-6 mb-6">
+          
+          {/* Left Side: Avatar & Details */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+            <S3Avatar
+              userId={profile.Id}
+              fallbackSrc={avatarPlaceholder}
+              className="w-24 h-24 sm:w-40 sm:h-40 rounded-lg object-cover mx-auto sm:mx-0"
+              alt={`${profile.Name} ${profile.Surname}`}
+            />
+            <div className="flex-1 pl-1 sm:pl-0 text-center sm:text-left">
+              <h2 className="text-2xl font-semibold text-primary mb-1">
+                {profile.Title ? `${profile.Title} ` : ''}
+                {profile.Name} {profile.Surname}
+              </h2>
+              <div className="space-y-0.5 text-foreground">
                 <p>
-                  <strong>{t('app.therapist.profile.address')}</strong> {profile.Address}
+                  <strong>{t('app.therapist.profile.age')}</strong> {age}
                 </p>
-              )}
-              <p>
-                <strong>{t('app.therapist.profile.role')}</strong>{' '}
-                {profile.JobTitle || t('app.therapist.profile.therapist')}
-              </p>
+                <p>
+                  <strong>{t('app.therapist.profile.city')}</strong> {profile.City}
+                </p>
+                {profile.Address && (
+                  <p>
+                    <strong>{t('app.therapist.profile.address')}</strong> {profile.Address}
+                  </p>
+                )}
+                <p>
+                  <strong>{t('app.therapist.profile.role')}</strong>{' '}
+                  {profile.JobTitle || t('app.therapist.profile.therapist')}
+                </p>
+              </div>
             </div>
+          </div>
+
+          {/* Right Side: Action Buttons */}
+          <div className="flex flex-col gap-2 shrink-0 sm:w-48">
+            <button
+              onClick={() => navigate('edit')}
+              className="feelora-btn-primary flex items-center justify-center w-full"
+            >
+              {t('app.therapist.profile.edit')}
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </button>
+            
+            {/* GHOST MODE BUTTON */}
+            <button
+              onClick={handleToggleGhostMode}
+              disabled={isTogglingGhost}
+              className={`flex items-center justify-center px-4 py-2 w-full text-sm font-medium rounded-xl border transition-all duration-200 ${
+                isGhostMode 
+                  ? 'bg-muted text-foreground border-border hover:bg-muted/80' 
+                  : 'bg-transparent text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'
+              }`}
+            >
+              {isTogglingGhost ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Ghost className={`w-4 h-4 mr-2 ${isGhostMode ? 'text-primary' : ''}`} />
+                  {isGhostMode 
+                    ? t('app.therapist.profile.ghostOn', 'Ghost Mode: An') 
+                    : t('app.therapist.profile.ghostOff', 'Ghost Mode: Aus')}
+                </>
+              )}
+            </button>
           </div>
         </div>
 
+        {/* BOTTOM SECTION: Practice Details */}
         <div className="space-y-4 text-foreground">
           <div>
             <p>
@@ -251,7 +313,7 @@ const TherapistProfilePage = () => {
                 ? t('app.therapist.profile.insuranceYes')
                 : t('app.therapist.profile.insuranceNo')}
             </p>
-            <div className="flex items-end gap-4 mt-2">
+            <div className="mt-2">
               <p className="mb-0">
                 <span className="font-bold">{t('app.therapist.profile.availability')}</span>{' '}
                 {profile.Availability && profile.Availability.length > 0
@@ -269,14 +331,6 @@ const TherapistProfilePage = () => {
                   }).join(', ')
                 : t('app.therapist.profile.noInfo')}
               </p>
-              <div className="flex-1"></div>
-              <button
-                onClick={() => navigate('edit')}
-                className="feelora-btn-primary flex items-center justify-center"
-              >
-                {t('app.therapist.profile.edit')}
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </button>
             </div>
           </div>
         </div>

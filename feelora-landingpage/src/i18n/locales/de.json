@@ -712,6 +712,7 @@
   "app.therapist.profile.gender": "Geschlecht",
   "app.therapist.profile.loadError": "Profil konnte nicht geladen werden.",
   "app.therapist.profile.noProfile": "Kein Profil gefunden.",
+  "app.therapist.profile.ghostError": "Fehler beim Ändern der Sichtbarkeit. Bitte versuche es später noch einmal.",
   "app.therapist.notifications.title": "Benachrichtigungen & Neuigkeiten",
   "app.therapist.notifications.messages": "Chat Nachrichten",
   "app.therapist.notifications.noNew": "Keine neuen Benachrichtigungen",

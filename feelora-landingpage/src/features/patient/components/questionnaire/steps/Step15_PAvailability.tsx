@@ -3,18 +3,16 @@ import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { z } from 'zod';
 import { useStepValidation } from '@/hooks/use-step-validation';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
 
 interface AvailabilityStepProps {
   onNext: () => void;
   onBack: () => void;
   data: string[];
   onDataChange: (data: string[]) => void;
-  isLoading?: boolean;
 }
 
 // Step Component
-const Step15_PAvailability = ({ onNext, onBack, data, onDataChange, isLoading = false }: AvailabilityStepProps) => {
+const Step15_PAvailability = ({ onNext, onBack, data, onDataChange }: AvailabilityStepProps) => {
   const { t } = useTranslation();
   const safeData = data || [];
 
@@ -57,17 +55,6 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange, isLoading = 
 
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
-
-      {/* --- LOADING OVERLAY --- */}
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-2xl animate-in fade-in duration-200">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-          <p className="mt-4 text-foreground font-medium text-lg">
-            {t('q.common.creatingProfile', 'Profil wird erstellt...')}
-          </p>
-        </div>
-      )}
-
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-purple mb-2">{t('q.p.availability.title')}</h1>
@@ -94,7 +81,6 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange, isLoading = 
                 key={day.id}
                 type="button"
                 onClick={() => handleToggle(day.id)}
-                disabled={isLoading}
                 className={`w-16 h-16 rounded-xl text-lg font-medium transition-all duration-200 ${
                   isSelected
                     ? 'bg-purple-100 text-purple border-2 border-purple-600 shadow-md'
@@ -110,10 +96,7 @@ const Step15_PAvailability = ({ onNext, onBack, data, onDataChange, isLoading = 
         </div>
       </div>
 
-      {/* Fade out buttons slightly and block clicks while loading */}
-      <div className={isLoading ? 'pointer-events-none opacity-50' : ''}>
-        <NavigationButtons onNext={validateAndNext} onBack={onBack} />
-      </div>
+      <NavigationButtons onNext={validateAndNext} onBack={onBack} />
     </div>
   );
 };

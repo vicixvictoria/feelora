@@ -161,29 +161,34 @@ const PatientQuestionnaire = () => {
     }
   };
 
-  const handleCreatePatientProfile = async () => {
-    setIsIntermediateLoading(true);
-    try {
-      const payload = {
-        Name: data.personalData.firstName,
-        Surname: data.personalData.lastName,
-        BirthDate: data.personalData.bday,
-        Gender: data.personalData.gender,
-        City: data.contactInfo.city,
-        Languages: data.languages,
-        Availability: data.availability,
-      };
-      console.log('Creating patient profile with payload:', payload);
-      // Call your API to create the patient profile and get the patient ID
-      const response = await patientService.createPatientProfile(data); // Maybe better to pass full data object and then extract in the service?
-      console.log('Patient profile created successfully!', response);
-      // You can store the patient ID in state or context if needed for future API calls
-      goNext();
-    } catch (error) {
-      console.error('Error creating patient profile:', error);
-    } finally {
-      setIsIntermediateLoading(false);
-    }
+  const handleCreatePatientProfile = () => {
+    //Instantly move to the next page so the user doesn't wait
+    goNext();
+
+    //Perform the API call asynchronously in the background
+    const createProfileAsync = async () => {
+      try {
+        const payload = {
+          Name: data.personalData.firstName,
+          Surname: data.personalData.lastName,
+          BirthDate: data.personalData.bday,
+          Gender: data.personalData.gender,
+          City: data.contactInfo.city,
+          Languages: data.languages,
+          Availability: data.availability,
+        };
+        console.log('Creating patient profile with payload:', payload);
+        
+        // Call API to create the patient profile
+        const response = await patientService.createPatientProfile(data); 
+        console.log('Patient profile created successfully!', response);
+      } catch (error) {
+        console.error('Error creating patient profile:', error);
+        // Because the user is already on the next step, just log this
+      }
+    };
+
+    createProfileAsync();
   };
 
   /*const handleLogout = () => {
@@ -197,7 +202,8 @@ const PatientQuestionnaire = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} />;
+        // Pass goToStep(0) so the component can throw them back to the start if the consent API call fails in the background
+        return <WelcomeStep onNext={goNext} onBack={goBack} onError={() => goToStep(0)} />;
       case 1:
         return (
           <PersonalDataStep
@@ -321,8 +327,7 @@ const PatientQuestionnaire = () => {
             onNext={handleCreatePatientProfile}
             onBack={goBack}
             data={data.availability}
-            onDataChange={(newData) => updateField('availability', newData)}
-            isLoading={isIntermediateLoading} 
+            onDataChange={(newData) => updateField('availability', newData)} 
           />
         );
       case 15:

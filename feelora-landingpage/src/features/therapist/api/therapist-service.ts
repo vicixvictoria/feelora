@@ -143,6 +143,17 @@ const CREATE_CONSENTS_MUTATION = gql`
   }
 `;
 
+// -- Update Questionnaire Mutation - for Ghost mode and partial updates
+const UPDATE_QUESTIONNAIRE_MUTATION = gql`
+  mutation UpdateQuestionnaire($input: QuestionnaireInput!) {
+    updateQuestionnaire(input: $input) {
+      Id
+      Type
+      Questionnaire
+    }
+  }
+`;
+
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
@@ -401,6 +412,37 @@ export const therapistService = {
       return true;
     } catch (error) {
       console.error('Error saving therapist consent:', error);
+      return false;
+    }
+  },
+
+
+  // -- Toggle Ghost Mode (Discoverability) --
+  toggleGhostMode: async (isGhostMode: boolean): Promise<boolean> => {
+    try {
+      // Fetch the existing questionnaire string from the database
+      const currentData = await therapistService.getQuestionnaire();
+      
+      if (!currentData || !currentData.Questionnaire) {
+        throw new Error("Could not find existing questionnaire data to update.");
+      }
+
+      // Prepare the input with the flipped Discoverable flag
+      // If Ghost Mode is ON, Discoverable is FALSE.
+      const input = {
+        Questionnaire: currentData.Questionnaire,
+        Discoverable: true, 
+      };
+
+      // Send the update mutation
+      await apolloClient.mutate({
+        mutation: UPDATE_QUESTIONNAIRE_MUTATION,
+        variables: { input },
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error toggling Ghost Mode:', error);
       return false;
     }
   },
