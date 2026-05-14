@@ -58,8 +58,27 @@ const TherapistProfilePage = () => {
 
   // --- Ghost Mode State ---
   // Initialize from local storage since backend doesn't return the flag currently - CHANGE LATER
-  const [isGhostMode, setIsGhostMode] = useState(() => localStorage.getItem('feelora_ghost_mode') === 'true');
+  const [isGhostMode, setIsGhostMode] = useState(false);
   const [isTogglingGhost, setIsTogglingGhost] = useState(false);
+
+  // Fetch True Ghost Mode State on Load
+  useEffect(() => {
+    const fetchGhostModeStatus = async () => {
+      try {
+        const questionnaireData = await therapistService.getQuestionnaire();
+        
+        // If Discoverable is true, Ghost Mode is false. 
+        // If Discoverable is false, Ghost Mode is true.
+        if (questionnaireData && typeof questionnaireData.Discoverable === 'boolean') {
+          setIsGhostMode(!questionnaireData.Discoverable);
+        }
+      } catch (err) {
+        console.error('Failed to fetch ghost mode status:', err);
+      }
+    };
+
+    fetchGhostModeStatus();
+  }, []);
 
   // --- Notification & Websocket State ---
   const { messages: websocketMessages } = useWebsocket();
@@ -176,11 +195,11 @@ const TherapistProfilePage = () => {
     setIsTogglingGhost(true);
     const newGhostState = !isGhostMode;
     
+    // This service call already handles flipping the Discoverable flag correctly based on the Ghost state
     const success = await therapistService.toggleGhostMode(newGhostState);
     
     if (success) {
       setIsGhostMode(newGhostState);
-      localStorage.setItem('feelora_ghost_mode', String(newGhostState));
     } else {
       alert(t('app.therapist.profile.ghostError', 'Fehler beim Ändern der Sichtbarkeit. Bitte versuche es später noch einmal.'));
     }

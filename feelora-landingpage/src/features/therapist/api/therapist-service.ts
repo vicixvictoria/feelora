@@ -121,6 +121,7 @@ const GET_QUESTIONNAIRE_QUERY = gql`
       Id
       Type
       Questionnaire
+      Discoverable
     }
   }
 `;
@@ -150,6 +151,7 @@ const UPDATE_QUESTIONNAIRE_MUTATION = gql`
       Id
       Type
       Questionnaire
+      Discoverable
     }
   }
 `;
@@ -352,7 +354,7 @@ export const therapistService = {
   },
 
   // -- Fetch the full questionnaire data for the therapist --
-  getQuestionnaire: async (): Promise<{ Id: string; Type: string; Questionnaire: string } | null> => {
+  getQuestionnaire: async (): Promise<{ Id: string; Type: string; Questionnaire: string; Discoverable?: boolean } | null> => {
     try {
       const { data } = await apolloClient.query({
         query: GET_QUESTIONNAIRE_QUERY,
@@ -360,8 +362,6 @@ export const therapistService = {
       });
       return data.getQuestionnaire;
     } catch (error) {
-      // If the user hasn't submitted yet, the backend might throw an error 
-      // or return null depending on your AppSync resolver setup.
       console.log('No questionnaire found or error fetching:', error);
       return null;
     }
@@ -431,7 +431,7 @@ export const therapistService = {
       // If Ghost Mode is ON, Discoverable is FALSE.
       const input = {
         Questionnaire: currentData.Questionnaire,
-        Discoverable: true, 
+        Discoverable: !isGhostMode, 
       };
 
       // Send the update mutation
