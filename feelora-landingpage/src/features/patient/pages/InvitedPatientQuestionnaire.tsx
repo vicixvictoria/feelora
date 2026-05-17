@@ -1,130 +1,133 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import { useNavigate } from 'react-router-dom';
+import WelcomeStep from '../components/invitedQuestionnaire/Step1_Welcome';
+import PersonalDataStep from '../components/invitedQuestionnaire/Step2_PersonalData';
+import ContactInfoStep from '../components/invitedQuestionnaire/Step3_ContactInformation';
+import { patientService } from '../api/patient-service';
 import { Loader2 } from 'lucide-react';
 
-import WelcomeStep from '../components/invitedQuestionnaire/Step1_Welcome.tsx';
-import PersonalDataStep from '../components/invitedQuestionnaire/Step2_PersonalData';
-import ContactInfoStep from '../components/invitedQuestionnaire/Step3_ContactInformation.tsx';
-
-import { patientService } from '../api/patient-service';
-
-
-interface InvitedData {
-  personalData: Record<string, string>;
-  contactInfo: Record<string, string>;
-}
-
-const initialData: InvitedData = {
+const initialInvitedData = {
   personalData: {},
   contactInfo: {},
 };
 
 const InvitedPatientQuestionnaire = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [inviterName, setInviterName] = useState<string | null>(null);
-  const [isLoadingInviter, setIsLoadingInviter] = useState(true);
-  
   const navigate = useNavigate();
+  // Assuming the URL looks like: /invite/:invitationId
+  const { invitationId } = useParams<{ invitationId: string }>();
 
-  // DIFFERENT storage key so it doesn't mess with the normal questionnaire!
+  // State for the Therapist who invited them
+  const [inviterDetails, setInviterDetails] = useState<any>(null);
+  const [isLoadingInviter, setIsLoadingInviter] = useState(true);
+  const [inviterError, setInviterError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // We use a different local storage key so it doesn't conflict with the main questionnaire
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
-    usePersistedQuestionnaire<InvitedData>('feelora_invited_patient_v1', initialData);
+    usePersistedQuestionnaire<any>('feelora_invited_patient_v1', initialInvitedData);
 
-  const totalSteps = 3; 
+  const totalSteps = 3; // Welcome, Personal Data, Contact Info
 
-  //  Fetch the Therapist's Details on Load ---
+  // --- Fetch Inviter Details on Load ---
   useEffect(() => {
     const fetchInviter = async () => {
-      try {
-        const inviteId = localStorage.getItem('pending_invite_id');
-        if (!inviteId) {
-          // If they somehow got here without a link, kick them to the normal flow
-          navigate('/patient/questionnaire');
-          return;
-        }
+      if (!invitationId) {
+        setInviterError('Keine Einladungs-ID gefunden.');
+        setIsLoadingInviter(false);
+        return;
+      }
 
-        // Fetch the details of the therapist who invited them
-        const inviterDetails = await patientService.getInviterDetails(inviteId);
-        
-        // Save the name to show a nice custom welcome message in Step 1
-        setInviterName(`${inviterDetails.Title || ''} ${inviterDetails.Name} ${inviterDetails.Surname}`);
+      try {
+        const details = await patientService.getInviterDetails(invitationId);
+        setInviterDetails(details);
       } catch (error) {
-        console.error("Failed to load inviter details", error);
-        alert("Einladungslink ungültig oder abgelaufen.");
+        console.error('Failed to load inviter:', error);
+        setInviterError('Einladung ungültig oder abgelaufen.');
       } finally {
         setIsLoadingInviter(false);
       }
     };
 
     fetchInviter();
-  }, [navigate]);
+  }, [invitationId]);
 
   const goNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      // If we are on the last step (Contact Info), submit!
-      handleSubmit();
     }
   };
 
   const goBack = () => {
-    if (currentStep > 0) setCurrentStep(currentStep - 1);
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
-  // --- The Custom Submission Logic ---
-  const handleSubmit = async () => {
-    if (isSubmitting) return;
+  const goToStep = (step: number) => {
+    setCurrentStep(step);
+  };
+
+  // --- Final Submission Logic ---
+  const handleCompleteOnboarding = async () => {
+    if (isSubmitting || !inviterDetails) return;
     setIsSubmitting(true);
 
     try {
-      const inviteId = localStorage.getItem('pending_invite_id');
-      if (!inviteId) throw new Error("Missing Invite ID");
+      // 1. Create the Patient Profile with the limited data
+      await patientService.createPatientProfile(data);
 
-      // Create the basic patient profile in the backend
-      await patientService.createPatientProfile({
-        personalData: data.personalData,
-        contactInfo: data.contactInfo,
-        // Fill the rest with empty arrays/defaults since they skipped the matching steps
-        languages: { selected: [], other: [] },
-        availability: [], 
-      });
+      // 2. Automatically save the match with the inviting therapist
+      const isSuccess = await patientService.saveMatch(inviterDetails.Id);
 
-      // Fetch the inviter ID using the session ID
-      const inviterDetails = await patientService.getInviterDetails(inviteId);
-
-      // Force the match
-      await patientService.saveMatch(inviterDetails.Id);
-
-      // Clean up and send to dashboard
-      clearProgress();
-      localStorage.removeItem('pending_invite_id');
-      navigate('/patient'); // Go straight to their new dashboard!
-
-    } catch (error: unknown) {
-      console.error(error);
-      alert("Es gab einen Fehler bei der Registrierung.");
+      if (isSuccess) {
+        // 3. Clear storage and send them directly to the dashboard!
+        clearProgress();
+        navigate('/patient/dashboard'); 
+      } else {
+        throw new Error('Fehler beim Zuweisen des Therapeuten.');
+      }
+    } catch (error: any) {
+      console.error('Error completing invited onboarding:', error);
+      alert(error.message || 'Es ist ein Fehler aufgetreten.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // --- Render Loading or Error States ---
   if (isLoadingInviter) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-question-bg">
+        <Loader2 className="w-10 h-10 animate-spin text-purple" />
       </div>
     );
   }
 
+  if (inviterError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-question-bg text-center p-4">
+        <h2 className="text-2xl font-bold text-destructive mb-2">Oops!</h2>
+        <p className="text-muted-foreground">{inviterError}</p>
+      </div>
+    );
+  }
+
+  // --- Render Steps ---
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        //  pass inviterName as a prop to WelcomeStep --> optional lets see
-        return <WelcomeStep onNext={goNext} onBack={goBack} inviterName={inviterName} />;
+        return (
+          <WelcomeStep 
+            onNext={goNext} 
+            onBack={goBack} 
+            onError={() => goToStep(0)}
+            // Pass the formatted name to the Welcome Step
+            inviterName={`${inviterDetails?.Title ? inviterDetails.Title + ' ' : ''}${inviterDetails?.Name} ${inviterDetails?.Surname}`} 
+          />
+        );
       case 1:
         return (
           <PersonalDataStep
@@ -135,14 +138,21 @@ const InvitedPatientQuestionnaire = () => {
           />
         );
       case 2:
-        // need on next triggers handle submit
         return (
-          <ContactInfoStep
-            onNext={goNext}
-            onBack={goBack}
-            data={data.contactInfo}
-            onDataChange={(newData) => updateField('contactInfo', newData)}
-          />
+          <div className="relative">
+            <ContactInfoStep
+              onNext={handleCompleteOnboarding} // <-- Submit happens here!
+              onBack={goBack}
+              data={data.contactInfo}
+              onDataChange={(newData) => updateField('contactInfo', newData)}
+            />
+            {/* Overlay if submitting to prevent double clicks */}
+            {isSubmitting && (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center z-50 rounded-xl">
+                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            )}
+          </div>
         );
       default:
         return null;
@@ -152,15 +162,13 @@ const InvitedPatientQuestionnaire = () => {
   return (
     <div className="min-h-screen bg-question-bg flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        {currentStep > 0 && (
+        {currentStep > 0 && currentStep < totalSteps && (
           <ProgressBar currentStep={currentStep} totalSteps={totalSteps - 1} />
         )}
-        <div className="w-full max-w-4xl">
-          {renderStep()}
-        </div>
+        <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
       <div className="flex justify-end p-6">
-        <img src={FeeloraLogo} alt="Feelora Logo" className="h-16 w-50" />
+        <img src={FeeloraLogo} alt="Feelora Logo" className="h-15 w-58" />
       </div>
     </div>
   );

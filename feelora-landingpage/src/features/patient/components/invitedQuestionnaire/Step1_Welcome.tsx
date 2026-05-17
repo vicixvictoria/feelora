@@ -7,6 +7,7 @@ import { patientService } from '../../api/patient-service';
 interface WelcomeStepProps {
   onNext: () => void;
   onBack: () => void;
+  onError?: () => void; //optional so TS doesn't crash
   inviterName?: string | null;
 }
 
@@ -36,28 +37,26 @@ const ExpandableSection = ({ title, children }: { title: string; children: React
   );
 };
 
-const Step1_PWelcome = ({ onNext, onBack, inviterName }: WelcomeStepProps) => {
+const Step1_PWelcome = ({ onNext, onBack, onError, inviterName }: WelcomeStepProps) => {
   const { t } = useTranslation();
   
   const [hasConsented, setHasConsented] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNextWithConsent = async () => {
+  const handleNextWithConsent = () => {
     if (!hasConsented) return;
     
-    setIsLoading(true);
-    // Log the consent in AWS before moving to the next page
-    const success = await patientService.submitConsent();
-    setIsLoading(false);
+    // Fire and forget in the background
+    patientService.submitConsent().then((success) => {
+      if (!success) {
+        console.error("Failed to save patient consent in background");
+        // Alert the user and yank them back to the start if onError is provided
+        alert(t('q.p.welcome.consentError', 'Beim Speichern deiner Einwilligung ist ein Fehler aufgetreten. Bitte versuche es erneut.'));
+        if (onError) onError(); 
+      }
+    });
 
-    if (success) {
-      onNext();
-    } else {
-      console.error("Failed to save patient consent");
-      // Optional: Add a toast notification here if the backend call fails,
-      // or fallback to letting them proceed if you want to ensure no drop-offs during MVP.
-      // onNext();
-    }
+    // Move to the next step instantly!
+    onNext();
   };
 
   return (
@@ -79,10 +78,13 @@ const Step1_PWelcome = ({ onNext, onBack, inviterName }: WelcomeStepProps) => {
       <div className="mb-8">
         <ExpandableSection title={t('q.p.welcome.sensibleData.title')}>
           {t('q.p.welcome.sensibleData.text')}
+          {/* Show the inviter name dynamically if it exists */}
           {inviterName && (
-            <p className="text-sm text-muted-foreground mt-2">
-              {t('q.p.welcome.inviterMessage', { inviterName })}
-            </p>
+            <div className="mt-3 p-3 bg-purple/10 rounded-md border border-purple/20">
+              <p className="text-sm text-foreground font-medium">
+                {t('q.p.welcome.inviterMessage', { inviterName, defaultValue: `Du wurdest von ${inviterName} eingeladen.` })}
+              </p>
+            </div>
           )}
         </ExpandableSection>
 
@@ -113,19 +115,13 @@ const Step1_PWelcome = ({ onNext, onBack, inviterName }: WelcomeStepProps) => {
         </label>
       </div>
 
-      <div className={!hasConsented || isLoading ? "opacity-50 pointer-events-none" : ""}>
+      <div className={!hasConsented ? "opacity-50 pointer-events-none" : ""}>
         <NavigationButtons 
           onBack={onBack} 
           onNext={handleNextWithConsent} 
           isFirstStep={true} 
         />
       </div>
-      
-      {isLoading && (
-        <p className="text-sm text-muted-foreground mt-4 animate-pulse">
-          {t('q.p.welcome.saving', 'Einwilligung wird gespeichert...')}
-        </p>
-      )}
     </div>
   );
 };

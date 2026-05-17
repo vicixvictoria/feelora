@@ -59,6 +59,7 @@ import TherapistEditProfilePage from './features/therapist/pages/TherapistEditPr
 import TherapistEmergencyPage from './features/therapist/pages/EmergencyPage';
 import { WebsocketProvider } from './contexts/WebsocketContext';
 import AdminPage from './features/admin/pages/AdminPage';
+import InvitedPatientQuestionnaire from './features/patient/pages/InvitedPatientQuestionnaire';
 
 // --- Amplify Configuration ---
 Amplify.configure(amplifyConfig);
@@ -146,6 +147,7 @@ const router = createBrowserRouter([
         element: <RequireAuth allowedType="user" />,
         children: [
           { path: '/patient/questionnaire', element: <PatientQuestionnaire /> },
+          { path: '/patient/invited/:invitationId', element: <InvitedPatientQuestionnaire /> },
           {
             path: '/patient',
             element: <PatientLayoutWrapper />,

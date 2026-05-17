@@ -213,7 +213,7 @@ const ChatPage = () => {
             availability: therapist.Availability || [],
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage:
-              existingChat?.lastMessage || t('patient.chat.startChat', 'Beginne den Chat...'),
+              existingChat?.lastMessage || t('app.patient.chat.startChat', 'Beginne den Chat...'),
           };
         });
 
@@ -332,7 +332,7 @@ const ChatPage = () => {
           </div>
         ) : chatList.length === 0 ? (
           <div className="text-center text-muted-foreground p-4">
-            Du hast noch keinen Therapeuten akzeptiert.
+            {t('patient.chat.noChats')}
           </div>
         ) : (
           <div className="space-y-2">
