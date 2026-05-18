@@ -147,7 +147,7 @@ const router = createBrowserRouter([
         element: <RequireAuth allowedType="user" />,
         children: [
           { path: '/patient/questionnaire', element: <PatientQuestionnaire /> },
-          { path: '/patient/invited/:invitationId', element: <InvitedPatientQuestionnaire /> },
+          { path: '/patient/invited', element: <InvitedPatientQuestionnaire /> },
           {
             path: '/patient',
             element: <PatientLayoutWrapper />,

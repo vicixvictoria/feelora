@@ -4,10 +4,12 @@ import { ChevronDownIcon } from 'lucide-react';
 import NavigationButtons from '@/components/questionnaire/NavigationButton';
 import { patientService } from '../../../api/patient-service'; 
 
+// BOTH are optional so this single file can be used by both questionnaires
 interface WelcomeStepProps {
   onNext: () => void;
   onBack: () => void;
-  onError: () => void;
+  onError?: () => void; 
+  inviterName?: string | null;
 }
 
 // Helper component for the expandable sections
@@ -36,7 +38,7 @@ const ExpandableSection = ({ title, children }: { title: string; children: React
   );
 };
 
-const Step1_PWelcome = ({ onNext, onBack, onError }: WelcomeStepProps) => {
+const Step1_PWelcome = ({ onNext, onBack, onError, inviterName }: WelcomeStepProps) => {
   const { t } = useTranslation();
   
   const [hasConsented, setHasConsented] = useState(false);
@@ -44,13 +46,12 @@ const Step1_PWelcome = ({ onNext, onBack, onError }: WelcomeStepProps) => {
   const handleNextWithConsent = () => {
     if (!hasConsented) return;
     
-    // Fire and forget: Log the consent in AWS in the background
+    // Fire and forget in the background for BOTH flows
     patientService.submitConsent().then((success) => {
       if (!success) {
         console.error("Failed to save patient consent in background");
-        // 2. Alert the user and yank them back to the start!
         alert(t('q.p.welcome.consentError', 'Beim Speichern deiner Einwilligung ist ein Fehler aufgetreten. Bitte versuche es erneut.'));
-        onError();
+        if (onError) onError();
       }
     });
 
@@ -68,7 +69,6 @@ const Step1_PWelcome = ({ onNext, onBack, onError }: WelcomeStepProps) => {
       {/* --- Subtle Divider --- */}
       <hr className="border-t border-border mb-8 opacity-70" />
 
-      {/* Reusing the consentData translation key or creating a patient specific one */}
       <h3 className="text-foreground font-semibold text-body-large mb-6">
         {t('q.p.welcome.consentData', 'Wichtige Hinweise vor dem Start')}
       </h3>
@@ -77,6 +77,14 @@ const Step1_PWelcome = ({ onNext, onBack, onError }: WelcomeStepProps) => {
       <div className="mb-8">
         <ExpandableSection title={t('q.p.welcome.sensibleData.title')}>
           {t('q.p.welcome.sensibleData.text')}
+          {/* Show the inviter name dynamically ONLY if it exists (Invited Flow) */}
+          {inviterName && (
+            <div className="mt-3 p-3 bg-purple/10 rounded-md border border-purple/20">
+              <p className="text-sm text-foreground font-medium">
+                {t('q.p.welcome.inviterMessage', { inviterName, defaultValue: `Du wurdest von ${inviterName} eingeladen.` })}
+              </p>
+            </div>
+          )}
         </ExpandableSection>
 
         <ExpandableSection title={t('q.p.welcome.ai.title')}>

@@ -156,6 +156,13 @@ const UPDATE_QUESTIONNAIRE_MUTATION = gql`
   }
 `;
 
+// create invitation for therapist to invite an existing patient
+const CREATE_INVITATION_MUTATION = gql`
+  mutation CreateInvitation {
+    createInvitation
+  }
+`;
+
 // --- Service Object --- //
 export const therapistService = {
   // -- API call to submit the full questionnaire --
@@ -444,6 +451,19 @@ export const therapistService = {
     } catch (error) {
       console.error('Error toggling Ghost Mode:', error);
       return false;
+    }
+  },
+
+  // -- Create Invitation for Therapist to Invite an Existing Patient --
+  createInvitation: async (): Promise<string> => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: CREATE_INVITATION_MUTATION,
+      });
+      return data.createInvitation; // This returns the String! (the ID or URL)
+    } catch (error) {
+      console.error('Error creating invitation:', error);
+      throw error;
     }
   },
 
