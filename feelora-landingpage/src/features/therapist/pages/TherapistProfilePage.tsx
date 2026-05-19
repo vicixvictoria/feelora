@@ -157,11 +157,13 @@ const TherapistProfilePage = () => {
     try {
       const result = await therapistService.createInvitation();
       
-      // If the backend returns a full URL (starting with http), use it directly. 
-      // If it only returns an ID, construct the backend URL string that sets the cookie.
-      // (Adjust this origin to match your backend URL if it's on a different subdomain!)
-      const backendDomain = import.meta.env.VITE_AUTH_API_URL || window.location.origin;
-      const fullLink = result.startsWith('http') ? result : `${backendDomain}/invite/${result}`;
+      // Get the auth domain (e.g. https://auth.feelora-dev.com)
+      const backendDomain = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
+      
+      // Format exactly as backend requests: auth.<domain>/invite/token?inviteId=<token>
+      const fullLink = result.startsWith('http') 
+        ? result 
+        : `${backendDomain}/invite/token?inviteId=${result}`;
       
       setInviteLink(fullLink);
     } catch (error) {
@@ -270,6 +272,10 @@ const TherapistProfilePage = () => {
             </h3>
             <p className="text-sm text-muted-foreground">
               {t('app.therapist.profile.inviteDesc', 'Für bestehenden Patient:innen hier einen Einladungslink erstellen. Bitte sende diesen Link direkt an deine Patient:innen, diese sollen sich genau damit registrieren und anmelden.')}
+              <br />
+              <span className="inline-block mt-1 font-medium text-primary">
+                {t('app.therapist.profile.inviteExpiry', 'Hinweis: Dieser Link ist nach der Erstellung für 30 Tage gültig.')}
+              </span>
             </p>
           </div>
           

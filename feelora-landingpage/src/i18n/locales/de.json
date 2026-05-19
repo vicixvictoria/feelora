@@ -720,6 +720,7 @@
   "app.therapist.profile.inviteTitle": "Patient:innen einladen",
   "app.therapist.profile.inviteDesc": "Hier kannst du einen Einladungslink erstellen, um ihn mit deinen Patient:innen zu teilen. So können sie Feelora mit dir nutzen. Sende diesen genauen Link an sie, damit sie sich registrieren und automatisch mit dir verknüpft werden.",
   "app.therapist.profile.createInviteBtn": "Einladungslink erstellen",
+  "app.therapist.profile.inviteExpiry": "Hinweis: Dieser Link ist nach der Erstellung für 30 Tage gültig.",
   "app.therapist.notifications.title": "Benachrichtigungen & Neuigkeiten",
   "app.therapist.notifications.messages": "Chat Nachrichten",
   "app.therapist.notifications.noNew": "Keine neuen Benachrichtigungen",

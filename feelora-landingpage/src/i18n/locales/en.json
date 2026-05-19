@@ -774,6 +774,7 @@
   "app.therapist.profile.ghostOn": "Ghost Mode: On",
   "app.therapist.profile.ghostOff": "Ghost Mode: Off",
   "app.therapist.profile.inviteTitle": "Invite Patients",
+  "app.therapist.profile.inviteExpiry": "Note: This link is valid for 30 days after creation.",
   "app.therapist.profile.inviteDesc": "Here you can create an invitation link to share with your patients so you can use Feelora with them. Send this exact link to them, so they can register and are automatically matched to you.",
   "app.therapist.profile.createInviteBtn": "Create Invitation Link",
   "app.therapist.notifications.title": "Notifications & News",
