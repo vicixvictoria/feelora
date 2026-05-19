@@ -31,7 +31,7 @@ const InvitedPatientQuestionnaire = () => {
   const navigate = useNavigate();
 
   // Read the cookie for invitation ID
-  const invitationId = getCookie('InvitationId');
+  const invitationId = getCookie('invitationId');
 
   const [inviterDetails, setInviterDetails] = useState<any>(null);
   const [isLoadingInviter, setIsLoadingInviter] = useState(true);
@@ -90,7 +90,7 @@ const InvitedPatientQuestionnaire = () => {
       if (isSuccess) {
         // Clear local storage AND delete the cookie so it doesn't run again!
         clearProgress();
-        deleteCookie('InvitationId');
+        deleteCookie('invitationId');
         navigate('/patient/dashboard'); 
       } else {
         throw new Error('Fehler beim Zuweisen des Therapeuten.');

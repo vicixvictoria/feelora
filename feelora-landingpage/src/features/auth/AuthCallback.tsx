@@ -35,7 +35,7 @@ function AuthCallback() {
       // ==========================================
       //  TRAFFIC COP (INVITED PATIENT CHECK)
       // ==========================================
-      const hasInviteCookie = getCookie('InvitationId');
+      const hasInviteCookie = getCookie('invitationId');
       
       // Ensure they are a patient (type:U) or don't have therapist groups
       const isPatient = user?.groups?.includes('type:U') || (!user?.groups?.includes('type:T') && !user?.groups?.includes('type:P'));
