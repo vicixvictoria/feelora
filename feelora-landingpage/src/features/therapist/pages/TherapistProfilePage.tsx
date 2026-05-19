@@ -160,10 +160,10 @@ const TherapistProfilePage = () => {
       // Get the auth domain (e.g. https://auth.feelora-dev.com)
       const backendDomain = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
       
-      // Format exactly as backend requests: auth.<domain>/invite/token?inviteId=<token>
+      // Format exactly as backend requests: auth.<domain>/invite/token?invitationId=<token>
       const fullLink = result.startsWith('http') 
         ? result 
-        : `${backendDomain}/invite/token?inviteId=${result}`;
+        : `${backendDomain}/invite/token?invitationId=${result}`;
       
       setInviteLink(fullLink);
     } catch (error) {
