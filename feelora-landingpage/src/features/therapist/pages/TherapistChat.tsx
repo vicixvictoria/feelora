@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2, X, UserMinus, AlertTriangle } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
@@ -43,7 +43,6 @@ interface WebsocketMessage {
 const translateLanguage = (langKey: string, t: any) => {
   if (!langKey) return '';
   const langMap: Record<string, string> = {
-    // Main Languages
     german: 'q.p.languages.options.german',
     english: 'q.p.languages.options.english',
     croatian: 'q.p.languages.options.croatian',
@@ -59,7 +58,6 @@ const translateLanguage = (langKey: string, t: any) => {
     french: 'q.p.languages.options.french',
     ukrainian: 'q.p.languages.options.ukrainian',
     russian: 'q.p.languages.options.russian',
-    // "Other" Languages
     albanian: 'q.p.languages.other.albanian',
     portuguese: 'q.p.languages.other.portuguese',
     chinese: 'q.p.languages.other.chinese',
@@ -109,13 +107,11 @@ const S3Avatar = ({
     if (userId) {
       download('profile', 'public', userId).catch(() => {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
 };
 
-// Helper to calculate age from Unix Seconds or Date String
 const calculateAge = (birthDate: string | number | null | undefined): string => {
   if (!birthDate) return 'N/A';
   const dob = typeof birthDate === 'number' ? new Date(birthDate * 1000) : new Date(birthDate);
@@ -152,10 +148,8 @@ const TherapistChat = () => {
   const [isConfirmUnmatchOpen, setIsConfirmUnmatchOpen] = useState(false);
   const [isUnmatching, setIsUnmatching] = useState(false);
 
-  // Create a reference to the bottom of the chat
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Helper function to scroll to the anchor
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
@@ -163,24 +157,77 @@ const TherapistChat = () => {
     }
   };
 
-  // Fetch Therapist avatar exactly once when the component mounts
   const { download: downloadMyAvatar, imageUrl: myAvatarUrl } = useS3Download();
-
   useEffect(() => {
-    // No ownerSub passed = fetches logged-in user's image
     downloadMyAvatar('profile', 'public').catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch Patient avatar exactly once whenever the selected chat changes
   const { download: downloadTheirAvatar, imageUrl: theirAvatarUrl } = useS3Download();
   useEffect(() => {
     if (selectedChat?.contactId) {
       downloadTheirAvatar('profile', 'public', selectedChat.contactId).catch(() => {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?.contactId]);
 
+  // ==========================================
+  // REUSABLE FETCH FUNCTION (Moved out of useEffect)
+  // ==========================================
+  const fetchContactsAndChats = useCallback(async (isBackgroundUpdate = false) => {
+    try {
+      if (!isBackgroundUpdate) setIsLoadingChats(true);
+
+      const profile = await therapistService.getProfile();
+      const patients = profile?.Matches && profile.Matches.length > 0
+        ? await therapistService.getMatchedPatients(profile.Matches)
+        : [];
+
+      const conversations = await chatService.getChatConversations();
+
+      const sidebarItems: SidebarChat[] = patients
+        .filter((patient: any) => patient && patient.Id) 
+        .map((patient: any) => {
+          const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
+
+          return {
+            contactId: patient.Id,
+            name: `${patient.Name} ${patient.Surname}`,
+            firstName: patient.Name || '',
+            lastName: patient.Surname || '',
+            age: calculateAge(patient.BirthDate),
+            gender: patient.Gender || 'N/A',
+            city: patient.City || patient.city || [],
+            languages: Array.isArray(patient.Languages)
+              ? patient.Languages.map((l: string) => translateLanguage(l, t)).join(', ')
+              : patient.Languages || patient.languages || 'N/A',
+            avatar: avatar,
+            conversationId: existingChat ? existingChat.conversationId : null,
+            lastMessage: existingChat?.lastMessage || t('app.therapist.chat.startChat', 'Beginne den Chat...'),
+          };
+        });
+
+      setChatList(sidebarItems);
+
+      // If a background update finds a new conversation ID for our active chat, inject it immediately!
+      setSelectedChat(currentSelected => {
+        if (!currentSelected) return null;
+        const updatedMatch = sidebarItems.find(item => item.contactId === currentSelected.contactId);
+        return updatedMatch ? updatedMatch : currentSelected;
+      });
+
+      if (!isBackgroundUpdate && sidebarItems.length > 0 && window.innerWidth >= 768) {
+        handleSelectChat(sidebarItems[0]);
+      }
+    } catch (error) {
+      console.error('Error loading chat contacts:', error);
+    } finally {
+      if (!isBackgroundUpdate) setIsLoadingChats(false);
+    }
+  }, [t]);
+
+  // Fetch on Initial Load
+  useEffect(() => {
+    fetchContactsAndChats();
+  }, [fetchContactsAndChats]);
 
   // ==========================================
   // WEBSOCKET NOTIFICATION LOGIC
@@ -189,8 +236,7 @@ const TherapistChat = () => {
     rawMessage: WebsocketMessage,
   ): IncomingNotification | null => {
     if (rawMessage.type !== 'notification') return null;
-    if (rawMessage.data?.type !== 'new_message') return null;
-    if (!rawMessage.data.conversationId) return null;
+    // FIX: Removed the line that rejected new_match notifications!
     return rawMessage as IncomingNotification;
   };
 
@@ -201,34 +247,37 @@ const TherapistChat = () => {
     processedMessageCountRef.current = websocketMessages.length;
 
     let activeChatNeedsUpdate = false;
+    let shouldRefetchSidebar = false; // Flag to check if we need to reload the sidebar
 
-    // Check if any of the new messages belong to the currently open chat
-    for (const rawMessage of newMessages) {
-      const incoming = extractIncomingNotification(rawMessage);
-      if (incoming?.data?.conversationId && incoming.data.conversationId === selectedChat?.conversationId) {
-        activeChatNeedsUpdate = true;
-        break; // found one, no need to keep checking the rest for this flag
-      }
-    }
-
-    // Update the unread badges for all other background chats
     setUnreadByConversation((previous) => {
       const next = { ...previous };
+
       for (const rawMessage of newMessages) {
         const incoming = extractIncomingNotification(rawMessage);
-        if (!incoming?.data?.conversationId) continue;
-        
-        const conversationId = incoming.data.conversationId;
+        if (!incoming?.data) continue;
 
-        // Skip adding an unread badge if the user is currently looking at this chat
-        if (selectedChat?.conversationId === conversationId) {
-          continue; 
+        // If it's a new match or someone unmatched, we MUST update the sidebar
+        if (incoming.data.type === 'new_match' || incoming.data.type === 'new_unmatch') {
+          shouldRefetchSidebar = true;
+          continue;
         }
 
-        // Increment the badge for background chats
-        const fallbackCount = (next[conversationId] ?? 0) + 1;
-        const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
-        next[conversationId] = Math.max(0, count);
+        // Handle standard chat messages
+        if (incoming.data.type === 'new_message') {
+          shouldRefetchSidebar = true; // Refetch so the sidebar shows the new "lastMessage" text
+          
+          const conversationId = incoming.data.conversationId;
+          if (!conversationId) continue;
+
+          if (conversationId === selectedChat?.conversationId) {
+            activeChatNeedsUpdate = true;
+            continue; 
+          }
+
+          const fallbackCount = (next[conversationId] ?? 0) + 1;
+          const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
+          next[conversationId] = Math.max(0, count);
+        }
       }
       return next;
     });
@@ -241,78 +290,20 @@ const TherapistChat = () => {
         })
         .catch((err) => console.error('Failed to auto-update active chat messages:', err));
 
-      // Immediately mark incoming messages in the active chat as read
       notificationService.readNotification({
         notificationType: 'new_message',
         notificationId: selectedChat.conversationId,
         }).then(() => {
-          window.dispatchEvent(new Event('notificationsRead')); // Notify sidebar to refetch notifications and update badges
+          window.dispatchEvent(new Event('notificationsRead'));
       }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
 
-  }, [websocketMessages, selectedChat]);
+    // FIRE THE BACKGROUND REFRESH! (Fixes the missing match & missing first message bug)
+    if (shouldRefetchSidebar) {
+      fetchContactsAndChats(true); // "true" means do it quietly without the big loading spinner
+    }
 
-
-  // Fetch Matches and Conversations on Load
-  useEffect(() => {
-    const fetchContactsAndChats = async () => {
-      try {
-        setIsLoadingChats(true);
-
-        // Get the Therapist's Profile
-        const profile = await therapistService.getProfile();
-
-        // Get the Therapist's matched Patients
-        const patients =
-          profile?.Matches && profile.Matches.length > 0
-            ? await therapistService.getMatchedPatients(profile.Matches)
-            : [];
-
-        // Get the active Conversations
-        const conversations = await chatService.getChatConversations();
-
-        // Combine them into Sidebar List
-        const sidebarItems: SidebarChat[] = patients
-        .filter((patient: any) => patient && patient.Id) // Filter out any invalid patient entries that might cause crashes
-        .map((patient: any) => {
-          
-          // Check if a conversation already exists for this patient
-          const existingChat = conversations.find((c) => c.participantIds.includes(patient.Id));
-
-          return {
-            contactId: patient.Id,
-            name: `${patient.Name} ${patient.Surname}`,
-            firstName: patient.Name || '',
-            lastName: patient.Surname || '',
-            age: calculateAge(patient.BirthDate),
-            gender: patient.Gender || 'N/A',
-            city: patient.City || patient.city || [],
-            // --- TRANSLATE LANGUAGES HERE ---
-            languages: Array.isArray(patient.Languages)
-              ? patient.Languages.map((l: string) => translateLanguage(l, t)).join(', ')
-              : patient.Languages || patient.languages || 'N/A',
-            avatar: avatar, // Fallback avatar string
-            conversationId: existingChat ? existingChat.conversationId : null,
-            lastMessage:
-              existingChat?.lastMessage || t('app.therapist.chat.startChat', 'Beginne den Chat...'),
-          };
-        });
-
-        setChatList(sidebarItems);
-
-        // Auto-select the first chat on desktop
-        if (sidebarItems.length > 0 && window.innerWidth >= 768) {
-          handleSelectChat(sidebarItems[0]);
-        }
-      } catch (error) {
-        console.error('Error loading chat contacts:', error);
-      } finally {
-        setIsLoadingChats(false);
-      }
-    };
-
-    fetchContactsAndChats();
-  }, [t]);
+  }, [websocketMessages, selectedChat, fetchContactsAndChats]);
 
   // Trigger the scroll whenever the messages array updates
   useEffect(() => {
@@ -325,7 +316,6 @@ const TherapistChat = () => {
     setMobileShowChat(true);
     setMessages([]);
 
-    // Clear unread count for this conversation when opened
     if (chat.conversationId) {
       const conversationId = chat.conversationId;
       setUnreadByConversation((previous) => {
@@ -340,7 +330,7 @@ const TherapistChat = () => {
           notificationType: 'new_message',
           notificationId: conversationId, 
         });
-        window.dispatchEvent(new Event('notificationsRead')); // Notify sidebar to refetch notifications and update badges
+        window.dispatchEvent(new Event('notificationsRead')); 
       } catch (err) {
         console.error('Failed to mark messages as read on the server:', err);
       }
@@ -390,6 +380,9 @@ const TherapistChat = () => {
       );
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
+      
+      // Update the sidebar preview text for our own message immediately
+      fetchContactsAndChats(true);
     } catch (error) {
       console.error('Failed to send message:', error);
       alert('Nachricht konnte nicht gesendet werden.');
@@ -615,7 +608,6 @@ const TherapistChat = () => {
             <div className="p-6 space-y-6">
               {/* Avatar & Name */}
               <div className="flex items-center gap-4">
-                {/* Dynamically load the specific chat's image */}
                 <img
                   src={theirAvatarUrl || avatar}
                   alt={selectedChat.name}

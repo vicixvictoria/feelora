@@ -5,8 +5,8 @@ import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
 
 import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome'; 
-import PersonalDataStep from '../components/invitedQuestionnaire/Step2_PersonalData';
-import ContactInfoStep from '../components/invitedQuestionnaire/Step3_ContactInformation';
+import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
+import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo';
 import { patientService } from '../api/patient-service';
 import { Loader2 } from 'lucide-react';
 

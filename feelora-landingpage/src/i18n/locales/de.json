@@ -177,7 +177,7 @@
   "_comment": "German translations for Questionnaire",
   "q.p.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
   "q.p.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Patient:innenprofil für dich. Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen\" durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.",
-  "q.p.welcome.questionCount": "Dieser Fragebogen umfasst 16 Fragen.",
+  "q.p.welcome.questionCount": "Dieser Fragebogen kann einige Minuten dauern.",
 
   "q.p.welcome.consentData": "Bitte lies dir unsere Einwilligungserklärung sorgfältig durch, bevor du fortfährst. Es ist wichtig, dass du verstehst, wie wir deine Daten verwenden und welche Bedingungen für die Nutzung unserer Plattform gelten.",
   "q.p.welcome.sensibleData.title": "Verarbeitung von Gesundheitsdaten",

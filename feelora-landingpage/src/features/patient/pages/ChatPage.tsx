@@ -332,7 +332,7 @@ const ChatPage = () => {
           </div>
         ) : chatList.length === 0 ? (
           <div className="text-center text-muted-foreground p-4">
-            {t('patient.chat.noChats')}
+            {t('app.patient.chat.noChats')}
           </div>
         ) : (
           <div className="space-y-2">
