@@ -1,50 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome.tsx';
+import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
-import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo.tsx';
+import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
-import TimeframeStep from '../components/questionnaire/steps/Step5_PTimeframe.tsx';
-import PreviousTherapyStep from '../components/questionnaire/steps/Step6_PPreviousTherapy.tsx';
-import LanguagesStep from '../components/questionnaire/steps/Step7_PLanguages.tsx';
-import TherapySchoolStep from '../components/questionnaire/steps/Step8_PTherapySchool.tsx';
-import TherapySettingStep from '../components/questionnaire/steps/Step9_PTherapySetting.tsx';
-import TherapyFormatStep from '../components/questionnaire/steps/Step10_PTherapyFormat.tsx';
-import TherapyDurationStep from '../components/questionnaire/steps/Step11_PTherapyDuration.tsx';
-import SessionFrequencyStep from '../components/questionnaire/steps/Step12_PSessionFrequency.tsx';
-import PatientGenderStep from '../components/questionnaire/steps/Step13_PTherapistGender.tsx';
-import ValuesPreferencesStep from '../components/questionnaire/steps/Step14_PValuesPreferences.tsx';
-import AdditionalInfoStep from '../components/questionnaire/steps/Step16_PAdditionalInfo.tsx';
-import AvailabilityStep from '../components/questionnaire/steps/Step15_PAvailability.tsx';
-import SummaryStep from '../components/questionnaire/steps/Step17_PSummary.tsx';
+import TimeframeStep from '../components/questionnaire/steps/Step5_PTimeframe';
+import PreviousTherapyStep from '../components/questionnaire/steps/Step6_PPreviousTherapy';
+import LanguagesStep from '../components/questionnaire/steps/Step7_PLanguages';
+import TherapySchoolStep from '../components/questionnaire/steps/Step8_PTherapySchool';
+import TherapySettingStep from '../components/questionnaire/steps/Step9_PTherapySetting';
+import TherapyFormatStep from '../components/questionnaire/steps/Step10_PTherapyFormat';
+import TherapyDurationStep from '../components/questionnaire/steps/Step11_PTherapyDuration';
+import SessionFrequencyStep from '../components/questionnaire/steps/Step12_PSessionFrequency';
+import PatientGenderStep from '../components/questionnaire/steps/Step13_PTherapistGender';
+import ValuesPreferencesStep from '../components/questionnaire/steps/Step14_PValuesPreferences';
+import AdditionalInfoStep from '../components/questionnaire/steps/Step16_PAdditionalInfo';
+import AvailabilityStep from '../components/questionnaire/steps/Step15_PAvailability';
+import SummaryStep from '../components/questionnaire/steps/Step17_PSummary';
 import TherapistMatchStep from '../components/questionnaire/steps/Step18_TherapistMatch';
-//import Preregistration from '../components/questionnaire/steps/Step_Preregsitration.tsx';
 import { AlgorithmMatch } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
 
 import { patientService } from '../api/patient-service';
 import { QuestionnaireData } from '../types/questionnaire';
-
-/*interface QuestionnaireData {
-  personalData: Record<string, string>;
-  contactInfo: Record<string, string>;
-  mentalHealth: { selected: string[]; other: string };
-  timeframe: string[];
-  previousTherapy: { selected: string[]; other: string; neverHadTherapy: boolean };
-  languages: { selected: string[]; other: string };
-  therapySchool: { selected: string[]; other: string };
-  //therapyMethods: string;
-  therapySetting: string[];
-  therapyFormat: string[];
-  therapyDuration: string;
-  sessionFrequency: string[];
-  therapistGender: string[];
-  valuesPreferences: { selected: string[]; other: string };
-  additionalInfo: string;
-  availability: string[];
-}*/
 
 const initialData: QuestionnaireData = {
   personalData: {},
@@ -54,7 +34,6 @@ const initialData: QuestionnaireData = {
   previousTherapy: { selected: [], other: '', neverHadTherapy: false },
   languages: { selected: [], other: [] },
   therapySchool: { selected: [], other: '' },
-  //therapyMethods: "",
   therapySetting: [],
   therapyFormat: [],
   therapyDuration: '',
@@ -65,30 +44,46 @@ const initialData: QuestionnaireData = {
   availability: [],
 };
 
+// --- Helper to check for the cookie (Case-Insensitive) ---
+const getCookie = (name: string) => {
+  const value = `; ${document.cookie}`;
+  let parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  
+  parts = value.split(`; ${name.toLowerCase()}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  
+  return null;
+};
+
 const PatientQuestionnaire = () => {
-  /*const [currentStep, setCurrentStep] = useState(0);
-  const [data, setData] = useState<QuestionnaireData>(initialData);*/
+  const navigate = useNavigate();
+
+  // ==========================================
+  // redirect catcher for invited patients
+  // ==========================================
+  useEffect(() => {
+    const hasInviteCookie = getCookie('invitationId');
+    if (hasInviteCookie) {
+      // They landed on the big questionnaire, but they have the cookie!
+      // Instantly bounce them to the short one.
+      navigate('/patient/invited', { replace: true });
+    }
+  }, [navigate]);
+  // ==========================================
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  //const [isIntermediateLoading, setIsIntermediateLoading] = useState(false);
-  const [matchedProfiles, setMatchedProfiles] = useState<AlgorithmMatch[]>([]); // Store matched therapist profiles returned from the backend
+  const [matchedProfiles, setMatchedProfiles] = useState<AlgorithmMatch[]>([]);
 
-  const navigate = useNavigate(); // For navigating to dashboard after completeion --> lets see if backend does it after acceptin?
-
-  // The usePersistedQuestionnaire hook combines state management with localStorage persistence, ensuring that user progress is saved across sessions and page reloads. It provides a clean API for updating questionnaire data and navigating between steps.
   const { data, currentStep, setCurrentStep, updateField, clearProgress } =
-    usePersistedQuestionnaire<QuestionnaireData>('feelora_patient_v2', initialData); // The storage key "feelora_patient_v2" is used to namespace the data in localStorage, allowing for easy updates to the data structure in the future without conflicts.
+    usePersistedQuestionnaire<QuestionnaireData>('feelora_patient_v2', initialData);
 
-  const totalSteps = 18; // Welcome + 17 questions
+  const totalSteps = 18;
 
   const goNext = () => {
-    // 1. Fire the ping quietly in the background when transitioning from Step 14 or 15
-    // This gives the Lambda a few seconds to warm up while the user reads the Summary step
     if (currentStep === 14) {
-      patientService.pingMatchingAlgorithm(); // No 'await', it runs in the background
+      patientService.pingMatchingAlgorithm();
     }
-
-    // 2. Proceed to the next step as normal
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -104,29 +99,20 @@ const PatientQuestionnaire = () => {
     setCurrentStep(step);
   };
 
-
-  // Define the submission logic here, which will be called from the SummaryStep when the user confirms their answers. This function should send the data to your backend API and handle any responses or errors accordingly.
   const handleSubmit = async () => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
     try {
       console.log('Submitting data:', data);
-
-      // Run the Matching Algorithm (which now returns FULL profiles)
       const result = await patientService.submitQuestionnaire(data);
 
       if (result.success && result.matches && result.matches.length > 0) {
         console.log('Algorithm returned full profiles:', result.matches);
-
-        // Directly save the matches to state! No secondary fetch needed.
         setMatchedProfiles(result.matches);
-
-        // Clear storage and move to the Match step
         clearProgress();
         goNext();
       } else {
-        // No matches found - redirect to profile so user can retake questionnaire
         console.log('No matches found. Redirecting to profile...');
         clearProgress();
         navigate('/patient/profile');
@@ -141,21 +127,14 @@ const PatientQuestionnaire = () => {
     }
   };
 
-  // This function will be called when the user accepts a therapist match.
   const handleAcceptTherapist = async (therapistId: string) => {
     try {
       console.log('Accepting Therapist ID:', therapistId);
-
-      // 1. Call the backend to save the match
       const isSuccess = await patientService.saveMatch(therapistId);
 
       if (isSuccess) {
-        // 2. Data is safely stored and match is created!
-        // Now you can safely clear the local storage
         clearProgress();
-
-        // 3. Navigate the user to the dashboard
-        navigate('/patient'); // Depends if the backend routes that or if you want to do it on the frontend after receiving a success response
+        navigate('/patient');
       } else {
         alert('Etwas ist schiefgelaufen. Bitte versuche es noch einmal.');
       }
@@ -165,10 +144,8 @@ const PatientQuestionnaire = () => {
   };
 
   const handleCreatePatientProfile = () => {
-    //Instantly move to the next page so the user doesn't wait
     goNext();
 
-    //Perform the API call asynchronously in the background
     const createProfileAsync = async () => {
       try {
         const payload = {
@@ -182,30 +159,19 @@ const PatientQuestionnaire = () => {
         };
         console.log('Creating patient profile with payload:', payload);
         
-        // Call API to create the patient profile
         const response = await patientService.createPatientProfile(data); 
         console.log('Patient profile created successfully!', response);
       } catch (error) {
         console.error('Error creating patient profile:', error);
-        // Because the user is already on the next step, just log this
       }
     };
 
     createProfileAsync();
   };
 
-  /*const handleLogout = () => {
-    // Clear the persisted questionnaire progress
-    clearProgress();
-    
-    // Navigate to login page
-    navigate('/login');
-  };*/
-
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        // Pass goToStep(0) so the component can throw them back to the start if the consent API call fails in the background
         return <WelcomeStep onNext={goNext} onBack={goBack} onError={() => goToStep(0)} />;
       case 1:
         return (
@@ -345,11 +311,11 @@ const PatientQuestionnaire = () => {
       case 16:
         return (
           <SummaryStep
-            onNext={handleSubmit} // This will handle the final submission of the questionnaire
+            onNext={handleSubmit}
             onBack={goBack}
             onEdit={goToStep}
             data={data}
-            isLoading={isSubmitting} // Pass the loading state down
+            isLoading={isSubmitting}
           />
         );
       case 17:
@@ -357,7 +323,7 @@ const PatientQuestionnaire = () => {
           <TherapistMatchStep
             therapists={matchedProfiles}
             onAccept={handleAcceptTherapist}
-            onBack={goBack} // Or navigate to a specific step
+            onBack={goBack} 
           />
         );
     }
