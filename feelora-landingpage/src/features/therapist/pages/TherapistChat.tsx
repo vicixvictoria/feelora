@@ -236,74 +236,72 @@ const TherapistChat = () => {
     rawMessage: WebsocketMessage,
   ): IncomingNotification | null => {
     if (rawMessage.type !== 'notification') return null;
-    // FIX: Removed the line that rejected new_match notifications!
     return rawMessage as IncomingNotification;
   };
 
   useEffect(() => {
-    if (websocketMessages.length <= processedMessageCountRef.current) return;
+  if (websocketMessages.length <= processedMessageCountRef.current) return;
 
-    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
-    processedMessageCountRef.current = websocketMessages.length;
+  const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+  processedMessageCountRef.current = websocketMessages.length;
 
-    let activeChatNeedsUpdate = false;
-    let shouldRefetchSidebar = false; // Flag to check if we need to reload the sidebar
+  // Determine flags first, synchronously, before any setState calls
+  let activeChatNeedsUpdate = false;
+  let shouldRefetchSidebar = false;
 
-    setUnreadByConversation((previous) => {
-      const next = { ...previous };
+  for (const rawMessage of newMessages) {
+    const incoming = extractIncomingNotification(rawMessage);
+    if (!incoming?.data) continue;
 
-      for (const rawMessage of newMessages) {
-        const incoming = extractIncomingNotification(rawMessage);
-        if (!incoming?.data) continue;
+    if (incoming.data.type === 'new_match' || incoming.data.type === 'new_unmatch') {
+      shouldRefetchSidebar = true;
+      continue;
+    }
 
-        // If it's a new match or someone unmatched, we MUST update the sidebar
-        if (incoming.data.type === 'new_match' || incoming.data.type === 'new_unmatch') {
-          shouldRefetchSidebar = true;
-          continue;
-        }
+    if (incoming.data.type === 'new_message') {
+      shouldRefetchSidebar = true;
+      const conversationId = incoming.data.conversationId;
+      if (!conversationId) continue;
 
-        // Handle standard chat messages
-        if (incoming.data.type === 'new_message') {
-          shouldRefetchSidebar = true; // Refetch so the sidebar shows the new "lastMessage" text
-          
-          const conversationId = incoming.data.conversationId;
-          if (!conversationId) continue;
-
-          if (conversationId === selectedChat?.conversationId) {
-            activeChatNeedsUpdate = true;
-            continue; 
-          }
-
-          const fallbackCount = (next[conversationId] ?? 0) + 1;
-          const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
-          next[conversationId] = Math.max(0, count);
-        }
+      if (conversationId === selectedChat?.conversationId) {
+        activeChatNeedsUpdate = true;
       }
-      return next;
-    });
-
-    // Silently fetch the latest chat history if the active chat got a message
-    if (activeChatNeedsUpdate && selectedChat?.conversationId) {
-      chatService.getChatMessages(selectedChat.conversationId)
-        .then((latestMessages) => {
-          setMessages(latestMessages);
-        })
-        .catch((err) => console.error('Failed to auto-update active chat messages:', err));
-
-      notificationService.readNotification({
-        notificationType: 'new_message',
-        notificationId: selectedChat.conversationId,
-        }).then(() => {
-          window.dispatchEvent(new Event('notificationsRead'));
-      }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
+  }
 
-    // FIRE THE BACKGROUND REFRESH! (Fixes the missing match & missing first message bug)
-    if (shouldRefetchSidebar) {
-      fetchContactsAndChats(true); // "true" means do it quietly without the big loading spinner
+  //update unread counts, only for background chats
+  setUnreadByConversation((previous) => {
+    const next = { ...previous };
+    for (const rawMessage of newMessages) {
+      const incoming = extractIncomingNotification(rawMessage);
+      if (incoming?.data?.type !== 'new_message') continue;
+      const conversationId = incoming.data.conversationId;
+      if (!conversationId) continue;
+      if (conversationId === selectedChat?.conversationId) continue; // skip active chat
+
+      const fallbackCount = (next[conversationId] ?? 0) + 1;
+      const count = typeof incoming.data.count === 'number' ? incoming.data.count : fallbackCount;
+      next[conversationId] = Math.max(0, count);
     }
+    return next;
+  });
 
-  }, [websocketMessages, selectedChat, fetchContactsAndChats]);
+  // These read the correct synchronously-set values
+  if (activeChatNeedsUpdate && selectedChat?.conversationId) {
+    chatService.getChatMessages(selectedChat.conversationId)
+      .then(setMessages)
+      .catch(err => console.error('Auto-update failed:', err));
+
+    notificationService.readNotification({
+      notificationType: 'new_message',
+      notificationId: selectedChat.conversationId,
+    }).catch((err) => console.error('Failed to mark as read:', err));
+  }
+
+  if (shouldRefetchSidebar) {
+    fetchContactsAndChats(true);
+  }
+}, [websocketMessages, selectedChat, fetchContactsAndChats]);
 
   // Trigger the scroll whenever the messages array updates
   useEffect(() => {

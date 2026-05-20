@@ -84,13 +84,21 @@ const InvitedPatientQuestionnaire = () => {
     setIsSubmitting(true);
 
     try {
+      // Create the Patient Profile with the limited data
       await patientService.createPatientProfile(data);
+
+      // SILENT SAVE. of questionnaire: Trigger the matching algorithm to save the questionnaire in the DB.
+      // We don't care about the matches it returns, we just need the backend to log that 
+      // the questionnaire is completed so the user doesn't get stuck in a redirect loop with a new login
+      await patientService.submitQuestionnaire(data);
+
+      // Automatically save the specific match with the inviting therapist
       const isSuccess = await patientService.saveMatch(inviterDetails.Id);
 
       if (isSuccess) {
-        // Clear local storage AND delete the cookie so it doesn't run again!
+        // Clear local storage and delete the cookie so it doesn't run again!
         clearProgress();
-        deleteCookie('invitationId');
+        deleteCookie('invitationId'); 
         navigate('/patient/dashboard'); 
       } else {
         throw new Error('Fehler beim Zuweisen des Therapeuten.');
