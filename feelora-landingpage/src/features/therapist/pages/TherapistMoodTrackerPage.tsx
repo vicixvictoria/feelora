@@ -68,9 +68,12 @@ const TherapistMoodTrackerPage = () => {
         // Get the patient profiles to get their names
         const patients = await therapistService.getMatchedPatients(patientIds);
 
+        // if tehrapist has deleted patients that werent unmatched yet -- current bug
+        const validPatients = patients.filter((p: any) => p != null && p.Id);
+
         // Fetch mood trackers for each patient and combine them
         const allTrackers = [];
-        for (const patient of patients) {
+        for (const patient of validPatients) {
           const { trackers, hasConsent } = await therapistService.getPatientMoodTrackers(
             patient.Id,
           );
