@@ -150,6 +150,9 @@ const TherapistChat = () => {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // ref to track if we're waiting for a conversationId
+  const pendingConversationLoadRef = useRef<string | null>(null); // store the ID directly
+
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
@@ -168,6 +171,20 @@ const TherapistChat = () => {
       downloadTheirAvatar('profile', 'public', selectedChat.contactId).catch(() => {});
     }
   }, [selectedChat?.contactId]);
+
+  //
+  useEffect(() => {
+  const conversationId = selectedChat?.conversationId;
+  if (!conversationId) return;
+  if (pendingConversationLoadRef.current !== conversationId) return;
+
+  pendingConversationLoadRef.current = null;
+  setIsLoadingMessages(true);
+  chatService.getChatMessages(conversationId)
+    .then(setMessages)
+    .catch(err => console.error('Failed to load messages after conversation discovery:', err))
+    .finally(() => setIsLoadingMessages(false));
+}, [selectedChat?.conversationId]);
 
   // ==========================================
   // REUSABLE FETCH FUNCTION (Moved out of useEffect)
@@ -207,12 +224,23 @@ const TherapistChat = () => {
 
       setChatList(sidebarItems);
 
-      // If a background update finds a new conversation ID for our active chat, inject it immediately!
-      setSelectedChat(currentSelected => {
-        if (!currentSelected) return null;
-        const updatedMatch = sidebarItems.find(item => item.contactId === currentSelected.contactId);
-        return updatedMatch ? updatedMatch : currentSelected;
-      });
+      // If a background update finds a new conversation ID for our active chat, inject it immediately AND block to also directly fetch messages when the conversation is newly discovered, without waiting for a re-render
+       setSelectedChat(currentSelected => {
+      if (!currentSelected) return null;
+      const updatedMatch = sidebarItems.find(item => item.contactId === currentSelected.contactId);
+      if (!updatedMatch) return currentSelected;
+
+      // If we just discovered a conversationId that didn't exist before, load the messages now
+      if (!currentSelected.conversationId && updatedMatch.conversationId) {
+        setIsLoadingMessages(true);
+        chatService.getChatMessages(updatedMatch.conversationId)
+          .then(setMessages)
+          .catch(err => console.error('Failed to load messages:', err))
+          .finally(() => setIsLoadingMessages(false));
+      }
+
+      return updatedMatch;
+    });
 
       if (!isBackgroundUpdate && sidebarItems.length > 0 && window.innerWidth >= 768) {
         handleSelectChat(sidebarItems[0]);

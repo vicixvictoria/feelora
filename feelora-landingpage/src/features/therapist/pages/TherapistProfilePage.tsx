@@ -1,13 +1,103 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ExternalLink, Loader2, Send, Bell, UserCheck, UserMinus, ChevronRight, Check, Ghost, Link, Copy } from 'lucide-react'; // <-- Added Link & Copy
+import { ExternalLink, Loader2, Send, Bell, UserCheck, UserMinus, ChevronRight, Check, Ghost, Link, Copy } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
 import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { notificationService, NotificationItem } from '../../notifications/api/notification-service';
+
+// --- Translation Helpers ---
+
+const translateLanguage = (langKey: string, t: any) => {
+  if (!langKey) return '';
+  const langMap: Record<string, string> = {
+    // Main Languages
+    german: 'q.p.languages.options.german',
+    english: 'q.p.languages.options.english',
+    croatian: 'q.p.languages.options.croatian',
+    arabic: 'q.p.languages.options.arabic',
+    turkish: 'q.p.languages.options.turkish',
+    polish: 'q.p.languages.options.polish',
+    serbian: 'q.p.languages.options.serbian',
+    italian: 'q.p.languages.options.italian',
+    hungarian: 'q.p.languages.options.hungarian',
+    farsi: 'q.p.languages.options.farsi',
+    romanian: 'q.p.languages.options.romanian',
+    spanish: 'q.p.languages.options.spanish',
+    french: 'q.p.languages.options.french',
+    ukrainian: 'q.p.languages.options.ukrainian',
+    russian: 'q.p.languages.options.russian',
+    // "Other" Languages
+    albanian: 'q.p.languages.other.albanian',
+    portuguese: 'q.p.languages.other.portuguese',
+    chinese: 'q.p.languages.other.chinese',
+    japanese: 'q.p.languages.other.japanese',
+    korean: 'q.p.languages.other.korean',
+    dutch: 'q.p.languages.other.dutch',
+    swedish: 'q.p.languages.other.swedish',
+    danish: 'q.p.languages.other.danish',
+    norwegian: 'q.p.languages.other.norwegian',
+    finnish: 'q.p.languages.other.finnish',
+    greek: 'q.p.languages.other.greek',
+    hebrew: 'q.p.languages.other.hebrew',
+    czech: 'q.p.languages.other.czech',
+    slovak: 'q.p.languages.other.slovak',
+    bulgarian: 'q.p.languages.other.bulgarian',
+    slovenian: 'q.p.languages.other.slovenian',
+    hindi: 'q.p.languages.other.hindi',
+    bengali: 'q.p.languages.other.bengali',
+    vietnamese: 'q.p.languages.other.vietnamese',
+    thai: 'q.p.languages.other.thai',
+    urdu: 'q.p.languages.other.urdu',
+    pashto: 'q.p.languages.other.pashto',
+    kurdish: 'q.p.languages.other.kurdish',
+    dari: 'q.p.languages.other.dari',
+    indonesian: 'q.p.languages.other.indonesian',
+  };
+
+  const key = langMap[langKey.toLowerCase()];
+  // Fallback to capitalizing the word if it's not in the map
+  return key ? t(key) : langKey.charAt(0).toUpperCase() + langKey.slice(1);
+};
+
+const translateAvailability = (day: string, t: any) => {
+  if (!day) return '';
+  const dayMap: Record<string, string> = {
+    mo: 'q.t.availability.mon',
+    di: 'q.t.availability.tue',
+    mi: 'q.t.availability.wed',
+    do: 'q.t.availability.thu',
+    fr: 'q.t.availability.fri',
+    sa: 'q.t.availability.sat',
+    so: 'q.t.availability.sun',
+  };
+  const key = dayMap[day.toLowerCase()];
+  return key ? t(key) : day.toUpperCase();
+};
+
+const translateSpecialty = (spec: string, t: any) => {
+  if (!spec) return '';
+  const specialtyMap: Record<string, string> = {
+    'depression': 'q.options.depression',
+    'angst': 'q.options.anxiety',
+    'stress': 'q.options.stress',
+    'psychosomatik': 'q.options.psychosomatics',
+    'trauma': 'q.options.trauma',
+    'sucht': 'q.options.addiction',
+    'sexuelle identität': 'q.options.sexualIdentity',
+    'zwang': 'q.options.compulsion',
+    'gewalterfahrungen': 'q.options.violence',
+    'chronische schmerzen': 'q.options.chronicPain',
+    'essverhalten': 'q.options.eatingDisorder',
+  };
+  const key = specialtyMap[spec.toLowerCase()];
+  return key ? t(key) : spec;
+};
+
+// --- Interfaces ---
 
 interface IncomingNotification {
   type?: string;
@@ -157,10 +247,7 @@ const TherapistProfilePage = () => {
     try {
       const result = await therapistService.createInvitation();
       
-      // Get the auth domain (e.g. https://auth.feelora-dev.com)
       const backendDomain = import.meta.env.VITE_AUTH_API_URL || 'https://auth.feelora-dev.com';
-      
-      // Format exactly as backend requests: auth.<domain>/invite/token?invitationId=<token>
       const fullLink = result.startsWith('http') 
         ? result 
         : `${backendDomain}/invite/token?invitationId=${result}`;
@@ -177,7 +264,7 @@ const TherapistProfilePage = () => {
     if (inviteLink) {
       navigator.clipboard.writeText(inviteLink);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Reset checkmark after 2s
+      setTimeout(() => setIsCopied(false), 2000); 
     }
   };
 
@@ -242,22 +329,35 @@ const TherapistProfilePage = () => {
         {/* BOTTOM SECTION */}
         <div className="space-y-4 text-foreground">
           <div>
-            <p><span className="font-bold">{t('app.therapist.profile.specializedIn')}</span> {profile.Specialties?.join(', ') || t('app.therapist.profile.noInfo')}</p>
-            <p><span className="font-bold">{t('app.therapist.profile.languages')}</span> {profile.Languages?.join(', ') || t('app.therapist.profile.noInfo')}</p>
+            {/* Translated Specialties */}
+            <p>
+              <span className="font-bold">{t('app.therapist.profile.specializedIn')}</span>{' '}
+              {profile.Specialties?.length > 0 
+                ? profile.Specialties.map((s: string) => translateSpecialty(s, t)).join(', ') 
+                : t('app.therapist.profile.noInfo')}
+            </p>
+            
+            {/* Translated Languages */}
+            <p>
+              <span className="font-bold">{t('app.therapist.profile.languages')}</span>{' '}
+              {profile.Languages?.length > 0 
+                ? profile.Languages.map((l: string) => translateLanguage(l, t)).join(', ') 
+                : t('app.therapist.profile.noInfo')}
+            </p>
+
             <p><span className="font-bold">{t('app.therapist.profile.priceRange')}</span> {profile.PriceRange || t('app.therapist.profile.noPriceRange')}</p>
             <p>
               <span className="font-bold">{t('app.therapist.profile.hasInsurance')}</span>{' '}
               {profile.HasInsurance ? t('app.therapist.profile.insuranceYes') : t('app.therapist.profile.insuranceNo')}
             </p>
+
+            {/* Translated Availability */}
             <div className="mt-2">
               <p className="mb-0">
                 <span className="font-bold">{t('app.therapist.profile.availability')}</span>{' '}
-                {profile.Availability && profile.Availability.length > 0
-                ? profile.Availability.map((day: string) => {
-                    const dayMap: Record<string, string> = { mo: 'Mon', di: 'Tue', mi: 'Wed', do: 'Thu', fr: 'Fri', sa: 'Sat', so: 'Sun' };
-                    return dayMap[day] || day.toUpperCase();
-                  }).join(', ')
-                : t('app.therapist.profile.noInfo')}
+                {profile.Availability?.length > 0
+                  ? profile.Availability.map((day: string) => translateAvailability(day, t)).join(', ')
+                  : t('app.therapist.profile.noInfo')}
               </p>
             </div>
           </div>
@@ -339,9 +439,8 @@ const TherapistProfilePage = () => {
           ) : (
             generalNotifs.map((notif, index) => {
               const isMatch = notif.type === 'new_match';
-              const sender = notif.senderName; // Look for a name attached to the payload
+              const sender = notif.senderName;
 
-              // Use _named translation if senderName exists, otherwise fallback to _generic
               let notificationText = '';
               if (isMatch) {
                 notificationText = sender
