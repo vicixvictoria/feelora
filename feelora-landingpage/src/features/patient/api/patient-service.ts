@@ -348,7 +348,10 @@ updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
 },
 
   // Fetch matched therapist(s)
-  getMatchedTherapists: async (therapistIds: string[]): Promise<MatchedTherapist[]> => {
+  getMatchedTherapists: async (
+    therapistIds: string[], 
+    policy: FetchPolicy = 'cache-first'
+  ): Promise<MatchedTherapist[]> => {
     // Log to understand return
     console.log('Sending IDs to backend:', therapistIds);
     console.log('Is it an array?', Array.isArray(therapistIds));
@@ -360,6 +363,7 @@ updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_MATCHED_THERAPISTS_QUERY,
       variables: { TherapistsIds: therapistIds },
+      fetchPolicy: policy, // use the skip cache policy
     });
 
     return responseData.getMatchedTherapists.items || [];

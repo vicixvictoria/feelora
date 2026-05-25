@@ -136,7 +136,8 @@ const InvitedPatientQuestionnaire = () => {
             onNext={goNext} 
             onBack={goBack} 
             onError={() => goToStep(0)}
-            inviterName={`${inviterDetails?.Title ? inviterDetails.Title + ' ' : ''}${inviterDetails?.Name} ${inviterDetails?.Surname}`} 
+            inviterName={`${inviterDetails?.Title ? inviterDetails.Title + ' ' : ''}${inviterDetails?.Name} ${inviterDetails?.Surname}`}
+            isInvitedFlow={true} 
           />
         );
       case 1:

@@ -175,7 +175,7 @@
 
   "q.p.welcome.title": "Thank you for joining Feelora!",
   "q.p.welcome.desc": "Before you can begin, we will create a patient profile for you. We will go through our patient screening questionnaire together to create an ideal profile and match you with suitable therapists.",
-  "q.p.welcome.questionCount": "This questionnaire will take a few minutes.",
+  "q.p.welcome.questionCount": "This questionnaire has 17 questions.",
   "q.p.welcome.consentData": "Please read our consent declaration carefully before proceeding. It is important that you understand how we use your data and what conditions apply for using our platform.",
   "q.p.welcome.sensibleData.title": "Processing of Health Data",
   "q.p.welcome.sensibleData.text": "To find the best possible therapist match for you and provide personalized tools (like the mood tracker), we collect sensitive data regarding your mental health, symptoms, and preferences. With your consent, this data is treated strictly confidentially, stored securely encrypted, and used exclusively to provide Feelora services (Art. 9 GDPR).",
@@ -187,6 +187,9 @@
   "q.p.welcome.tac.text2": ".",
   "q.p.welcome.checkbox": "I have read the information regarding the processing of my health data, the use of AI (incl. emergency disclaimer), and the T&C, and I expressly consent.",
   "q.p.welcome.saving": "Saving consent...",
+  "q.p.welcome.inviterMessage":" This therapist has invited you to use Feelora:",
+  "q.p.welcome.invitedDesc": "Before you can begin, we will create a patient profile for you. You can adjust these details at any time in your profile settings.",
+  "q.p.welcome.invitedQuestionCount":"The questionnaire takes only a few minutes",
   
   "q.p.personal.title": "Personal Data",
   "q.p.personal.subtitle": "Please share your personal data for your profile.",

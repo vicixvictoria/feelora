@@ -10,6 +10,7 @@ interface WelcomeStepProps {
   onBack: () => void;
   onError?: () => void; 
   inviterName?: string | null;
+  isInvitedFlow?: boolean; 
 }
 
 // Helper component for the expandable sections
@@ -38,7 +39,7 @@ const ExpandableSection = ({ title, children }: { title: string; children: React
   );
 };
 
-const Step1_PWelcome = ({ onNext, onBack, onError, inviterName }: WelcomeStepProps) => {
+const Step1_PWelcome = ({ onNext, onBack, onError, inviterName, isInvitedFlow }: WelcomeStepProps) => {
   const { t } = useTranslation();
   
   const [hasConsented, setHasConsented] = useState(false);
@@ -63,8 +64,30 @@ const Step1_PWelcome = ({ onNext, onBack, onError, inviterName }: WelcomeStepPro
     <div className="animate-slide-up text-center max-w-2xl mx-auto pb-12">
       <h1 className="text-2xl font-semibold text-purple mb-6">{t('q.p.welcome.title')}</h1>
 
-      <p className="text-foreground text-body-large mb-4">{t('q.p.welcome.desc')}</p>
-      <p className="text-foreground text-body-large mb-8">{t('q.p.welcome.questionCount')}</p>
+      {/* --- CONDITIONAL SUBTITLES --- */}
+      {isInvitedFlow ? (
+        <div className="mb-4 space-y-2">
+          {inviterName && (
+            <p className="text-primary font-medium text-lg">
+              {t('q.p.welcome.inviterMessage', { inviterName, defaultValue: ` ${inviterName} ` })}
+            </p>
+          )}
+          <p className="text-foreground text-body-large">
+            {t('q.p.welcome.invitedDesc', 'Bitte bestätige deine Angaben, um direkt loszulegen.')}
+          </p>
+        </div>
+      ) : (
+        <p className="text-foreground text-body-large mb-4">
+          {t('q.p.welcome.desc')}
+        </p>
+      )}
+      
+      <p className="text-foreground text-body-large mb-8">
+        {isInvitedFlow 
+          ? t('q.p.welcome.invitedQuestionCount', 'Dauert nur 2 Minuten.') 
+          : t('q.p.welcome.questionCount')}
+      </p>
+      {/* ----------------------------- */}
 
       {/* --- Subtle Divider --- */}
       <hr className="border-t border-border mb-8 opacity-70" />
@@ -75,16 +98,9 @@ const Step1_PWelcome = ({ onNext, onBack, onError, inviterName }: WelcomeStepPro
 
       {/* Expandable Legal Info container */}
       <div className="mb-8">
+        {/* Removed the inviterName block from here! */}
         <ExpandableSection title={t('q.p.welcome.sensibleData.title')}>
           {t('q.p.welcome.sensibleData.text')}
-          {/* Show the inviter name dynamically ONLY if it exists (Invited Flow) */}
-          {inviterName && (
-            <div className="mt-3 p-3 bg-purple/10 rounded-md border border-purple/20">
-              <p className="text-sm text-foreground font-medium">
-                {t('q.p.welcome.inviterMessage', { inviterName, defaultValue: `Du wurdest von ${inviterName} eingeladen.` })}
-              </p>
-            </div>
-          )}
         </ExpandableSection>
 
         <ExpandableSection title={t('q.p.welcome.ai.title')}>

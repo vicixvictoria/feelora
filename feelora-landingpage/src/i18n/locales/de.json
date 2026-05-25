@@ -176,8 +176,8 @@
 
   "_comment": "German translations for Questionnaire",
   "q.p.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
-  "q.p.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Patient:innenprofil für dich. Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen\" durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.",
-  "q.p.welcome.questionCount": "Dieser Fragebogen kann einige Minuten dauern.",
+  "q.p.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Patient:innenprofil für dich. Dafür werden wir gemeinsam unseren Patienten-Screening-Fragebogen durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Therapeut*Innen zusammenzubringen.",
+  "q.p.welcome.questionCount": "Dieser Fragebogen umfasst 17 Fragen.",
 
   "q.p.welcome.consentData": "Bitte lies dir unsere Einwilligungserklärung sorgfältig durch, bevor du fortfährst. Es ist wichtig, dass du verstehst, wie wir deine Daten verwenden und welche Bedingungen für die Nutzung unserer Plattform gelten.",
   "q.p.welcome.sensibleData.title": "Verarbeitung von Gesundheitsdaten",
@@ -190,6 +190,9 @@
   "q.p.welcome.tac.text2": " nachlesen.",
   "q.p.welcome.checkbox": "Ich habe die Hinweise zur Verarbeitung meiner Gesundheitsdaten, zur KI-Nutzung (inkl. Notfall-Disclaimer) und den AGB gelesen und willige ausdrücklich ein.",
   "q.p.welcome.saving": "Einwilligung wird gespeichert...",
+  "q.p.welcome.inviterMessage":" Diese/r Therapeut:in hat dich eingeladen Feelora zu nutzen:",
+  "q.p.welcome.invitedDesc": "Bevor du beginnen kannst, erstellen wir ein Patient:innenprofil für dich. Diese angaben kannst du später in deinen Profileinstellungen jederzeit anpassen.",
+  "q.p.welcome.invitedQuestionCount":"Der Fragebogen dauert nur wenige Minuten",
 
   "q.p.personal.title": "Persönliche Daten",
   "q.p.personal.subtitle": "Bitte teile uns deine persönlichen Daten für dein Profil mit.",
@@ -203,7 +206,7 @@
   "q.p.personal.diverse": "Divers",
   "q.p.contact.title": "Kontaktinformationen",
   "q.p.contact.cardTitle": "Kontaktinformationen",
-  "q.p.contact.subtitle": "Gib deine Kontaktdaten an, damit deine Patient:Innen dich erreichen können. Wenn du noch eine weitere E-Mail, neben der email mit der du dich angemeldet hast, oder deine Telefonnummer angeben möchtest gib sie hier ein (optional). Wir können diese Daten nicht validieren oder auf Richtigkeit prüfen! Füge butte auch die Adresse deiner Praxis hinzu falls du eine hast. Wenn du nur online Therapis anbietest, gib bitte die Stadt und das Land an, in der du dich befindest.",
+  "q.p.contact.subtitle": "Gib deine Kontaktdaten an, unter denen dein/e Therapeut:in dich erreichen kann. Wenn du zusätzlich zu der, bei der Registrierung angegebenen E-Mail-Adresse, weitere Kontaktdaten angeben möchten, trage diese bitte hier ein (optional). Wir können diese Angaben nicht überprüfen oder bestätigen! Bitte überprüfe deine Eingaben sorgfältig.",
   "q.p.contact.phone": "Handy/Mobil",
   "q.p.contact.email": "E-Mail",
   "q.p.contact.city": "Stadt*",

@@ -250,17 +250,18 @@ export const therapistService = {
   },
 
   // -- Get profile API call --
-  getProfile: async (): Promise<TherapistProfile> => {
+  getProfile: async (forceNetwork = false): Promise<TherapistProfile> => {
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_THERAPIST_PROFILE_QUERY,
-      fetchPolicy: 'cache-first', // Ensure to not always hit the backend, but use cache when available for better performance
+      // If forced by a WebSocket event, bypass the cache. Otherwise, use cache-first.
+      fetchPolicy: forceNetwork ? 'network-only' : 'cache-first', 
     });
 
     return responseData.getOwnTherapistProfile;
   },
 
   // -- Fetch matched patient(s) profiles --
-  getMatchedPatients: async (patientIds: string[]): Promise<any[]> => {
+  getMatchedPatients: async (patientIds: string[], forceNetwork = false): Promise<any[]> => {
     // Safety net: if the therapist has no matches yet, just return an empty array
     if (!patientIds || patientIds.length === 0) {
       return [];
@@ -270,7 +271,8 @@ export const therapistService = {
       const { data: responseData } = await apolloClient.query({
         query: GET_MATCHED_USERS_QUERY,
         variables: { UsersIds: patientIds },
-        fetchPolicy: 'cache-first', // Uses cache if we already loaded them elsewhere
+        // bypass cache if it's a real-time background update
+        fetchPolicy: forceNetwork ? 'network-only' : 'cache-first', 
       });
 
       return responseData.getMatchedUsers.items || [];

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2, X, UserMinus, AlertTriangle } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
@@ -13,8 +13,8 @@ import { useS3Download } from '@/hooks/use-s3-download';
 interface SidebarChat {
   contactId: string;
   name: string;
-  email: string; // <-- Added
-  availability: string[]; // <-- Added
+  email: string;
+  availability: string[];
   conversationId: string | null;
   lastMessage: string;
 }
@@ -128,6 +128,49 @@ const ChatPage = () => {
 
 
   // ==========================================
+  // REUSABLE FETCH FUNCTION
+  // ==========================================
+  const fetchContactsAndChats = useCallback(async (isBackgroundUpdate = false) => {
+    try {
+      if (!isBackgroundUpdate) setIsLoadingChats(true);
+
+      const fetchPolicy = isBackgroundUpdate ? 'network-only' : 'cache-first'; // Use cache for the initial load, but force network for background updates
+      
+      const profile = await patientService.getProfile(fetchPolicy);
+      const therapists = await patientService.getMatchedTherapists(profile.Matches || [], fetchPolicy);
+      const conversations = await chatService.getChatConversations();
+
+      const sidebarItems: SidebarChat[] = therapists.map((therapist) => {
+        const existingChat = conversations.find((c) => c.participantIds.includes(therapist.Id));
+        return {
+          contactId: therapist.Id,
+          name: `${therapist.Title ? therapist.Title + ' ' : ''}${therapist.Name} ${therapist.Surname}`,
+          email: therapist.Email || '—',
+          availability: therapist.Availability || [],
+          conversationId: existingChat ? existingChat.conversationId : null,
+          lastMessage:
+            existingChat?.lastMessage || t('app.patient.chat.startChat', 'Beginne den Chat...'),
+        };
+      });
+
+      setChatList(sidebarItems);
+
+      if (!isBackgroundUpdate && sidebarItems.length > 0 && window.innerWidth >= 768) {
+        handleSelectChat(sidebarItems[0]);
+      }
+    } catch (error) {
+      console.error('Error loading chat contacts:', error);
+    } finally {
+      if (!isBackgroundUpdate) setIsLoadingChats(false);
+    }
+  }, [t]);
+
+  // Fetch Matches and Conversations on Load
+  useEffect(() => {
+    fetchContactsAndChats();
+  }, [fetchContactsAndChats]);
+
+  // ==========================================
   // WEBSOCKET NOTIFICATION LOGIC
   // ==========================================
   const extractIncomingNotification = (
@@ -146,14 +189,18 @@ const ChatPage = () => {
     processedMessageCountRef.current = websocketMessages.length;
 
     let activeChatNeedsUpdate = false;
+    let shouldRefetchSidebar = false;
     
     // Check if any of the new messages belong to the currently open chat
     for (const rawMessage of newMessages) {
       const incoming = extractIncomingNotification(rawMessage);
       
-      if (incoming?.data?.conversationId && incoming.data.conversationId === selectedChat?.conversationId) {
-        activeChatNeedsUpdate = true;
-        break; 
+      if (incoming?.data?.type === 'new_message' && incoming.data.conversationId) {
+        shouldRefetchSidebar = true;
+        
+        if (incoming.data.conversationId === selectedChat?.conversationId) {
+          activeChatNeedsUpdate = true;
+        }
       }
     }
 
@@ -180,58 +227,28 @@ const ChatPage = () => {
 
     // Silently fetch the latest chat history if the active chat got a message
     if (activeChatNeedsUpdate && selectedChat?.conversationId) {
-      chatService.getChatMessages(selectedChat?.conversationId)
+      chatService.getChatMessages(selectedChat.conversationId)
         .then((latestMessages) => {
           setMessages(latestMessages);
         })
         .catch((err) => console.error('Failed to auto-update active chat messages:', err));
 
-        //  Instantly mark incoming messages in the active chat as read ---
+        // Instantly mark incoming messages in the active chat as read
       notificationService.readNotification({
         notificationType: 'new_message',
         notificationId: selectedChat.conversationId,
       }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
-  }, [websocketMessages, selectedChat]);
+
+    // Refetch the sidebar in the background to update 'lastMessage'
+    if (shouldRefetchSidebar) {
+      setTimeout(() => {
+        fetchContactsAndChats(true);
+      }, 500); 
+    }
+
+  }, [websocketMessages, selectedChat, fetchContactsAndChats]);
   
-
-  // Fetch Matches and Conversations on Load
-  useEffect(() => {
-    const fetchContactsAndChats = async () => {
-      try {
-        setIsLoadingChats(true);
-        const profile = await patientService.getProfile();
-        const therapists = await patientService.getMatchedTherapists(profile.Matches || []);
-        const conversations = await chatService.getChatConversations();
-
-        const sidebarItems: SidebarChat[] = therapists.map((therapist) => {
-          const existingChat = conversations.find((c) => c.participantIds.includes(therapist.Id));
-          return {
-            contactId: therapist.Id,
-            name: `${therapist.Title ? therapist.Title + ' ' : ''}${therapist.Name} ${therapist.Surname}`,
-            email: therapist.Email || '—',
-            availability: therapist.Availability || [],
-            conversationId: existingChat ? existingChat.conversationId : null,
-            lastMessage:
-              existingChat?.lastMessage || t('app.patient.chat.startChat', 'Beginne den Chat...'),
-          };
-        });
-
-        setChatList(sidebarItems);
-
-        if (sidebarItems.length > 0 && window.innerWidth >= 768) {
-          handleSelectChat(sidebarItems[0]);
-        }
-      } catch (error) {
-        console.error('Error loading chat contacts:', error);
-      } finally {
-        setIsLoadingChats(false);
-      }
-    };
-
-    fetchContactsAndChats();
-  }, [t]);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -289,6 +306,10 @@ const ChatPage = () => {
       );
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
+      
+      // Update the sidebar preview text for our own message immediately
+      fetchContactsAndChats(true);
+      
     } catch (error) {
       console.error('Failed to send message:', error);
       alert('Nachricht konnte nicht gesendet werden.');

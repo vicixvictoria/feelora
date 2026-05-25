@@ -193,7 +193,7 @@ const TherapistChat = () => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
 
-      const profile = await therapistService.getProfile();
+      const profile = await therapistService.getProfile(isBackgroundUpdate);
       const patients = profile?.Matches && profile.Matches.length > 0
         ? await therapistService.getMatchedPatients(profile.Matches)
         : [];
@@ -327,7 +327,9 @@ const TherapistChat = () => {
   }
 
   if (shouldRefetchSidebar) {
+    setTimeout(() => {
     fetchContactsAndChats(true);
+  }, 500); // A 500ms delay for database read-replicas to sync
   }
 }, [websocketMessages, selectedChat, fetchContactsAndChats]);
 
