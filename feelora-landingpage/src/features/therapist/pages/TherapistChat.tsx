@@ -195,9 +195,12 @@ const TherapistChat = () => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
 
-      const profile = await therapistService.getProfile();
+      // Use network-only for background updates so a new_match notification
+      // immediately surfaces the new patient and their conversation in the sidebar.
+      const fetchPolicy = isBackgroundUpdate ? 'network-only' : 'cache-first';
+      const profile = await therapistService.getProfile(fetchPolicy);
       const patients = profile?.Matches && profile.Matches.length > 0
-        ? await therapistService.getMatchedPatients(profile.Matches)
+        ? await therapistService.getMatchedPatients(profile.Matches, fetchPolicy)
         : [];
 
       const conversations = await chatService.getChatConversations();
@@ -346,9 +349,7 @@ const TherapistChat = () => {
   }
 
   if (shouldRefetchSidebar) {
-    setTimeout(() => {
-      fetchContactsAndChats(true);
-    }, 500);
+    fetchContactsAndChats(true);
   }
 }, [websocketMessages, selectedChat, fetchContactsAndChats]);
 
