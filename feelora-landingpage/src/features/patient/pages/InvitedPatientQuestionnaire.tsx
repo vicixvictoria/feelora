@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
+import { useTranslation } from 'react-i18next';
 
 import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome'; 
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
@@ -29,7 +30,7 @@ const initialInvitedData = {
 
 const InvitedPatientQuestionnaire = () => {
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   // Read the cookie for invitation ID
   const invitationId = getCookie('invitationId');
 
@@ -160,7 +161,12 @@ const InvitedPatientQuestionnaire = () => {
             />
             {isSubmitting && (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center z-50 rounded-xl">
-                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <p className="text-sm font-medium text-foreground text-center">
+                    {t('q.p.submitting')}
+                  </p>
+                </div>
               </div>
             )}
           </div>

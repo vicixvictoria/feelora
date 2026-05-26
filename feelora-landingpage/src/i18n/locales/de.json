@@ -295,6 +295,8 @@
   "q.p.match.specialties": "Spezialisierungen:",
   "q.p.match.noInfo": "Keine Angabe",
   "q.p.match.years": "Jahre",
+  "q.p.submitting":"Bitte warte einen Moment, dein Profil wird erstellt...",
+
   "q.t.welcome.title": "Vielen Dank für deine Teilnahme an Feelora!",
   "q.t.welcome.desc": "Bevor du beginnen kannst, erstellen wir ein Therapeutenprofil für dich. Dafür werden wir gemeinsam unseren 'Therapeuten-Screening-Fragebogen' durchgehen, um ein optimales Profil zu erstellen und dich mit passenden Patient:Innen zusammenzubringen.",
   "q.t.welcome.questionCount": "Dieser Fragebogen umfasst 18 Fragen.",
