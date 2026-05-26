@@ -684,7 +684,7 @@ const TherapistChat = () => {
                 <div>
                   <h4 className="text-xl font-bold text-foreground">{selectedChat.name}</h4>
                   <p className="text-muted-foreground">
-                    {selectedChat.age !== 'N/A' ? `${selectedChat.age} Jahre` : 'Alter unbekannt'}
+                    {selectedChat.age !== 'N/A' ? `${selectedChat.age} ${t('app.therapist.profile.years', 'Jahre')}` : t('app.therapist.profile.ageUnknown', 'Alter unbekannt')}
                   </p>
                   <p className="text-muted-foreground"> {selectedChat.languages}</p>
                 </div>

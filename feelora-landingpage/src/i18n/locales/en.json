@@ -780,6 +780,8 @@
   "app.therapist.profile.inviteExpiry": "Note: This link is valid for 30 days after creation.",
   "app.therapist.profile.inviteDesc": "Here you can create an invitation link to share with your patients so you can use Feelora with them. Send this exact link to them, so they can register and are automatically matched to you.",
   "app.therapist.profile.createInviteBtn": "Create Invitation Link",
+  "app.therapist.profile.years": "years",
+  "app.therapist.profile.ageUnknown": "Age unknown",
   "app.therapist.notifications.title": "Notifications & News",
   "app.therapist.notifications.messages": "Chat Messages",
   "app.therapist.notifications.noNew": "No new notifications",
