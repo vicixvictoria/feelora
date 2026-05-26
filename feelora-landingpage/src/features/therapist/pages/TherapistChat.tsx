@@ -31,6 +31,8 @@ interface IncomingNotification {
     type?: string;
     conversationId?: string;
     count?: number;
+    matchedId?: string;
+    unmatchedId?: string;
   };
 }
 
@@ -193,7 +195,7 @@ const TherapistChat = () => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
 
-      const profile = await therapistService.getProfile(isBackgroundUpdate);
+      const profile = await therapistService.getProfile();
       const patients = profile?.Matches && profile.Matches.length > 0
         ? await therapistService.getMatchedPatients(profile.Matches)
         : [];
@@ -225,22 +227,29 @@ const TherapistChat = () => {
       setChatList(sidebarItems);
 
       // If a background update finds a new conversation ID for our active chat, inject it immediately AND block to also directly fetch messages when the conversation is newly discovered, without waiting for a re-render
-       setSelectedChat(currentSelected => {
-      if (!currentSelected) return null;
-      const updatedMatch = sidebarItems.find(item => item.contactId === currentSelected.contactId);
-      if (!updatedMatch) return currentSelected;
+      setSelectedChat(currentSelected => {
+        if (!currentSelected) return null;
+        const updatedMatch = sidebarItems.find(item => item.contactId === currentSelected.contactId);
+        if (!updatedMatch) return currentSelected;
 
-      // If we just discovered a conversationId that didn't exist before, load the messages now
-      if (!currentSelected.conversationId && updatedMatch.conversationId) {
-        setIsLoadingMessages(true);
-        chatService.getChatMessages(updatedMatch.conversationId)
-          .then(setMessages)
-          .catch(err => console.error('Failed to load messages:', err))
-          .finally(() => setIsLoadingMessages(false));
-      }
+        // If we just discovered a conversationId that didn't exist before, load the messages now
+        if (!currentSelected.conversationId && updatedMatch.conversationId) {
+          setIsLoadingMessages(true);
+          chatService.getChatMessages(updatedMatch.conversationId)
+            .then(setMessages)
+            .catch(err => console.error('Failed to load messages:', err))
+            .finally(() => setIsLoadingMessages(false));
+          return updatedMatch;
+        }
 
-      return updatedMatch;
-    });
+        // Return the same reference if conversationId hasn't changed to avoid
+        // triggering the websocket effect on every background sidebar refresh.
+        if (currentSelected.conversationId === updatedMatch.conversationId) {
+          return currentSelected;
+        }
+
+        return updatedMatch;
+      });
 
       if (!isBackgroundUpdate && sidebarItems.length > 0 && window.innerWidth >= 768) {
         handleSelectChat(sidebarItems[0]);
@@ -281,7 +290,17 @@ const TherapistChat = () => {
     const incoming = extractIncomingNotification(rawMessage);
     if (!incoming?.data) continue;
 
-    if (incoming.data.type === 'new_match' || incoming.data.type === 'new_unmatch') {
+    if (incoming.data.type === 'new_match') {
+      shouldRefetchSidebar = true;
+      // Backend sends new_match when a patient sends their first message (creating the conversation).
+      // If this involves the currently open chat and a conversation already exists, refresh messages.
+      if (incoming.data.matchedId === selectedChat?.contactId && selectedChat?.conversationId) {
+        activeChatNeedsUpdate = true;
+      }
+      continue;
+    }
+
+    if (incoming.data.type === 'new_unmatch') {
       shouldRefetchSidebar = true;
       continue;
     }
@@ -328,10 +347,31 @@ const TherapistChat = () => {
 
   if (shouldRefetchSidebar) {
     setTimeout(() => {
-    fetchContactsAndChats(true);
-  }, 500); // A 500ms delay for database read-replicas to sync
+      fetchContactsAndChats(true);
+    }, 500);
   }
 }, [websocketMessages, selectedChat, fetchContactsAndChats]);
+
+  /*// Polling fallback: backend does not push new_message WebSocket events to therapists,
+  // so poll every 8 seconds to pick up messages sent by patients.
+  useEffect(() => {
+    if (!selectedChat?.conversationId) return;
+    const conversationId = selectedChat.conversationId;
+
+    const interval = setInterval(() => {
+      chatService.getChatMessages(conversationId)
+        .then((latest) => {
+          setMessages((prev) => {
+            const lastPrev = prev[prev.length - 1]?.messageId;
+            const lastLatest = latest[latest.length - 1]?.messageId;
+            return lastPrev === lastLatest ? prev : latest;
+          });
+        })
+        .catch(() => {});
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [selectedChat?.conversationId]); */
 
   // Trigger the scroll whenever the messages array updates
   useEffect(() => {
@@ -734,4 +774,4 @@ const TherapistChat = () => {
   );
 };
 
-export default TherapistChat;
+export default TherapistChat; 

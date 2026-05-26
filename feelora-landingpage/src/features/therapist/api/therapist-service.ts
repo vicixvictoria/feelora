@@ -7,466 +7,464 @@ import { TherapistProfile } from '../types/profiles';
 
 // Using the insert questionnaire mutation for therapist submission, as it accepts the full questionnaire data and has the 'Discoverable' flag
 const INSERT_QUESTIONNAIRE_MUTATION = gql`
-  mutation InsertQuestionnaire($input: QuestionnaireInput!) {
-    insertQuestionnaire(input: $input) {
-      Id
-      Type
-      Questionnaire
-    }
-  }
+mutation InsertQuestionnaire($input: QuestionnaireInput!) {
+insertQuestionnaire(input: $input) {
+Id
+Type
+Questionnaire
+}
+}
 `;
 
 // match the Therapist Query to get existing Therapist Data
 export const GET_OWN_THERAPIST_PROFILE_QUERY = gql`
-  query GetOwnTherapistProfile {
-    getOwnTherapistProfile {
-      Id
-      Email
-      Name
-      Surname
-      Gender
-      BirthDate
-      City
-      Address
-      Languages
-      Availability
-      Specialties
-      LicenseData
-      LicenseVerified
-      Matches
-      Title
-      JobTitle
-      HasInsurance
-      PriceRange
-    }
-  }
+query GetOwnTherapistProfile {
+getOwnTherapistProfile {
+Id
+Email
+Name
+Surname
+Gender
+BirthDate
+City
+Address
+Languages
+Availability
+Specialties
+LicenseData
+LicenseVerified
+Matches
+Title
+JobTitle
+HasInsurance
+PriceRange
+}
+}
 `;
 
 // to save a new Therpaists Data
 const SAVE_THERAPIST_PROFILE_MUTATION = gql`
-  mutation SaveTherapistProfile($input: CreateTherapistProfileInput!) {
-    saveTherapistProfile(input: $input) {
-      Id
-      Name
-      Surname
-      Address
-      LicenseVerified
-    }
-  }
+mutation SaveTherapistProfile($input: CreateTherapistProfileInput!) {
+saveTherapistProfile(input: $input) {
+Id
+Name
+Surname
+Address
+LicenseVerified
+}
+}
 `;
 
 //update existing profile data
 export const UPDATE_OWN_THERAPIST_PROFILE_MUTATION = gql`
-  mutation UpdateOwnTherapistProfile($input: TherapistProfileInput!) {
-    updateOwnTherapistProfile(input: $input) {
-      Id
-      Name
-      Surname
-      Gender
-      BirthDate
-      City
-      Address
-      Languages
-      Availability
-      Specialties
-      Title
-      JobTitle
-      HasInsurance
-      PriceRange
-    }
-  }
+mutation UpdateOwnTherapistProfile($input: TherapistProfileInput!) {
+updateOwnTherapistProfile(input: $input) {
+Id
+Name
+Surname
+Gender
+BirthDate
+City
+Address
+Languages
+Availability
+Specialties
+Title
+JobTitle
+HasInsurance
+PriceRange
+}
+}
 `;
 
 // get the matched patients of a therapist
 const GET_MATCHED_USERS_QUERY = gql`
-  query GetMatchedUsers($UsersIds: [ID]) {
-    getMatchedUsers(UsersIds: $UsersIds) {
-      items {
-        Id
-        Name
-        Surname
-        Gender
-        City
-        BirthDate
-        Languages
-      }
-    }
-  }
+query GetMatchedUsers($UsersIds: [ID]) {
+getMatchedUsers(UsersIds: $UsersIds) {
+items {
+Id
+Name
+Surname
+Gender
+City
+BirthDate
+Languages
+}
+}
+}
 `;
 
 // -- Delete Account Data Mutation
 const DELETE_DATA_MUTATION = gql`
-  mutation DeleteData {
-    deleteData
-  }
+mutation DeleteData {
+deleteData
+}
 `;
 
 // -- Mood Tracker Data Queries
 const THERAPIST_GET_MOOD_TRACKERS_QUERY = gql`
-  query TherapistGetMoodTrackerQuestionnaires($userId: ID!, $limit: Int) {
-    therapistGetMoodTrackerQuestionnaires(userId: $userId, limit: $limit) {
-      items {
-        CreatedAt
-        Questionnaire
-        QuestionnaireSummary
-      }
-    }
-  }
+query TherapistGetMoodTrackerQuestionnaires($userId: ID!, $limit: Int) {
+therapistGetMoodTrackerQuestionnaires(userId: $userId, limit: $limit) {
+items {
+CreatedAt
+Questionnaire
+QuestionnaireSummary
+}
+}
+}
 `;
 
-// -- Get full questionnaire data for a therapist 
+// -- Get full questionnaire data for a therapist
 const GET_QUESTIONNAIRE_QUERY = gql`
-  query GetQuestionnaire {
-    getQuestionnaire {
-      Id
-      Type
-      Questionnaire
-      Discoverable
-    }
-  }
+query GetQuestionnaire {
+getQuestionnaire {
+Id
+Type
+Questionnaire
+Discoverable
+}
+}
 `;
 
 // delete specific match with a patient
 const DELETE_MATCH_MUTATION = gql`
-  mutation DeleteMatch($match: ID!) {
-    deleteMatch(match: $match)
-  }
+mutation DeleteMatch($match: ID!) {
+deleteMatch(match: $match)
+}
 `;
 
-// -- Save Consent for DB  --
+// -- Save Consent for DB --
 const CREATE_CONSENTS_MUTATION = gql`
-  mutation CreateConsents($input: ConsentInput!) {
-    createConsents(input: $input) {
-      id
-      timestamp
-      subject_id
-    }
-  }
+mutation CreateConsents($input: ConsentInput!) {
+createConsents(input: $input) {
+id
+timestamp
+subject_id
+}
+}
 `;
 
 // -- Update Questionnaire Mutation - for Ghost mode and partial updates
 const UPDATE_QUESTIONNAIRE_MUTATION = gql`
-  mutation UpdateQuestionnaire($input: QuestionnaireInput!) {
-    updateQuestionnaire(input: $input) {
-      Id
-      Type
-      Questionnaire
-      Discoverable
-    }
-  }
+mutation UpdateQuestionnaire($input: QuestionnaireInput!) {
+updateQuestionnaire(input: $input) {
+Id
+Type
+Questionnaire
+Discoverable
+}
+}
 `;
 
 // create invitation for therapist to invite an existing patient
 const CREATE_INVITATION_MUTATION = gql`
-  mutation CreateInvitation {
-    createInvitation
-  }
+mutation CreateInvitation {
+createInvitation
+}
 `;
 
 // --- Service Object --- //
 export const therapistService = {
-  // -- API call to submit the full questionnaire --
-  submitQuestionnaire: async (
-    data: TherapistQuestionnaireData,
-  ): Promise<{
-    success: boolean;
-    savedData?: { Id: string; Type: string; Questionnaire: string };
-    error?: string;
-  }> => {
-    // 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
-    const input = {
-      Questionnaire: JSON.stringify(data),
-      Discoverable: true, // Crucial: Makes the therapist visible to the patient matching algorithm
-    };
+// -- API call to submit the full questionnaire --
+submitQuestionnaire: async (
+data: TherapistQuestionnaireData,
+): Promise<{
+success: boolean;
+savedData?: { Id: string; Type: string; Questionnaire: string };
+error?: string;
+}> => {
+// 1. Prepare Input (Matches 'QuestionnaireInput' in schema)
+const input = {
+Questionnaire: JSON.stringify(data),
+Discoverable: true, // Crucial: Makes the therapist visible to the patient matching algorithm
+};
 
-    try {
-      const { data: responseData } = await apolloClient.mutate({
-        mutation: INSERT_QUESTIONNAIRE_MUTATION,
-        variables: { input },
-      });
+try {
+const { data: responseData } = await apolloClient.mutate({
+mutation: INSERT_QUESTIONNAIRE_MUTATION,
+variables: { input },
+});
 
-      return {
-        success: true,
-        savedData: responseData.insertQuestionnaire,
-      };
-    } catch (error: unknown) {
-      console.error('Therapist Submission Error:', error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'An error during the therapist submission occurred';
+return {
+success: true,
+savedData: responseData.insertQuestionnaire,
+};
+} catch (error: unknown) {
+console.error('Therapist Submission Error:', error);
+const errorMessage =
+error instanceof Error
+? error.message
+: 'An error during the therapist submission occurred';
 
-      return {
-        success: false,
-        error: errorMessage,
-      };
-    }
-  },
+return {
+success: false,
+error: errorMessage,
+};
+}
+},
 
-  // -- Create User Profile API call --
-  // (Triggered earlier in the flow on the Availability step)
-  createTherapistProfile: async (
-    data: Partial<TherapistQuestionnaireData>,
-  ): Promise<TherapistProfile> => {
-    const formattedAddress = [
-      data.contactInfo?.street,
-      data.contactInfo?.zip,
-      data.contactInfo?.city,
-    ]
-      .filter(Boolean)
-      .join(', ');
+// -- Create User Profile API call --
+// (Triggered earlier in the flow on the Availability step)
+createTherapistProfile: async (
+data: Partial<TherapistQuestionnaireData>,
+): Promise<TherapistProfile> => {
+const formattedAddress = [
+data.contactInfo?.street,
+data.contactInfo?.zip,
+data.contactInfo?.city,
+]
+.filter(Boolean)
+.join(', ');
 
-    const licenseDataObj = {
-      licenseId: data.qualifications?.licenseNumber || '',
-      pathToLicenseDocument: data.qualifications?.idUpload || '',
-    };
+const licenseDataObj = {
+licenseId: data.qualifications?.licenseNumber || '',
+pathToLicenseDocument: data.qualifications?.idUpload || '',
+};
 
-    // Fallback value safety net: Add || "" to all strictly required String! fields
-    // Add || 0 to BirthDate since it is a required Float
-    const input = {
-      Name: data.personalData?.firstName || '',
-      Surname: data.personalData?.lastName || '',
-      BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : 0,
-      Gender: data.personalData?.gender || '',
-      City: data.contactInfo?.city || '',
-      Languages: data.languages?.selected || [],
-      Address: formattedAddress || null,
-      Availability: data.availability || [],
-      LicenseData: JSON.stringify(licenseDataObj),
-      Specialties: data.specialties?.selected || [],
-      Title: data.personalData?.title || '',
-      JobTitle: data.personalData?.jobTitle || '',
-      HasInsurance: data.priceRange?.kassenvertrag || false,
-      PriceRange: data.priceRange?.priceDetails || '',
-    };
-    console.log('2. Formatted GraphQL Payload (input):', input);
+// Fallback value safety net: Add || "" to all strictly required String! fields
+// Add || 0 to BirthDate since it is a required Float
+const input = {
+Name: data.personalData?.firstName || '',
+Surname: data.personalData?.lastName || '',
+BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : 0,
+Gender: data.personalData?.gender || '',
+City: data.contactInfo?.city || '',
+Languages: data.languages?.selected || [],
+Address: formattedAddress || null,
+Availability: data.availability || [],
+LicenseData: JSON.stringify(licenseDataObj),
+Specialties: data.specialties?.selected || [],
+Title: data.personalData?.title || '',
+JobTitle: data.personalData?.jobTitle || '',
+HasInsurance: data.priceRange?.kassenvertrag || false,
+PriceRange: data.priceRange?.priceDetails || '',
+};
+console.log('2. Formatted GraphQL Payload (input):', input);
 
-    const { data: responseData } = await apolloClient.mutate({
-      mutation: SAVE_THERAPIST_PROFILE_MUTATION,
-      variables: { input },
-    });
+const { data: responseData } = await apolloClient.mutate({
+mutation: SAVE_THERAPIST_PROFILE_MUTATION,
+variables: { input },
+});
 
-    return responseData.saveTherapistProfile;
-  },
+return responseData.saveTherapistProfile;
+},
 
-  // -- Get profile API call --
-  getProfile: async (forceNetwork = false): Promise<TherapistProfile> => {
-    const { data: responseData } = await apolloClient.query({
-      query: GET_OWN_THERAPIST_PROFILE_QUERY,
-      // If forced by a WebSocket event, bypass the cache. Otherwise, use cache-first.
-      fetchPolicy: forceNetwork ? 'network-only' : 'cache-first', 
-    });
+// -- Get profile API call --
+getProfile: async (): Promise<TherapistProfile> => {
+const { data: responseData } = await apolloClient.query({
+query: GET_OWN_THERAPIST_PROFILE_QUERY,
+fetchPolicy: 'cache-first', // Ensure to not always hit the backend, but use cache when available for better performance
+});
 
-    return responseData.getOwnTherapistProfile;
-  },
+return responseData.getOwnTherapistProfile;
+},
 
-  // -- Fetch matched patient(s) profiles --
-  getMatchedPatients: async (patientIds: string[], forceNetwork = false): Promise<any[]> => {
-    // Safety net: if the therapist has no matches yet, just return an empty array
-    if (!patientIds || patientIds.length === 0) {
-      return [];
-    }
+// -- Fetch matched patient(s) profiles --
+getMatchedPatients: async (patientIds: string[]): Promise<any[]> => {
+// Safety net: if the therapist has no matches yet, just return an empty array
+if (!patientIds || patientIds.length === 0) {
+return [];
+}
 
-    try {
-      const { data: responseData } = await apolloClient.query({
-        query: GET_MATCHED_USERS_QUERY,
-        variables: { UsersIds: patientIds },
-        // bypass cache if it's a real-time background update
-        fetchPolicy: forceNetwork ? 'network-only' : 'cache-first', 
-      });
+try {
+const { data: responseData } = await apolloClient.query({
+query: GET_MATCHED_USERS_QUERY,
+variables: { UsersIds: patientIds },
+fetchPolicy: 'cache-first', // Uses cache if we already loaded them elsewhere
+});
 
-      return responseData.getMatchedUsers.items || [];
-    } catch (error) {
-      console.error('Error fetching matched patients:', error);
-      return [];
-    }
-  },
+return responseData.getMatchedUsers.items || [];
+} catch (error) {
+console.error('Error fetching matched patients:', error);
+return [];
+}
+},
 
-  // -- Delete Therapist Profile and all associated data --
-  deleteProfile: async (): Promise<boolean> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_DATA_MUTATION,
-      });
-      return data.deleteData; // Returns true if successful
-    } catch (error) {
-      console.error('Error deleting therapist profile data:', error);
-      throw error;
-    }
-  },
+// -- Delete Therapist Profile and all associated data --
+deleteProfile: async (): Promise<boolean> => {
+try {
+const { data } = await apolloClient.mutate({
+mutation: DELETE_DATA_MUTATION,
+});
+return data.deleteData; // Returns true if successful
+} catch (error) {
+console.error('Error deleting therapist profile data:', error);
+throw error;
+}
+},
 
-  // -- Update Therapist Profile API call --
-  updateProfile: async (data: {
-    Name?: string;
-    Surname?: string;
-    Gender?: string;
-    BirthDate?: number | null;
-    City?: string;
-    Address?: string;
-    Languages?: string[];
-    Availability?: string[];
-    Specialties?: string[];
-    Title?: string;
-    JobTitle?: string;
-    HasInsurance?: boolean;
-    PriceRange?: string;
-  }) => {
-    console.log('🟢 [SERVICE] 2. Received variables for Apollo Mutation:', { input: data });
-    try {
-      const { data: responseData } = await apolloClient.mutate({
-        mutation: UPDATE_OWN_THERAPIST_PROFILE_MUTATION,
-        variables: { input: data },
-        refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
-      });
+// -- Update Therapist Profile API call --
+updateProfile: async (data: {
+Name?: string;
+Surname?: string;
+Gender?: string;
+BirthDate?: number | null;
+City?: string;
+Address?: string;
+Languages?: string[];
+Availability?: string[];
+Specialties?: string[];
+Title?: string;
+JobTitle?: string;
+HasInsurance?: boolean;
+PriceRange?: string;
+}) => {
+console.log('🟢 [SERVICE] 2. Received variables for Apollo Mutation:', { input: data });
+try {
+const { data: responseData } = await apolloClient.mutate({
+mutation: UPDATE_OWN_THERAPIST_PROFILE_MUTATION,
+variables: { input: data },
+refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
+});
 
-      console.log('🟢 [SERVICE] 3. Success! Backend returned:', responseData);
-      return responseData.updateOwnTherapistProfile;
-    } catch (error: any) {
-      console.error('🔴 [SERVICE] Apollo Mutation Failed!');
+console.log('🟢 [SERVICE] 3. Success! Backend returned:', responseData);
+return responseData.updateOwnTherapistProfile;
+} catch (error: any) {
+console.error('🔴 [SERVICE] Apollo Mutation Failed!');
 
-      // Apollo buries the actual backend complaints in these two objects:
-      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-        console.error('🔴 [SERVICE] GraphQL Schema/Validation Errors:', error.graphQLErrors);
-      }
-      if (error.networkError) {
-        console.error('🔴 [SERVICE] Network Error (e.g. 400/500):', error.networkError);
-      }
+// Apollo buries the actual backend complaints in these two objects:
+if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+console.error('🔴 [SERVICE] GraphQL Schema/Validation Errors:', error.graphQLErrors);
+}
+if (error.networkError) {
+console.error('🔴 [SERVICE] Network Error (e.g. 400/500):', error.networkError);
+}
 
-      throw error;
-    }
-  },
+throw error;
+}
+},
 
-  // -- Fetch Mood Trackers for a specific patient --
-  getPatientMoodTrackers: async (
-    userId: string,
-  ): Promise<{ trackers: any[]; hasConsent: boolean }> => {
-    try {
-      const { data } = await apolloClient.query({
-        query: THERAPIST_GET_MOOD_TRACKERS_QUERY,
-        variables: { userId, limit: 10 }, // Get their 10 most recent entries --> do we need more?
-        fetchPolicy: 'network-only',
-      });
-      return {
-        trackers: data.therapistGetMoodTrackerQuestionnaires.items || [],
-        hasConsent: true,
-      };
-    } catch (error: any) {
-      // Check if the backend threw the specific GDPR consent error
-      if (error.message && error.message.includes('consented')) {
-        console.info(`Patient ${userId} withheld consent for mood trackers.`); // Soft info instead of red error
-        return { trackers: [], hasConsent: false };
-      }
+// -- Fetch Mood Trackers for a specific patient --
+getPatientMoodTrackers: async (
+userId: string,
+): Promise<{ trackers: any[]; hasConsent: boolean }> => {
+try {
+const { data } = await apolloClient.query({
+query: THERAPIST_GET_MOOD_TRACKERS_QUERY,
+variables: { userId, limit: 10 }, // Get their 10 most recent entries --> do we need more?
+fetchPolicy: 'network-only',
+});
+return {
+trackers: data.therapistGetMoodTrackerQuestionnaires.items || [],
+hasConsent: true,
+};
+} catch (error: any) {
+// Check if the backend threw the specific GDPR consent error
+if (error.message && error.message.includes('consented')) {
+console.info(`Patient ${userId} withheld consent for mood trackers.`); // Soft info instead of red error
+return { trackers: [], hasConsent: false };
+}
 
-      console.error(`Error fetching mood trackers for patient ${userId}:`, error);
-      return { trackers: [], hasConsent: true }; // Return true for standard network drops to avoid false locked states
-    }
-  },
+console.error(`Error fetching mood trackers for patient ${userId}:`, error);
+return { trackers: [], hasConsent: true }; // Return true for standard network drops to avoid false locked states
+}
+},
 
-  // -- Fetch the full questionnaire data for the therapist --
-  getQuestionnaire: async (): Promise<{ Id: string; Type: string; Questionnaire: string; Discoverable?: boolean } | null> => {
-    try {
-      const { data } = await apolloClient.query({
-        query: GET_QUESTIONNAIRE_QUERY,
-        fetchPolicy: 'network-only', // Important to get the latest status from DB
-      });
-      return data.getQuestionnaire;
-    } catch (error) {
-      console.log('No questionnaire found or error fetching:', error);
-      return null;
-    }
-  },
+// -- Fetch the full questionnaire data for the therapist --
+getQuestionnaire: async (): Promise<{ Id: string; Type: string; Questionnaire: string; Discoverable?: boolean } | null> => {
+try {
+const { data } = await apolloClient.query({
+query: GET_QUESTIONNAIRE_QUERY,
+fetchPolicy: 'network-only', // Important to get the latest status from DB
+});
+return data.getQuestionnaire;
+} catch (error) {
+console.log('No questionnaire found or error fetching:', error);
+return null;
+}
+},
 
 
-  // -- Delete a patient match --
-  deleteMatch: async (patientId: string): Promise<boolean> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_MATCH_MUTATION,
-        variables: { match: patientId },
-        // Refetch the profile so the "Matches" array stays in sync locally
-        refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
-      });
-      return data.deleteMatch;
-    } catch (error) {
-      console.error('Error unmatching patient:', error);
-      throw error;
-    }
-  },
+// -- Delete a patient match --
+deleteMatch: async (patientId: string): Promise<boolean> => {
+try {
+const { data } = await apolloClient.mutate({
+mutation: DELETE_MATCH_MUTATION,
+variables: { match: patientId },
+// Refetch the profile so the "Matches" array stays in sync locally
+refetchQueries: [{ query: GET_OWN_THERAPIST_PROFILE_QUERY }],
+});
+return data.deleteMatch;
+} catch (error) {
+console.error('Error unmatching patient:', error);
+throw error;
+}
+},
 
-  // -- Log Therapist Consent to Consent-DB --
-  submitConsent: async (): Promise<boolean> => {
-    const input = {
-      preferences: [
-        { key: "terms_and_conditions", value: true },
-        { key: "ai_matching", value: true },
-        { key: "data_processing", value: true }
-      ],
-      legal_notices: [
-        { identifier: "terms_and_conditions" },
-        { identifier: "privacy_policy" }
-      ],
-      proofs: [
-        {
-          content: "Therapist actively checked the box agreeing to T&C, AI usage, and data processing on the Welcome Step.",
-          form: "therapist_welcome_step"
-        }
-      ]
-    };
+// -- Log Therapist Consent to Consent-DB --
+submitConsent: async (): Promise<boolean> => {
+const input = {
+preferences: [
+{ key: "terms_and_conditions", value: true },
+{ key: "ai_matching", value: true },
+{ key: "data_processing", value: true }
+],
+legal_notices: [
+{ identifier: "terms_and_conditions" },
+{ identifier: "privacy_policy" }
+],
+proofs: [
+{
+content: "Therapist actively checked the box agreeing to T&C, AI usage, and data processing on the Welcome Step.",
+form: "therapist_welcome_step"
+}
+]
+};
 
-    try {
-      await apolloClient.mutate({
-        mutation: CREATE_CONSENTS_MUTATION,
-        variables: { input },
-      });
-      return true;
-    } catch (error) {
-      console.error('Error saving therapist consent:', error);
-      return false;
-    }
-  },
+try {
+await apolloClient.mutate({
+mutation: CREATE_CONSENTS_MUTATION,
+variables: { input },
+});
+return true;
+} catch (error) {
+console.error('Error saving therapist consent:', error);
+return false;
+}
+},
 
 
-  // -- Toggle Ghost Mode (Discoverability) --
-  toggleGhostMode: async (isGhostMode: boolean): Promise<boolean> => {
-    try {
-      // Fetch the existing questionnaire string from the database
-      const currentData = await therapistService.getQuestionnaire();
-      
-      if (!currentData || !currentData.Questionnaire) {
-        throw new Error("Could not find existing questionnaire data to update.");
-      }
+// -- Toggle Ghost Mode (Discoverability) --
+toggleGhostMode: async (isGhostMode: boolean): Promise<boolean> => {
+try {
+// Fetch the existing questionnaire string from the database
+const currentData = await therapistService.getQuestionnaire();
 
-      // Prepare the input with the flipped Discoverable flag
-      // If Ghost Mode is ON, Discoverable is FALSE.
-      const input = {
-        Questionnaire: currentData.Questionnaire,
-        Discoverable: !isGhostMode, 
-      };
+if (!currentData || !currentData.Questionnaire) {
+throw new Error("Could not find existing questionnaire data to update.");
+}
 
-      // Send the update mutation
-      await apolloClient.mutate({
-        mutation: UPDATE_QUESTIONNAIRE_MUTATION,
-        variables: { input },
-      });
+// Prepare the input with the flipped Discoverable flag
+// If Ghost Mode is ON, Discoverable is FALSE.
+const input = {
+Questionnaire: currentData.Questionnaire,
+Discoverable: !isGhostMode,
+};
 
-      return true;
-    } catch (error) {
-      console.error('Error toggling Ghost Mode:', error);
-      return false;
-    }
-  },
+// Send the update mutation
+await apolloClient.mutate({
+mutation: UPDATE_QUESTIONNAIRE_MUTATION,
+variables: { input },
+});
 
-  // -- Create Invitation for Therapist to Invite an Existing Patient --
-  createInvitation: async (): Promise<string> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_INVITATION_MUTATION,
-      });
-      return data.createInvitation; // This returns the String! (the ID or URL)
-    } catch (error) {
-      console.error('Error creating invitation:', error);
-      throw error;
-    }
-  },
+return true;
+} catch (error) {
+console.error('Error toggling Ghost Mode:', error);
+return false;
+}
+},
+
+// -- Create Invitation for Therapist to Invite an Existing Patient --
+createInvitation: async (): Promise<string> => {
+try {
+const { data } = await apolloClient.mutate({
+mutation: CREATE_INVITATION_MUTATION,
+});
+return data.createInvitation; // This returns the String! (the ID or URL)
+} catch (error) {
+console.error('Error creating invitation:', error);
+throw error;
+}
+},
 
 };
