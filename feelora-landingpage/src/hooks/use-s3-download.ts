@@ -2,10 +2,9 @@ import { useState, useRef } from 'react';
 import { usePresignedUrl } from './use-presignedurl';
 import { s3Service } from '@/features/s3/s3Service';
 
-// Session-level cache for S3 blob URLs. Images are not sensitive and are
-// expensive to retrieve (presigned URL request + S3 download), so we cache
-// them for the lifetime of the page session.
-const _s3BlobCache = new Map<string, string>();
+// Session-level cache for S3 blob URLs. null = confirmed no image (404/403),
+// string = blob URL of the downloaded image.
+const _s3BlobCache = new Map<string, string | null>();
 
 export const useS3Download = () => {
   const { download: getDownloadUrl } = usePresignedUrl();
@@ -16,9 +15,9 @@ export const useS3Download = () => {
     const key = `${imageId}::${ownerSub ?? ''}`;
     currentKeyRef.current = key;
 
-    const cached = _s3BlobCache.get(key);
-    if (cached) {
-      setImageUrl(cached);
+    // Cache hit: includes null (no image) so we never retry a known-missing image
+    if (_s3BlobCache.has(key)) {
+      setImageUrl(_s3BlobCache.get(key) ?? null);
       return;
     }
 
@@ -34,7 +33,9 @@ export const useS3Download = () => {
         setImageUrl(localUrl);
       }
     } catch {
-      // Leave as null so the caller's fallback/placeholder renders
+      // Cache the failure so we don't retry on every re-render
+      _s3BlobCache.set(key, null);
+      // Leave imageUrl as null so the caller's fallback/placeholder renders
     }
   };
 
