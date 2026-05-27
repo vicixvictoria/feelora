@@ -128,8 +128,26 @@ const ChatPage = () => {
 
 
   // ==========================================
-  // REUSABLE FETCH FUNCTION
+  // REUSABLE FETCH FUNCTIONS
   // ==========================================
+
+  // Lightweight refresh: only updates the lastMessage preview in the sidebar.
+  // Used when a new_message WS event arrives — the therapist list hasn't changed,
+  // so there's no need to re-fetch the full profile or matched therapists.
+  const refreshConversationPreviews = useCallback(async () => {
+    try {
+      const conversations = await chatService.getChatConversations();
+      setChatList((prev) =>
+        prev.map((item) => {
+          const conv = conversations.find((c) => c.participantIds.includes(item.contactId));
+          return conv ? { ...item, lastMessage: conv.lastMessage || item.lastMessage } : item;
+        }),
+      );
+    } catch (err) {
+      console.error('Failed to refresh conversation previews:', err);
+    }
+  }, []);
+
   const fetchContactsAndChats = useCallback(async (isBackgroundUpdate = false) => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
@@ -238,14 +256,15 @@ const ChatPage = () => {
       }).catch((err) => console.error('Failed to instantly mark incoming message as read:', err));
     }
 
-    // Refetch the sidebar in the background to update 'lastMessage'
+    // Refresh only the lastMessage previews in the sidebar — no need to re-fetch
+    // the full profile or therapist list just because a new message arrived.
     if (shouldRefetchSidebar) {
       setTimeout(() => {
-        fetchContactsAndChats(true);
-      }, 500); 
+        refreshConversationPreviews();
+      }, 500);
     }
 
-  }, [websocketMessages, selectedChat, fetchContactsAndChats]);
+  }, [websocketMessages, selectedChat, fetchContactsAndChats, refreshConversationPreviews]);
   
   useEffect(() => {
     scrollToBottom();
@@ -304,9 +323,9 @@ const ChatPage = () => {
       );
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
-      
+
       // Update the sidebar preview text for our own message immediately
-      fetchContactsAndChats(true);
+      refreshConversationPreviews();
       
     } catch (error) {
       console.error('Failed to send message:', error);

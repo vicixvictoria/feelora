@@ -189,8 +189,26 @@ const TherapistChat = () => {
 }, [selectedChat?.conversationId]);
 
   // ==========================================
-  // REUSABLE FETCH FUNCTION (Moved out of useEffect)
+  // REUSABLE FETCH FUNCTIONS
   // ==========================================
+
+  // Lightweight refresh: only updates the lastMessage preview in the sidebar.
+  // Used when a new_message WS event arrives — the patient list hasn't changed,
+  // so there's no need to re-fetch the full profile or matched patients.
+  const refreshConversationPreviews = useCallback(async () => {
+    try {
+      const conversations = await chatService.getChatConversations();
+      setChatList((prev) =>
+        prev.map((item) => {
+          const conv = conversations.find((c) => c.participantIds.includes(item.contactId));
+          return conv ? { ...item, lastMessage: conv.lastMessage || item.lastMessage } : item;
+        }),
+      );
+    } catch (err) {
+      console.error('Failed to refresh conversation previews:', err);
+    }
+  }, []);
+
   const fetchContactsAndChats = useCallback(async (isBackgroundUpdate = false) => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
@@ -284,14 +302,17 @@ const TherapistChat = () => {
 
   // Determine flags first, synchronously, before any setState calls
   let activeChatNeedsUpdate = false;
-  let shouldRefetchSidebar = false;
+  // Full refetch needed when the patient list changes (new match / unmatch)
+  let shouldFullRefetchSidebar = false;
+  // Lightweight preview-only refresh needed when a new message arrives
+  let shouldRefreshPreviews = false;
 
   for (const rawMessage of newMessages) {
     const incoming = extractIncomingNotification(rawMessage);
     if (!incoming?.data) continue;
 
     if (incoming.data.type === 'new_match') {
-      shouldRefetchSidebar = true;
+      shouldFullRefetchSidebar = true;
       // Backend sends new_match when a patient sends their first message (creating the conversation).
       // If this involves the currently open chat and a conversation already exists, refresh messages.
       if (incoming.data.matchedId === selectedChat?.contactId && selectedChat?.conversationId) {
@@ -301,12 +322,12 @@ const TherapistChat = () => {
     }
 
     if (incoming.data.type === 'new_unmatch') {
-      shouldRefetchSidebar = true;
+      shouldFullRefetchSidebar = true;
       continue;
     }
 
     if (incoming.data.type === 'new_message') {
-      shouldRefetchSidebar = true;
+      shouldRefreshPreviews = true;
       const conversationId = incoming.data.conversationId;
       if (!conversationId) continue;
 
@@ -345,10 +366,17 @@ const TherapistChat = () => {
     }).catch((err) => console.error('Failed to mark as read:', err));
   }
 
-  if (shouldRefetchSidebar) {
+  // Full refetch when the patient list may have changed (new_match / new_unmatch)
+  if (shouldFullRefetchSidebar) {
     fetchContactsAndChats(true);
   }
-}, [websocketMessages, selectedChat, fetchContactsAndChats]);
+
+  // Lightweight preview-only refresh when a new message arrived — no need to
+  // re-fetch the full profile or patient list just because of a new message.
+  if (shouldRefreshPreviews && !shouldFullRefetchSidebar) {
+    refreshConversationPreviews();
+  }
+}, [websocketMessages, selectedChat, fetchContactsAndChats, refreshConversationPreviews]);
 
   /*// Polling fallback: backend does not push new_message WebSocket events to therapists,
   // so poll every 8 seconds to pick up messages sent by patients.
@@ -446,9 +474,9 @@ const TherapistChat = () => {
       );
       setMessages((prev) => [...prev, realMessage]);
       setNewMessage('');
-      
+
       // Update the sidebar preview text for our own message immediately
-      fetchContactsAndChats(true);
+      refreshConversationPreviews();
     } catch (error) {
       console.error('Failed to send message:', error);
       alert('Nachricht konnte nicht gesendet werden.');

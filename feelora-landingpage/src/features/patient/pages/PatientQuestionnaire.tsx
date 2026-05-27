@@ -110,7 +110,6 @@ const PatientQuestionnaire = () => {
       if (result.success && result.matches && result.matches.length > 0) {
         console.log('Algorithm returned full profiles:', result.matches);
         setMatchedProfiles(result.matches);
-        clearProgress();
         goNext();
       } else {
         console.log('No matches found. Redirecting to profile...');

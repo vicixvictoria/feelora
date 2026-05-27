@@ -147,7 +147,11 @@ const Step18_TherapistMatch = ({ therapists, onAccept, onBack }: TherapistMatchS
 
       {/* Navigation */}
       <div className="flex justify-start mt-8">
-        <Button variant="outline" onClick={onBack} className="feelora-btn-outline">
+        <Button
+          variant="outline"
+          onClick={showAlternativeMatches ? () => setShowAlternativeMatches(false) : onBack}
+          className="feelora-btn-outline"
+        >
           <ChevronLeft className="w-4 h-4" />
           {t('q.p.therapistMatch.back')}{' '}
           {showAlternativeMatches && t('q.p.therapistMatch.toBestMatch')}
