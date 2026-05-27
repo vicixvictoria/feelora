@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apollo-client';
+import { apolloClient, isCacheStale, markCacheFresh } from '@/lib/apollo-client';
 import { TherapistQuestionnaireData } from '../types/questionnaire-therapist';
 import { TherapistProfile } from '../types/profiles';
 
@@ -250,29 +250,30 @@ return responseData.saveTherapistProfile;
 },
 
 // -- Get profile API call --
-getProfile: async (fetchPolicy: 'cache-first' | 'network-only' = 'cache-first'): Promise<TherapistProfile> => {
+getProfile: async (forceRefresh = false): Promise<TherapistProfile> => {
+const CACHE_KEY = 'therapist:getOwnTherapistProfile';
+const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
 const { data: responseData } = await apolloClient.query({
 query: GET_OWN_THERAPIST_PROFILE_QUERY,
-fetchPolicy,
+fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
 });
-
+if (useNetwork) markCacheFresh(CACHE_KEY);
 return responseData.getOwnTherapistProfile;
 },
 
 // -- Fetch matched patient(s) profiles --
-getMatchedPatients: async (patientIds: string[], fetchPolicy: 'cache-first' | 'network-only' = 'cache-first'): Promise<any[]> => {
-// Safety net: if the therapist has no matches yet, just return an empty array
-if (!patientIds || patientIds.length === 0) {
-return [];
-}
+getMatchedPatients: async (patientIds: string[], forceRefresh = false): Promise<any[]> => {
+if (!patientIds || patientIds.length === 0) return [];
 
+const CACHE_KEY = 'therapist:getMatchedPatients';
+const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
 try {
 const { data: responseData } = await apolloClient.query({
 query: GET_MATCHED_USERS_QUERY,
 variables: { UsersIds: patientIds },
-fetchPolicy,
+fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
 });
-
+if (useNetwork) markCacheFresh(CACHE_KEY);
 return responseData.getMatchedUsers.items || [];
 } catch (error) {
 console.error('Error fetching matched patients:', error);

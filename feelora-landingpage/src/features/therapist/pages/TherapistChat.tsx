@@ -195,12 +195,9 @@ const TherapistChat = () => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
 
-      // Use network-only for background updates so a new_match notification
-      // immediately surfaces the new patient and their conversation in the sidebar.
-      const fetchPolicy = isBackgroundUpdate ? 'network-only' : 'cache-first';
-      const profile = await therapistService.getProfile(fetchPolicy);
+      const profile = await therapistService.getProfile(isBackgroundUpdate);
       const patients = profile?.Matches && profile.Matches.length > 0
-        ? await therapistService.getMatchedPatients(profile.Matches, fetchPolicy)
+        ? await therapistService.getMatchedPatients(profile.Matches, isBackgroundUpdate)
         : [];
 
       const conversations = await chatService.getChatConversations();

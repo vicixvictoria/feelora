@@ -86,7 +86,7 @@ const Dashboard = () => {
       setIsLoadingMoods(true);
       try {
         const [profile, trackers] = await Promise.all([
-          patientService.getProfile('network-only'),
+          patientService.getProfile(true),
           patientService.getMoodTrackers(),
           fetchAndProcessNotifications() // Fetch notifications
         ]);

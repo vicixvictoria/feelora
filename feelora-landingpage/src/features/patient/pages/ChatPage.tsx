@@ -134,10 +134,8 @@ const ChatPage = () => {
     try {
       if (!isBackgroundUpdate) setIsLoadingChats(true);
 
-      const fetchPolicy = isBackgroundUpdate ? 'network-only' : 'cache-first'; // Use cache for the initial load, but force network for background updates
-      
-      const profile = await patientService.getProfile(fetchPolicy);
-      const therapists = await patientService.getMatchedTherapists(profile.Matches || [], fetchPolicy);
+      const profile = await patientService.getProfile(isBackgroundUpdate);
+      const therapists = await patientService.getMatchedTherapists(profile.Matches || [], isBackgroundUpdate);
       const conversations = await chatService.getChatConversations();
 
       const sidebarItems: SidebarChat[] = therapists.map((therapist) => {

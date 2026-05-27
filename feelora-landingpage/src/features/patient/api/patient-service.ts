@@ -1,8 +1,7 @@
 import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apollo-client';
+import { apolloClient, isCacheStale, markCacheFresh } from '@/lib/apollo-client';
 import { QuestionnaireData } from '../types/questionnaire';
 import { PatientProfile, MatchedTherapist, AlgorithmMatch } from '../types/profiles';
-import { FetchPolicy } from '@apollo/client';
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
 
@@ -299,11 +298,14 @@ export const patientService = {
   },
 
   //Get patient profile API call
-  getProfile: async (policy: FetchPolicy = 'cache-first'): Promise<PatientProfile> => {
+  getProfile: async (forceRefresh = false): Promise<PatientProfile> => {
+    const CACHE_KEY = 'patient:getOwnUserProfile';
+    const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
     const { data: responseData } = await apolloClient.query({
       query: GET_OWN_USER_PROFILE_QUERY,
-      fetchPolicy: policy, // passed policy to avoid cache conflicts
+      fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
     });
+    if (useNetwork) markCacheFresh(CACHE_KEY);
     return responseData.getOwnUserProfile;
   },
 
@@ -349,23 +351,22 @@ updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
 
   // Fetch matched therapist(s)
   getMatchedTherapists: async (
-    therapistIds: string[], 
-    policy: FetchPolicy = 'cache-first'
+    therapistIds: string[],
+    forceRefresh = false,
   ): Promise<MatchedTherapist[]> => {
-    // Log to understand return
     console.log('Sending IDs to backend:', therapistIds);
     console.log('Is it an array?', Array.isArray(therapistIds));
 
-    // Safety net
-    if (!therapistIds || therapistIds.length === 0) {
-      return [];
-    }
+    if (!therapistIds || therapistIds.length === 0) return [];
+
+    const CACHE_KEY = 'patient:getMatchedTherapists';
+    const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
     const { data: responseData } = await apolloClient.query({
       query: GET_MATCHED_THERAPISTS_QUERY,
       variables: { TherapistsIds: therapistIds },
-      fetchPolicy: policy, // use the skip cache policy
+      fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
     });
-
+    if (useNetwork) markCacheFresh(CACHE_KEY);
     return responseData.getMatchedTherapists.items || [];
   },
 

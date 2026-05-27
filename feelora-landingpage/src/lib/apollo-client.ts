@@ -35,6 +35,20 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+// 30-second TTL for cacheable queries (profile data etc.)
+// Tracks the last time a given query key was fetched from the network.
+const QUERY_CACHE_TTL_MS = 30_000;
+const _cacheFetchTimes = new Map<string, number>();
+
+export function isCacheStale(key: string): boolean {
+  const t = _cacheFetchTimes.get(key);
+  return t === undefined || Date.now() - t >= QUERY_CACHE_TTL_MS;
+}
+
+export function markCacheFresh(key: string): void {
+  _cacheFetchTimes.set(key, Date.now());
+}
+
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([authLink, httpLink]),
   cache: new InMemoryCache(),
