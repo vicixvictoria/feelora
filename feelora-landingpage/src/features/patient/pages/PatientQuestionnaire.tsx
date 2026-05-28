@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome';
+import Preregistration from '../components/questionnaire/steps/Step_Preregsitration';
+//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome';
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
@@ -168,10 +169,18 @@ const PatientQuestionnaire = () => {
     createProfileAsync();
   };
 
+  const handleLogout = () => {
+    // Clear the persisted questionnaire progress
+    clearProgress();
+    
+    // Navigate to login page
+    navigate('/login');
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeStep onNext={goNext} onBack={goBack} onError={() => goToStep(0)} />;
+        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Pilot test change this back to Welcome Step!!
       case 1:
         return (
           <PersonalDataStep
