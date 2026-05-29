@@ -1,5 +1,5 @@
 import { notificationService } from '@/features/notifications/api/notification-service';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
 
 interface WebsocketContextType {
@@ -31,10 +31,11 @@ const WebsocketContext = createContext<WebsocketContextType | undefined>(undefin
 
 export function WebsocketProvider({ children }: { children: React.ReactNode }) {
   const [websocket, setWebsocket] = useState<any>(null);
+  const websocketRef = useRef<WebSocket | null>(null);
   const [websocketToken, setWebsocketToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<WebsocketNotification[]>([]);
   const [nextToken, setNextToken] = useState<string | null | undefined>(null);
-  let isWebsocketConnected = websocket != null;
+  let isWebsocketConnected = websocket?.readyState === WebSocket.OPEN;
 
   const { isAuthenticated } = useAuth();
 
@@ -76,28 +77,123 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
     setWebsocketToken(newWebsocketToken);
   };
 
-  useEffect(() => {
-    if (!websocketToken) {
-      if (websocket != null) setWebsocket(null);
-      getWebsocketToken();
-    } else if (websocket === null) {
-      let now = Date.now();
-      let newWebsocket = new WebSocket(
-        `${import.meta.env.VITE_WEBSOCKET_API_URL}?token=${websocketToken}`,
-      );
-      setWebsocket(newWebsocket);
+  const connectWebsocket = () => {
+    if (!websocketToken) return;
 
-      //! Testing logs for performance (do not delete the setMessages line)
-      newWebsocket.onopen = () =>
-        console.log(`[WS] Connected to WebSocket server, took ${Date.now() - now}ms`);
-      newWebsocket.onmessage = (event: any) => {
-        console.log(`[WS] Received message from WebSocket server`, event.data);
-        setMessages((prevMessages) => [...prevMessages, JSON.parse(event.data)]);
-      };
-      newWebsocket.onclose = () =>
-        console.log(`[WS] Disconnected from WebSocket server, took ${Date.now() - now}ms`);
+    let now = Date.now();
+
+    const ws = new WebSocket(
+      `${import.meta.env.VITE_WEBSOCKET_API_URL}?token=${websocketToken}`,
+    );
+
+    websocketRef.current = ws;
+    setWebsocket(ws);
+
+    ws.onopen = () => {
+      console.log(`[WS] Connected, took ${Date.now() - now}ms`);
+      setWebsocket(ws);
+    };
+
+    ws.onmessage = (event) => {
+      console.log('[WS] Message', event.data);
+      setMessages((prev) => [...prev, JSON.parse(event.data)]);
+    };
+
+    ws.onclose = () => {
+      console.log('[WS] Closed');
+
+      websocketRef.current = null;
+      setWebsocket(null);
+    };
+
+    ws.onerror = () => {
+      console.log('[WS] Error');
+      ws.close();
+    };
+  };
+
+  const ensureWebsocketAlive = async () => {
+    const ws = websocketRef.current;
+
+    if (!ws) {
+      console.log('[WS] Missing websocket, reconnecting...');
+
+      await getWebsocketToken();
+      return;
     }
-  }, [isAuthenticated, websocket, websocketToken]);
+
+    if (ws.readyState !== WebSocket.OPEN) {
+      console.log('[WS] Dead websocket, reconnecting...');
+      try {
+        ws.close();
+      } catch {}
+      await getWebsocketToken();
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (!websocketToken) {
+      getWebsocketToken();
+      return;
+    }
+
+    if (!websocket || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
+      connectWebsocket();
+    }
+  }, [isAuthenticated, websocketToken]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[WS] Tab became visible');
+        ensureWebsocketAlive();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [websocket]);
+
+  useEffect(() => {
+    let inactivityTimer: ReturnType<typeof setTimeout>;
+    let wasIdle = false;
+
+    const markActivity = () => {
+      clearTimeout(inactivityTimer);
+
+      if (wasIdle) {
+        console.log('[WS] User became active again');
+        ensureWebsocketAlive();
+        wasIdle = false;
+      }
+
+      inactivityTimer = setTimeout(() => {
+        wasIdle = true;
+        console.log('[WS] User idle');
+      }, 60000); // 1 minute
+    };
+
+    window.addEventListener('mousemove', markActivity);
+    window.addEventListener('keydown', markActivity);
+    window.addEventListener('click', markActivity);
+    window.addEventListener('scroll', markActivity);
+
+    markActivity();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+
+      window.removeEventListener('mousemove', markActivity);
+      window.removeEventListener('keydown', markActivity);
+      window.removeEventListener('click', markActivity);
+      window.removeEventListener('scroll', markActivity);
+    };
+  }, [websocket]);
 
   return (
     <WebsocketContext.Provider
