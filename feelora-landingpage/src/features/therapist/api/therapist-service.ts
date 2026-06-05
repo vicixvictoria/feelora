@@ -209,9 +209,8 @@ createTherapistProfile: async (
 data: Partial<TherapistQuestionnaireData>,
 ): Promise<TherapistProfile> => {
 const formattedAddress = [
-data.contactInfo?.street,
-data.contactInfo?.zip,
-data.contactInfo?.city,
+data.contactInfo?.address,
+data.contactInfo?.postalCode,
 ]
 .filter(Boolean)
 .join(', ');
@@ -258,6 +257,7 @@ query: GET_OWN_THERAPIST_PROFILE_QUERY,
 fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
 });
 if (useNetwork) markCacheFresh(CACHE_KEY);
+console.log('🟢 [getProfile] Full payload from backend:', responseData.getOwnTherapistProfile);
 return responseData.getOwnTherapistProfile;
 },
 

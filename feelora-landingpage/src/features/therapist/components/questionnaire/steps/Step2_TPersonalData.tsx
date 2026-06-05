@@ -57,7 +57,7 @@ const step2Schema = z.object({
       { message: 'Underage or Incomplete' },
     ),
   gender: z.string().min(1, 'Required'),
-  job: z.string().min(1, 'Required'),
+  jobTitle: z.string().min(1, 'Required'),
   title: z.string().optional(),
   profilePictureName: z.string().optional(),
   profilePictureUrl: z.string().optional(), // Added for the local preview URL
@@ -96,8 +96,8 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
 
   // Local state for custom selections
   const [isCustomJob, setIsCustomJob] = useState(() => {
-    if (!data.job) return false;
-    return !predefinedJobs.includes(data.job);
+    if (!data.jobTitle) return false;
+    return !predefinedJobs.includes(data.jobTitle);
   });
 
   const [isCustomTitle, setIsCustomTitle] = useState(() => {
@@ -116,7 +116,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
     lastName: t('q.t.personal.lastName'),
     bday: t('q.t.personal.birthday'),
     gender: t('q.t.personal.gender'),
-    job: t('q.t.personal.job'),
+    jobTitle: t('q.t.personal.job'),
     title: t('q.t.personal.titleField', 'Titel'),
   };
 
@@ -301,7 +301,7 @@ const Step2_PersonalData = ({ onNext, onBack, data, onDataChange }: PersonalData
                       </div>
                     );
                   })()
-                ) : field === 'job' ? (
+                ) : field === 'jobTitle' ? (
                   <>
                     <Select
                       value={isCustomJob ? 'other' : data[field] || ''}

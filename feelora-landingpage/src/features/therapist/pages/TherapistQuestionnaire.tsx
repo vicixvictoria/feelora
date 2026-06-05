@@ -177,9 +177,8 @@ const TherapistQuestionnaire = () => {
           console.log('Updating existing therapist profile...');
           
           const formattedAddress = [
-            data.contactInfo?.street,
-            data.contactInfo?.zip,
-            data.contactInfo?.city,
+            data.contactInfo?.address,
+            data.contactInfo?.postalCode,
           ]
             .filter(Boolean)
             .join(', ');
@@ -195,7 +194,7 @@ const TherapistQuestionnaire = () => {
             Availability: data.availability || [],
             Specialties: data.specialties?.selected || [],
             Title: data.personalData?.title || '',
-            JobTitle: data.personalData?.job || '', 
+            JobTitle: data.personalData?.jobTitle || '', 
             HasInsurance: data.priceRange?.kassenvertrag || false,
             PriceRange: data.priceRange?.priceDetails || '',
           });
