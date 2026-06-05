@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { SmartphoneIcon, FileCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card-landing';
 import evidenceImg from '@/assets/evidenceBasedImg.png';
@@ -8,10 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export function EvidenceBasedSection() {
   const { t } = useTranslation();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const [effectiveness, setEffectiveness] = useState(0);
 
@@ -127,7 +124,7 @@ export function EvidenceBasedSection() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="relative"
         >
           <motion.div

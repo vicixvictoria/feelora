@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { ArrowLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -13,10 +13,7 @@ import micheleFoto from '@/assets/Michele-Foto.JPG';
 
 export function AboutUsPage() {
   const { t } = useTranslation();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const teamMembers = [
     {

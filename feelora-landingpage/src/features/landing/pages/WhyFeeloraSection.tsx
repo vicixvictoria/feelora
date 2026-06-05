@@ -1,16 +1,13 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card-landing';
 import { useTranslation } from 'react-i18next';
 
 export function WhyFeeloraSection() {
   const { t } = useTranslation();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const stats = [
     {

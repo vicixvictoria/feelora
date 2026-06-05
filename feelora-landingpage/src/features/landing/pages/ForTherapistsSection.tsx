@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -10,10 +10,7 @@ import { useNavigate } from 'react-router-dom';
 export function ForTherapistsSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const handleLoginClickTherapist = () => {
     navigate('/login');

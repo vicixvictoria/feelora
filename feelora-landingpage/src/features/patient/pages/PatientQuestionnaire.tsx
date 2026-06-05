@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import Preregistration from '../components/questionnaire/steps/Step_Preregsitration';
-//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome';
+import Preregistration from '../components/questionnaire/steps/Step_Preregsitration'; //comment out for pilot test
+//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome'; //comment in for pilot test
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
@@ -23,6 +23,7 @@ import SummaryStep from '../components/questionnaire/steps/Step17_PSummary';
 import TherapistMatchStep from '../components/questionnaire/steps/Step18_TherapistMatch';
 import { AlgorithmMatch } from '../types/profiles';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/use-auth';
 
 import { patientService } from '../api/patient-service';
 import { QuestionnaireData } from '../types/questionnaire';
@@ -59,6 +60,7 @@ const getCookie = (name: string) => {
 
 const PatientQuestionnaire = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // ==========================================
   // redirect catcher for invited patients
@@ -170,17 +172,14 @@ const PatientQuestionnaire = () => {
   };
 
   const handleLogout = () => {
-    // Clear the persisted questionnaire progress
     clearProgress();
-    
-    // Navigate to login page
-    navigate('/login');
+    logout('user');
   };
 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Pilot test change this back to Welcome Step!!
+        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Patient Pilot test login: change Preregsitration to  WelcomeStep and in the imports use WelcomneStep but comment out Preregsitration
       case 1:
         return (
           <PersonalDataStep

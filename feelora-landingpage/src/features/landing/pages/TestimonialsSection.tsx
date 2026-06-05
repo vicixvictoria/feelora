@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { useState, useEffect } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -8,10 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export function TestimonialsSection() {
   const { t } = useTranslation();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const [currentIndex, setCurrentIndex] = useState(0);
 

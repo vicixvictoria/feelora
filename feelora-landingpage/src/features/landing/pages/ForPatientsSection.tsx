@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { useState } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { HeartIcon, CalendarIcon, BrainIcon, HandshakeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -12,10 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export function ForPatientsSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+  const [ref, inView] = useScrollReveal();
 
   const [isHovered, setIsHovered] = useState(false);
 
