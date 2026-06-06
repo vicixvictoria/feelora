@@ -35,13 +35,13 @@ function UnifiedLoginPage() {
           </div>
           <h2 className="text-2xl font-bold mb-2">{t('login.patient.title')}</h2>
           <p className="text-gray-500 mb-8 min-h-[3rem]">
-            {t('login.patient.subtitle')}
+            {t('login.patient.subtitle.preReg')}
           </p>
           <Button 
             onClick={() => handleLogin('user')} 
             className="w-full py-6 text-lg"
           >
-            {t('login.continueSignIn.patient')}
+            {t('login.continueSignIn.patient.preReg')}
           </Button>
         </div>
 
