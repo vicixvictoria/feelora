@@ -34,6 +34,7 @@ const menuItems = [
     icon: User,
     path: '/therapist/profile',
   },
+  /*
   {
     titleKey: 'app.therapist.sidebar.homework',
     descKey: 'app.therapist.sidebar.homeworkDesc',
@@ -52,6 +53,7 @@ const menuItems = [
     icon: Calendar,
     path: '/therapist/calendar',
   },
+  */
 ];
 
 export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {

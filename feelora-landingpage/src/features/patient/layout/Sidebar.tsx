@@ -40,6 +40,7 @@ const menuItems = [
     icon: LayoutDashboard,
     path: '/patient/dashboard',
   },
+  /*
   {
     titleKey: 'patient.sidebar.calendar',
     descKey: 'patient.sidebar.calendarDesc',
@@ -52,6 +53,7 @@ const menuItems = [
     icon: BookOpen,
     path: '/patient/homework',
   },
+  */
 ];
 
 export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
