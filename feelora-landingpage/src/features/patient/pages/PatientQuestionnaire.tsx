@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import FeeloraLogo from '@/assets/logo_feelora.png';
 import ProgressBar from '@/components/questionnaire/ProgressBar';
 import { usePersistedQuestionnaire } from '@/hooks/use-persisted-questionnaire';
-import Preregistration from '../components/questionnaire/steps/Step_Preregsitration'; //comment out for pilot test
-//import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome'; //comment in for pilot test
+//import Preregistration from '../components/questionnaire/steps/Step_Preregsitration'; //comment out for pilot test
+import WelcomeStep from '../components/questionnaire/steps/Step1_PWelcome'; //comment in for pilot test
 import PersonalDataStep from '../components/questionnaire/steps/Step2_PPersonalData';
 import ContactInfoStep from '../components/questionnaire/steps/Step3_PContactInfo';
 import MentalHealthStep from '../components/questionnaire/steps/Step4_PMentalHealth';
@@ -179,7 +179,7 @@ const PatientQuestionnaire = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <Preregistration onNext={handleLogout} onBack={handleLogout} />; //Patient Pilot test login: change Preregsitration to  WelcomeStep and in the imports use WelcomneStep but comment out Preregsitration
+        return <WelcomeStep onNext={goNext} onBack={handleLogout} />; //Patient Pilot test login: change Preregsitration to  WelcomeStep and in the imports use WelcomneStep but comment out Preregsitration
       case 1:
         return (
           <PersonalDataStep

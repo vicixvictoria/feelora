@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import {User, Send, Smile} from 'lucide-react'; //import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
+import {User, Send, Smile, Users2} from 'lucide-react'; //import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -34,18 +34,18 @@ const menuItems = [
     icon: User,
     path: '/therapist/profile',
   },
+  {
+    titleKey: 'app.therapist.sidebar.patients',
+    descKey: 'app.therapist.sidebar.patientsDesc',
+    icon: Users2,
+    path: '/therapist/patients',
+  },
   /*
   {
     titleKey: 'app.therapist.sidebar.homework',
     descKey: 'app.therapist.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/therapist/homework',
-  },
-  {
-    titleKey: 'app.therapist.sidebar.patients',
-    descKey: 'app.therapist.sidebar.patientsDesc',
-    icon: Users2,
-    path: '/therapist/patients',
   },
   {
     titleKey: 'app.therapist.sidebar.calendar',
