@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import {User, Send, Smile} from 'lucide-react'; //import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
+import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -21,39 +21,43 @@ const menuItems = [
     descKey: 'app.therapist.sidebar.chatDesc',
     icon: Send,
     path: '/therapist/',
+    comingSoon: false,
   },
   {
     titleKey: 'app.therapist.sidebar.moodTracker',
     descKey: 'app.therapist.sidebar.moodTrackerDesc',
     icon: Smile,
     path: '/therapist/mood-tracker',
+    comingSoon: false,
   },
   {
     titleKey: 'app.therapist.sidebar.profile',
     descKey: 'app.therapist.sidebar.profileDesc',
     icon: User,
     path: '/therapist/profile',
-  },
-  /*
-  {
-    titleKey: 'app.therapist.sidebar.homework',
-    descKey: 'app.therapist.sidebar.homeworkDesc',
-    icon: BookOpen,
-    path: '/therapist/homework',
+    comingSoon: false,
   },
   {
     titleKey: 'app.therapist.sidebar.patients',
     descKey: 'app.therapist.sidebar.patientsDesc',
     icon: Users2,
     path: '/therapist/patients',
+    comingSoon: true,
+  },
+  {
+    titleKey: 'app.therapist.sidebar.homework',
+    descKey: 'app.therapist.sidebar.homeworkDesc',
+    icon: BookOpen,
+    path: '/therapist/homework',
+    comingSoon: true,
   },
   {
     titleKey: 'app.therapist.sidebar.calendar',
     descKey: 'app.therapist.sidebar.calendarDesc',
     icon: Calendar,
     path: '/therapist/calendar',
+    comingSoon: true,
   },
-  */
 ];
 
 export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
@@ -159,8 +163,15 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
               )}
             </div>
 
-            <div className="flex flex-col ml-2">
-              <span className="text-sm font-medium text-sidebar-text">{t(item.titleKey)}</span>
+            <div className="flex flex-col ml-2 flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-sidebar-text">{t(item.titleKey)}</span>
+                {item.comingSoon && (
+                  <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary px-1.5 py-0.5 rounded-full leading-none">
+                    {t('app.therapist.calendar.comingSoon')}
+                  </span>
+                )}
+              </div>
               <span className="text-xs text-sidebar-muted leading-tight">{t(item.descKey)}</span>
             </div>
           </NavLink>

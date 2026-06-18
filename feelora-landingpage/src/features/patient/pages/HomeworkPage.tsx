@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, FileText, RefreshCw } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
@@ -38,18 +39,32 @@ const completedTasks: Task[] = [
 
 const HomeworkPage = () => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(true);
 
   return (
-    <div className="max-w-4xl animate-fade-in">
-      {/* Coming Soon Watermark */}
-      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
-        <p
-          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: 'rotate(-25deg)' }}
-        >
-          {t('patient.homework.comingSoon')}
-        </p>
-      </div>
+    <div className="max-w-4xl animate-fade-in relative">
+      {/* Coming Soon Overlay */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {t('patient.homework.comingSoon')}
+            </span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              {t('patient.homework.comingSoonTitle')}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+              {t('patient.homework.comingSoonDesc')}
+            </p>
+            <button
+              onClick={() => setShowOverlay(false)}
+              className="mt-2 feelora-btn-outline"
+            >
+              {t('patient.homework.revealPreview')}
+            </button>
+          </div>
+        </div>
+      )}
       {/* New Tasks */}
       <h1 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.newTasks')}</h1>
       <div className="space-y-4 mb-10">

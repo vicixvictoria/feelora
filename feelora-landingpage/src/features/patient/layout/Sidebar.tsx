@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { User, Send, Smile, LayoutDashboard } from 'lucide-react'; //import { Calendar, User, Send, Smile, BookOpen, LayoutDashboard } from 'lucide-react';
+import { User, Send, Smile, LayoutDashboard, Calendar, BookOpen } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -21,39 +21,43 @@ const menuItems = [
     descKey: 'patient.sidebar.profileDesc',
     icon: User,
     path: '/patient/profile',
+    comingSoon: false,
   },
   {
     titleKey: 'patient.sidebar.chat',
     descKey: 'patient.sidebar.chatDesc',
     icon: Send,
     path: '/patient/',
+    comingSoon: false,
   },
   {
     titleKey: 'patient.sidebar.moodTracker',
     descKey: 'patient.sidebar.moodTrackerDesc',
     icon: Smile,
     path: '/patient/mood-tracker',
+    comingSoon: false,
   },
   {
     titleKey: 'patient.sidebar.dashboard',
     descKey: 'patient.sidebar.dashboardDesc',
     icon: LayoutDashboard,
     path: '/patient/dashboard',
+    comingSoon: false,
   },
-  /*
   {
     titleKey: 'patient.sidebar.calendar',
     descKey: 'patient.sidebar.calendarDesc',
     icon: Calendar,
     path: '/patient/calendar',
+    comingSoon: true,
   },
   {
     titleKey: 'patient.sidebar.homework',
     descKey: 'patient.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/patient/homework',
+    comingSoon: true,
   },
-  */
 ];
 
 export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
@@ -170,8 +174,15 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
               )}
             </div>
 
-            <div className="flex flex-col ml-2">
-              <span className="text-sm font-medium text-sidebar-text">{t(item.titleKey)}</span>
+            <div className="flex flex-col ml-2 flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-sidebar-text">{t(item.titleKey)}</span>
+                {item.comingSoon && (
+                  <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary px-1.5 py-0.5 rounded-full leading-none">
+                    {t('patient.calendar.comingSoon')}
+                  </span>
+                )}
+              </div>
               <span className="text-xs text-sidebar-muted leading-tight">{t(item.descKey)}</span>
             </div>
           </NavLink>

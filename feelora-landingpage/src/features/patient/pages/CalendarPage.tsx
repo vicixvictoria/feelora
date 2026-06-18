@@ -20,6 +20,7 @@ import {
 
 const CalendarPage = () => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -84,17 +85,30 @@ const CalendarPage = () => {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-        {/* Coming Soon Watermark */}
-        <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
-          <p
-            className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-            style={{ transform: 'rotate(-25deg)' }}
-          >
-            {t('patient.calendar.comingSoon')}
-          </p>
+    <div className="animate-fade-in relative">
+      {/* Coming Soon Overlay */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {t('patient.calendar.comingSoon')}
+            </span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              {t('patient.calendar.comingSoonTitle')}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+              {t('patient.calendar.comingSoonDesc')}
+            </p>
+            <button
+              onClick={() => setShowOverlay(false)}
+              className="mt-2 feelora-btn-outline"
+            >
+              {t('patient.calendar.revealPreview')}
+            </button>
+          </div>
         </div>
+      )}
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Left Column - Calendar */}
         <div className="flex-1">
           {/* Calendar */}

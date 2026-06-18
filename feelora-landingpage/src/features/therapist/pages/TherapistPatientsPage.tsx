@@ -1,6 +1,7 @@
 import { ChevronRight, Search, Send, Check, ChevronLeft } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 interface Patient {
   name: string;
@@ -51,18 +52,32 @@ const newPatients: NewPatient[] = [
 
 const PatientsPage = () => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(true);
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in relative">
-      {/* Coming Soon Watermark */}
-      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
-        <p
-          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: 'rotate(-25deg)' }}
-        >
-          {t('app.therapist.patients.comingSoon')}
-        </p>
-      </div>
+      {/* Coming Soon Overlay */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {t('app.therapist.patients.comingSoon')}
+            </span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              {t('app.therapist.patients.comingSoonTitle')}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+              {t('app.therapist.patients.comingSoonDesc')}
+            </p>
+            <button
+              onClick={() => setShowOverlay(false)}
+              className="mt-2 feelora-btn-outline"
+            >
+              {t('app.therapist.patients.revealPreview')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Existing Patients */}
       <h1 className="text-2xl font-bold text-foreground mb-6">

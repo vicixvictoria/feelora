@@ -16,26 +16,26 @@ interface TaskStatus {
 }
 
 const patients: Patient[] = [
-  { name: 'Nina Netwon', avatar: ninaAvatar },
-  { name: 'Tom Turbo', avatar: ninaAvatar },
-  { name: 'Jon Doe', avatar: ninaAvatar },
+  { name: 'Patient 1', avatar: ninaAvatar },
+  { name: 'Patient 2', avatar: ninaAvatar },
+  { name: 'Patient 3', avatar: ninaAvatar },
 ];
 
 const taskStatuses: TaskStatus[] = [
   {
-    patientName: 'Nina Netwon',
+    patientName: 'Patient 1',
     avatar: ninaAvatar,
     date: '20.09.2025',
     status: 'in Bearbeitung',
   },
   {
-    patientName: 'Nina Netwon',
+    patientName: 'Patient 2',
     avatar: ninaAvatar,
     date: '19.09.2025',
     status: 'Erledigt',
   },
   {
-    patientName: 'Tom Turbo',
+    patientName: 'Patient 3',
     avatar: ninaAvatar,
     date: '15.09.2025',
     status: 'Erledigt',
@@ -44,6 +44,7 @@ const taskStatuses: TaskStatus[] = [
 
 const TherapistHomeworkPage = () => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(true);
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [taskText, setTaskText] = useState('');
 
@@ -65,15 +66,28 @@ const TherapistHomeworkPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in relative">
-      {/* Coming Soon Watermark */}
-      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
-        <p
-          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: 'rotate(-25deg)' }}
-        >
-          {t('app.therapist.homework.comingSoon')}
-        </p>
-      </div>
+      {/* Coming Soon Overlay */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {t('app.therapist.homework.comingSoon')}
+            </span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              {t('app.therapist.homework.comingSoonTitle')}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+              {t('app.therapist.homework.comingSoonDesc')}
+            </p>
+            <button
+              onClick={() => setShowOverlay(false)}
+              className="mt-2 feelora-btn-outline"
+            >
+              {t('app.therapist.homework.revealPreview')}
+            </button>
+          </div>
+        </div>
+      )}
       {/* New Tasks Section */}
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('app.therapist.homework.createTasks')}

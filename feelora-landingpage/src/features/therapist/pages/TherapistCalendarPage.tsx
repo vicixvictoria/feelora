@@ -78,6 +78,7 @@ const colorMap = {
 
 const TherapistCalendarPage = () => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(true);
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
@@ -92,15 +93,28 @@ const TherapistCalendarPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in relative">
-      {/* Coming Soon Watermark */}
-      <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
-        <p
-          className="text-4xl md:text-7xl font-extrabold text-primary/20 uppercase tracking-widest select-none"
-          style={{ transform: 'rotate(-25deg)' }}
-        >
-          {t('app.therapist.calendar.comingSoon')}
-        </p>
-      </div>
+      {/* Coming Soon Overlay */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              {t('app.therapist.calendar.comingSoon')}
+            </span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              {t('app.therapist.calendar.comingSoonTitle')}
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+              {t('app.therapist.calendar.comingSoonDesc')}
+            </p>
+            <button
+              onClick={() => setShowOverlay(false)}
+              className="mt-2 feelora-btn-outline"
+            >
+              {t('app.therapist.calendar.revealPreview')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
