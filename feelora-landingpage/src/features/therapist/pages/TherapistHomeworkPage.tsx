@@ -68,23 +68,25 @@ const TherapistHomeworkPage = () => {
     <div className="max-w-5xl mx-auto animate-fade-in relative">
       {/* Coming Soon Overlay */}
       {showOverlay && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl px-6">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
-              {t('app.therapist.homework.comingSoon')}
-            </span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
-              {t('app.therapist.homework.comingSoonTitle')}
-            </p>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
-              {t('app.therapist.homework.comingSoonDesc')}
-            </p>
-            <button
-              onClick={() => setShowOverlay(false)}
-              className="mt-2 feelora-btn-outline"
-            >
-              {t('app.therapist.homework.revealPreview')}
-            </button>
+        <div className="absolute inset-0 z-20 bg-background/80 backdrop-blur-sm rounded-2xl">
+          <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-[25vh] px-6 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+                {t('app.therapist.homework.comingSoon')}
+              </span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
+                {t('app.therapist.homework.comingSoonTitle')}
+              </p>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
+                {t('app.therapist.homework.comingSoonDesc')}
+              </p>
+              <button
+                onClick={() => setShowOverlay(false)}
+                className="mt-2 feelora-btn-outline"
+              >
+                {t('app.therapist.homework.revealPreview')}
+              </button>
+            </div>
           </div>
         </div>
       )}
