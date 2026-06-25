@@ -22,6 +22,7 @@ import { ForPatientsSection } from './features/landing/pages/ForPatientsSection'
 import { ForTherapistsSection } from './features/landing/pages/ForTherapistsSection';
 import { WhyFeeloraSection } from './features/landing/pages/WhyFeeloraSection';
 import { EvidenceBasedSection } from './features/landing/pages/EvidenceBasedSection';
+import { AchievementsSection } from './features/landing/pages/AchievementsSection';
 import { TestimonialsSection } from './features/landing/pages/TestimonialsSection';
 import { AboutUsPage } from './features/landing/pages/AboutUsPage';
 import { PrivacyPolicyPage } from './features/landing/pages/PrivacyPolicyPage';
@@ -76,6 +77,7 @@ function HomePage() {
       <ForTherapistsSection />
       <WhyFeeloraSection />
       <EvidenceBasedSection />
+      <AchievementsSection />
       <TestimonialsSection />
     </>
   );

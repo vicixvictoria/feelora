@@ -1,41 +1,12 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { SmartphoneIcon, FileCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card-landing';
-import evidenceImg from '@/assets/evidenceBasedImg.png';
 import { useTranslation } from 'react-i18next';
 
 export function EvidenceBasedSection() {
   const { t } = useTranslation();
   const [ref, inView] = useScrollReveal();
-
-  const [effectiveness, setEffectiveness] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-
-    const duration = 1500;
-    const startTime = Date.now();
-    const endValue = 1;
-
-    const animate = () => {
-      const now = Date.now();
-      const elapsed = now - startTime;
-
-      if (elapsed < duration) {
-        const progress = elapsed / duration;
-        const easeOutQuad = 1 - Math.pow(1 - progress, 3);
-        const currentValue = Math.floor(easeOutQuad * endValue);
-        setEffectiveness(currentValue);
-        requestAnimationFrame(animate);
-      } else {
-        setEffectiveness(endValue);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [inView]);
 
   return (
     <section className="py-24 px-8 bg-gradient-to-br from-tertiary/50 to-background">
@@ -55,7 +26,7 @@ export function EvidenceBasedSection() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -121,43 +92,6 @@ export function EvidenceBasedSection() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="relative"
-        >
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto"
-          >
-            <img
-              src={evidenceImg}
-              alt="evidence support visualization"
-              className="w-full h-auto object-cover"
-              loading="lazy"
-            />
-          </motion.div>
-          <div className="absolute inset-0 flex items-center justify-center px-4">
-            <Card className="bg-background/95 backdrop-blur-sm p-4 sm:p-6 md:p-10 shadow-2xl max-w-xs sm:max-w-sm md:max-w-md">
-              <div className="text-center">
-                <div
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-tertiary-foreground mb-2 sm:mb-3 md:mb-4"
-                  aria-live="polite"
-                >
-                  {effectiveness}st
-                </div>
-                <p className="text-sm sm:text-base md:text-lg font-headline font-semibold text-gray-800 mb-2 sm:mb-3">
-                  {t('evidence.effectiveness')}
-                </p>
-                <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-body">
-                  {t('evidence.effectiveness.desc')}
-                </p>
-              </div>
-            </Card>
-          </div>
-        </motion.div>
       </div>
     </section>
   );
