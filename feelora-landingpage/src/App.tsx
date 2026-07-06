@@ -139,6 +139,7 @@ const router = createBrowserRouter([
           { path: '/auth/callback', element: <AuthCallback /> },
           { path: '/termsandconditions', element: <PrivacyPolicyPage /> },
           { path: '/support', element: <SupportPage /> },
+          { path: '/resources', element: ( <div className="pt-24"> <EmergencyPage /> </div> ),},
         ],
       },
       // Test routes

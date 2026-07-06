@@ -16,7 +16,7 @@ export function Footer() {
             </h3>
             <div className="flex gap-4">
               <a
-                href="https://www.instagram.com/feelora.at/?hl=en"
+                href="https://www.instagram.com/feelora.therapy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -50,7 +50,10 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <button className="text-gray-600 hover:text-primary transition-colors">
+                <button
+                  onClick={() => navigate('/resources')}
+                  className="text-gray-600 hover:text-primary transition-colors cursor-pointer"
+                >
                   {t('footer.users.resources')}
                 </button>
               </li>
@@ -134,9 +137,12 @@ export function Footer() {
               </li>
               <li></li>
               <li>
-                <button className="text-gray-600 hover:text-primary transition-colors">
+                <a
+                  href="mailto:info@feelora.com"
+                  className="text-gray-600 hover:text-primary transition-colors"
+                >
                   {t('footer.about.contact')}
-                </button>
+                </a>
               </li>
             </ul>
           </div>
