@@ -89,8 +89,16 @@ Gender
 City
 BirthDate
 Languages
+sessionStarted
 }
 }
+}
+`;
+
+// acknowledge that a therapist has formally started therapy with a patient
+const SESSIONS_MANAGEMENT_MUTATION = gql`
+mutation SessionsManagement($input: SessionManagementInput!) {
+sessionsManagement(input: $input)
 }
 `;
 
@@ -452,6 +460,20 @@ return true;
 } catch (error) {
 console.error('Error toggling Ghost Mode:', error);
 return false;
+}
+},
+
+// -- Acknowledge that therapy has formally started with a patient --
+startSession: async (patientId: string): Promise<boolean> => {
+try {
+const { data } = await apolloClient.mutate({
+mutation: SESSIONS_MANAGEMENT_MUTATION,
+variables: { input: { match: patientId, sessionStarted: true } },
+});
+return data.sessionsManagement;
+} catch (error) {
+console.error('Error starting session for patient:', patientId, error);
+throw error;
 }
 },
 

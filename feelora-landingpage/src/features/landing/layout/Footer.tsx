@@ -143,6 +143,9 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-500 max-w-4xl mx-auto mb-4">
+            {t('footer.disclaimer')}
+          </p>
           <p className="text-body text-gray-600">
             © {new Date().getFullYear()} {t('footer.rights')}
           </p>
