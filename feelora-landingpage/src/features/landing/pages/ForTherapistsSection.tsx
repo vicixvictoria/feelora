@@ -56,7 +56,7 @@ export function ForTherapistsSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative order-2 lg:order-1 flex justify-center w-full"
+            className="relative hidden lg:flex order-2 lg:order-1 justify-center w-full"
           >
             <img
               src={forTherapistsImg}
@@ -67,12 +67,24 @@ export function ForTherapistsSection() {
           </motion.div>
 
           <div className="order-1 lg:order-2">
-            <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              {t('therapists.title')}
-            </h2>
-            <p className="text-body-large text-gray-600 mb-12 leading-body">
-              {t('therapists.description')}
-            </p>
+            <div className="relative">
+              <div
+                aria-hidden="true"
+                className="absolute -top-6 -right-4 w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden pointer-events-none opacity-80 lg:hidden [mask-image:radial-gradient(circle,black_50%,transparent_80%)]"
+              >
+                <img
+                  src={forTherapistsImg}
+                  alt=""
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <h2 className="relative z-10 text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6 pr-32 sm:pr-44 lg:pr-0">
+                {t('therapists.title')}
+              </h2>
+              <p className="relative z-10 text-body-large text-gray-600 mb-12 leading-body">
+                {t('therapists.description')}
+              </p>
+            </div>
 
             <div className="space-y-8 mb-12">
               {features.map((feature, index) => (

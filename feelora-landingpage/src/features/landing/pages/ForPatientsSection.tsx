@@ -58,12 +58,27 @@ export function ForPatientsSection() {
           className="grid lg:grid-cols-2 gap-16 items-center"
         >
           <div>
-            <h2 className="text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6">
-              {t('patients.title')}
-            </h2>
-            <p className="text-body-large mb-12 leading-body" style={{ color: '#2F3E46' }}>
-              {t('patients.description')}
-            </p>
+            <div className="relative">
+              <div
+                aria-hidden="true"
+                className="absolute -top-6 -right-4 w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden pointer-events-none opacity-80 lg:hidden [mask-image:radial-gradient(circle,black_50%,transparent_80%)]"
+              >
+                <img
+                  src={forPatientsImg}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h2 className="relative z-10 text-h2 font-headline font-semibold text-gray-800 tracking-headline leading-headline mb-6 pr-32 sm:pr-44 lg:pr-0">
+                {t('patients.title')}
+              </h2>
+              <p
+                className="relative z-10 text-body-large mb-12 leading-body"
+                style={{ color: '#2F3E46' }}
+              >
+                {t('patients.description')}
+              </p>
+            </div>
 
             <div className="space-y-8 mb-12">
               {features.map((feature, index) => (
@@ -155,7 +170,7 @@ export function ForPatientsSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative flex justify-center w-full"
+            className="relative hidden lg:flex justify-center w-full"
           >
             <img
               src={forPatientsImg}
