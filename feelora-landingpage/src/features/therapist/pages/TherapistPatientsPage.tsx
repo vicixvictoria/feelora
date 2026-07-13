@@ -375,7 +375,7 @@ const PatientsPage = () => {
                       <Send className="w-4 h-4" />
                     </button>
                     <button
-                      className="border border-destructive text-destructive px-4 py-2 rounded-full font-medium hover:bg-destructive/10 transition-all duration-200 flex items-center gap-2 text-sm disabled:opacity-50"
+                      className="border border-primary text-primary px-4 py-2 rounded-full font-medium hover:bg-primary/10 transition-all duration-200 flex items-center gap-2 text-sm disabled:opacity-50"
                       onClick={() => handleStartSession(patient)}
                       disabled={startingSession === patient.Id}
                     >

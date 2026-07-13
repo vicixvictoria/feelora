@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { Send, Info, ChevronRight, ArrowLeft, Loader2, X, UserMinus, AlertTriangle } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,6 +23,7 @@ interface SidebarChat {
   avatar: string;
   conversationId: string | null;
   lastMessage: string;
+  lastMessageAt: number;
 }
 
 // --- WebSocket Interfaces ---
@@ -128,6 +130,11 @@ const TherapistChat = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { messages: websocketMessages } = useWebsocket();
+  const location = useLocation();
+
+  // Captured once on mount: which patient's chat to auto-open, e.g. when
+  // navigated here from the "Message" button on a patient's profile card.
+  const openChatWithIdRef = useRef<string | undefined>((location.state as { openChatWith?: string } | null)?.openChatWith);
 
   // State
   const [chatList, setChatList] = useState<SidebarChat[]>([]);
@@ -192,18 +199,26 @@ const TherapistChat = () => {
   // REUSABLE FETCH FUNCTIONS
   // ==========================================
 
-  // Lightweight refresh: only updates the lastMessage preview in the sidebar.
+  // Lightweight refresh: only updates the lastMessage preview in the sidebar
+  // (and re-sorts so the most recently active chat floats to the top).
   // Used when a new_message WS event arrives — the patient list hasn't changed,
   // so there's no need to re-fetch the full profile or matched patients.
   const refreshConversationPreviews = useCallback(async () => {
     try {
       const conversations = await chatService.getChatConversations();
-      setChatList((prev) =>
-        prev.map((item) => {
+      setChatList((prev) => {
+        const updated = prev.map((item) => {
           const conv = conversations.find((c) => c.participantIds.includes(item.contactId));
-          return conv ? { ...item, lastMessage: conv.lastMessage || item.lastMessage } : item;
-        }),
-      );
+          return conv
+            ? {
+                ...item,
+                lastMessage: conv.lastMessage || item.lastMessage,
+                lastMessageAt: conv.lastMessageAt ?? item.lastMessageAt,
+              }
+            : item;
+        });
+        return updated.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
+      });
     } catch (err) {
       console.error('Failed to refresh conversation previews:', err);
     }
@@ -239,8 +254,13 @@ const TherapistChat = () => {
             avatar: avatar,
             conversationId: existingChat ? existingChat.conversationId : null,
             lastMessage: existingChat?.lastMessage || t('app.therapist.chat.startChat', 'Beginne den Chat...'),
+            lastMessageAt: existingChat?.lastMessageAt ?? 0,
           };
         });
+
+      // Most recently active conversations first; chats without any
+      // messages yet (lastMessageAt 0) keep their original relative order.
+      sidebarItems.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
 
       setChatList(sidebarItems);
 
@@ -269,8 +289,16 @@ const TherapistChat = () => {
         return updatedMatch;
       });
 
-      if (!isBackgroundUpdate && sidebarItems.length > 0 && window.innerWidth >= 768) {
-        handleSelectChat(sidebarItems[0]);
+      if (!isBackgroundUpdate && sidebarItems.length > 0) {
+        const targetChat = openChatWithIdRef.current
+          ? sidebarItems.find((item) => item.contactId === openChatWithIdRef.current)
+          : undefined;
+
+        if (targetChat) {
+          handleSelectChat(targetChat);
+        } else if (window.innerWidth >= 768) {
+          handleSelectChat(sidebarItems[0]);
+        }
       }
     } catch (error) {
       console.error('Error loading chat contacts:', error);
