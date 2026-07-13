@@ -1,13 +1,15 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ExternalLink, Loader2, Send, Bell, UserCheck, UserMinus, ChevronRight, Check, Ghost, Link, Copy } from 'lucide-react';
+import { ExternalLink, Loader2, Check, Ghost, Link, Copy } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
 import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
-import { useWebsocket } from '@/contexts/WebsocketContext';
-import { notificationService, NotificationItem } from '../../notifications/api/notification-service';
+// Notification center is disabled on this page (see below) — re-add these imports
+// (plus `useRef` from 'react') if it gets re-enabled.
+// import { useWebsocket } from '@/contexts/WebsocketContext';
+// import { notificationService, NotificationItem } from '../../notifications/api/notification-service';
 
 // --- Translation Helpers ---
 
@@ -99,18 +101,19 @@ const translateSpecialty = (spec: string, t: any) => {
 
 // --- Interfaces ---
 
-interface IncomingNotification {
-  type?: string;
-  data?: {
-    type?: string;
-    conversationId?: string;
-    count?: number;
-    senderName?: string;
-    matchedId?: string;
-    unmatchedId?: string;
-    sk?: string;
-  };
-}
+// Only used by the disabled notification center below.
+// interface IncomingNotification {
+//   type?: string;
+//   data?: {
+//     type?: string;
+//     conversationId?: string;
+//     count?: number;
+//     senderName?: string;
+//     matchedId?: string;
+//     unmatchedId?: string;
+//     sk?: string;
+//   };
+// }
 
 const S3Avatar = ({ userId, fallbackSrc, className, alt = '' }: { userId?: string; fallbackSrc: string; className: string; alt?: string; }) => {
   const { download, imageUrl } = useS3Download();
@@ -153,6 +156,10 @@ const TherapistProfilePage = () => {
   }, []);
 
   // --- Notification & Websocket State ---
+  // Disabled: this page no longer shows a notification center, so none of
+  // this fetches, listens to the websocket, or touches read/unread state.
+  // Restore verbatim (plus the imports/interface noted above) to bring it back.
+  /*
   const { messages: websocketMessages } = useWebsocket();
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [generalNotifs, setGeneralNotifs] = useState<NotificationItem[]>([]);
@@ -211,7 +218,7 @@ const TherapistProfilePage = () => {
   };
 
   const handleClearChats = async (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (unreadChatCount === 0 || isClearingChats) return;
 
     setIsClearingChats(true);
@@ -231,6 +238,7 @@ const TherapistProfilePage = () => {
       setIsClearingChats(false);
     }
   };
+  */
 
   const handleToggleGhostMode = async () => {
     setIsTogglingGhost(true);
@@ -272,7 +280,7 @@ const TherapistProfilePage = () => {
   if (error || !profile) return <div className="text-center text-red-500 mt-10">{error ? t('app.therapist.profile.loadError') : t('app.therapist.profile.noProfile')}</div>;
 
   const age = profile.BirthDate ? Math.floor((Date.now() - profile.BirthDate * 1000) / 31557600000) : 'k.A.';
-  const unreadChatLine = t('app.therapist.notifications.unreadCount', { count: unreadChatCount });
+  // const unreadChatLine = t('app.therapist.notifications.unreadCount', { count: unreadChatCount });
 
   return (
     <div className="w-full max-w-8xl mx-auto px-4 py-8 animate-fade-in">
@@ -407,70 +415,77 @@ const TherapistProfilePage = () => {
         </div>
       </div>
 
-      {/* --- NOTIFICATIONS SECTION --- */}
-      <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-        <Bell className="w-5 h-5 text-primary" />
-        {t('app.therapist.notifications.title', 'Neuigkeiten & Benachrichtigungen')}
-      </h2>
+      {/*
+        --- NOTIFICATIONS SECTION (fully disabled) ---
+        Not used on this page anymore. Everything it depended on (state,
+        effects, handlers, the websocket subscription, and the related
+        imports/interface above) is commented out too, so this page doesn't
+        fetch notifications, read/mark anything, or otherwise touch the
+        notification mechanism at all while disabled. Un-comment this block
+        and restore the code above verbatim to bring it back.
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Messages Notification Card */}
-        <div onClick={() => navigate('../')} className="feelora-card relative flex items-center gap-4 transition-shadow text-left cursor-pointer hover:shadow-md hover:border-primary/30">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-            <Send className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-foreground">{t('app.therapist.notifications.messages', 'Chat Nachrichten')}</h3>
-            <p className={`text-sm ${unreadChatCount > 0 ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>{unreadChatLine}</p>
-          </div>
-          {unreadChatCount > 0 ? (
-            <button onClick={handleClearChats} disabled={isClearingChats} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
-              {isClearingChats ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-5 h-5 text-green-500" />}
-            </button>
-          ) : <ChevronRight className="w-5 h-5 text-muted-foreground" />}
-        </div>
+        <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+          <Bell className="w-5 h-5 text-primary" />
+          {t('app.therapist.notifications.title', 'Neuigkeiten & Benachrichtigungen')}
+        </h2>
 
-        {/* General Notifications List with Correct Translation Hooks! */}
-        <div className="flex flex-col gap-3">
-          {generalNotifs.length === 0 ? (
-            <div className="feelora-card flex items-center justify-center h-full min-h-[5rem] text-muted-foreground text-sm">
-              {t('app.therapist.notifications.noNew', 'Keine neuen Benachrichtigungen')}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div onClick={() => navigate('../')} className="feelora-card relative flex items-center gap-4 transition-shadow text-left cursor-pointer hover:shadow-md hover:border-primary/30">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+              <Send className="w-5 h-5" />
             </div>
-          ) : (
-            generalNotifs.map((notif, index) => {
-              const isMatch = notif.type === 'new_match';
-              const sender = notif.senderName;
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground">{t('app.therapist.notifications.messages', 'Chat Nachrichten')}</h3>
+              <p className={`text-sm ${unreadChatCount > 0 ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>{unreadChatLine}</p>
+            </div>
+            {unreadChatCount > 0 ? (
+              <button onClick={handleClearChats} disabled={isClearingChats} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+                {isClearingChats ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-5 h-5 text-green-500" />}
+              </button>
+            ) : <ChevronRight className="w-5 h-5 text-muted-foreground" />}
+          </div>
 
-              let notificationText = '';
-              if (isMatch) {
-                notificationText = sender
-                  ? t('app.therapist.notifications.newMatch_named', { name: sender, defaultValue: '{{name}} wurde dir zugewiesen!' })
-                  : t('app.therapist.notifications.newMatch_generic', 'Ein Patient wurde dir zugewiesen!');
-              } else {
-                notificationText = sender
-                  ? t('app.therapist.notifications.unmatch_named', { name: sender, defaultValue: '{{name}} hat dich entmatcht.' })
-                  : t('app.therapist.notifications.unmatch_generic', 'Ein Patient hat dich entmatcht.');
-              }
+          <div className="flex flex-col gap-3">
+            {generalNotifs.length === 0 ? (
+              <div className="feelora-card flex items-center justify-center h-full min-h-[5rem] text-muted-foreground text-sm">
+                {t('app.therapist.notifications.noNew', 'Keine neuen Benachrichtigungen')}
+              </div>
+            ) : (
+              generalNotifs.map((notif, index) => {
+                const isMatch = notif.type === 'new_match';
+                const sender = notif.senderName;
 
-              return (
-                <div key={notif.sk || index} className="feelora-card p-3 sm:p-4 flex items-center gap-4 transition-all hover:border-primary/30">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isMatch ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                    {isMatch ? <UserCheck className="w-5 h-5" /> : <UserMinus className="w-5 h-5" />}
+                let notificationText = '';
+                if (isMatch) {
+                  notificationText = sender
+                    ? t('app.therapist.notifications.newMatch_named', { name: sender, defaultValue: '{{name}} wurde dir zugewiesen!' })
+                    : t('app.therapist.notifications.newMatch_generic', 'Ein Patient wurde dir zugewiesen!');
+                } else {
+                  notificationText = sender
+                    ? t('app.therapist.notifications.unmatch_named', { name: sender, defaultValue: '{{name}} hat dich entmatcht.' })
+                    : t('app.therapist.notifications.unmatch_generic', 'Ein Patient hat dich entmatcht.');
+                }
+
+                return (
+                  <div key={notif.sk || index} className="feelora-card p-3 sm:p-4 flex items-center gap-4 transition-all hover:border-primary/30">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isMatch ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                      {isMatch ? <UserCheck className="w-5 h-5" /> : <UserMinus className="w-5 h-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">
+                        {notificationText}
+                      </p>
+                    </div>
+                    <button onClick={() => handleDismissGeneral(notif)} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+                      <Check className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {notificationText}
-                    </p>
-                  </div>
-                  <button onClick={() => handleDismissGeneral(notif)} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
-                    <Check className="w-4 h-4" />
-                  </button>
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
         </div>
-      </div>
+      */}
     </div>
   );
 };
