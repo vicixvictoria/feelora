@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, Send, X, Loader2, Users, Check } from 'lucide-react';
+import { ChevronRight, Send, X, Loader2, Users, Check, UserMinus, AlertTriangle } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
+import { notificationService } from '../../notifications/api/notification-service';
 
 interface MatchedPatient {
   Id: string;
@@ -57,69 +58,102 @@ interface PatientProfileModalProps {
   patient: MatchedPatient;
   onClose: () => void;
   onMessage: (patient: MatchedPatient) => void;
+  onUnmatch: (patient: MatchedPatient) => void;
   t: ReturnType<typeof useTranslation>['t'];
 }
 
-const PatientProfileModal = ({ patient, onClose, onMessage, t }: PatientProfileModalProps) => {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in"
-      onClick={onClose}
-    >
-      <div
-        className="bg-background rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+const PatientProfileModal = ({ patient, onClose, onMessage, onUnmatch, t }: PatientProfileModalProps) => {
+  const age = calcAge(patient.BirthDate);
+  const languages = patient.Languages && patient.Languages.length > 0 ? patient.Languages.join(', ') : '';
 
-        <div className="flex items-center gap-4 mb-6">
-          <S3Avatar
-            userId={patient.Id}
-            fallbackSrc={avatar}
-            className="w-20 h-20 rounded-xl object-cover"
-            alt={`${patient.Name} ${patient.Surname}`}
-          />
-          <div>
-            <h2 className="text-xl font-bold text-primary">
-              {patient.Name} {patient.Surname}
-            </h2>
-            <p className="text-sm text-muted-foreground">{patient.City || '—'}</p>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border chat-bubble-received">
+          <h3 className="text-lg font-semibold text-foreground">
+            {t('app.therapist.chat.patientProfile', 'Patientenprofil')}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-md text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 space-y-6">
+          {/* Avatar & Name */}
+          <div className="flex items-center gap-4">
+            <S3Avatar
+              userId={patient.Id}
+              fallbackSrc={avatar}
+              className="w-16 h-16 rounded-full object-cover border border-border"
+              alt={`${patient.Name} ${patient.Surname}`}
+            />
+            <div>
+              <h4 className="text-xl font-bold text-foreground">
+                {patient.Name} {patient.Surname}
+              </h4>
+              <p className="text-muted-foreground">
+                {age !== '—' ? `${age} ${t('app.therapist.profile.years', 'Jahre')}` : t('app.therapist.profile.ageUnknown', 'Alter unbekannt')}
+              </p>
+              {languages && <p className="text-muted-foreground"> {languages}</p>}
+            </div>
+          </div>
+
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                {t('app.therapist.profile.firstName', 'Vorname')}
+              </p>
+              <p className="font-medium text-foreground">{patient.Name || '-'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                {t('app.therapist.profile.lastName', 'Nachname')}
+              </p>
+              <p className="font-medium text-foreground">{patient.Surname || '-'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                {t('app.therapist.profile.gender', 'Geschlecht')}
+              </p>
+              <p className="font-medium text-foreground capitalize">
+                {translateGender(patient.Gender, t)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                {t('app.therapist.profile.city', 'Stadt')}
+              </p>
+              <p className="font-medium text-foreground capitalize">
+                {patient.City || '-'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            className="feelora-btn-primary w-full flex items-center justify-center gap-2"
+            onClick={() => onMessage(patient)}
+          >
+            <Send className="w-4 h-4" />
+            {t('app.therapist.patients.message', 'Nachricht')}
+          </button>
+
+          {/* UNMATCH BUTTON */}
+          <div className="pt-4 border-t border-border mt-4">
+            <button
+              onClick={() => onUnmatch(patient)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-destructive bg-destructive/10 hover:bg-destructive/20 rounded-xl transition-colors font-medium"
+            >
+              <UserMinus className="w-4 h-4" />
+              {t('app.therapist.chat.unmatchButton', 'Patienten entfernen')}
+            </button>
           </div>
         </div>
-
-        <div className="space-y-2 text-sm text-foreground mb-6">
-          <p>
-            <span className="font-semibold">{t('app.therapist.patients.age')} </span>
-            {calcAge(patient.BirthDate)}
-          </p>
-          <p>
-            <span className="font-semibold">{t('app.therapist.patients.city')} </span>
-            {patient.City || '—'}
-          </p>
-          <p>
-            <span className="font-semibold">{t('app.therapist.profile.gender', 'Geschlecht:')} </span>
-            {translateGender(patient.Gender, t)}
-          </p>
-          {patient.Languages && patient.Languages.length > 0 && (
-            <p>
-              <span className="font-semibold">{t('app.therapist.profile.languages', 'Sprachen:')} </span>
-              {patient.Languages.join(', ')}
-            </p>
-          )}
-        </div>
-
-        <button
-          className="feelora-btn-primary w-full flex items-center justify-center gap-2"
-          onClick={() => onMessage(patient)}
-        >
-          <Send className="w-4 h-4" />
-          {t('app.therapist.patients.message', 'Nachricht')}
-        </button>
       </div>
     </div>
   );
@@ -133,7 +167,11 @@ const PatientsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPatient, setSelectedPatient] = useState<MatchedPatient | null>(null);
   const [startingSession, setStartingSession] = useState<string | null>(null);
+  const [unreadMatchIds, setUnreadMatchIds] = useState<Set<string>>(new Set());
+  const [isConfirmUnmatchOpen, setIsConfirmUnmatchOpen] = useState(false);
+  const [isUnmatching, setIsUnmatching] = useState(false);
 
+  // Fetch patients on component mount
   useEffect(() => {
     const fetchPatients = async () => {
       setIsLoading(true);
@@ -150,6 +188,26 @@ const PatientsPage = () => {
         const fetched = await therapistService.getMatchedPatients(ids);
         setPatients(fetched.filter((p: MatchedPatient) => p.sessionStarted));
         setNewPatients(fetched.filter((p: MatchedPatient) => !p.sessionStarted));
+
+        // Figure out which patients have an unread "new match" notification —
+        // these get the "new" tag for this visit, then are marked as read below
+        // so the tag is gone on the next visit (even though the patient stays
+        // in the "new patients" section until the therapist starts a session).
+        const { notifications } = await notificationService.getNotifications({ notificationType: 'new_match' });
+        const unreadIds = notifications
+          .map((n) => n.matchedId)
+          .filter((id): id is string => Boolean(id));
+
+        if (unreadIds.length > 0) {
+          setUnreadMatchIds(new Set(unreadIds));
+          Promise.all(
+            unreadIds.map((matchedId) =>
+              notificationService.readNotification({ notificationType: 'new_match', notificationId: matchedId })
+            )
+          )
+            .then(() => window.dispatchEvent(new Event('notificationsRead')))
+            .catch((err) => console.error('Error marking new match notifications as read:', err));
+        }
       } catch (err) {
         console.error('Error loading patients:', err);
       } finally {
@@ -167,6 +225,25 @@ const PatientsPage = () => {
   const handleMessage = (patient: MatchedPatient) => {
     setSelectedPatient(null);
     navigate('../', { state: { openChatWith: patient.Id } });
+  };
+
+  // --- UNMATCH HANDLER ---
+  // Opens the confirmation modal for unmatching a patient
+  const handleConfirmUnmatch = async () => {
+    if (!selectedPatient) return;
+    setIsUnmatching(true);
+    try {
+      await therapistService.deleteMatch(selectedPatient.Id);
+      setPatients((prev) => prev.filter((p) => p.Id !== selectedPatient.Id));
+      setNewPatients((prev) => prev.filter((p) => p.Id !== selectedPatient.Id));
+      setSelectedPatient(null);
+      setIsConfirmUnmatchOpen(false);
+    } catch (err) {
+      console.error('Unmatch failed', err);
+      alert(t('app.therapist.chat.unmatchError', 'Fehler beim Auflösen der Verbindung. Bitte versuche es erneut.'));
+    } finally {
+      setIsUnmatching(false);
+    }
   };
 
   const handleStartSession = async (patient: MatchedPatient) => {
@@ -253,9 +330,11 @@ const PatientsPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {newPatients.map((patient) => (
                 <div key={patient.Id} className="feelora-card relative">
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full z-20">
-                    new
-                  </span>
+                  {unreadMatchIds.has(patient.Id) && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full z-20">
+                      {t('app.therapist.patients.newTag', 'New')}
+                    </span>
+                  )}
 
                   <div className="flex gap-4 mb-4">
                     <S3Avatar
@@ -322,8 +401,42 @@ const PatientsPage = () => {
           patient={selectedPatient}
           onClose={() => setSelectedPatient(null)}
           onMessage={handleMessage}
+          onUnmatch={() => setIsConfirmUnmatchOpen(true)}
           t={t}
         />
+      )}
+
+      {/* --- CONFIRM UNMATCH OVERLAY --- */}
+      {isConfirmUnmatchOpen && selectedPatient && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-sm rounded-2xl border border-destructive/20 shadow-xl p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              {t('app.therapist.chat.unmatchConfirmTitle', 'Patienten entfernen?')}
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              {t('app.therapist.chat.unmatchConfirmText', 'Bist du sicher, dass du die Verbindung zu diesem Patienten trennen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden und der gesamte Chatverlauf wird gelöscht.')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsConfirmUnmatchOpen(false)}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-muted text-foreground hover:bg-muted/80 rounded-xl transition-colors font-medium disabled:opacity-50"
+              >
+                {t('common.cancel', 'Abbrechen')}
+              </button>
+              <button
+                onClick={handleConfirmUnmatch}
+                disabled={isUnmatching}
+                className="flex-1 px-4 py-2 bg-destructive text-white hover:bg-destructive/90 rounded-xl transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isUnmatching ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.unmatch', 'Entfernen')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

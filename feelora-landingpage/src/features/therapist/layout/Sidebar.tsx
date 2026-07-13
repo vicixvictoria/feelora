@@ -42,7 +42,7 @@ const menuItems = [
     descKey: 'app.therapist.sidebar.patientsDesc',
     icon: Users2,
     path: '/therapist/patients',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     titleKey: 'app.therapist.sidebar.homework',
@@ -67,7 +67,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
   
   // Notification States
   const [chatNotifCount, setChatNotifCount] = useState(0);
-  const [profileNotifCount, setProfileNotifCount] = useState(0);
+  const [patientsNotifCount, setPatientsNotifCount] = useState(0);
   const processedMessageCountRef = useRef(0);
 
   // --- Fetch Initial Notifications & Listen for Read Events ---
@@ -76,15 +76,15 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
       try {
         const { notifications } = await notificationService.getNotifications();
         let chatCount = 0;
-        let profCount = 0;
+        let patientsCount = 0;
 
         notifications.forEach((n) => {
           if (n.type === 'new_message') chatCount += n.count || 1;
-          else if (n.type === 'new_match' || n.type === 'new_unmatch') profCount += 1;
+          else if (n.type === 'new_match' || n.type === 'new_unmatch') patientsCount += 1;
         });
 
         setChatNotifCount(chatCount);
-        setProfileNotifCount(profCount);
+        setPatientsNotifCount(patientsCount);
       } catch (err) {
         console.error('Sidebar failed to fetch notifications:', err);
       }
@@ -92,7 +92,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
 
     fetchNotifications();
 
-    // Custom Event Listener: Refetch when Chat or Profile marks items as read
+    // Custom Event Listener: Refetch when Chat or Patients marks items as read
     const handleNotificationsRead = () => {
       fetchNotifications();
     };
@@ -111,7 +111,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     processedMessageCountRef.current = websocketMessages.length;
 
     let newChats = 0;
-    let newProfs = 0;
+    let newPatientsNotifs = 0;
 
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
@@ -119,7 +119,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
         if (parsed.data.type === 'new_message') {
           newChats += 1;
         } else if (parsed.data.type === 'new_match' || parsed.data.type === 'new_unmatch') {
-          newProfs += 1;
+          newPatientsNotifs += 1;
         }
       }
     }
@@ -128,15 +128,15 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     if (newChats > 0 && location.pathname !== '/therapist/') {
       setChatNotifCount((prev) => prev + newChats);
     }
-    if (newProfs > 0 && location.pathname !== '/therapist/profile') {
-      setProfileNotifCount((prev) => prev + newProfs);
+    if (newPatientsNotifs > 0 && location.pathname !== '/therapist/patients') {
+      setPatientsNotifCount((prev) => prev + newPatientsNotifs);
     }
   }, [websocketMessages, location.pathname]);
 
   // Helper to get the correct badge count for the current menu item
   const getBadgeCount = (path: string) => {
     if (path === '/therapist/') return chatNotifCount;
-    if (path === '/therapist/profile') return profileNotifCount;
+    if (path === '/therapist/patients') return patientsNotifCount;
     return 0;
   };
 
