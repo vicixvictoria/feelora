@@ -34,6 +34,7 @@ import AuthCallback from './features/auth/AuthCallback';
 import PatientAppLayout from './features/patient/layout/AppLayout';
 import PatientDashboard from './features/patient/pages/Dashboard';
 import CalendarPage from './features/patient/pages/CalendarPage';
+import BookAppointmentPage from './features/patient/pages/BookAppointmentPage';
 import ProfilePage from './features/patient/pages/ProfilePage';
 import ChatPage from './features/patient/pages/ChatPage';
 import MoodTrackerPage from './features/patient/pages/MoodTrackerPage';
@@ -54,6 +55,7 @@ import TherapistProfilePage from './features/therapist/pages/TherapistProfilePag
 import TherapistHomeworkPage from './features/therapist/pages/TherapistHomeworkPage';
 import TherapistPatientsPage from './features/therapist/pages/TherapistPatientsPage';
 import TherapistCalendarPage from './features/therapist/pages/TherapistCalendarPage';
+import ManageAvailabilityPage from './features/therapist/pages/ManageAvailabilityPage';
 import TherapistAccountPage from './features/therapist/pages/TherapistAccountPage';
 import TherapistMoodTrackerDetailsPage from './features/therapist/pages/TherapistMoodTrackerDetailsPage';
 import TherapistEditProfilePage from './features/therapist/pages/TherapistEditProfilePage';
@@ -157,6 +159,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <ChatPage /> },
               { path: 'calendar', element: <CalendarPage /> },
+              { path: 'calendar/book', element: <BookAppointmentPage /> },
               { path: 'profile', element: <ProfilePage /> },
               { path: 'dashboard', element: <PatientDashboard /> },
               { path: 'mood-tracker', element: <MoodTrackerPage /> },
@@ -184,6 +187,7 @@ const router = createBrowserRouter([
               { path: 'homework', element: <TherapistHomeworkPage /> },
               { path: 'patients', element: <TherapistPatientsPage /> },
               { path: 'calendar', element: <TherapistCalendarPage /> },
+              { path: 'calendar/manage', element: <ManageAvailabilityPage /> },
               { path: 'account', element: <TherapistAccountPage /> },
               { path: 'mood-tracker/details', element: <TherapistMoodTrackerDetailsPage /> },
               { path: 'profile/edit', element: <TherapistEditProfilePage /> },

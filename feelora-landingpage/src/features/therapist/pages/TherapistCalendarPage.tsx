@@ -1,229 +1,277 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Phone, RefreshCw, Plus } from 'lucide-react';
-import { addWeeks, subWeeks, startOfWeek, addDays, format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
+import {
+  addDays,
+  addWeeks,
+  format,
+  isToday,
+  parseISO,
+  startOfWeek,
+  subWeeks,
+} from 'date-fns';
 import { de } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, Loader2, Settings2 } from 'lucide-react';
+import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import MonthCalendar from '@/features/calendar/components/MonthCalendar';
+import AppointmentTypeBadge from '@/features/calendar/components/AppointmentTypeBadge';
+import AppointmentInfoDialog from '@/features/calendar/components/AppointmentInfoDialog';
+import CancelAppointmentDialog from '@/features/calendar/components/CancelAppointmentDialog';
+import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
+import { Appointment } from '@/features/calendar/types/appointment';
 
-interface Appointment {
-  day: number; // 0=Mon, 1=Tue, etc.
-  startSlot: number; // index into timeSlots
-  span: number; // how many slots wide
-  title: string;
-  color: 'teal' | 'yellow' | 'peach';
-}
+const DATE_FORMAT = 'yyyy-MM-dd';
 
-const timeSlots = [
-  '08:00',
-  '08:15',
-  '08:30',
-  '08:45',
-  '09:00',
-  '09:15',
-  '09:30',
-  '09:45',
-  '10:00',
-  '10:15',
-  '10:30',
-  '10:45',
-  '11:00',
-  '11:15',
-];
-
-const appointments: Appointment[] = [
-  {
-    day: 0,
-    startSlot: 1,
-    span: 7,
-    title: 'Online Therapie Nina',
-    color: 'teal',
-  },
-  {
-    day: 1,
-    startSlot: 3,
-    span: 7,
-    title: 'Online Therapie Tom',
-    color: 'teal',
-  },
-  { day: 3, startSlot: 6, span: 7, title: 'Erstgespräch Mel', color: 'yellow' },
-  {
-    day: 3,
-    startSlot: 11,
-    span: 7,
-    title: 'Online Therapie Jon',
-    color: 'teal',
-  },
-  {
-    day: 4,
-    startSlot: 1,
-    span: 7,
-    title: 'Online Therapie Nina',
-    color: 'teal',
-  },
-  {
-    day: 4,
-    startSlot: 8,
-    span: 7,
-    title: 'Vor Ort Therapie Tom',
-    color: 'peach',
-  },
-];
-
-const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sst', 'Sun'];
-
-const colorMap = {
-  teal: 'bg-primary/15 border-primary/30',
-  yellow: 'bg-yellow-100 border-yellow-300',
-  peach: 'bg-orange-100 border-orange-300',
+// Used by the monthly view's day-detail list. The weekly view renders its
+// own, more compact appointment blocks directly in the grid below instead
+// (see the `compact` props on AppointmentInfoDialog/CancelAppointmentDialog),
+// since a day cell in the grid is much tighter on space than this list.
+const AppointmentCard = ({
+  appointment,
+  onSaveDetails,
+  onCancel,
+}: {
+  appointment: Appointment;
+  onSaveDetails: (details: { meetingLink?: string; location?: string }) => Promise<void>;
+  onCancel: () => Promise<void>;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="feelora-card">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p className="font-semibold text-foreground">{appointment.patientName}</p>
+          <p className="text-sm text-muted-foreground mb-2">
+            {appointment.startTime} – {appointment.endTime}
+          </p>
+          <AppointmentTypeBadge type={appointment.type} />
+        </div>
+        <div className="flex items-center gap-2">
+          <AppointmentInfoDialog appointment={appointment} editable onSave={onSaveDetails} />
+          <CancelAppointmentDialog
+            warningMessage={t('app.therapist.calendar.cancelWarning')}
+            onConfirm={onCancel}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const TherapistCalendarPage = () => {
   const { t } = useTranslation();
-  const [showOverlay, setShowOverlay] = useState(true);
+  const navigate = useNavigate();
+
+  const [view, setView] = useState<'weekly' | 'monthly'>('weekly');
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handlePrevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
-  const handleNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+  const { data: therapistData, loading: therapistLoading } = useQuery(
+    GET_OWN_THERAPIST_PROFILE_QUERY,
+  );
+  const therapist = therapistData?.getOwnTherapistProfile;
+  const therapistName = therapist ? `${therapist.Name} ${therapist.Surname}` : '';
 
+  const refreshAppointments = async (therapistId: string) => {
+    setIsLoading(true);
+    try {
+      setAppointments(await mockCalendarService.getAppointmentsForTherapist(therapistId));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Seed a demo appointment with a placeholder patient so the calendar isn't
+  // empty even if no real patient has been through the booking flow yet in
+  // this browser session (appointment data is in-memory only, see
+  // mockCalendarService.ts).
+  useEffect(() => {
+    if (!therapist?.Id) return;
+    mockCalendarService.ensureDemoData(therapist.Id, therapistName, 'demo-patient-preview', 'Nina Muster');
+    refreshAppointments(therapist.Id);
+  }, [therapist?.Id, therapistName]);
+
+  const handleSaveDetails = async (
+    appointmentId: string,
+    details: { meetingLink?: string; location?: string },
+  ) => {
+    await mockCalendarService.updateAppointmentDetails(appointmentId, details);
+    if (therapist?.Id) await refreshAppointments(therapist.Id);
+  };
+
+  const handleCancel = async (appointmentId: string) => {
+    await mockCalendarService.cancelAppointment(appointmentId);
+    if (therapist?.Id) await refreshAppointments(therapist.Id);
+  };
+
+  const weekDays = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i)),
+    [currentWeekStart],
+  );
   const weekEnd = addDays(currentWeekStart, 6);
-  const weekLabel = `${format(currentWeekStart, 'd')}.- ${format(weekEnd, 'd')}. ${format(weekEnd, 'MMMM yyyy', { locale: de })}`;
+  const weekLabel = `${format(currentWeekStart, 'd')}.–${format(weekEnd, 'd')}. ${format(weekEnd, 'MMMM yyyy', { locale: de })}`;
 
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
+  const appointmentDates = useMemo(() => appointments.map((a) => parseISO(a.date)), [appointments]);
+  const selectedDateKey = format(selectedDate, DATE_FORMAT);
+  const appointmentsForSelectedDate = appointments.filter((a) => a.date === selectedDateKey);
+
+  if (therapistLoading || !therapist) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto animate-fade-in relative">
-      {/* Coming Soon Overlay */}
-      {showOverlay && (
-        <div className="absolute inset-0 z-20 bg-background/80 backdrop-blur-sm rounded-2xl">
-          <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-[25vh] px-6 text-center">
-            <div className="flex flex-col items-center gap-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {t('app.therapist.calendar.comingSoon')}
-              </span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
-                {t('app.therapist.calendar.comingSoonTitle')}
-              </p>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
-                {t('app.therapist.calendar.comingSoonDesc')}
-              </p>
-              <button
-                onClick={() => setShowOverlay(false)}
-                className="mt-2 feelora-btn-outline"
-              >
-                {t('app.therapist.calendar.revealPreview')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handlePrevWeek}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5 text-muted-foreground" />
-          </button>
-          <h1 className="text-2xl font-bold text-foreground">{weekLabel}</h1>
-          <button
-            onClick={handleNextWeek}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </button>
-        </div>
-        <button className="feelora-btn-primary">
-          {t('app.therapist.calendar.new')}
-          <Plus className="w-4 h-4" />
+    <div className="max-w-6xl mx-auto animate-fade-in">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <Tabs value={view} onValueChange={(v) => setView(v as 'weekly' | 'monthly')}>
+          <TabsList>
+            <TabsTrigger value="weekly">{t('app.therapist.calendar.weekly')}</TabsTrigger>
+            <TabsTrigger value="monthly">{t('app.therapist.calendar.monthly')}</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <button onClick={() => navigate('manage')} className="feelora-btn-outline">
+          {t('app.therapist.calendar.manageAvailability')}
+          <Settings2 className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Weekly Grid */}
-      <div className="feelora-card overflow-x-auto">
-        {/* Time header */}
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: `100px repeat(${timeSlots.length}, minmax(70px, 1fr))`,
-          }}
-        >
-          <div />
-          {timeSlots.map((time) => (
-            <div
-              key={time}
-              className="text-xs text-muted-foreground text-center py-2 border-b border-border"
+      {view === 'weekly' ? (
+        <>
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              onClick={() => setCurrentWeekStart(subWeeks(currentWeekStart, 1))}
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
             >
-              {time}
+              <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+            </button>
+            <h1 className="text-xl font-bold text-foreground">{weekLabel}</h1>
+            <button
+              onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
-          ))}
-        </div>
+          ) : (
+            // Agenda-style grid: 7 day columns, each stacking that day's
+            // appointment cards vertically (rather than a proportional
+            // time-axis layout), so it stays readable at any session length.
+            <div className="feelora-card overflow-x-auto">
+              <div className="grid grid-cols-7 divide-x divide-border min-w-[840px]">
+                {weekDays.map((date) => {
+                  const dateKey = format(date, DATE_FORMAT);
+                  const dayAppointments = appointments
+                    .filter((a) => a.date === dateKey)
+                    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+                  const isCurrentDay = isToday(date);
 
-        {/* Day rows */}
-        {weekDays.map((date, dayIndex) => {
-          const dayAppointments = appointments.filter((a) => a.day === dayIndex);
-          return (
-            <div
-              key={dayIndex}
-              className="grid border-b border-border last:border-0"
-              style={{
-                gridTemplateColumns: `100px repeat(${timeSlots.length}, minmax(70px, 1fr))`,
-              }}
-            >
-              {/* Day label */}
-              <div className="flex flex-col items-center justify-center py-4 border-r border-border">
-                <span className="text-sm font-medium text-muted-foreground">
-                  {dayLabels[dayIndex]}
-                </span>
-                <span className="text-lg font-bold text-foreground">
-                  {format(date, 'dd')}.{format(date, 'MMM', { locale: de })}
-                </span>
-              </div>
-
-              {/* Time cells with appointments */}
-              <div
-                className="relative col-span-full"
-                style={{
-                  gridColumn: `2 / -1`,
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${timeSlots.length}, minmax(70px, 1fr))`,
-                  minHeight: '80px',
-                }}
-              >
-                {/* Grid lines */}
-                {timeSlots.map((_, i) => (
-                  <div key={i} className="border-r border-border/50" />
-                ))}
-
-                {/* Appointments */}
-                {dayAppointments.map((apt, aptIndex) => (
-                  <div
-                    key={aptIndex}
-                    className={`absolute top-2 bottom-2 rounded-xl border px-3 py-2 flex flex-col justify-center ${colorMap[apt.color]}`}
-                    style={{
-                      gridColumn: `${apt.startSlot + 1} / span ${apt.span}`,
-                      left: `${(apt.startSlot / timeSlots.length) * 100}%`,
-                      width: `${(apt.span / timeSlots.length) * 100}%`,
-                    }}
-                  >
-                    <p className="text-sm font-semibold text-foreground truncate">{apt.title}</p>
-                    <div className="flex gap-2 mt-1">
-                      <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        {t('app.therapist.calendar.startCall')} <Phone className="w-3 h-3" />
-                      </button>
-                      <button className="inline-flex items-center gap-1 text-xs font-medium text-primary border border-primary/30 rounded-full px-2 py-0.5 bg-background/80">
-                        {t('app.therapist.calendar.reschedule')} <RefreshCw className="w-3 h-3" />
-                      </button>
+                  return (
+                    <div key={dateKey} className="flex flex-col">
+                      <div
+                        className={`text-center py-3 border-b border-border ${isCurrentDay ? 'bg-primary/5' : ''}`}
+                      >
+                        <p className="text-xs font-medium text-muted-foreground">
+                          {format(date, 'EEE', { locale: de })}
+                        </p>
+                        <p
+                          className={`text-lg font-bold mx-auto mt-0.5 flex items-center justify-center ${
+                            isCurrentDay
+                              ? 'w-8 h-8 rounded-full bg-primary text-primary-foreground'
+                              : 'text-foreground'
+                          }`}
+                        >
+                          {format(date, 'd')}
+                        </p>
+                      </div>
+                      <div className="flex-1 p-2 space-y-2 min-h-[220px]">
+                        {dayAppointments.length === 0 ? (
+                          <p className="text-xs text-muted-foreground text-center mt-4">—</p>
+                        ) : (
+                          dayAppointments.map((appointment) => (
+                            <div
+                              key={appointment.id}
+                              className="rounded-lg border border-primary/30 bg-primary/10 px-2 py-2"
+                            >
+                              <p className="text-xs font-semibold text-foreground truncate">
+                                {appointment.startTime}
+                              </p>
+                              <p className="text-xs text-foreground truncate mb-1.5">
+                                {appointment.patientName}
+                              </p>
+                              <div className="flex flex-col gap-1">
+                                <AppointmentInfoDialog
+                                  appointment={appointment}
+                                  editable
+                                  compact
+                                  onSave={(details) => handleSaveDetails(appointment.id, details)}
+                                />
+                                <CancelAppointmentDialog
+                                  warningMessage={t('app.therapist.calendar.cancelWarning')}
+                                  onConfirm={() => handleCancel(appointment.id)}
+                                  compact
+                                />
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className="lg:flex-[3]">
+            <MonthCalendar
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              appointmentDates={appointmentDates}
+            />
+          </div>
+          <div className="lg:flex-[2]">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              {format(selectedDate, 'd. MMMM yyyy', { locale: de })}
+            </h2>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : appointmentsForSelectedDate.length > 0 ? (
+              <div className="space-y-3">
+                {appointmentsForSelectedDate.map((appointment) => (
+                  <AppointmentCard
+                    key={appointment.id}
+                    appointment={appointment}
+                    onSaveDetails={(details) => handleSaveDetails(appointment.id, details)}
+                    onCancel={() => handleCancel(appointment.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="feelora-card text-center text-muted-foreground py-8">
+                {t('app.therapist.calendar.noAppointmentsThisDay')}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

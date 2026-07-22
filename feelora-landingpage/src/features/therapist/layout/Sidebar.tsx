@@ -56,7 +56,7 @@ const menuItems = [
     descKey: 'app.therapist.sidebar.calendarDesc',
     icon: Calendar,
     path: '/therapist/calendar',
-    comingSoon: true,
+    comingSoon: false,
   },
 ];
 

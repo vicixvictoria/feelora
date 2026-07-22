@@ -49,7 +49,7 @@ const menuItems = [
     descKey: 'patient.sidebar.calendarDesc',
     icon: Calendar,
     path: '/patient/calendar',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     titleKey: 'patient.sidebar.homework',

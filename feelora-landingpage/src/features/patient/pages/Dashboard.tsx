@@ -5,8 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { patientService } from '../api/patient-service';
-import { notificationService } from '../../notifications/api/notification-service'; 
+import { notificationService } from '../../notifications/api/notification-service';
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
+import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
+import { Appointment } from '@/features/calendar/types/appointment';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface IncomingNotification {
   type?: string;
@@ -55,6 +59,9 @@ const Dashboard = () => {
   // State for dynamically loaded mood trackers
   const [moodDiary, setMoodDiary] = useState<any[]>([]);
   const [isLoadingMoods, setIsLoadingMoods] = useState(true);
+
+  // State for the upcoming appointments teaser
+  const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
 
   // State for the mood tracker consent toggle
   const [isShared, setIsShared] = useState(false);
@@ -106,6 +113,26 @@ const Dashboard = () => {
         });
         setMoodDiary(formattedTrackers);
 
+        // Calendar teaser card: only relevant once the patient has a
+        // matched therapist. Mirrors the same seed-then-fetch pattern used
+        // on CalendarPage.tsx so the teaser and the full calendar agree.
+        if (profile.Matches && profile.Matches.length > 0) {
+          const [therapist] = await patientService.getMatchedTherapists(profile.Matches);
+          if (therapist) {
+            const therapistName = `${therapist.Name} ${therapist.Surname}`;
+            mockCalendarService.ensureDemoData(
+              therapist.Id,
+              therapistName,
+              profile.Id,
+              `${profile.Name} ${profile.Surname}`,
+            );
+            const todayKey = format(new Date(), 'yyyy-MM-dd');
+            const patientAppointments = await mockCalendarService.getAppointmentsForPatient(profile.Id);
+            setUpcomingAppointments(
+              patientAppointments.filter((a) => a.date >= todayKey).slice(0, 2),
+            );
+          }
+        }
       } catch (error) {
         console.error('Failed to load dashboard data', error);
       } finally {
@@ -235,12 +262,20 @@ const Dashboard = () => {
       icon: Calendar,
       iconColor: 'text-purple',
       title: t('patient.dashboard.calendar'),
-      isGreyedOut: true,
-      onClick: undefined,
+      isGreyedOut: false,
+      onClick: () => navigate('/patient/calendar'),
       content: (
         <div className="text-sm text-muted-foreground mt-1 space-y-1">
-          <p>{t('patient.dashboard.upcomingAppointments')}</p>
-          <p>{t('patient.dashboard.appointmentRequest')}</p>
+          {upcomingAppointments.length > 0 ? (
+            upcomingAppointments.map((appointment) => (
+              <p key={appointment.id}>
+                {format(new Date(appointment.date), 'd. MMM', { locale: de })} ·{' '}
+                {appointment.startTime} {t('patient.dashboard.withTherapist', { name: appointment.therapistName })}
+              </p>
+            ))
+          ) : (
+            <p>{t('patient.dashboard.noUpcomingAppointments')}</p>
+          )}
         </div>
       ),
     },
