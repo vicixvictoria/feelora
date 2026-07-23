@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
-import { addDays, addMinutes, format, parse, startOfWeek } from 'date-fns';
+import { addDays, addMinutes, format, getDay, parse, startOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { ChevronLeft, Loader2, Plus, X } from 'lucide-react';
+import { Ban, ChevronLeft, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service';
 import {
@@ -16,9 +16,12 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import MonthCalendar from '@/features/calendar/components/MonthCalendar';
 import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
 import { TimeSlot } from '@/features/calendar/types/appointment';
+import { BlockedDate } from '@/features/calendar/types/blockedDate';
 
+const DATE_FORMAT = 'yyyy-MM-dd';
 const SESSION_LENGTH_OPTIONS = [15, 30, 45, 50, 60];
 // Displayed Monday-first (matching the weekly calendar view) even though the
 // underlying day numbers follow the schema's 0=Sunday..6=Saturday convention.
@@ -35,11 +38,13 @@ const ManageAvailabilityPage = () => {
   );
   const therapist = therapistData?.getOwnTherapistProfile;
 
-  // Working days repeat every week (no per-date exceptions). Working hours
-  // are only the outer "HH:mm-HH:mm" timeframe a slot may fall within — the
-  // therapist places each bookable slot (slotsByDay) individually, and gets
-  // a break simply by leaving a gap before the next one.
-  const [workingDays, setWorkingDays] = useState<number[]>([]);
+  // Every weekday always has a working-hours entry — an empty array simply
+  // means the therapist doesn't work that day, rather than the day being
+  // absent from a separate list. The same template repeats every week (no
+  // per-date exceptions yet). Working hours are only the outer
+  // "HH:mm-HH:mm" timeframe a slot may fall within — the therapist places
+  // each bookable slot (slotsByDay) individually, and gets a break simply
+  // by leaving a gap before the next one.
   const [workingHoursByDay, setWorkingHoursByDay] = useState<Record<number, string[]>>({});
   const [slotsByDay, setSlotsByDay] = useState<Record<number, TimeSlot[]>>({});
   const [slotLengthMinutes, setSlotLengthMinutes] = useState(50);
@@ -49,14 +54,24 @@ const ManageAvailabilityPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
+  // One-off exceptions layered on top of the recurring template above —
+  // not backed by a real endpoint yet (see mockCalendarService.ts), but
+  // fully wired through the mock so the flow works end to end.
+  const [blockDate, setBlockDate] = useState<Date>(() => addDays(new Date(), 1));
+  const [blockedDateInfo, setBlockedDateInfo] = useState<BlockedDate>({
+    date: '',
+    fullDay: false,
+    blockedStartTimes: [],
+  });
+  const [blockedDatesForCalendar, setBlockedDatesForCalendar] = useState<Date[]>([]);
+
   useEffect(() => {
     if (!therapist?.Id) return;
     setIsLoading(true);
     mockCalendarService
       .getTherapistSettings(therapist.Id)
       .then((settings) => {
-        setWorkingDays(settings.workingDays);
-        setWorkingHoursByDay(settings.workingHoursByDay as Record<number, string[]>);
+        setWorkingHoursByDay(settings.workingHoursByDay);
         setSlotsByDay(settings.slotsByDay as Record<number, TimeSlot[]>);
         setSlotLengthMinutes(settings.slotLengthMinutes);
         setBreakBetweenSessionsMinutes(settings.breakBetweenSessionsMinutes);
@@ -66,18 +81,70 @@ const ManageAvailabilityPage = () => {
       .finally(() => setIsLoading(false));
   }, [therapist?.Id]);
 
-  // Toggling a day on gives it one default working-hours range so it's
-  // never saved empty; toggling off keeps its ranges/slots around in case
-  // the therapist re-enables it.
-  const toggleWorkingDay = (day: number) => {
-    setWorkingDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
-    setWorkingHoursByDay((prev) =>
-      prev[day]?.length ? prev : { ...prev, [day]: ['09:00-17:00'] },
+  const refreshBlockedDatesForCalendar = async (therapistId: string) => {
+    const dates = await mockCalendarService.getAllBlockedDates(therapistId);
+    setBlockedDatesForCalendar(dates.map((d) => parse(d, DATE_FORMAT, new Date())));
+  };
+
+  // Loads whichever date is currently selected in the small block-picker
+  // calendar below, and (once, per therapist) the full list of blocked
+  // dates so the calendar can show a dot on each of them.
+  useEffect(() => {
+    if (!therapist?.Id) return;
+    const dateKey = format(blockDate, DATE_FORMAT);
+    mockCalendarService.getBlockedDate(therapist.Id, dateKey).then(setBlockedDateInfo);
+  }, [therapist?.Id, blockDate]);
+
+  useEffect(() => {
+    if (!therapist?.Id) return;
+    refreshBlockedDatesForCalendar(therapist.Id);
+  }, [therapist?.Id]);
+
+  const handleToggleFullDayBlock = async () => {
+    if (!therapist?.Id) return;
+    const dateKey = format(blockDate, DATE_FORMAT);
+    const nextValue = !blockedDateInfo.fullDay;
+    await mockCalendarService.setFullDayBlocked(therapist.Id, dateKey, nextValue);
+    setBlockedDateInfo((prev) => ({ ...prev, date: dateKey, fullDay: nextValue }));
+    await refreshBlockedDatesForCalendar(therapist.Id);
+    toast.success(
+      nextValue
+        ? t('app.therapist.calendar.manage.dayBlocked')
+        : t('app.therapist.calendar.manage.dayUnblocked'),
     );
   };
 
+  const handleToggleSlotBlock = async (startTime: string) => {
+    if (!therapist?.Id) return;
+    const dateKey = format(blockDate, DATE_FORMAT);
+    const isCurrentlyBlocked = blockedDateInfo.blockedStartTimes.includes(startTime);
+    await mockCalendarService.setSlotBlocked(therapist.Id, dateKey, startTime, !isCurrentlyBlocked);
+    setBlockedDateInfo((prev) => ({
+      ...prev,
+      date: dateKey,
+      blockedStartTimes: isCurrentlyBlocked
+        ? prev.blockedStartTimes.filter((time) => time !== startTime)
+        : [...prev.blockedStartTimes, startTime],
+    }));
+    await refreshBlockedDatesForCalendar(therapist.Id);
+  };
+
+  // A day counts as "worked" exactly when its hours array is non-empty —
+  // there's no separate on/off list. Toggling on fills it with a default
+  // range; toggling off clears it to [], keeping any slots around
+  // (hidden, since the day is no longer shown) in case it's re-enabled.
+  const isWorkingDay = (day: number) => (workingHoursByDay[day]?.length ?? 0) > 0;
+
+  const toggleWorkingDay = (day: number) => {
+    setWorkingHoursByDay((prev) => ({
+      ...prev,
+      [day]: prev[day]?.length ? [] : ['09:00-17:00'],
+    }));
+  };
+
+  // Appends a new working-hours range starting right after the previous
+  // one's end (or 09:00 if the day has none yet) — just a starting point,
+  // both times are freely editable via the inputs below.
   const handleAddRange = (day: number) => {
     setWorkingHoursByDay((prev) => {
       const existing = prev[day] ?? [];
@@ -97,6 +164,9 @@ const ManageAvailabilityPage = () => {
     });
   };
 
+  // Working-hours ranges are stored as a single "HH:mm-HH:mm" string (to
+  // match the backend's format), so editing either time input means
+  // splitting it apart, replacing the edited half, and rejoining it.
   const handleRangeChange = (day: number, index: number, part: 'start' | 'end', value: string) => {
     setWorkingHoursByDay((prev) => {
       const existing = prev[day] ?? [];
@@ -123,10 +193,14 @@ const ManageAvailabilityPage = () => {
     });
   };
 
+  // Unlike working-hours ranges, a day is allowed to end up with zero
+  // slots (e.g. mid-setup) — nothing forces at least one to remain.
   const handleRemoveSlot = (day: number, index: number) => {
     setSlotsByDay((prev) => ({ ...prev, [day]: (prev[day] ?? []).filter((_, i) => i !== index) }));
   };
 
+  // Slots are stored as {startTime, endTime} objects rather than a joined
+  // string, since they're the same TimeSlot shape used by the booking flow.
   const handleSlotChange = (day: number, index: number, field: 'startTime' | 'endTime', value: string) => {
     setSlotsByDay((prev) => ({
       ...prev,
@@ -134,12 +208,16 @@ const ManageAvailabilityPage = () => {
     }));
   };
 
+  // Drives both the "select at least one working day" empty state below
+  // and whether Save is allowed — a day only counts once its hours array
+  // is non-empty (see isWorkingDay above).
+  const hasAnyWorkingDay = Object.values(workingHoursByDay).some((hours) => hours.length > 0);
+
   const handleSave = async () => {
-    if (!therapist?.Id || workingDays.length === 0) return;
+    if (!therapist?.Id || !hasAnyWorkingDay) return;
     setIsSaving(true);
     try {
       await mockCalendarService.saveTherapistSettings(therapist.Id, {
-        workingDays,
         workingHoursByDay,
         slotsByDay,
         slotLengthMinutes,
@@ -190,9 +268,7 @@ const ManageAvailabilityPage = () => {
                 <button
                   key={day}
                   onClick={() => toggleWorkingDay(day)}
-                  className={
-                    workingDays.includes(day) ? 'feelora-btn-primary text-sm' : 'feelora-btn-outline text-sm'
-                  }
+                  className={isWorkingDay(day) ? 'feelora-btn-primary text-sm' : 'feelora-btn-outline text-sm'}
                 >
                   {weekdayLabel(day)}
                 </button>
@@ -250,13 +326,13 @@ const ManageAvailabilityPage = () => {
             <label className="text-sm font-medium text-foreground mb-2 block">
               {t('app.therapist.calendar.manage.workingHours')}
             </label>
-            {workingDays.length === 0 ? (
+            {!hasAnyWorkingDay ? (
               <p className="text-sm text-muted-foreground">
                 {t('app.therapist.calendar.manage.selectWorkingDay')}
               </p>
             ) : (
               <div className="space-y-4">
-                {DISPLAY_ORDER.filter((day) => workingDays.includes(day)).map((day) => (
+                {DISPLAY_ORDER.filter(isWorkingDay).map((day) => (
                   <div key={day} className="feelora-card">
                     <p className="font-semibold text-foreground mb-3">{weekdayLabel(day)}</p>
 
@@ -358,6 +434,94 @@ const ManageAvailabilityPage = () => {
 
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">
+              {t('app.therapist.calendar.manage.blockTitle')}
+            </label>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t('app.therapist.calendar.manage.blockHint')}
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+              <div className="md:flex-1 max-w-sm">
+                <MonthCalendar
+                  selected={blockDate}
+                  onSelect={(date) => date && setBlockDate(date)}
+                  blockedDates={blockedDatesForCalendar}
+                  disablePastDates
+                />
+              </div>
+
+              <div className="md:flex-1">
+                <p className="font-medium text-foreground mb-3">
+                  {format(blockDate, 'EEEE, d. MMMM', { locale: de })}
+                </p>
+
+                <button
+                  onClick={handleToggleFullDayBlock}
+                  className={
+                    blockedDateInfo.fullDay
+                      ? 'feelora-btn-primary w-full justify-center mb-4'
+                      : 'w-full inline-flex items-center justify-center gap-2 rounded-full border border-destructive/40 text-destructive px-4 py-2 font-medium hover:bg-destructive/10 transition-colors mb-4'
+                  }
+                >
+                  <Ban className="w-4 h-4" />
+                  {blockedDateInfo.fullDay
+                    ? t('app.therapist.calendar.manage.unblockDay')
+                    : t('app.therapist.calendar.manage.blockDay')}
+                </button>
+
+                {blockedDateInfo.fullDay ? (
+                  <p className="text-sm text-muted-foreground text-center">
+                    {t('app.therapist.calendar.manage.dayFullyBlocked')}
+                  </p>
+                ) : (slotsByDay[getDay(blockDate)] ?? []).length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    {t('app.therapist.calendar.manage.noSlotsThisDay')}
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {[...(slotsByDay[getDay(blockDate)] ?? [])]
+                      .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                      .map((slot) => {
+                        const isBlocked = blockedDateInfo.blockedStartTimes.includes(slot.startTime);
+                        return (
+                          <div
+                            key={slot.startTime}
+                            className={`flex items-center justify-between px-3 py-2 rounded-xl border ${
+                              isBlocked ? 'border-destructive/30 bg-destructive/5' : 'border-border'
+                            }`}
+                          >
+                            <span
+                              className={
+                                isBlocked
+                                  ? 'text-sm text-muted-foreground line-through'
+                                  : 'text-sm text-foreground'
+                              }
+                            >
+                              {slot.startTime} – {slot.endTime}
+                            </span>
+                            <button
+                              onClick={() => handleToggleSlotBlock(slot.startTime)}
+                              className={
+                                isBlocked
+                                  ? 'text-xs font-medium text-primary hover:underline'
+                                  : 'text-xs font-medium text-destructive hover:underline'
+                              }
+                            >
+                              {isBlocked
+                                ? t('app.therapist.calendar.manage.unblockSlot')
+                                : t('app.therapist.calendar.manage.blockSlot')}
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">
               {t('app.therapist.calendar.manage.cancellationPolicy')}
             </label>
             <Textarea
@@ -370,7 +534,7 @@ const ManageAvailabilityPage = () => {
 
           <button
             onClick={handleSave}
-            disabled={isSaving || workingDays.length === 0}
+            disabled={isSaving || !hasAnyWorkingDay}
             className="feelora-btn-primary w-full justify-center disabled:opacity-50"
           >
             {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}

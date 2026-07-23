@@ -10,21 +10,24 @@
 //
 // Availability is modelled as a recurring weekly template (TherapistSettings)
 // rather than per-date overrides, matching the direction of the backend's
-// schema.graphql: a therapist picks working days once and they repeat every
-// week. Working hours only define the outer timeframe a slot may fall
-// within — the actual bookable slots (slotsByDay) are placed one at a time
-// by the therapist, and a break is simply the gap they leave before the
-// next block. Nothing here auto-slices a range into slots at runtime.
+// schema.graphql: every weekday always has a working-hours entry (empty
+// array = not a working day), repeated identically every week. Working
+// hours only define the outer timeframe a slot may fall within — the
+// actual bookable slots (slotsByDay) are placed one at a time by the
+// therapist, and a break is simply the gap they leave before the next
+// block. Nothing here auto-slices a range into slots at runtime.
 import { addDays, addMinutes, format, getDay, parse } from 'date-fns';
 import { Appointment, BookAppointmentInput, TimeSlot } from '../types/appointment';
 import { TherapistSettings } from '../types/settings';
+import { BlockedDate } from '../types/blockedDate';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
 const DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm';
 const NETWORK_DELAY_MS = 250;
 
+// Excludes workingHoursByDay/slotsByDay since those are per-therapist
+// (built fresh in seedTherapistSettings) rather than one shared constant.
 const DEFAULT_SETTINGS: Omit<TherapistSettings, 'workingHoursByDay' | 'slotsByDay'> = {
-  workingDays: [1, 2, 3, 4, 5], // Mon–Fri
   slotLengthMinutes: 50,
   breakBetweenSessionsMinutes: 10,
   minimalNoticeHours: 24,
@@ -33,6 +36,10 @@ const DEFAULT_SETTINGS: Omit<TherapistSettings, 'workingHoursByDay' | 'slotsByDa
 
 const appointments: Appointment[] = [];
 const settingsByTherapist = new Map<string, TherapistSettings>();
+// One-off exceptions to the recurring template, keyed by therapistId then
+// date — see BlockedDate. There is no backend endpoint for this yet; it
+// exists here so the "block a session/day" UI has something to call.
+const blockedDatesByTherapist = new Map<string, Map<string, BlockedDate>>();
 // Track which therapists/patient-therapist pairs have already been seeded
 // with demo data, so re-visiting a page doesn't keep appending duplicates.
 const seededTherapistIds = new Set<string>();
@@ -63,6 +70,11 @@ const generateStarterSlots = (
   return slots;
 };
 
+// Defaults to "nothing blocked" for a date that has no entry yet, so
+// callers never have to null-check.
+const getBlockedDateEntry = (therapistId: string, date: string): BlockedDate =>
+  blockedDatesByTherapist.get(therapistId)?.get(date) ?? { date, fullDay: false, blockedStartTimes: [] };
+
 // True if `slot` falls fully inside at least one "HH:mm-HH:mm" range — this
 // is what makes "working hours" a real constraint rather than decorative:
 // a manually-placed slot outside every working-hours window is never
@@ -77,21 +89,24 @@ const isWithinAnyRange = (slot: TimeSlot, ranges: string[]): boolean => {
 };
 
 // First time a given therapist is seen, set up a default Mon–Fri
-// 09:00–17:00 template — plus starter slots generated from it — so the UI
-// (booking slots, monthly dots, weekly grid) has something to show before
-// the therapist has configured anything themselves via
-// ManageAvailabilityPage. Real therapists overwrite this via
-// saveTherapistSettings once they place their own slots.
+// 09:00–17:00 template (weekend days present but empty) — plus starter
+// slots generated from it — so the UI (booking slots, monthly dots, weekly
+// grid) has something to show before the therapist has configured
+// anything themselves via ManageAvailabilityPage. Real therapists
+// overwrite this via saveTherapistSettings once they place their own slots.
 const seedTherapistSettings = (therapistId: string) => {
   if (seededTherapistIds.has(therapistId)) return;
   seededTherapistIds.add(therapistId);
 
-  const workingHoursByDay = {
+  // 0=Sunday .. 6=Saturday — every day is always present, weekends start empty.
+  const workingHoursByDay: Record<number, string[]> = {
+    0: [],
     1: ['09:00-17:00'],
     2: ['09:00-17:00'],
     3: ['09:00-17:00'],
     4: ['09:00-17:00'],
     5: ['09:00-17:00'],
+    6: [],
   };
   const slotsByDay: Record<number, TimeSlot[]> = {};
   Object.entries(workingHoursByDay).forEach(([day, ranges]) => {
@@ -129,6 +144,8 @@ const seedDemoAppointment = (
   const settings = settingsByTherapist.get(therapistId)!;
   const targetDate = addDays(new Date(), 2);
   const slots = settings.slotsByDay[getDay(targetDate)] ?? [];
+  // Prefer the second starter slot over the first, just so the very next
+  // available slot isn't immediately taken by the demo booking.
   const slot = slots[1] ?? slots[0];
   if (!slot) return;
 
@@ -176,20 +193,24 @@ export const mockCalendarService = {
   },
 
   // Returns the therapist's manually-placed slots for `date` — filtered to
-  // that weekday being a working day, falling inside working hours,
-  // excluding anything already booked, and excluding anything starting
-  // sooner than minimalNoticeHours from now. This is what
-  // BookAppointmentPage lists as choosable times.
+  // falling inside that weekday's working hours (an empty array means it's
+  // not a working day at all), excluding anything the therapist has
+  // blocked for this specific date, excluding anything already booked, and
+  // excluding anything starting sooner than minimalNoticeHours from now.
+  // This is what BookAppointmentPage lists as choosable times.
   async getAvailableSlots(therapistId: string, date: string): Promise<TimeSlot[]> {
     await delay();
     seedTherapistSettings(therapistId);
     const settings = settingsByTherapist.get(therapistId)!;
     const weekday = getDay(parse(date, DATE_FORMAT, new Date()));
-    if (!settings.workingDays.includes(weekday)) return [];
-
     const boundaryRanges = settings.workingHoursByDay[weekday] ?? [];
-    const daySlots = (settings.slotsByDay[weekday] ?? []).filter((slot) =>
-      isWithinAnyRange(slot, boundaryRanges),
+    if (boundaryRanges.length === 0) return [];
+
+    const blocked = getBlockedDateEntry(therapistId, date);
+    if (blocked.fullDay) return [];
+
+    const daySlots = (settings.slotsByDay[weekday] ?? []).filter(
+      (slot) => isWithinAnyRange(slot, boundaryRanges) && !blocked.blockedStartTimes.includes(slot.startTime),
     );
 
     const earliestBookable = addMinutes(new Date(), settings.minimalNoticeHours * 60);
@@ -242,5 +263,45 @@ export const mockCalendarService = {
   async saveTherapistSettings(therapistId: string, settings: TherapistSettings): Promise<void> {
     await delay();
     settingsByTherapist.set(therapistId, settings);
+  },
+
+  // --- Blocked dates: ahead of the backend, no real endpoint exists yet ---
+
+  async getBlockedDate(therapistId: string, date: string): Promise<BlockedDate> {
+    await delay();
+    return getBlockedDateEntry(therapistId, date);
+  },
+
+  async setFullDayBlocked(therapistId: string, date: string, blocked: boolean): Promise<void> {
+    await delay();
+    const therapistBlocks = blockedDatesByTherapist.get(therapistId) ?? new Map<string, BlockedDate>();
+    const existing = getBlockedDateEntry(therapistId, date);
+    therapistBlocks.set(date, { ...existing, date, fullDay: blocked });
+    blockedDatesByTherapist.set(therapistId, therapistBlocks);
+  },
+
+  // Toggles a single slot's blocked state for one date, independent of the
+  // full-day flag (a slot can be individually blocked without blocking the
+  // whole day).
+  async setSlotBlocked(therapistId: string, date: string, startTime: string, blocked: boolean): Promise<void> {
+    await delay();
+    const therapistBlocks = blockedDatesByTherapist.get(therapistId) ?? new Map<string, BlockedDate>();
+    const existing = getBlockedDateEntry(therapistId, date);
+    const blockedStartTimes = blocked
+      ? Array.from(new Set([...existing.blockedStartTimes, startTime]))
+      : existing.blockedStartTimes.filter((t) => t !== startTime);
+    therapistBlocks.set(date, { ...existing, date, blockedStartTimes });
+    blockedDatesByTherapist.set(therapistId, therapistBlocks);
+  },
+
+  // Every date with any block at all (full-day or specific slots) — used
+  // to draw a dot on the block-picker's small calendar.
+  async getAllBlockedDates(therapistId: string): Promise<string[]> {
+    await delay();
+    const therapistBlocks = blockedDatesByTherapist.get(therapistId);
+    if (!therapistBlocks) return [];
+    return Array.from(therapistBlocks.values())
+      .filter((b) => b.fullDay || b.blockedStartTimes.length > 0)
+      .map((b) => b.date);
   },
 };
