@@ -2,16 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
-import { format, parseISO } from 'date-fns';
+import { endOfMonth, format, parseISO, startOfMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarPlus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
 import MonthCalendar from '@/features/calendar/components/MonthCalendar';
-import AppointmentTypeBadge from '@/features/calendar/components/AppointmentTypeBadge';
 import AppointmentInfoDialog from '@/features/calendar/components/AppointmentInfoDialog';
 import CancelAppointmentDialog from '@/features/calendar/components/CancelAppointmentDialog';
-import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
-import { Appointment } from '@/features/calendar/types/appointment';
+import { sessionService } from '@/features/calendar/api/session-service';
+import { Session } from '@/features/calendar/types/session';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
 
@@ -20,17 +20,18 @@ const CalendarPage = () => {
   const navigate = useNavigate();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  // Tracked separately from selectedDate because getOwnSessions requires an
+  // explicit [StartingDate, EndDate] range (no "get everything" option) —
+  // this is what drives that range, controlling MonthCalendar so we always
+  // know which month is actually visible.
+  const [displayMonth, setDisplayMonth] = useState<Date>(new Date());
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  // The therapist's own cancellation-policy text, shown instead of a generic
-  // message when the patient goes to cancel. Falls back to that generic
-  // copy until it's loaded.
-  const [cancellationPolicy, setCancellationPolicy] = useState<string | null>(null);
 
   // Patient profile and matched therapist come from the real backend
-  // (same query pattern as ProfilePage) — only the appointment data itself
-  // is mocked. This is also what enforces "only book with your matched
-  // therapist": the booking page simply never has any other therapist to show.
+  // (same query pattern as ProfilePage). This is also what enforces "only
+  // book with your matched therapist": the booking page simply never has
+  // any other therapist to show.
   const { data: patientData, loading: patientLoading } = useQuery(GET_OWN_USER_PROFILE_QUERY);
   const patient = patientData?.getOwnUserProfile;
 
@@ -41,37 +42,47 @@ const CalendarPage = () => {
   const therapist = therapistData?.getMatchedTherapists?.items?.[0];
   const therapistName = therapist ? `${therapist.Name} ${therapist.Surname}` : '';
 
-  useEffect(() => {
-    if (!patient?.Id || !therapist?.Id) {
-      setIsLoading(false);
-      return;
-    }
-
+  const refreshSessions = async () => {
+    if (!patient?.Id) return;
     setIsLoading(true);
-    // Seed demo data once per patient/therapist pair, then load whatever's
-    // actually stored for this patient (their own bookings + the demo one).
-    mockCalendarService.ensureDemoData(therapist.Id, therapistName, patient.Id, `${patient.Name} ${patient.Surname}`);
-    mockCalendarService
-      .getAppointmentsForPatient(patient.Id)
-      .then(setAppointments)
-      .finally(() => setIsLoading(false));
-    mockCalendarService.getTherapistSettings(therapist.Id).then((settings) => {
-      setCancellationPolicy(settings.cancellationPolicy);
-    });
-  }, [patient?.Id, patient?.Name, patient?.Surname, therapist?.Id, therapistName]);
+    try {
+      setSessions(
+        await sessionService.getSessions(
+          'CONFIRMED',
+          format(startOfMonth(displayMonth), DATE_FORMAT),
+          format(endOfMonth(displayMonth), DATE_FORMAT),
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to load sessions:', error);
+      toast.error(t('patient.calendar.loadError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // getOwnSessions requires a mandatory date range — re-fetch whenever the
+  // patient navigates to a different month in the calendar below.
+  useEffect(() => {
+    refreshSessions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patient?.Id, displayMonth]);
 
   const appointmentDates = useMemo(
-    () => appointments.map((a) => parseISO(a.date)),
-    [appointments],
+    () => sessions.map((s) => parseISO(s.date)),
+    [sessions],
   );
 
   const selectedDateKey = format(selectedDate, DATE_FORMAT);
-  const appointmentsForSelectedDate = appointments.filter((a) => a.date === selectedDateKey);
+  const sessionsForSelectedDate = sessions.filter((s) => s.date === selectedDateKey);
 
-  const handleCancel = async (appointmentId: string) => {
-    await mockCalendarService.cancelAppointment(appointmentId);
-    if (patient?.Id) {
-      setAppointments(await mockCalendarService.getAppointmentsForPatient(patient.Id));
+  const handleCancel = async (bookingId: string) => {
+    try {
+      await sessionService.cancelSession(bookingId);
+      await refreshSessions();
+    } catch (error) {
+      console.error('Failed to cancel session:', error);
+      toast.error(t('patient.calendar.actionError'));
     }
   };
 
@@ -93,6 +104,8 @@ const CalendarPage = () => {
             selected={selectedDate}
             onSelect={(date) => date && setSelectedDate(date)}
             appointmentDates={appointmentDates}
+            month={displayMonth}
+            onMonthChange={setDisplayMonth}
           />
         </div>
 
@@ -105,25 +118,32 @@ const CalendarPage = () => {
             <div className="feelora-card flex justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
-          ) : appointmentsForSelectedDate.length > 0 ? (
+          ) : sessionsForSelectedDate.length > 0 ? (
             <div className="space-y-3 mb-6">
-              {appointmentsForSelectedDate.map((appointment) => (
-                <div key={appointment.id} className="feelora-card">
+              {sessionsForSelectedDate.map((session) => (
+                <div key={session.bookingId} className="feelora-card">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
                       <p className="font-semibold text-foreground">
-                        {t('patient.calendar.sessionWith', { name: appointment.therapistName })}
+                        {t('patient.calendar.sessionWith', { name: therapistName })}
                       </p>
                       <p className="text-sm text-muted-foreground mb-2">
-                        {appointment.startTime} – {appointment.endTime}
+                        {session.startTime} – {session.endTime}
                       </p>
-                      <AppointmentTypeBadge type={appointment.type} />
                     </div>
                     <div className="flex items-center gap-2">
-                      <AppointmentInfoDialog appointment={appointment} />
+                      <AppointmentInfoDialog session={session} counterpartName={therapistName} />
                       <CancelAppointmentDialog
-                        warningMessage={cancellationPolicy ?? t('patient.calendar.cancelWarning')}
-                        onConfirm={() => handleCancel(appointment.id)}
+                        // Each session carries a snapshot of the therapist's
+                        // cancellation policy from when it was booked (not a
+                        // live fetch of their current settings), so this
+                        // stays accurate even if the therapist edits their
+                        // policy afterwards. Purely informational — the
+                        // cancellation itself is never blocked by it.
+                        warningMessage={
+                          session.cancellationPolicy?.cancellationPolicy ?? t('patient.calendar.cancelWarning')
+                        }
+                        onConfirm={() => handleCancel(session.bookingId)}
                       />
                     </div>
                   </div>

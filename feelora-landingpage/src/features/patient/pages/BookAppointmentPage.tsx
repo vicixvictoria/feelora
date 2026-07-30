@@ -8,19 +8,21 @@ import { Check, ChevronLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
 import MonthCalendar from '@/features/calendar/components/MonthCalendar';
-import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
-import { AppointmentType, TimeSlot } from '@/features/calendar/types/appointment';
+import { sessionService } from '@/features/calendar/api/session-service';
+import { TimeSlot } from '@/features/calendar/types/session';
+
+// There used to be an online/in-person/phone selector here, but the backend
+// Session type has no field to store it on (only a single free-text
+// `address`, filled in later by the therapist) — see AppointmentInfoDialog.
+// Booking is now just "pick a slot".
 
 const DATE_FORMAT = 'yyyy-MM-dd';
-const appointmentTypes: AppointmentType[] = ['online', 'in_person', 'phone'];
-const typeKey = (type: AppointmentType) => (type === 'in_person' ? 'inPerson' : type);
 
 const BookAppointmentPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedType, setSelectedType] = useState<AppointmentType>('online');
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(true);
@@ -43,30 +45,34 @@ const BookAppointmentPage = () => {
     if (!therapist?.Id) return;
     setIsLoadingSlots(true);
     setSelectedSlot(null);
-    mockCalendarService
+    sessionService
       .getAvailableSlots(therapist.Id, format(selectedDate, DATE_FORMAT))
       .then(setSlots)
+      .catch((error) => {
+        console.error('Failed to load available slots:', error);
+        toast.error(t('patient.calendar.loadError'));
+        setSlots([]);
+      })
       .finally(() => setIsLoadingSlots(false));
-  }, [therapist?.Id, selectedDate]);
+  }, [therapist?.Id, selectedDate, t]);
 
   // Books immediately — there's no therapist-side confirmation step in this
-  // flow. Once booked it's just an appointment the patient can cancel later.
+  // flow. Once booked it's just a session the patient can cancel later.
   const handleBook = async () => {
     if (!patient?.Id || !therapist?.Id || !selectedSlot) return;
     setIsBooking(true);
     try {
-      await mockCalendarService.bookAppointment({
-        patientId: patient.Id,
-        patientName: `${patient.Name} ${patient.Surname}`,
+      await sessionService.createSession({
         therapistId: therapist.Id,
-        therapistName,
         date: format(selectedDate, DATE_FORMAT),
         startTime: selectedSlot.startTime,
         endTime: selectedSlot.endTime,
-        type: selectedType,
       });
       toast.success(t('patient.calendar.bookingConfirmed'));
       navigate('/patient/calendar');
+    } catch (error) {
+      console.error('Failed to book session:', error);
+      toast.error(t('patient.calendar.bookingError'));
     } finally {
       setIsBooking(false);
     }
@@ -101,23 +107,6 @@ const BookAppointmentPage = () => {
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('patient.calendar.bookAppointmentWith', { name: therapistName })}
       </h1>
-
-      <div className="mb-6">
-        <p className="text-sm font-medium text-foreground mb-2">{t('calendar.type.label')}</p>
-        <div className="flex gap-2">
-          {appointmentTypes.map((type) => (
-            <button
-              key={type}
-              onClick={() => setSelectedType(type)}
-              className={
-                selectedType === type ? 'feelora-btn-primary text-sm' : 'feelora-btn-outline text-sm'
-              }
-            >
-              {t(`calendar.type.${typeKey(type)}`)}
-            </button>
-          ))}
-        </div>
-      </div>
 
       <div className="flex flex-col md:flex-row gap-6 md:gap-8">
         <div className="flex-1 max-w-md">

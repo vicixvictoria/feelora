@@ -7,9 +7,9 @@ import { useWebsocket } from '@/contexts/WebsocketContext';
 import { patientService } from '../api/patient-service';
 import { notificationService } from '../../notifications/api/notification-service';
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
-import { mockCalendarService } from '@/features/calendar/api/mockCalendarService';
-import { Appointment } from '@/features/calendar/types/appointment';
-import { format } from 'date-fns';
+import { sessionService } from '@/features/calendar/api/session-service';
+import { Session } from '@/features/calendar/types/session';
+import { addDays, format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 interface IncomingNotification {
@@ -61,7 +61,8 @@ const Dashboard = () => {
   const [isLoadingMoods, setIsLoadingMoods] = useState(true);
 
   // State for the upcoming appointments teaser
-  const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
+  const [upcomingTherapistName, setUpcomingTherapistName] = useState('');
 
   // State for the mood tracker consent toggle
   const [isShared, setIsShared] = useState(false);
@@ -114,23 +115,19 @@ const Dashboard = () => {
         setMoodDiary(formattedTrackers);
 
         // Calendar teaser card: only relevant once the patient has a
-        // matched therapist. Mirrors the same seed-then-fetch pattern used
-        // on CalendarPage.tsx so the teaser and the full calendar agree.
+        // matched therapist. getOwnSessions has no "everything upcoming"
+        // option — it requires an explicit date range — so this just uses
+        // a 30-day window from today, which is plenty for a "next 2" teaser.
         if (profile.Matches && profile.Matches.length > 0) {
           const [therapist] = await patientService.getMatchedTherapists(profile.Matches);
           if (therapist) {
-            const therapistName = `${therapist.Name} ${therapist.Surname}`;
-            mockCalendarService.ensureDemoData(
-              therapist.Id,
-              therapistName,
-              profile.Id,
-              `${profile.Name} ${profile.Surname}`,
-            );
+            // Session only carries therapistEmail, not a name, so it's kept
+            // here from the profile fetch instead.
+            setUpcomingTherapistName(`${therapist.Name} ${therapist.Surname}`);
             const todayKey = format(new Date(), 'yyyy-MM-dd');
-            const patientAppointments = await mockCalendarService.getAppointmentsForPatient(profile.Id);
-            setUpcomingAppointments(
-              patientAppointments.filter((a) => a.date >= todayKey).slice(0, 2),
-            );
+            const rangeEndKey = format(addDays(new Date(), 30), 'yyyy-MM-dd');
+            const upcoming = await sessionService.getSessions('CONFIRMED', todayKey, rangeEndKey);
+            setUpcomingSessions(upcoming.sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`)).slice(0, 2));
           }
         }
       } catch (error) {
@@ -266,11 +263,11 @@ const Dashboard = () => {
       onClick: () => navigate('/patient/calendar'),
       content: (
         <div className="text-sm text-muted-foreground mt-1 space-y-1">
-          {upcomingAppointments.length > 0 ? (
-            upcomingAppointments.map((appointment) => (
-              <p key={appointment.id}>
-                {format(new Date(appointment.date), 'd. MMM', { locale: de })} ·{' '}
-                {appointment.startTime} {t('patient.dashboard.withTherapist', { name: appointment.therapistName })}
+          {upcomingSessions.length > 0 ? (
+            upcomingSessions.map((session) => (
+              <p key={session.bookingId}>
+                {format(new Date(session.date), 'd. MMM', { locale: de })} ·{' '}
+                {session.startTime} {t('patient.dashboard.withTherapist', { name: upcomingTherapistName })}
               </p>
             ))
           ) : (

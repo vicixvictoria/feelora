@@ -1,8 +1,8 @@
-// Shows (or, for therapists, edits) the "how to join/find this appointment"
-// detail — a meeting link, a phone number, or an address, depending on
-// appointment.type. This replaces a "start call" button since there's no
-// video integration yet: the therapist provides a link/number/address here
-// and the patient just opens it.
+// Shows (or, for therapists, edits) the "how to join/find this session"
+// detail — the backend only has a single free-text `address` field for
+// this (no separate meeting-link/phone/location fields, no session
+// "type"), so a URL is detected and rendered as a link while anything else
+// is shown as plain text (phone number or physical address).
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Info, Loader2 } from 'lucide-react';
@@ -16,48 +16,43 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Appointment } from '../types/appointment';
+import { Session } from '../types/session';
+
+const isUrl = (value: string): boolean => /^https?:\/\//i.test(value.trim());
 
 interface AppointmentInfoDialogProps {
-  appointment: Appointment;
-  // Therapist views pass editable=true to let them fill in/change the link
-  // or address. Patient views omit it and just see a read-only value.
+  session: Session;
+  // The name of the other party in this session (the therapist for a
+  // patient view, the patient for a therapist view) — the backend only
+  // returns emails on Session, so callers resolve a display name themselves
+  // from profile data they already have and pass it in.
+  counterpartName: string;
+  // Therapist views pass editable=true to let them fill in/change the
+  // address. Patient views omit it and just see a read-only value.
   editable?: boolean;
   // Renders a smaller, full-width trigger button for tight spaces like the
   // therapist's weekly grid cells, instead of the normal pill button.
   compact?: boolean;
-  onSave?: (details: { meetingLink?: string; location?: string }) => Promise<void>;
+  onSave?: (address: string) => Promise<void>;
 }
 
 const AppointmentInfoDialog = ({
-  appointment,
+  session,
+  counterpartName,
   editable = false,
   compact = false,
   onSave,
 }: AppointmentInfoDialogProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [meetingLink, setMeetingLink] = useState(appointment.meetingLink ?? '');
-  const [location, setLocation] = useState(appointment.location ?? '');
+  const [address, setAddress] = useState(session.address ?? '');
   const [isSaving, setIsSaving] = useState(false);
-
-  const fieldLabel =
-    appointment.type === 'online'
-      ? t('calendar.info.meetingLinkLabel')
-      : appointment.type === 'phone'
-        ? t('calendar.info.phoneNumberLabel')
-        : t('calendar.info.locationLabel');
-
-  const value = appointment.type === 'online' ? meetingLink : location;
-  const setValue = appointment.type === 'online' ? setMeetingLink : setLocation;
 
   const handleSave = async () => {
     if (!onSave) return;
     setIsSaving(true);
     try {
-      await onSave(
-        appointment.type === 'online' ? { meetingLink } : { location },
-      );
+      await onSave(address);
       setOpen(false);
     } finally {
       setIsSaving(false);
@@ -81,37 +76,37 @@ const AppointmentInfoDialog = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{appointment.patientName || appointment.therapistName}</DialogTitle>
+          <DialogTitle>{counterpartName}</DialogTitle>
           <DialogDescription>
-            {appointment.date} · {appointment.startTime}–{appointment.endTime}
+            {session.date} · {session.startTime}–{session.endTime}
           </DialogDescription>
         </DialogHeader>
 
         {editable ? (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{fieldLabel}</label>
+            <label className="text-sm font-medium text-foreground">{t('calendar.info.addressLabel')}</label>
             <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={fieldLabel}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder={t('calendar.info.addressLabel')}
             />
           </div>
         ) : (
           <div className="space-y-1">
-            <p className="text-sm font-medium text-foreground">{fieldLabel}</p>
-            {value ? (
-              appointment.type === 'online' ? (
+            <p className="text-sm font-medium text-foreground">{t('calendar.info.addressLabel')}</p>
+            {address ? (
+              isUrl(address) ? (
                 <a
-                  href={value}
+                  href={address}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-primary hover:underline break-all"
                 >
-                  {value}
+                  {address}
                   <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                 </a>
               ) : (
-                <p className="text-foreground">{value}</p>
+                <p className="text-foreground">{address}</p>
               )
             ) : (
               <p className="text-muted-foreground">{t('calendar.info.noneProvided')}</p>
