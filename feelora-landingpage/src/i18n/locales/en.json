@@ -771,7 +771,7 @@
   "app.therapist.calendar.manage.cancellationPolicyPlaceholder": "Describe your cancellation policy for patients...",
   "app.therapist.calendar.manage.workingHoursHint": "The outer timeframe a slot may be scheduled within.",
   "app.therapist.calendar.manage.addWorkingHoursRange": "Add Time Range",
-  "app.therapist.calendar.manage.slotsHint": "Add each bookable slot yourself — leave a gap before the next one for a break.",
+  "app.therapist.calendar.manage.slotsHint": "New slots are placed after the break set above — you can still edit any time freely.",
   "app.therapist.calendar.manage.noSlotsYet": "No slots added yet.",
   "app.therapist.calendar.manage.blockTitle": "Block Sessions or Days",
   "app.therapist.calendar.manage.blockHint": "Pick a date to block a specific session, or the entire day. This doesn't change your recurring schedule.",

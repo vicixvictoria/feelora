@@ -23,12 +23,23 @@ import { DateOverride } from '@/features/calendar/types/schedule';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
 const SESSION_LENGTH_OPTIONS = [15, 30, 45, 50, 60];
+const BREAK_OPTIONS = [0, 5, 10, 15, 20, 30];
+const DEFAULT_BREAK_MINUTES = 10;
 // Displayed Monday-first (matching the weekly calendar view) even though the
 // underlying day numbers follow the schema's 0=Sunday..6=Saturday convention.
 const DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const SUNDAY_ANCHOR = startOfWeek(new Date(), { weekStartsOn: 0 });
 const weekdayLabel = (day: number) => format(addDays(SUNDAY_ANCHOR, day), 'EEE', { locale: de });
 const EMPTY_SCHEDULE: Record<number, TimeSlot[]> = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+const DEFAULT_BREAK_BY_DAY: Record<number, number> = {
+  0: DEFAULT_BREAK_MINUTES,
+  1: DEFAULT_BREAK_MINUTES,
+  2: DEFAULT_BREAK_MINUTES,
+  3: DEFAULT_BREAK_MINUTES,
+  4: DEFAULT_BREAK_MINUTES,
+  5: DEFAULT_BREAK_MINUTES,
+  6: DEFAULT_BREAK_MINUTES,
+};
 
 // Slots can start whenever the therapist wants (no forced break) — the
 // only hard rule is that two slots on the same day can't overlap. "HH:mm"
@@ -67,9 +78,17 @@ const ManageAvailabilityPage = () => {
   const [slotsByDay, setSlotsByDay] = useState<Record<number, TimeSlot[]>>(EMPTY_SCHEDULE);
   // The backend has no SlotRange field — this is purely a local UI default
   // for the "Add Slot" button's duration below, never saved. There's no
-  // break setting: slots can start whenever the therapist wants, the only
-  // constraint is not overlapping another slot (see getOverlappingIndices).
+  // break constraint on the backend either: slots can start whenever the
+  // therapist wants, the only hard rule is not overlapping another slot
+  // (see getOverlappingIndices).
   const [slotLengthMinutes, setSlotLengthMinutes] = useState(50);
+  // Purely a local scheduling convenience, per weekday — it only changes
+  // where "Add Time Slot" places the START of the NEXT slot (latest end +
+  // this gap, instead of right at the latest end). It's never sent to the
+  // backend: a slot's Start/End on the schema IS the schedule, there's no
+  // BreakBetweenSessions field to save it into, and it has no effect on
+  // slots that already exist (editing existing times is still free-form).
+  const [breakMinutesByDay, setBreakMinutesByDay] = useState<Record<number, number>>(DEFAULT_BREAK_BY_DAY);
   // Two distinct notice periods on the backend: bookingNoticeHours (how soon
   // before its start a slot may still be booked) and cancellationNoticeHours
   // (the notice period the cancellation policy text itself refers to).
@@ -202,16 +221,21 @@ const ManageAvailabilityPage = () => {
     });
   };
 
-  // Adds one bookable slot for the day, defaulting its start to right when
-  // the latest existing slot ends (or 09:00 if it's the first one) and its
-  // length to slotLengthMinutes — this default can never overlap an
-  // existing slot; the therapist is free to drag it later (or anywhere
-  // else) from there.
+  // Adds one bookable slot for the day, defaulting its start to the latest
+  // existing slot's end plus that day's break (or 09:00 if it's the first
+  // one) and its length to slotLengthMinutes — this default can never
+  // overlap an existing slot; the therapist is free to drag it later (or
+  // anywhere else) from there. The break is purely where this default gets
+  // placed — it isn't a gap enforced afterwards.
   const handleAddSlot = (day: number) => {
     setSlotsByDay((prev) => {
       const existing = prev[day] ?? [];
       const latestEnd = existing.reduce((latest, s) => (s.endTime > latest ? s.endTime : latest), '00:00');
-      const start = existing.length > 0 ? latestEnd : '09:00';
+      const breakMinutes = breakMinutesByDay[day] ?? 0;
+      const start =
+        existing.length > 0
+          ? format(addMinutes(parse(latestEnd, 'HH:mm', new Date()), breakMinutes), 'HH:mm')
+          : '09:00';
       const end = format(addMinutes(parse(start, 'HH:mm', new Date()), slotLengthMinutes), 'HH:mm');
       return { ...prev, [day]: [...existing, { startTime: start, endTime: end }] };
     });
@@ -365,7 +389,31 @@ const ManageAvailabilityPage = () => {
                   const overlappingIndices = getOverlappingIndices(daySlots);
                   return (
                   <div key={day} className="feelora-card">
-                    <p className="font-semibold text-foreground mb-3">{weekdayLabel(day)}</p>
+                    <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+                      <p className="font-semibold text-foreground">{weekdayLabel(day)}</p>
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t('app.therapist.calendar.manage.breakBetweenSessions')}
+                        </label>
+                        <Select
+                          value={String(breakMinutesByDay[day] ?? DEFAULT_BREAK_MINUTES)}
+                          onValueChange={(v) =>
+                            setBreakMinutesByDay((prev) => ({ ...prev, [day]: Number(v) }))
+                          }
+                        >
+                          <SelectTrigger className="h-8 w-24 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {BREAK_OPTIONS.map((minutes) => (
+                              <SelectItem key={minutes} value={String(minutes)}>
+                                {t('app.therapist.calendar.manage.minutes', { count: minutes })}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
                     <p className="text-xs font-medium text-muted-foreground mb-2">
                       {t('app.therapist.calendar.manage.slotsHint')}

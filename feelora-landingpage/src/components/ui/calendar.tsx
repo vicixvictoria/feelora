@@ -47,7 +47,10 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
           defaultClassNames.weekday,
           'flex-1 text-center text-muted-foreground rounded-md font-medium text-xs',
         ),
-        week: cn(defaultClassNames.week, 'flex w-full mt-2'),
+        // min-h + items-center give each week row more vertical breathing
+        // room (rather than shrinking to the day button's own height), and
+        // center the day cells within that taller row.
+        week: cn(defaultClassNames.week, 'flex w-full mt-2 min-h-14 items-center'),
         day: cn(
           defaultClassNames.day,
           'relative flex-1 p-0 text-center text-sm focus-within:relative focus-within:z-20',
@@ -56,7 +59,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         // within its now-flexible-width day cell.
         day_button: cn(
           defaultClassNames.day_button,
-          'relative mx-auto h-10 w-10 rounded-full font-medium text-foreground transition-colors hover:bg-muted aria-selected:opacity-100',
+          'relative mx-auto h-11 w-11 rounded-full font-medium text-foreground transition-colors hover:bg-muted aria-selected:opacity-100',
         ),
         selected: cn(
           defaultClassNames.selected,

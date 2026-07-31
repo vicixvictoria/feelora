@@ -717,7 +717,7 @@
   "app.therapist.calendar.manage.cancellationPolicyPlaceholder": "Beschreibe deine Stornierungsbedingungen für Patient:innen...",
   "app.therapist.calendar.manage.workingHoursHint": "Der äußere Zeitrahmen, innerhalb dessen ein Termin geplant werden kann.",
   "app.therapist.calendar.manage.addWorkingHoursRange": "Zeitrahmen hinzufügen",
-  "app.therapist.calendar.manage.slotsHint": "Füge jeden buchbaren Termin selbst hinzu — lasse vor dem nächsten eine Pause.",
+  "app.therapist.calendar.manage.slotsHint": "Neue Termine werden nach der oben festgelegten Pause platziert — du kannst jede Uhrzeit trotzdem frei anpassen.",
   "app.therapist.calendar.manage.noSlotsYet": "Noch keine Termine hinzugefügt.",
   "app.therapist.calendar.manage.blockTitle": "Termine oder Tage blockieren",
   "app.therapist.calendar.manage.blockHint": "Wähle ein Datum, um einen bestimmten Termin oder den ganzen Tag zu blockieren. Das ändert nicht deinen wiederkehrenden Zeitplan.",
