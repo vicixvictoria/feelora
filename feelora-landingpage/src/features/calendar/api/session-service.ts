@@ -3,7 +3,7 @@
 // patient booking flow (createSession, getTherapistAvailabilities — auth
 // group "type:U") and the therapist calendar (getOwnSessions/updateSession —
 // both groups can read their own sessions, but only a therapist can attach
-// an address). This replaces mockCalendarService.ts entirely.
+// an address)
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
 import { fromAWSTime, toAWSTime } from '@/features/calendar/lib/awsTime';
