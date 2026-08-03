@@ -63,6 +63,46 @@ const AppointmentCard = ({
   );
 };
 
+// One session's compact "chip" in the weekly view, shared between the
+// desktop grid (stacked full-width in a day column) and the mobile layout
+// (fixed-width, sitting in a day row's horizontal scroller) — only the
+// wrapper's own width/shrink behavior differs between the two, via `className`.
+const WeekSessionChip = ({
+  session,
+  patientName,
+  onSaveAddress,
+  onCancel,
+  className = '',
+}: {
+  session: Session;
+  patientName: string;
+  onSaveAddress: (address: string) => Promise<void>;
+  onCancel: () => Promise<void>;
+  className?: string;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className={`rounded-lg border border-primary/30 bg-primary/10 px-2 py-2 ${className}`}>
+      <p className="text-xs font-semibold text-foreground truncate">{session.startTime}</p>
+      <p className="text-xs text-foreground truncate mb-1.5">{patientName}</p>
+      <div className="flex flex-col gap-1">
+        <AppointmentInfoDialog
+          session={session}
+          counterpartName={patientName}
+          editable
+          compact
+          onSave={onSaveAddress}
+        />
+        <CancelAppointmentDialog
+          warningMessage={t('app.therapist.calendar.cancelWarning')}
+          onConfirm={onCancel}
+          compact
+        />
+      </div>
+    </div>
+  );
+};
+
 const TherapistCalendarPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -205,11 +245,12 @@ const TherapistCalendarPage = () => {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : (
-            // Agenda-style grid: 7 day columns, each stacking that day's
-            // session cards vertically (rather than a proportional
-            // time-axis layout), so it stays readable at any session length.
-            <div className="feelora-card overflow-x-auto">
-              <div className="grid grid-cols-7 divide-x divide-border min-w-[840px]">
+            <>
+              {/* Mobile (below md): one full-width row per weekday, day
+                  label on the left and that day's sessions in a horizontally
+                  scrollable strip to its right — swipe if there are more
+                  than fit on screen, rather than squeezing 7 columns in. */}
+              <div className="feelora-card md:hidden divide-y divide-border">
                 {weekDays.map((date) => {
                   const dateKey = format(date, DATE_FORMAT);
                   const daySessions = sessions
@@ -218,61 +259,94 @@ const TherapistCalendarPage = () => {
                   const isCurrentDay = isToday(date);
 
                   return (
-                    <div key={dateKey} className="flex flex-col">
-                      <div
-                        className={`text-center py-3 border-b border-border ${isCurrentDay ? 'bg-primary/5' : ''}`}
-                      >
+                    <div key={dateKey} className="flex items-stretch gap-3 py-2">
+                      <div className="flex flex-col items-center justify-center w-10 shrink-0">
                         <p className="text-xs font-medium text-muted-foreground">
                           {format(date, 'EEE', { locale: de })}
                         </p>
                         <p
-                          className={`text-lg font-bold mx-auto mt-0.5 flex items-center justify-center ${
+                          className={`text-sm font-bold mt-0.5 flex items-center justify-center ${
                             isCurrentDay
-                              ? 'w-8 h-8 rounded-full bg-primary text-primary-foreground'
+                              ? 'w-7 h-7 rounded-full bg-primary text-primary-foreground'
                               : 'text-foreground'
                           }`}
                         >
                           {format(date, 'd')}
                         </p>
                       </div>
-                      <div className="flex-1 p-2 space-y-2 min-h-[220px]">
-                        {daySessions.length === 0 ? (
-                          <p className="text-xs text-muted-foreground text-center mt-4">—</p>
-                        ) : (
-                          daySessions.map((session) => (
-                            <div
+                      {daySessions.length === 0 ? (
+                        <p className="flex-1 self-center text-xs text-muted-foreground">—</p>
+                      ) : (
+                        <div className="flex-1 flex gap-2 overflow-x-auto">
+                          {daySessions.map((session) => (
+                            <WeekSessionChip
                               key={session.bookingId}
-                              className="rounded-lg border border-primary/30 bg-primary/10 px-2 py-2"
-                            >
-                              <p className="text-xs font-semibold text-foreground truncate">
-                                {session.startTime}
-                              </p>
-                              <p className="text-xs text-foreground truncate mb-1.5">
-                                {patientName(session.patientId)}
-                              </p>
-                              <div className="flex flex-col gap-1">
-                                <AppointmentInfoDialog
-                                  session={session}
-                                  counterpartName={patientName(session.patientId)}
-                                  editable
-                                  compact
-                                  onSave={(address) => handleSaveAddress(session.bookingId, address)}
-                                />
-                                <CancelAppointmentDialog
-                                  warningMessage={t('app.therapist.calendar.cancelWarning')}
-                                  onConfirm={() => handleCancel(session.bookingId)}
-                                  compact
-                                />
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
+                              session={session}
+                              patientName={patientName(session.patientId)}
+                              onSaveAddress={(address) => handleSaveAddress(session.bookingId, address)}
+                              onCancel={() => handleCancel(session.bookingId)}
+                              className="w-36 shrink-0"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            </div>
+
+              {/* Desktop (md+): agenda-style grid, 7 day columns each
+                  stacking that day's session cards vertically (rather than a
+                  proportional time-axis layout), so it stays readable at any
+                  session length. */}
+              <div className="hidden md:block feelora-card overflow-x-auto">
+                <div className="grid grid-cols-7 divide-x divide-border min-w-[840px]">
+                  {weekDays.map((date) => {
+                    const dateKey = format(date, DATE_FORMAT);
+                    const daySessions = sessions
+                      .filter((s) => s.date === dateKey)
+                      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+                    const isCurrentDay = isToday(date);
+
+                    return (
+                      <div key={dateKey} className="flex flex-col">
+                        <div
+                          className={`text-center py-3 border-b border-border ${isCurrentDay ? 'bg-primary/5' : ''}`}
+                        >
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {format(date, 'EEE', { locale: de })}
+                          </p>
+                          <p
+                            className={`text-lg font-bold mx-auto mt-0.5 flex items-center justify-center ${
+                              isCurrentDay
+                                ? 'w-8 h-8 rounded-full bg-primary text-primary-foreground'
+                                : 'text-foreground'
+                            }`}
+                          >
+                            {format(date, 'd')}
+                          </p>
+                        </div>
+                        <div className="flex-1 p-2 space-y-2 min-h-[220px]">
+                          {daySessions.length === 0 ? (
+                            <p className="text-xs text-muted-foreground text-center mt-4">—</p>
+                          ) : (
+                            daySessions.map((session) => (
+                              <WeekSessionChip
+                                key={session.bookingId}
+                                session={session}
+                                patientName={patientName(session.patientId)}
+                                onSaveAddress={(address) => handleSaveAddress(session.bookingId, address)}
+                                onCancel={() => handleCancel(session.bookingId)}
+                              />
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
           )}
         </>
       ) : (

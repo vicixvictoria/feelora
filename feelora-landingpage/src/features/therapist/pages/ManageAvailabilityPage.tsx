@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { addDays, addMinutes, format, getDay, parse, startOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { AlertTriangle, Ban, ChevronLeft, Loader2, Plus, X } from 'lucide-react';
+import { AlertTriangle, Ban, ChevronDown, ChevronLeft, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service';
 import { scheduleService } from '../api/schedule-service';
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import MonthCalendar from '@/features/calendar/components/MonthCalendar';
@@ -100,6 +101,8 @@ const ManageAvailabilityPage = () => {
   const [hasExistingSchedule, setHasExistingSchedule] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  // Purely a local UI toggle for the "how to use this page" explainer below.
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // One-off exceptions layered on top of the recurring schedule above, via
   // the backend's OverrideSettings (see schedule-service.ts). There's no
@@ -315,6 +318,71 @@ const ManageAvailabilityPage = () => {
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('app.therapist.calendar.manage.title')}
       </h1>
+
+      <Collapsible
+        open={isHelpOpen}
+        onOpenChange={setIsHelpOpen}
+        className={`feelora-card mb-6 bg-primary/5 border-primary/30 transition-[padding] ${
+          isHelpOpen ? 'p-4' : 'py-2.5 px-4'
+        }`}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-left text-sm font-semibold text-foreground">
+          {t('app.therapist.calendar.manage.help.title')}
+          <ChevronDown
+            className={`w-4 h-4 shrink-0 text-muted-foreground transition-transform ${isHelpOpen ? 'rotate-180' : ''}`}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-4 space-y-4 text-sm text-muted-foreground">
+          <p>{t('app.therapist.calendar.manage.help.intro2')}</p>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.scheduleHeading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.scheduleBody')}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step1Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step1Body')}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step2Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step2Body')}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step3Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step3Body1')}</p>
+            <p className="mt-2">
+              {t('app.therapist.calendar.manage.help.step3Body2')}{' '}
+              <strong className="text-foreground">{t('app.therapist.calendar.manage.help.step3Emphasis')}</strong>
+            </p>
+          </div>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step4Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step4Body')}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step5Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step5Body')}</p>
+            <p className="italic">{t('app.therapist.calendar.manage.help.step5Note')}</p>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {isLoading ? (
         <div className="flex justify-center py-12">
