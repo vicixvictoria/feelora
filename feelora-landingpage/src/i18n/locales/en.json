@@ -1503,5 +1503,12 @@
   "calendar.cancel.button": "Cancel",
   "calendar.cancel.title": "Cancel appointment?",
   "calendar.cancel.keep": "Keep appointment",
-  "calendar.cancel.confirm": "Yes, cancel"
+  "calendar.cancel.confirm": "Yes, cancel",
+  "calendar.notification.newTitle": "New appointment booked",
+  "calendar.notification.updatedTitle": "Appointment updated",
+  "calendar.notification.cancelledTitle": "Appointment cancelled",
+  "calendar.notification.loading": "Loading appointment details…",
+  "calendar.notification.details": "{{date}} · {{start}}–{{end}}",
+  "calendar.notification.detailsUnavailable": "Details couldn't be loaded — check your calendar for the latest.",
+  "calendar.notification.dismiss": "Got it"
 }

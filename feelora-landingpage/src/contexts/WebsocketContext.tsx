@@ -20,6 +20,7 @@ interface NotificationData {
   unmatchedId?: string;
   createdAt?: string;
   updatedAt?: string;
+  bookingId?: string;
 }
 
 interface WebsocketNotification {

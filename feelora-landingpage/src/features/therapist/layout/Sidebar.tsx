@@ -3,7 +3,7 @@ import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
-import { notificationService } from '../../notifications/api/notification-service';
+import { notificationService, SESSION_NOTIFICATION_TYPES } from '../../notifications/api/notification-service';
 
 // --- Interfaces for Websocket Data ---
 interface IncomingNotification {
@@ -12,8 +12,12 @@ interface IncomingNotification {
     type?: string;
     conversationId?: string;
     count?: number;
+    bookingId?: string;
   };
 }
+
+const isSessionNotification = (type?: string) =>
+  SESSION_NOTIFICATION_TYPES.includes(type as (typeof SESSION_NOTIFICATION_TYPES)[number]);
 
 const menuItems = [
   {
@@ -68,6 +72,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
   // Notification States
   const [chatNotifCount, setChatNotifCount] = useState(0);
   const [patientsNotifCount, setPatientsNotifCount] = useState(0);
+  const [calendarNotifCount, setCalendarNotifCount] = useState(0);
   const processedMessageCountRef = useRef(0);
 
   // --- Fetch Initial Notifications & Listen for Read Events ---
@@ -77,14 +82,17 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
         const { notifications } = await notificationService.getNotifications();
         let chatCount = 0;
         let patientsCount = 0;
+        let calendarCount = 0;
 
         notifications.forEach((n) => {
           if (n.type === 'new_message') chatCount += n.count || 1;
           else if (n.type === 'new_match' || n.type === 'new_unmatch') patientsCount += 1;
+          else if (isSessionNotification(n.type)) calendarCount += 1;
         });
 
         setChatNotifCount(chatCount);
         setPatientsNotifCount(patientsCount);
+        setCalendarNotifCount(calendarCount);
       } catch (err) {
         console.error('Sidebar failed to fetch notifications:', err);
       }
@@ -112,6 +120,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
 
     let newChats = 0;
     let newPatientsNotifs = 0;
+    let newCalendar = 0;
 
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
@@ -120,6 +129,8 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
           newChats += 1;
         } else if (parsed.data.type === 'new_match' || parsed.data.type === 'new_unmatch') {
           newPatientsNotifs += 1;
+        } else if (isSessionNotification(parsed.data.type)) {
+          newCalendar += 1;
         }
       }
     }
@@ -131,12 +142,16 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     if (newPatientsNotifs > 0 && location.pathname !== '/therapist/patients') {
       setPatientsNotifCount((prev) => prev + newPatientsNotifs);
     }
+    if (newCalendar > 0 && location.pathname !== '/therapist/calendar') {
+      setCalendarNotifCount((prev) => prev + newCalendar);
+    }
   }, [websocketMessages, location.pathname]);
 
   // Helper to get the correct badge count for the current menu item
   const getBadgeCount = (path: string) => {
     if (path === '/therapist/') return chatNotifCount;
     if (path === '/therapist/patients') return patientsNotifCount;
+    if (path === '/therapist/calendar') return calendarNotifCount;
     return 0;
   };
 

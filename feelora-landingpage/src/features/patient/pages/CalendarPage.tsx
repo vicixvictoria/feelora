@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
@@ -12,8 +12,27 @@ import AppointmentInfoDialog from '@/features/calendar/components/AppointmentInf
 import CancelAppointmentDialog from '@/features/calendar/components/CancelAppointmentDialog';
 import { sessionService } from '@/features/calendar/api/session-service';
 import { Session } from '@/features/calendar/types/session';
+import { useWebsocket } from '@/contexts/WebsocketContext';
+import {
+  notificationService,
+  NotificationType,
+  SESSION_NOTIFICATION_TYPES,
+} from '@/features/notifications/api/notification-service';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
+
+// Mirrors SidebarNav's own local shape for websocket notification payloads —
+// see notification-service.ts's schema comment for why type stays a loose
+// string here rather than NotificationType (the raw WS payload is untyped JSON).
+interface IncomingNotification {
+  type?: string;
+  data?: {
+    type?: string;
+    bookingId?: string;
+  };
+}
+const isSessionNotification = (type?: string) =>
+  SESSION_NOTIFICATION_TYPES.includes(type as (typeof SESSION_NOTIFICATION_TYPES)[number]);
 
 const CalendarPage = () => {
   const { t } = useTranslation();
@@ -42,6 +61,9 @@ const CalendarPage = () => {
   const therapist = therapistData?.getMatchedTherapists?.items?.[0];
   const therapistName = therapist ? `${therapist.Name} ${therapist.Surname}` : '';
 
+  const { messages: websocketMessages } = useWebsocket();
+  const processedMessageCountRef = useRef(0);
+
   const refreshSessions = async () => {
     if (!patient?.Id) return;
     setIsLoading(true);
@@ -67,6 +89,35 @@ const CalendarPage = () => {
     refreshSessions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient?.Id, displayMonth]);
+
+  // Live-updates the calendar when the therapist books/cancels/updates a
+  // session, instead of requiring a manual reload — SidebarNav handles the
+  // unread-badge side of these same events when this page isn't open.
+  useEffect(() => {
+    if (websocketMessages.length <= processedMessageCountRef.current) return;
+    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+    processedMessageCountRef.current = websocketMessages.length;
+
+    const sessionNotifs = newMessages.filter((msg) => {
+      const parsed = msg as IncomingNotification;
+      return parsed.type === 'notification' && isSessionNotification(parsed.data?.type);
+    });
+    if (sessionNotifs.length === 0) return;
+
+    refreshSessions();
+    sessionNotifs.forEach((msg) => {
+      const parsed = msg as IncomingNotification;
+      if (!parsed.data?.type || !parsed.data.bookingId) return;
+      notificationService
+        .readNotification({
+          notificationType: parsed.data.type as NotificationType,
+          notificationId: parsed.data.bookingId,
+        })
+        .then(() => window.dispatchEvent(new Event('notificationsRead')))
+        .catch((error) => console.error('Failed to ack session notification:', error));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websocketMessages]);
 
   const appointmentDates = useMemo(
     () => sessions.map((s) => parseISO(s.date)),

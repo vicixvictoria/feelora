@@ -1509,5 +1509,12 @@
   "calendar.cancel.button": "Stornieren",
   "calendar.cancel.title": "Termin stornieren?",
   "calendar.cancel.keep": "Termin behalten",
-  "calendar.cancel.confirm": "Ja, stornieren"
+  "calendar.cancel.confirm": "Ja, stornieren",
+  "calendar.notification.newTitle": "Neuer Termin gebucht",
+  "calendar.notification.updatedTitle": "Termin aktualisiert",
+  "calendar.notification.cancelledTitle": "Termin storniert",
+  "calendar.notification.loading": "Termindetails werden geladen…",
+  "calendar.notification.details": "{{date}} · {{start}}–{{end}}",
+  "calendar.notification.detailsUnavailable": "Details konnten nicht geladen werden — schau in deinem Kalender nach.",
+  "calendar.notification.dismiss": "Ok"
 }

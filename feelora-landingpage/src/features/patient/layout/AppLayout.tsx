@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import SessionNotificationModal from '@/features/calendar/components/SessionNotificationModal';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
         <main className="flex-1 p-4 md:p-8 overflow-auto">{children}</main>
       </div>
+      <SessionNotificationModal />
     </div>
   );
 };

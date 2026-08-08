@@ -1,9 +1,23 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
 
-type NotificationType = 'new_message' | 'new_match' | 'new_unmatch';
+type NotificationType =
+  | 'new_message'
+  | 'new_match'
+  | 'new_unmatch'
+  | 'new_session'
+  | 'updated_session'
+  | 'deleted_session';
 
 export type { NotificationType };
+
+// Types whose notificationId (see readNotification below) is a bookingId
+// rather than a conversationId/matchedId/unmatchedId.
+export const SESSION_NOTIFICATION_TYPES: NotificationType[] = [
+  'new_session',
+  'updated_session',
+  'deleted_session',
+];
 
 export interface NotificationItem {
   recipientId?: string;
@@ -16,6 +30,7 @@ export interface NotificationItem {
   unmatchedId?: string;
   createdAt?: string;
   updatedAt?: string;
+  bookingId?: string;
 }
 
 export interface NotificationBatch {
@@ -49,6 +64,7 @@ const GET_NOTIFICATIONS = gql`
         unmatchedId
         createdAt
         updatedAt
+        bookingId
       }
       nextToken
     }

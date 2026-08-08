@@ -3,7 +3,7 @@ import { User, Send, Smile, LayoutDashboard, Calendar, BookOpen } from 'lucide-r
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
-import { notificationService } from '../../notifications/api/notification-service';
+import { notificationService, SESSION_NOTIFICATION_TYPES } from '../../notifications/api/notification-service';
 
 // --- Interfaces for Websocket Data ---
 interface IncomingNotification {
@@ -12,8 +12,12 @@ interface IncomingNotification {
     type?: string;
     conversationId?: string;
     count?: number;
+    bookingId?: string;
   };
 }
+
+const isSessionNotification = (type?: string) =>
+  SESSION_NOTIFICATION_TYPES.includes(type as (typeof SESSION_NOTIFICATION_TYPES)[number]);
 
 const menuItems = [
   {
@@ -68,6 +72,7 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
   // Notification States
   const [chatNotifCount, setChatNotifCount] = useState(0);
   const [dashboardNotifCount, setDashboardNotifCount] = useState(0);
+  const [calendarNotifCount, setCalendarNotifCount] = useState(0);
   const processedMessageCountRef = useRef(0);
 
   // --- Fetch Initial Notifications & Listen for Read Events ---
@@ -77,18 +82,22 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
         const { notifications } = await notificationService.getNotifications({});
         let chatCount = 0;
         let dashCount = 0;
+        let calendarCount = 0;
 
         notifications.forEach((n) => {
           if (n.type === 'new_message') {
             chatCount += n.count || 1;
+          } else if (isSessionNotification(n.type)) {
+            calendarCount += 1;
           } else {
             // General notifications go to the dashboard
-            dashCount += 1; 
+            dashCount += 1;
           }
         });
 
         setChatNotifCount(chatCount);
         setDashboardNotifCount(dashCount);
+        setCalendarNotifCount(calendarCount);
       } catch (err) {
         console.error('Sidebar failed to fetch notifications:', err);
       }
@@ -116,12 +125,15 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
 
     let newChats = 0;
     let newDash = 0;
+    let newCalendar = 0;
 
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
       if (parsed.type === 'notification' && parsed.data) {
         if (parsed.data.type === 'new_message') {
           newChats += 1;
+        } else if (isSessionNotification(parsed.data.type)) {
+          newCalendar += 1;
         } else {
           newDash += 1;
         }
@@ -135,6 +147,9 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
     if (newDash > 0 && location.pathname !== '/patient/dashboard') {
       setDashboardNotifCount((prev) => prev + newDash);
     }
+    if (newCalendar > 0 && location.pathname !== '/patient/calendar') {
+      setCalendarNotifCount((prev) => prev + newCalendar);
+    }
   }, [websocketMessages, location.pathname]);
 
   // --- Helper to get the correct badge count ---
@@ -143,11 +158,13 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
     // "If I'm looking at it, don't scream at me to look at it."
     if (path === '/patient/' && location.pathname === '/patient/') return 0;
     if (path === '/patient/dashboard' && location.pathname === '/patient/dashboard') return 0;
+    if (path === '/patient/calendar' && location.pathname === '/patient/calendar') return 0;
 
     // Otherwise, show the actual count
     if (path === '/patient/') return chatNotifCount;
     if (path === '/patient/dashboard') return dashboardNotifCount;
-    
+    if (path === '/patient/calendar') return calendarNotifCount;
+
     return 0;
   };
 
