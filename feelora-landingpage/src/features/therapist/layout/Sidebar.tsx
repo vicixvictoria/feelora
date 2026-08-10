@@ -21,10 +21,24 @@ const isSessionNotification = (type?: string) =>
 
 const menuItems = [
   {
+    titleKey: 'app.therapist.sidebar.calendar',
+    descKey: 'app.therapist.sidebar.calendarDesc',
+    icon: Calendar,
+    path: '/therapist/calendar',
+    comingSoon: false,
+  },
+  {
     titleKey: 'app.therapist.sidebar.chat',
     descKey: 'app.therapist.sidebar.chatDesc',
     icon: Send,
     path: '/therapist/',
+    comingSoon: false,
+  },
+  {
+    titleKey: 'app.therapist.sidebar.patients',
+    descKey: 'app.therapist.sidebar.patientsDesc',
+    icon: Users2,
+    path: '/therapist/patients',
     comingSoon: false,
   },
   {
@@ -42,25 +56,11 @@ const menuItems = [
     comingSoon: false,
   },
   {
-    titleKey: 'app.therapist.sidebar.patients',
-    descKey: 'app.therapist.sidebar.patientsDesc',
-    icon: Users2,
-    path: '/therapist/patients',
-    comingSoon: false,
-  },
-  {
     titleKey: 'app.therapist.sidebar.homework',
     descKey: 'app.therapist.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/therapist/homework',
     comingSoon: true,
-  },
-  {
-    titleKey: 'app.therapist.sidebar.calendar',
-    descKey: 'app.therapist.sidebar.calendarDesc',
-    icon: Calendar,
-    path: '/therapist/calendar',
-    comingSoon: false,
   },
 ];
 

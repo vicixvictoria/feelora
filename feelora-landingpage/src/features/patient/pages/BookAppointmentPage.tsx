@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Check, ChevronLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,6 +17,16 @@ import { TimeSlot } from '@/features/calendar/types/session';
 // Booking is now just "pick a slot".
 
 const DATE_FORMAT = 'yyyy-MM-dd';
+
+// Only meaningful for today's date — greys out (and disables) any slot
+// whose start time has already passed. This is independent of whatever
+// minimal booking notice the therapist has configured: patients have no
+// way to know that value (getAvailableSlots doesn't expose it, and
+// getSettings is therapist-only — see the discussion in the codebase), so
+// this only ever catches the one rule we can always compute ourselves —
+// "would this literally start in the past?" — not the full notice window.
+const isSlotInThePast = (date: Date, slot: TimeSlot): boolean =>
+  isToday(date) && slot.startTime <= format(new Date(), 'HH:mm');
 
 const BookAppointmentPage = () => {
   const { t } = useTranslation();
@@ -131,20 +141,27 @@ const BookAppointmentPage = () => {
             </div>
           ) : slots.length > 0 ? (
             <div className="space-y-2 mb-6">
-              {slots.map((slot) => (
-                <button
-                  key={slot.startTime}
-                  onClick={() => setSelectedSlot(slot)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
-                    selectedSlot?.startTime === slot.startTime
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {slot.startTime} – {slot.endTime}
-                  {selectedSlot?.startTime === slot.startTime && <Check className="w-4 h-4" />}
-                </button>
-              ))}
+              {slots.map((slot) => {
+                const isPast = isSlotInThePast(selectedDate, slot);
+                return (
+                  <button
+                    key={slot.startTime}
+                    onClick={() => !isPast && setSelectedSlot(slot)}
+                    disabled={isPast}
+                    title={isPast ? t('patient.calendar.slotInThePast') : undefined}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
+                      isPast
+                        ? 'border-border text-muted-foreground opacity-50 cursor-not-allowed'
+                        : selectedSlot?.startTime === slot.startTime
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {slot.startTime} – {slot.endTime}
+                    {!isPast && selectedSlot?.startTime === slot.startTime && <Check className="w-4 h-4" />}
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <div className="feelora-card text-center text-muted-foreground py-8 mb-6">

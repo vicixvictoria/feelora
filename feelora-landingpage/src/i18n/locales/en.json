@@ -1074,6 +1074,7 @@
   "patient.calendar.bookAppointmentWith": "Book Appointment with {{name}}",
   "patient.calendar.dateAndTime": "Date & Time",
   "patient.calendar.noSlotsAvailable": "No available slots on this day.",
+  "patient.calendar.slotInThePast": "This time has already passed.",
   "patient.calendar.confirmBooking": "Book appointment",
   "patient.calendar.bookingConfirmed": "Your appointment has been booked.",
   "patient.calendar.bookingError": "Failed to book this appointment. Please try again.",

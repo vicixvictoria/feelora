@@ -1079,6 +1079,7 @@
   "patient.calendar.bookAppointmentWith": "Termin buchen mit {{name}}",
   "patient.calendar.dateAndTime": "Datum & Uhrzeit",
   "patient.calendar.noSlotsAvailable": "An diesem Tag sind keine Termine verfügbar.",
+  "patient.calendar.slotInThePast": "Dieser Zeitpunkt liegt bereits in der Vergangenheit.",
   "patient.calendar.confirmBooking": "Termin buchen",
   "patient.calendar.bookingConfirmed": "Dein Termin wurde gebucht.",
   "patient.calendar.bookingError": "Der Termin konnte nicht gebucht werden. Bitte versuche es erneut.",

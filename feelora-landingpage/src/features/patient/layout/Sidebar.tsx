@@ -21,10 +21,10 @@ const isSessionNotification = (type?: string) =>
 
 const menuItems = [
   {
-    titleKey: 'patient.sidebar.profile',
-    descKey: 'patient.sidebar.profileDesc',
-    icon: User,
-    path: '/patient/profile',
+    titleKey: 'patient.sidebar.dashboard',
+    descKey: 'patient.sidebar.dashboardDesc',
+    icon: LayoutDashboard,
+    path: '/patient/dashboard',
     comingSoon: false,
   },
   {
@@ -42,17 +42,17 @@ const menuItems = [
     comingSoon: false,
   },
   {
-    titleKey: 'patient.sidebar.dashboard',
-    descKey: 'patient.sidebar.dashboardDesc',
-    icon: LayoutDashboard,
-    path: '/patient/dashboard',
-    comingSoon: false,
-  },
-  {
     titleKey: 'patient.sidebar.calendar',
     descKey: 'patient.sidebar.calendarDesc',
     icon: Calendar,
     path: '/patient/calendar',
+    comingSoon: false,
+  },
+  {
+    titleKey: 'patient.sidebar.profile',
+    descKey: 'patient.sidebar.profileDesc',
+    icon: User,
+    path: '/patient/profile',
     comingSoon: false,
   },
   {

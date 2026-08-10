@@ -7,6 +7,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
 import { fromAWSTime, toAWSTime } from '@/features/calendar/lib/awsTime';
+import { isMissingDataError } from '@/features/calendar/lib/graphqlErrors';
 import { CreateSessionInput, DeletionResponse, Policy, Session, SessionStatus, TimeSlot } from '../types/session';
 
 const SESSION_FIELDS = `
@@ -127,17 +128,26 @@ export const sessionService = {
   // granularity the backend offers (no "which days this month have
   // openings" query), matching the existing pick-a-day-then-see-slots flow.
   async getAvailableSlots(therapistId: string, date: string): Promise<TimeSlot[]> {
-    const { data } = await apolloClient.query({
-      query: GET_THERAPIST_AVAILABILITIES_QUERY,
-      variables: { therapistId, date },
-      fetchPolicy: 'network-only',
-    });
-    const result = data.getTherapistAvailabilities;
-    if (!result) return [];
-    return result.Availabilities.map((slot: RemoteTimeSlot) => ({
-      startTime: fromAWSTime(slot.Start),
-      endTime: fromAWSTime(slot.End),
-    }));
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_THERAPIST_AVAILABILITIES_QUERY,
+        variables: { therapistId, date },
+        fetchPolicy: 'network-only',
+      });
+      const result = data.getTherapistAvailabilities;
+      if (!result) return [];
+      return result.Availabilities.map((slot: RemoteTimeSlot) => ({
+        startTime: fromAWSTime(slot.Start),
+        endTime: fromAWSTime(slot.End),
+      }));
+    } catch (error) {
+      // The therapist hasn't created a schedule yet — per the backend team
+      // this throws by design instead of returning an empty list, but from
+      // the patient's side it's a completely normal state (matched with a
+      // therapist who hasn't set up their calendar yet), not a failure.
+      if (isMissingDataError(error)) return [];
+      throw error;
+    }
   },
 
   // Fetches every session in [startDate, endDate] for the current user

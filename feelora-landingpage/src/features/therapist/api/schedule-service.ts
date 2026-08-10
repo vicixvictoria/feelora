@@ -5,6 +5,7 @@
 import { gql } from '@apollo/client';
 import { apolloClient, isCacheStale, markCacheFresh } from '@/lib/apollo-client';
 import { fromAWSTime, toAWSTime } from '@/features/calendar/lib/awsTime';
+import { isMissingDataError } from '@/features/calendar/lib/graphqlErrors';
 import { Policy, TimeSlot } from '@/features/calendar/types/session';
 import { DateOverride, TherapistSchedule } from '@/features/calendar/types/schedule';
 
@@ -133,13 +134,18 @@ export const scheduleService = {
   async getSchedule(forceRefresh = false): Promise<TherapistSchedule | null> {
     const CACHE_KEY = 'therapist:getSettings';
     const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
-    const { data } = await apolloClient.query({
-      query: GET_SETTINGS_QUERY,
-      fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
-    });
-    if (useNetwork) markCacheFresh(CACHE_KEY);
-    if (!data.getSettings) return null;
-    return toTherapistSchedule(data.getSettings);
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_SETTINGS_QUERY,
+        fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
+      });
+      if (useNetwork) markCacheFresh(CACHE_KEY);
+      if (!data.getSettings) return null;
+      return toTherapistSchedule(data.getSettings);
+    } catch (error) {
+      if (isMissingDataError(error)) return null;
+      throw error;
+    }
   },
 
   async saveSchedule(
@@ -161,20 +167,25 @@ export const scheduleService = {
   // Returns null if the date has no override yet — the recurring schedule
   // applies to it as-is.
   async getOverride(date: string): Promise<DateOverride | null> {
-    const { data } = await apolloClient.query({
-      query: GET_OVERRIDE_SETTINGS_QUERY,
-      variables: { date },
-      fetchPolicy: 'network-only',
-    });
-    const override = data.getOverrideSettings;
-    if (!override) return null;
-    return {
-      date: override.Date,
-      availabilities: override.Availabilities.map((slot: RemoteTimeSlot) => ({
-        startTime: fromAWSTime(slot.Start),
-        endTime: fromAWSTime(slot.End),
-      })),
-    };
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_OVERRIDE_SETTINGS_QUERY,
+        variables: { date },
+        fetchPolicy: 'network-only',
+      });
+      const override = data.getOverrideSettings;
+      if (!override) return null;
+      return {
+        date: override.Date,
+        availabilities: override.Availabilities.map((slot: RemoteTimeSlot) => ({
+          startTime: fromAWSTime(slot.Start),
+          endTime: fromAWSTime(slot.End),
+        })),
+      };
+    } catch (error) {
+      if (isMissingDataError(error)) return null;
+      throw error;
+    }
   },
 
   async saveOverride(date: string, availabilities: TimeSlot[]): Promise<DateOverride> {
