@@ -381,6 +381,13 @@ const ManageAvailabilityPage = () => {
             <p>{t('app.therapist.calendar.manage.help.step5Body')}</p>
             <p className="italic">{t('app.therapist.calendar.manage.help.step5Note')}</p>
           </div>
+
+           <div>
+            <p className="font-bold text-foreground mb-1">
+              {t('app.therapist.calendar.manage.help.step6Heading')}
+            </p>
+            <p>{t('app.therapist.calendar.manage.help.step6Body')}</p>
+          </div>
         </CollapsibleContent>
       </Collapsible>
 

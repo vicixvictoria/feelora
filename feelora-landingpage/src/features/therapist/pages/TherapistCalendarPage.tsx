@@ -14,9 +14,10 @@ import {
   subWeeks,
 } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Loader2, Settings2 } from 'lucide-react';
+import { AlertTriangle, ChevronLeft, ChevronRight, Loader2, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
+import { scheduleService } from '../api/schedule-service';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MonthCalendar from '@/features/calendar/components/MonthCalendar';
 import AppointmentInfoDialog from '@/features/calendar/components/AppointmentInfoDialog';
@@ -143,8 +144,38 @@ const TherapistCalendarPage = () => {
   );
   const therapist = therapistData?.getOwnTherapistProfile;
 
+  // Whether the therapist has at least one bookable slot set up anywhere in
+  // their recurring schedule. Starts `false` (banner hidden) so it never
+  // flashes on screen before the schedule check below has actually run —
+  // it only flips to true once we've confirmed there's really nothing to
+  // book, and stays true until a schedule with at least one slot is saved.
+  const [hasNoAvailability, setHasNoAvailability] = useState(false);
+
   const { messages: websocketMessages } = useWebsocket();
   const processedMessageCountRef = useRef(0);
+
+  // Checks whether the therapist has ever set up a schedule, and whether
+  // that schedule actually has any bookable slots — a schedule can exist
+  // (createSettings was called once) but still have every weekday cleared
+  // out, which leaves patients just as unable to book as having no schedule
+  // at all. Runs once the therapist profile is available, independently of
+  // the appointment-list fetching below (this isn't scoped to a date range).
+  useEffect(() => {
+    if (!therapist?.Id) return;
+    scheduleService
+      .getSchedule()
+      .then((schedule) => {
+        const hasAnySlot = schedule
+          ? Object.values(schedule.slotsByDay).some((slots) => slots.length > 0)
+          : false;
+        setHasNoAvailability(!hasAnySlot);
+      })
+      .catch((error) => {
+        // Non-critical: leave the banner hidden rather than risk a false
+        // warning if the check itself fails (e.g. transient network error).
+        console.error('Failed to check for an existing schedule:', error);
+      });
+  }, [therapist?.Id]);
 
   useEffect(() => {
     if (!therapist?.Matches || therapist.Matches.length === 0) return;
@@ -261,6 +292,27 @@ const TherapistCalendarPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in">
+      {/* Persistent warning: shown for as long as the therapist has no
+          bookable slots anywhere in their schedule, since that means
+          patients can't book any appointment with them at all. Points at
+          the "Manage Schedule & Availability" button below rather than
+          duplicating it here. Disappears automatically the next time this
+          page mounts after a schedule with at least one slot has been
+          saved (see the useEffect above). */}
+      {hasNoAvailability && (
+        <div className="feelora-card flex items-start gap-3 mb-6 border-warning/40 bg-warning/10">
+          <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold text-foreground">
+              {t('app.therapist.calendar.noAvailabilityTitle')}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t('app.therapist.calendar.noAvailabilityBody')}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <Tabs value={view} onValueChange={(v) => setView(v as 'weekly' | 'monthly')}>
           <TabsList>
