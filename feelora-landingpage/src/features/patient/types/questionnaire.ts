@@ -10,6 +10,19 @@ export interface SelectionWithMultipleOther {
   other?: string[];
 }
 
+// Therapy school orientations, used both for direct selection and for scoring the determination quiz
+export type TherapySchoolId = 'psychodynamic' | 'humanistic' | 'systemic' | 'behavioral';
+
+export interface TherapySchoolQuizAnswer {
+  questionId: number;
+  school: TherapySchoolId;
+}
+
+// Step 8: direct selection as before, or (if the user didn't know) answers to the 10-question determination quiz
+export interface TherapySchoolData extends SelectionWithOther {
+  quizAnswers?: TherapySchoolQuizAnswer[];
+}
+
 // 2. The Main Data Structure
 export interface QuestionnaireData {
   // Use specific types if known (e.g., string instead of any)
@@ -24,7 +37,7 @@ export interface QuestionnaireData {
   };
 
   languages: SelectionWithMultipleOther; // <-- Updated to use the new type with array for "other"
-  therapySchool: SelectionWithOther;
+  therapySchool: TherapySchoolData;
 
   therapySetting: string[];
   therapyFormat: string[];

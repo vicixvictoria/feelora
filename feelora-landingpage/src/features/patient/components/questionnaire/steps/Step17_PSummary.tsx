@@ -208,7 +208,12 @@ const Step17_PSummary = ({ onNext, onBack, onEdit, data, isLoading }: SummarySte
       title: t('q.p.summary.therapySchool'),
       content: (
         <p className="text-foreground/80">
-          {formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other, getGenericLabel)}
+          {(data.therapySchool?.quizAnswers?.length ?? 0) >= 10
+            ? t(
+                'q.p.summary.therapySchoolQuiz',
+                'Per Fragebogen ermittelt (10 Antworten erfasst)',
+              )
+            : formatArrayWithOther(data.therapySchool?.selected, data.therapySchool?.other, getGenericLabel)}
         </p>
       ),
     },
