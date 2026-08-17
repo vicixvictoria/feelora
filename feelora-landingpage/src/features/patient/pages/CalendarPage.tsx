@@ -147,7 +147,18 @@ const CalendarPage = () => {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('patient.calendar.title')}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-foreground">{t('patient.calendar.title')}</h1>
+        {therapist && (
+          <button
+            onClick={() => navigate('book')}
+            className="feelora-btn-primary lg:hidden"
+          >
+            {t('patient.calendar.book')}
+            <CalendarPlus className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <div className="lg:flex-[3]">
@@ -210,7 +221,7 @@ const CalendarPage = () => {
           {therapist ? (
             <button
               onClick={() => navigate('book')}
-              className="feelora-btn-primary"
+              className="feelora-btn-primary hidden lg:flex"
             >
               {t('patient.calendar.bookAppointment')}
               <CalendarPlus className="w-4 h-4" />

@@ -1076,6 +1076,7 @@
   "patient.calendar.cancelWarning": "Please consider the cancellation policy of your therapist.",
   "patient.calendar.noAppointmentsThisDay": "No appointments on this day.",
   "patient.calendar.bookAppointment": "Book Appointment",
+  "patient.calendar.book": "Book",
   "patient.calendar.noTherapistForBooking": "You don't have a matched therapist yet, so you can't book an appointment.",
   "patient.calendar.backToCalendar": "Back to calendar",
   "patient.calendar.bookAppointmentWith": "Book Appointment with {{name}}",

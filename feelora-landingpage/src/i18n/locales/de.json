@@ -1081,6 +1081,7 @@
   "patient.calendar.cancelWarning": "Bitte beachte die Stornierungsbedingungen deines Therapeuten.",
   "patient.calendar.noAppointmentsThisDay": "An diesem Tag gibt es keine Termine.",
   "patient.calendar.bookAppointment": "Termin buchen",
+  "patient.calendar.book": "Buchen",
   "patient.calendar.noTherapistForBooking": "Du hast noch keinen zugewiesenen Therapeuten und kannst daher noch keinen Termin buchen.",
   "patient.calendar.backToCalendar": "zurück zum Kalender",
   "patient.calendar.bookAppointmentWith": "Termin buchen mit {{name}}",

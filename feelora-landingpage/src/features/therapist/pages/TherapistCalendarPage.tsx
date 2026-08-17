@@ -102,7 +102,7 @@ const WeekSessionChip = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className={`rounded-lg border border-primary/30 bg-primary/10 px-2 py-2 ${className}`}>
+    <div className={`rounded-lg border border-primary/35 bg-primary/5 px-2 py-2 ${className}`}>
       <p className="text-xs font-semibold text-foreground truncate">{session.startTime}</p>
       <p className="text-xs text-foreground truncate mb-1.5">{patientName}</p>
       <div className="flex flex-col gap-1">
