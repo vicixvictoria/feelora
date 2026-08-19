@@ -57,7 +57,7 @@ export function ForPatientsSection() {
           transition={{ duration: 0.8 }}
           className="grid lg:grid-cols-2 gap-16 items-center"
         >
-          <div>
+          <div className="min-w-0">
             <div className="relative">
               <div
                 aria-hidden="true"
