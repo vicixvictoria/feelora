@@ -66,7 +66,7 @@ export function ForTherapistsSection() {
             />
           </motion.div>
 
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2 min-w-0">
             <div className="relative">
               <div
                 aria-hidden="true"
