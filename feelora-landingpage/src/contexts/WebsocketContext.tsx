@@ -21,6 +21,7 @@ interface NotificationData {
   createdAt?: string;
   updatedAt?: string;
   bookingId?: string;
+  homeworkId?: string;
 }
 
 interface WebsocketNotification {

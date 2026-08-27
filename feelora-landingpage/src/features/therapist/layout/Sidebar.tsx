@@ -3,7 +3,11 @@ import { Calendar, User, Send, Smile, BookOpen, Users2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
-import { notificationService, SESSION_NOTIFICATION_TYPES } from '../../notifications/api/notification-service';
+import {
+  notificationService,
+  SESSION_NOTIFICATION_TYPES,
+  HOMEWORK_NOTIFICATION_TYPES,
+} from '../../notifications/api/notification-service';
 
 // --- Interfaces for Websocket Data ---
 interface IncomingNotification {
@@ -18,6 +22,13 @@ interface IncomingNotification {
 
 const isSessionNotification = (type?: string) =>
   SESSION_NOTIFICATION_TYPES.includes(type as (typeof SESSION_NOTIFICATION_TYPES)[number]);
+
+// Same bucketing idea as isSessionNotification, but for the Aufgaben nav
+// item's own badge. In practice a therapist only ever gets "updated_homework"
+// (new_homework/deleted_homework go to the patient), but this checks the
+// whole homework group rather than hardcoding that assumption.
+const isHomeworkNotification = (type?: string) =>
+  HOMEWORK_NOTIFICATION_TYPES.includes(type as (typeof HOMEWORK_NOTIFICATION_TYPES)[number]);
 
 const menuItems = [
   {
@@ -60,7 +71,7 @@ const menuItems = [
     descKey: 'app.therapist.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/therapist/homework',
-    comingSoon: true,
+    comingSoon: false,
   },
 ];
 
@@ -73,6 +84,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
   const [chatNotifCount, setChatNotifCount] = useState(0);
   const [patientsNotifCount, setPatientsNotifCount] = useState(0);
   const [calendarNotifCount, setCalendarNotifCount] = useState(0);
+  const [homeworkNotifCount, setHomeworkNotifCount] = useState(0);
   const processedMessageCountRef = useRef(0);
 
   // --- Fetch Initial Notifications & Listen for Read Events ---
@@ -83,16 +95,19 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
         let chatCount = 0;
         let patientsCount = 0;
         let calendarCount = 0;
+        let homeworkCount = 0;
 
         notifications.forEach((n) => {
           if (n.type === 'new_message') chatCount += n.count || 1;
           else if (n.type === 'new_match' || n.type === 'new_unmatch') patientsCount += 1;
           else if (isSessionNotification(n.type)) calendarCount += 1;
+          else if (isHomeworkNotification(n.type)) homeworkCount += 1;
         });
 
         setChatNotifCount(chatCount);
         setPatientsNotifCount(patientsCount);
         setCalendarNotifCount(calendarCount);
+        setHomeworkNotifCount(homeworkCount);
       } catch (err) {
         console.error('Sidebar failed to fetch notifications:', err);
       }
@@ -121,6 +136,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     let newChats = 0;
     let newPatientsNotifs = 0;
     let newCalendar = 0;
+    let newHomework = 0;
 
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
@@ -131,6 +147,8 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
           newPatientsNotifs += 1;
         } else if (isSessionNotification(parsed.data.type)) {
           newCalendar += 1;
+        } else if (isHomeworkNotification(parsed.data.type)) {
+          newHomework += 1;
         }
       }
     }
@@ -145,6 +163,9 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     if (newCalendar > 0 && location.pathname !== '/therapist/calendar') {
       setCalendarNotifCount((prev) => prev + newCalendar);
     }
+    if (newHomework > 0 && location.pathname !== '/therapist/homework') {
+      setHomeworkNotifCount((prev) => prev + newHomework);
+    }
   }, [websocketMessages, location.pathname]);
 
   // Helper to get the correct badge count for the current menu item
@@ -152,6 +173,7 @@ export const TherapistSidebarNav = ({ onNavigate }: { onNavigate?: () => void })
     if (path === '/therapist/') return chatNotifCount;
     if (path === '/therapist/patients') return patientsNotifCount;
     if (path === '/therapist/calendar') return calendarNotifCount;
+    if (path === '/therapist/homework') return homeworkNotifCount;
     return 0;
   };
 

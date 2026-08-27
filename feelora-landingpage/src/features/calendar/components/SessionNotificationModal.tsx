@@ -38,6 +38,9 @@ interface QueuedAlert {
   bookingId: string;
 }
 
+// Only session types are ever pushed onto the queue (see isSessionNotification
+// below) — the rest of NotificationType is stubbed here only to satisfy the
+// exhaustive Record and is never actually rendered.
 const ICON_BY_TYPE: Record<NotificationType, typeof CalendarCheck> = {
   new_session: CalendarCheck,
   updated_session: CalendarClock,
@@ -45,6 +48,9 @@ const ICON_BY_TYPE: Record<NotificationType, typeof CalendarCheck> = {
   new_message: CalendarCheck,
   new_match: CalendarCheck,
   new_unmatch: CalendarCheck,
+  new_homework: CalendarCheck,
+  updated_homework: CalendarCheck,
+  deleted_homework: CalendarCheck,
 };
 
 const TITLE_KEY_BY_TYPE: Record<string, string> = {

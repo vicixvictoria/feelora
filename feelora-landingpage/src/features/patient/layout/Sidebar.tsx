@@ -3,7 +3,11 @@ import { User, Send, Smile, LayoutDashboard, Calendar, BookOpen } from 'lucide-r
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWebsocket } from '@/contexts/WebsocketContext';
-import { notificationService, SESSION_NOTIFICATION_TYPES } from '../../notifications/api/notification-service';
+import {
+  notificationService,
+  SESSION_NOTIFICATION_TYPES,
+  HOMEWORK_NOTIFICATION_TYPES,
+} from '../../notifications/api/notification-service';
 
 // --- Interfaces for Websocket Data ---
 interface IncomingNotification {
@@ -18,6 +22,12 @@ interface IncomingNotification {
 
 const isSessionNotification = (type?: string) =>
   SESSION_NOTIFICATION_TYPES.includes(type as (typeof SESSION_NOTIFICATION_TYPES)[number]);
+
+// Same bucketing idea as isSessionNotification, but for the Aufgaben nav
+// item's own badge (new_homework/updated_homework/deleted_homework), so
+// those don't fall through into the generic "everything else" count.
+const isHomeworkNotification = (type?: string) =>
+  HOMEWORK_NOTIFICATION_TYPES.includes(type as (typeof HOMEWORK_NOTIFICATION_TYPES)[number]);
 
 const menuItems = [
   {
@@ -60,7 +70,7 @@ const menuItems = [
     descKey: 'patient.sidebar.homeworkDesc',
     icon: BookOpen,
     path: '/patient/homework',
-    comingSoon: true,
+    comingSoon: false,
   },
 ];
 
@@ -73,6 +83,7 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
   const [chatNotifCount, setChatNotifCount] = useState(0);
   const [dashboardNotifCount, setDashboardNotifCount] = useState(0);
   const [calendarNotifCount, setCalendarNotifCount] = useState(0);
+  const [homeworkNotifCount, setHomeworkNotifCount] = useState(0);
   const processedMessageCountRef = useRef(0);
 
   // --- Fetch Initial Notifications & Listen for Read Events ---
@@ -83,12 +94,15 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
         let chatCount = 0;
         let dashCount = 0;
         let calendarCount = 0;
+        let homeworkCount = 0;
 
         notifications.forEach((n) => {
           if (n.type === 'new_message') {
             chatCount += n.count || 1;
           } else if (isSessionNotification(n.type)) {
             calendarCount += 1;
+          } else if (isHomeworkNotification(n.type)) {
+            homeworkCount += 1;
           } else {
             // General notifications go to the dashboard
             dashCount += 1;
@@ -98,6 +112,7 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
         setChatNotifCount(chatCount);
         setDashboardNotifCount(dashCount);
         setCalendarNotifCount(calendarCount);
+        setHomeworkNotifCount(homeworkCount);
       } catch (err) {
         console.error('Sidebar failed to fetch notifications:', err);
       }
@@ -126,6 +141,7 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
     let newChats = 0;
     let newDash = 0;
     let newCalendar = 0;
+    let newHomework = 0;
 
     for (const msg of newMessages) {
       const parsed = msg as IncomingNotification;
@@ -134,6 +150,8 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
           newChats += 1;
         } else if (isSessionNotification(parsed.data.type)) {
           newCalendar += 1;
+        } else if (isHomeworkNotification(parsed.data.type)) {
+          newHomework += 1;
         } else {
           newDash += 1;
         }
@@ -150,6 +168,9 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
     if (newCalendar > 0 && location.pathname !== '/patient/calendar') {
       setCalendarNotifCount((prev) => prev + newCalendar);
     }
+    if (newHomework > 0 && location.pathname !== '/patient/homework') {
+      setHomeworkNotifCount((prev) => prev + newHomework);
+    }
   }, [websocketMessages, location.pathname]);
 
   // --- Helper to get the correct badge count ---
@@ -159,11 +180,13 @@ export const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => {
     if (path === '/patient/' && location.pathname === '/patient/') return 0;
     if (path === '/patient/dashboard' && location.pathname === '/patient/dashboard') return 0;
     if (path === '/patient/calendar' && location.pathname === '/patient/calendar') return 0;
+    if (path === '/patient/homework' && location.pathname === '/patient/homework') return 0;
 
     // Otherwise, show the actual count
     if (path === '/patient/') return chatNotifCount;
     if (path === '/patient/dashboard') return dashboardNotifCount;
     if (path === '/patient/calendar') return calendarNotifCount;
+    if (path === '/patient/homework') return homeworkNotifCount;
 
     return 0;
   };

@@ -7,7 +7,10 @@ type NotificationType =
   | 'new_unmatch'
   | 'new_session'
   | 'updated_session'
-  | 'deleted_session';
+  | 'deleted_session'
+  | 'new_homework'
+  | 'updated_homework'
+  | 'deleted_homework';
 
 export type { NotificationType };
 
@@ -17,6 +20,16 @@ export const SESSION_NOTIFICATION_TYPES: NotificationType[] = [
   'new_session',
   'updated_session',
   'deleted_session',
+];
+
+// Types whose notificationId is a homeworkId. new_homework/deleted_homework
+// go to the patient (assigned/removed by the therapist); updated_homework
+// goes to whichever side didn't make the edit (therapist notified when the
+// patient updates status/adds a note, and vice versa).
+export const HOMEWORK_NOTIFICATION_TYPES: NotificationType[] = [
+  'new_homework',
+  'updated_homework',
+  'deleted_homework',
 ];
 
 export interface NotificationItem {
@@ -31,6 +44,7 @@ export interface NotificationItem {
   createdAt?: string;
   updatedAt?: string;
   bookingId?: string;
+  homeworkId?: string;
 }
 
 export interface NotificationBatch {
@@ -65,6 +79,7 @@ const GET_NOTIFICATIONS = gql`
         createdAt
         updatedAt
         bookingId
+        homeworkId
       }
       nextToken
     }

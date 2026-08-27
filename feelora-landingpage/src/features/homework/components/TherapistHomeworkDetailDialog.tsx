@@ -67,6 +67,11 @@ const TherapistHomeworkDetailDialog = ({
         <div className="flex items-center justify-between p-4 border-b border-border chat-bubble-received">
           <div className="min-w-0">
             <h3 className="text-lg font-semibold text-foreground truncate">{patientName}</h3>
+            {/* Plain-text status label — the colored pill version lives in
+                STATUS_META on TherapistHomeworkPage.tsx (the list row this
+                dialog opens from); duplicated here as text only since this
+                header has no room for a badge. NEW and IN_PROGRESS both read
+                as "in Bearbeitung" — see the comment on STATUS_META for why. */}
             <p className="text-xs text-muted-foreground">
               {homework.status === 'COMPLETED'
                 ? t('app.therapist.homework.completed')

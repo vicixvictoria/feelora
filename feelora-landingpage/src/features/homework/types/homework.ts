@@ -6,7 +6,11 @@
 // plain string; the resolver builds the HomeworkNote object (From/Type/
 // CreatedAt) itself from the auth context.
 
-export type HomeworkStatus = 'IN_PROGRESS' | 'COMPLETED';
+// NEW = assigned but not yet acted on by the patient, IN_PROGRESS = patient
+// has started/left a note, COMPLETED = patient marked it done. The frontend
+// never sets NEW itself — it's the resolver's default for a freshly assigned
+// homework — but does need to read and display it.
+export type HomeworkStatus = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
 
 export type HomeworkNoteAuthorType = 'THERAPIST' | 'PATIENT';
 

@@ -1,19 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Check, Clock, Loader2, Search, Send, X } from 'lucide-react';
 import placeholderAvatar from '@/assets/avatar-Placeholder.png';
 import { therapistService } from '../api/therapist-service';
 import { homeworkService } from '@/features/homework/api/homework-service';
-import { Homework } from '@/features/homework/types/homework';
+import { Homework, HomeworkStatus } from '@/features/homework/types/homework';
 import TherapistHomeworkDetailDialog from '@/features/homework/components/TherapistHomeworkDetailDialog';
 import { useS3Download } from '@/hooks/use-s3-download';
+import { notificationService } from '@/features/notifications/api/notification-service';
+import { useWebsocket } from '@/contexts/WebsocketContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// Sentinel value for the "show all patients" option in the filter dropdown —
+// same convention as TherapistMoodTrackerPage.tsx (Radix Select doesn't
+// allow an empty string as an item value).
+const ALL_PATIENTS_VALUE = 'all';
 
 // Therapist's homework tab: lets the therapist assign new homework to a
 // matched patient and see the status of everything they've assigned so far.
 // The schema has no "all homeworks for all my patients" query, only
 // getPatientHomeworks(PatientId) — so the Task Status section is built by
 // fetching each matched patient's homeworks separately and merging them
-// client-side (see the load() effect below).
+// client-side (see refreshHomeworks below).
+
+// Mirrors SidebarNav's own local shape for websocket notification payloads —
+// see notification-service.ts's schema comment for why type stays a loose
+// string here rather than NotificationType (the raw WS payload is untyped JSON).
+interface IncomingNotification {
+  type?: string;
+  data?: {
+    type?: string;
+    homeworkId?: string;
+  };
+}
 
 interface MatchedPatient {
   Id: string;
@@ -23,6 +42,16 @@ interface MatchedPatient {
 
 const patientLabel = (patient: MatchedPatient) =>
   [patient.Name, patient.Surname].filter(Boolean).join(' ') || patient.Id;
+
+// Status pill styling/label/icon, shared between the Task Status list rows.
+// NEW and IN_PROGRESS render identically ("in Bearbeitung" + clock icon) —
+// the therapist doesn't need to distinguish "assigned, untouched" from
+// "patient has started it," only whether it's done.
+const STATUS_META: Record<HomeworkStatus, { className: string; icon: typeof Check; labelKey: string }> = {
+  NEW: { className: 'bg-yellow-100 text-yellow-700', icon: Clock, labelKey: 'app.therapist.homework.inProgress' },
+  IN_PROGRESS: { className: 'bg-yellow-100 text-yellow-700', icon: Clock, labelKey: 'app.therapist.homework.inProgress' },
+  COMPLETED: { className: 'bg-green-100 text-green-700', icon: Check, labelKey: 'app.therapist.homework.completed' },
+};
 
 // Local copy of the S3Avatar pattern from TherapistPatientsPage.tsx (no
 // shared component for it yet) — resolves a patient's uploaded profile
@@ -49,7 +78,6 @@ const S3Avatar = ({
 
 const TherapistHomeworkPage = () => {
   const { t } = useTranslation();
-  const [showOverlay, setShowOverlay] = useState(true);
 
   const [patients, setPatients] = useState<MatchedPatient[]>([]);
   const [isLoadingPatients, setIsLoadingPatients] = useState(true);
@@ -64,6 +92,33 @@ const TherapistHomeworkPage = () => {
 
   const [detailHomeworkId, setDetailHomeworkId] = useState<string | null>(null);
 
+  // Task Status filter — narrows the combined list down to one patient;
+  // defaults to showing everyone's tasks.
+  const [taskFilterPatientId, setTaskFilterPatientId] = useState<string>(ALL_PATIENTS_VALUE);
+
+  const { messages: websocketMessages } = useWebsocket();
+  const processedMessageCountRef = useRef(0);
+
+  // One getPatientHomeworks call per patient (no bulk endpoint exists), then
+  // flatten + sort newest-first for the combined Task Status list. Takes the
+  // patient list explicitly (rather than reading `patients` state) so the
+  // mount effect can call it with a freshly-fetched list before that state
+  // update has actually landed.
+  const refreshHomeworks = async (patientList: MatchedPatient[]) => {
+    setIsLoadingHomeworks(true);
+    try {
+      const perPatient = await Promise.all(
+        patientList.map((patient) => homeworkService.getPatientHomeworks(patient.Id)),
+      );
+      const all = perPatient.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      setHomeworks(all);
+    } catch (err) {
+      console.error('Error refreshing homeworks:', err);
+    } finally {
+      setIsLoadingHomeworks(false);
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       setIsLoadingPatients(true);
@@ -74,24 +129,58 @@ const TherapistHomeworkPage = () => {
         const ids: string[] = profile.Matches || [];
         const fetched = ids.length > 0 ? await therapistService.getMatchedPatients(ids) : [];
         setPatients(fetched);
+        await refreshHomeworks(fetched);
 
-        setIsLoadingHomeworks(true);
-        // One getPatientHomeworks call per patient (no bulk endpoint exists),
-        // then flatten + sort newest-first for the combined Task Status list.
-        const perPatient = await Promise.all(
-          fetched.map((patient: MatchedPatient) => homeworkService.getPatientHomeworks(patient.Id)),
-        );
-        const all = perPatient.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-        setHomeworks(all);
+        // The therapist only ever receives "updated_homework" (a patient
+        // completed/added a note to one of their tasks) — visiting this page
+        // is enough acknowledgment, so clear those and let the sidebar badge
+        // refresh via the same 'notificationsRead' event other pages use.
+        const { notifications } = await notificationService.getNotifications({ notificationType: 'updated_homework' });
+        if (notifications.length > 0) {
+          await Promise.all(
+            notifications
+              .filter((n) => n.homeworkId)
+              .map((n) => notificationService.readNotification({ notificationType: 'updated_homework', notificationId: n.homeworkId! })),
+          );
+          window.dispatchEvent(new Event('notificationsRead'));
+        }
       } catch (err) {
         console.error('Error loading homework page data:', err);
       } finally {
         setIsLoadingPatients(false);
-        setIsLoadingHomeworks(false);
       }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Live-updates the Task Status list when a patient completes/adds a note
+  // to one of their tasks, instead of requiring a manual reload — SidebarNav
+  // handles the unread-badge side of these same events when this page isn't
+  // open. Re-fetches with the current `patients` state rather than
+  // re-resolving matched patients from scratch.
+  useEffect(() => {
+    if (websocketMessages.length <= processedMessageCountRef.current) return;
+    const newMessages = websocketMessages.slice(processedMessageCountRef.current);
+    processedMessageCountRef.current = websocketMessages.length;
+
+    const homeworkNotifs = newMessages.filter((msg) => {
+      const parsed = msg as IncomingNotification;
+      return parsed.type === 'notification' && parsed.data?.type === 'updated_homework';
+    });
+    if (homeworkNotifs.length === 0) return;
+
+    refreshHomeworks(patients);
+    homeworkNotifs.forEach((msg) => {
+      const parsed = msg as IncomingNotification;
+      if (!parsed.data?.homeworkId) return;
+      notificationService
+        .readNotification({ notificationType: 'updated_homework', notificationId: parsed.data.homeworkId })
+        .then(() => window.dispatchEvent(new Event('notificationsRead')))
+        .catch((err) => console.error('Failed to ack homework notification:', err));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websocketMessages, patients]);
 
   const patientName = (patientId: string) => {
     const patient = patients.find((p) => p.Id === patientId);
@@ -155,32 +244,15 @@ const TherapistHomeworkPage = () => {
 
   const selectedPatient = patients.find((p) => p.Id === selectedPatientId) ?? null;
 
+  // Task Status list filtered down to the selected patient (or everyone,
+  // when ALL_PATIENTS_VALUE is selected).
+  const filteredHomeworks = useMemo(() => {
+    if (taskFilterPatientId === ALL_PATIENTS_VALUE) return homeworks;
+    return homeworks.filter((h) => h.patientId === taskFilterPatientId);
+  }, [homeworks, taskFilterPatientId]);
+
   return (
     <div className="max-w-5xl mx-auto animate-fade-in relative">
-      {/* Coming Soon Overlay */}
-      {showOverlay && (
-        <div className="absolute inset-0 z-20 bg-background/80 backdrop-blur-sm rounded-2xl">
-          <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-[25vh] px-6 text-center">
-            <div className="flex flex-col items-center gap-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {t('app.therapist.homework.comingSoon')}
-              </span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-foreground">
-                {t('app.therapist.homework.comingSoonTitle')}
-              </p>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-xs">
-                {t('app.therapist.homework.comingSoonDesc')}
-              </p>
-              <button
-                onClick={() => setShowOverlay(false)}
-                className="mt-2 feelora-btn-outline"
-              >
-                {t('app.therapist.homework.revealPreview')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* New Tasks Section */}
       <h1 className="text-2xl font-bold text-foreground mb-6">
         {t('app.therapist.homework.createTasks')}
@@ -275,20 +347,45 @@ const TherapistHomeworkPage = () => {
       )}
 
       {/* Task Status Section */}
-      <h2 className="text-2xl font-bold text-foreground mb-6">
-        {t('app.therapist.homework.taskStatus')}
-      </h2>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <h2 className="text-2xl font-bold text-foreground">
+          {t('app.therapist.homework.taskStatus')}
+        </h2>
+
+        {/* Patient filter: narrows the combined list down to a single patient */}
+        {patients.length > 0 && (
+          <div className="w-full sm:w-64">
+            <Select value={taskFilterPatientId} onValueChange={setTaskFilterPatientId}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_PATIENTS_VALUE}>
+                  {t('app.therapist.homework.allPatients')}
+                </SelectItem>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.Id} value={patient.Id}>
+                    {patientLabel(patient)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
       {isLoadingHomeworks ? (
         <div className="feelora-card flex justify-center items-center py-10">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
-      ) : homeworks.length === 0 ? (
+      ) : filteredHomeworks.length === 0 ? (
         <div className="feelora-card text-center py-8 text-muted-foreground">
-          {t('app.therapist.homework.noTasks')}
+          {taskFilterPatientId === ALL_PATIENTS_VALUE
+            ? t('app.therapist.homework.noTasks')
+            : t('app.therapist.homework.noTasksForPatient')}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {homeworks.map((task) => (
+          {filteredHomeworks.map((task) => (
             <div key={task.id} className="feelora-card flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex items-center gap-4">
                 <S3Avatar
@@ -301,20 +398,16 @@ const TherapistHomeworkPage = () => {
               <p className="text-sm text-muted-foreground italic flex-1 truncate">{task.title}</p>
               <div className="flex items-center gap-4 self-end sm:self-auto">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                    task.status === 'COMPLETED'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${STATUS_META[task.status].className}`}
                 >
-                  {task.status === 'COMPLETED' ? (
-                    <Check className="w-3.5 h-3.5" />
-                  ) : (
-                    <Clock className="w-3.5 h-3.5" />
-                  )}
-                  {task.status === 'COMPLETED'
-                    ? t('app.therapist.homework.completed')
-                    : t('app.therapist.homework.inProgress')}
+                  {/* JSX only treats a capitalized identifier as a component,
+                      so the lookup has to be assigned to a variable first —
+                      can't write `<STATUS_META[task.status].icon />` directly. */}
+                  {(() => {
+                    const StatusIcon = STATUS_META[task.status].icon;
+                    return <StatusIcon className="w-3.5 h-3.5" />;
+                  })()}
+                  {t(STATUS_META[task.status].labelKey)}
                 </span>
                 <button className="feelora-btn-primary" onClick={() => setDetailHomeworkId(task.id)}>
                   {t('app.therapist.homework.details')}
