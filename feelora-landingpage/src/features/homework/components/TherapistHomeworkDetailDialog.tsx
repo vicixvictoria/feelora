@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Loader2, Pencil, Send, Trash2, X } from 'lucide-react';
-import { Homework } from '../types/homework';
+import { Check, Lock, Loader2, Pencil, Trash2, X } from 'lucide-react';
+import { Homework, HomeworkNotes } from '../types/homework';
 
 interface TherapistHomeworkDetailDialogProps {
   homework: Homework;
   patientName: string;
+  // null while loading, or once loaded if the patient has never written a
+  // note (getNotes returns null until the Notes record is created lazily).
+  notes: HomeworkNotes | null;
+  isLoadingNotes: boolean;
   onClose: () => void;
   onUpdate: (updates: { title?: string; description?: string }) => Promise<void>;
-  onAddNote: (note: string) => Promise<void>;
   onDelete: () => Promise<void>;
 }
 
 const TherapistHomeworkDetailDialog = ({
   homework,
   patientName,
+  notes,
+  isLoadingNotes,
   onClose,
   onUpdate,
-  onAddNote,
   onDelete,
 }: TherapistHomeworkDetailDialogProps) => {
   const { t } = useTranslation();
@@ -25,8 +29,6 @@ const TherapistHomeworkDetailDialog = ({
   const [title, setTitle] = useState(homework.title);
   const [description, setDescription] = useState(homework.description);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
-  const [noteText, setNoteText] = useState('');
-  const [isSavingNote, setIsSavingNote] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -40,18 +42,6 @@ const TherapistHomeworkDetailDialog = ({
     }
   };
 
-  const handleSendNote = async () => {
-    const trimmed = noteText.trim();
-    if (!trimmed) return;
-    setIsSavingNote(true);
-    try {
-      await onAddNote(trimmed);
-      setNoteText('');
-    } finally {
-      setIsSavingNote(false);
-    }
-  };
-
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -60,6 +50,15 @@ const TherapistHomeworkDetailDialog = ({
       setIsDeleting(false);
     }
   };
+
+  // Read-only by product decision — the therapist never writes notes (see
+  // types/homework.ts), and only sees the patient's notes at all once the
+  // patient has opted to share them via the toggle in their own dialog.
+  const patientNotesShared = notes?.shareToTherapist ?? false;
+  const visibleNotes = [
+    ...(patientNotesShared ? (notes?.patientNotes ?? []) : []),
+    ...(notes?.therapistNotes ?? []),
+  ].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -135,43 +134,39 @@ const TherapistHomeworkDetailDialog = ({
             </div>
           )}
 
-          {/* Notes */}
+          {/* Notes — read-only. The composer that used to live here was
+              removed: only the patient can write notes now, and only shares
+              them with the therapist when they choose to (ShareToTherapist). */}
           <div className="pt-3 border-t border-border space-y-3">
             <p className="text-sm font-semibold text-foreground">{t('homework.notes.title')}</p>
-            {homework.notes.length === 0 ? (
+            {isLoadingNotes ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              </div>
+            ) : !patientNotesShared ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground text-center justify-center py-4">
+                <Lock className="w-4 h-4 shrink-0" />
+                {t('homework.notes.notShared')}
+              </div>
+            ) : visibleNotes.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">{t('homework.notes.empty')}</p>
             ) : (
-              homework.notes.map((note, index) => (
-                <div key={index} className={`flex ${note.type === 'THERAPIST' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
-                      note.type === 'THERAPIST'
-                        ? 'bg-primary text-primary-foreground rounded-br-sm'
-                        : 'bg-secondary/10 text-foreground rounded-bl-sm'
-                    }`}
-                  >
-                    <p>{note.note}</p>
-                    <p className="text-[10px] opacity-70 mt-1">{new Date(note.createdAt).toLocaleString()}</p>
+              // A note card, not a chat bubble — matches HomeworkNotesDialog
+              // (the patient's own view of the same notes).
+              visibleNotes.map((note, index) => (
+                <div key={index} className="rounded-xl border border-border bg-secondary/5 p-3">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs font-semibold text-primary">
+                      {note.type === 'THERAPIST' ? t('homework.notes.you') : t('homework.notes.patientAuthor')}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">
+                      {new Date(note.createdAt).toLocaleString()}
+                    </span>
                   </div>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{note.note}</p>
                 </div>
               ))
             )}
-            <div className="flex gap-2">
-              <textarea
-                className="flex-1 border border-border rounded-xl p-2.5 text-sm text-foreground bg-background resize-none min-h-[44px] focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder={t('homework.notes.placeholder')}
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                disabled={isSavingNote}
-              />
-              <button
-                className="feelora-btn-primary self-end px-3"
-                onClick={handleSendNote}
-                disabled={isSavingNote || !noteText.trim()}
-              >
-                {isSavingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </button>
-            </div>
           </div>
         </div>
 

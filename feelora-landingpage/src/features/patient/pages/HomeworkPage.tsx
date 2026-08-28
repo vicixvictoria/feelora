@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { Check, FileText, Loader2, RefreshCw } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { homeworkService } from '@/features/homework/api/homework-service';
-import { Homework } from '@/features/homework/types/homework';
+import { Homework, HomeworkNotes } from '@/features/homework/types/homework';
 import HomeworkNotesDialog from '@/features/homework/components/HomeworkNotesDialog';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { useS3Download } from '@/hooks/use-s3-download';
@@ -40,6 +40,8 @@ const HomeworkPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [notesHomeworkId, setNotesHomeworkId] = useState<string | null>(null);
+  const [notesData, setNotesData] = useState<HomeworkNotes | null>(null);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
 
   const { messages: websocketMessages } = useWebsocket();
   const processedMessageCountRef = useRef(0);
@@ -147,9 +149,10 @@ const HomeworkPage = () => {
   const handleToggleStatus = async (homework: Homework) => {
     setUpdatingId(homework.id);
     try {
-      const updated = await homeworkService.updateOwnHomework(homework.id, {
-        status: homework.status === 'COMPLETED' ? 'IN_PROGRESS' : 'COMPLETED',
-      });
+      const updated = await homeworkService.updateOwnHomework(
+        homework.id,
+        homework.status === 'COMPLETED' ? 'IN_PROGRESS' : 'COMPLETED',
+      );
       setHomeworks((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
     } catch (err) {
       console.error('Error updating homework status:', err);
@@ -158,9 +161,51 @@ const HomeworkPage = () => {
     }
   };
 
-  const handleAddNote = async (homeworkId: string, note: string) => {
-    const updated = await homeworkService.updateOwnHomework(homeworkId, { note });
-    setHomeworks((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+  // Notes are a separate entity from Homework (see types/homework.ts), so
+  // they're fetched independently the moment the notes dialog opens rather
+  // than living on the `homeworks` list.
+  useEffect(() => {
+    if (!notesHomeworkId) {
+      setNotesData(null);
+      return;
+    }
+    setIsLoadingNotes(true);
+    homeworkService
+      .getNotes(notesHomeworkId)
+      .then(setNotesData)
+      .catch((err) => {
+        console.error('Error fetching homework notes:', err);
+        setNotesData(null);
+      })
+      .finally(() => setIsLoadingNotes(false));
+  }, [notesHomeworkId]);
+
+  const handleAddNote = async (note: string) => {
+    if (!notesHomeworkId) return;
+    const updated = await homeworkService.updateNotes(notesHomeworkId, { note });
+    setNotesData(updated);
+
+    // Writing a note is the patient's first real interaction with a task —
+    // move it out of NEW so the "Neu" badge clears. updateNotes only touches
+    // the separate Notes entity (see types/homework.ts), it can't do this
+    // itself, so it's a second call here.
+    const homework = homeworks.find((h) => h.id === notesHomeworkId);
+    if (homework?.status === 'NEW') {
+      try {
+        const updatedHomework = await homeworkService.updateOwnHomework(notesHomeworkId, 'IN_PROGRESS');
+        setHomeworks((prev) => prev.map((h) => (h.id === updatedHomework.id ? updatedHomework : h)));
+      } catch (err) {
+        console.error('Error moving homework out of NEW after adding a note:', err);
+      }
+    }
+  };
+
+  // Independent of handleAddNote — Note and Share are separately optional
+  // now, so the dialog's toggle saves on its own without needing a note.
+  const handleShareChange = async (share: boolean) => {
+    if (!notesHomeworkId) return;
+    const updated = await homeworkService.updateNotes(notesHomeworkId, { share });
+    setNotesData(updated);
   };
 
   // NEW and IN_PROGRESS both render in the "new tasks" section — the UI only
@@ -182,7 +227,7 @@ const HomeworkPage = () => {
       ) : (
         <>
           {/* New Tasks */}
-          <h1 className="text-2xl font-bold text-purple mb-6">{t('patient.homework.newTasks')}</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-6">{t('patient.homework.newTasks')}</h1>
           {newTasks.length === 0 ? (
             <div className="feelora-card text-center py-8 text-muted-foreground mb-10">
               {t('patient.homework.noNewTasks')}
@@ -243,7 +288,7 @@ const HomeworkPage = () => {
           )}
 
           {/* Completed Tasks */}
-          <h2 className="text-2xl font-bold text-purple mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-6">
             {t('patient.homework.completedTasks')}
           </h2>
           {completedTasks.length === 0 ? (
@@ -286,15 +331,14 @@ const HomeworkPage = () => {
         </>
       )}
 
-      {/* currentUserType is hardcoded here since this page is patient-only —
-          it just decides which side a note bubble renders on (own notes vs
-          the therapist's), the actual author is set server-side from the
-          auth token regardless of what's passed to onAddNote. */}
       {notesHomework && (
         <HomeworkNotesDialog
-          homework={notesHomework}
-          currentUserType="PATIENT"
-          onAddNote={(note) => handleAddNote(notesHomework.id, note)}
+          homeworkTitle={notesHomework.title}
+          homeworkDescription={notesHomework.description}
+          notes={notesData}
+          isLoading={isLoadingNotes}
+          onAddNote={handleAddNote}
+          onShareChange={handleShareChange}
           onClose={() => setNotesHomeworkId(null)}
         />
       )}

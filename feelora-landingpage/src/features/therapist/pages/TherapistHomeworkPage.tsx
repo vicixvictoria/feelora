@@ -4,7 +4,7 @@ import { BookOpen, Check, Clock, Loader2, Search, Send, X } from 'lucide-react';
 import placeholderAvatar from '@/assets/avatar-Placeholder.png';
 import { therapistService } from '../api/therapist-service';
 import { homeworkService } from '@/features/homework/api/homework-service';
-import { Homework, HomeworkStatus } from '@/features/homework/types/homework';
+import { Homework, HomeworkNotes, HomeworkStatus } from '@/features/homework/types/homework';
 import TherapistHomeworkDetailDialog from '@/features/homework/components/TherapistHomeworkDetailDialog';
 import { S3Avatar } from '@/components/s3/S3Avatar';
 import { notificationService } from '@/features/notifications/api/notification-service';
@@ -68,6 +68,8 @@ const TherapistHomeworkPage = () => {
   const [isSending, setIsSending] = useState(false);
 
   const [detailHomeworkId, setDetailHomeworkId] = useState<string | null>(null);
+  const [detailNotes, setDetailNotes] = useState<HomeworkNotes | null>(null);
+  const [isLoadingDetailNotes, setIsLoadingDetailNotes] = useState(false);
 
   // Task Status filter — narrows the combined list down to one patient;
   // defaults to showing everyone's tasks.
@@ -95,6 +97,28 @@ const TherapistHomeworkPage = () => {
       setIsLoadingHomeworks(false);
     }
   };
+
+  // Notes are a separate entity from Homework (see types/homework.ts), so
+  // they're fetched independently the moment the details dialog opens
+  // rather than living on the `homeworks` list. Read-only here — the
+  // therapist never writes notes, only views what the patient has shared.
+  const loadDetailNotes = async (id: string) => {
+    setIsLoadingDetailNotes(true);
+    try {
+      setDetailNotes(await homeworkService.getNotes(id));
+    } catch (err) {
+      console.error('Error fetching homework notes:', err);
+      setDetailNotes(null);
+    } finally {
+      setIsLoadingDetailNotes(false);
+    }
+  };
+
+  useEffect(() => {
+    if (detailHomeworkId) loadDetailNotes(detailHomeworkId);
+    else setDetailNotes(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailHomeworkId]);
 
   useEffect(() => {
     const load = async () => {
@@ -148,6 +172,10 @@ const TherapistHomeworkPage = () => {
     if (homeworkNotifs.length === 0) return;
 
     refreshHomeworks(patients);
+    // If the therapist currently has this homework's details open, also
+    // live-refresh its notes — the notification is very likely the patient
+    // having just added/shared one.
+    if (detailHomeworkId) loadDetailNotes(detailHomeworkId);
     homeworkNotifs.forEach((msg) => {
       const parsed = msg as IncomingNotification;
       if (!parsed.data?.homeworkId) return;
@@ -157,7 +185,7 @@ const TherapistHomeworkPage = () => {
         .catch((err) => console.error('Failed to ack homework notification:', err));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [websocketMessages, patients]);
+  }, [websocketMessages, patients, detailHomeworkId]);
 
   const patientName = (patientId: string) => {
     const patient = patients.find((p) => p.Id === patientId);
@@ -203,12 +231,6 @@ const TherapistHomeworkPage = () => {
   const handleUpdateDetail = async (updates: { title?: string; description?: string }) => {
     if (!detailHomework) return;
     const updated = await homeworkService.updateHomework(detailHomework.id, updates);
-    setHomeworks((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
-  };
-
-  const handleAddNoteDetail = async (note: string) => {
-    if (!detailHomework) return;
-    const updated = await homeworkService.updateHomework(detailHomework.id, { note });
     setHomeworks((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
   };
 
@@ -398,17 +420,19 @@ const TherapistHomeworkPage = () => {
         </div>
       )}
 
-      {/* Details pop-up: lets the therapist edit title/description, read and
-          add notes, and delete the task — all three actions go through
-          updateHomework/deleteHomework and patch the matching entry in
-          `homeworks` locally so the list doesn't need a full refetch. */}
+      {/* Details pop-up: lets the therapist edit title/description, read
+          (read-only) any notes the patient has chosen to share, and delete
+          the task. Edit/delete go through updateHomework/deleteHomework and
+          patch the matching entry in `homeworks` locally so the list
+          doesn't need a full refetch. */}
       {detailHomework && (
         <TherapistHomeworkDetailDialog
           homework={detailHomework}
           patientName={patientName(detailHomework.patientId)}
+          notes={detailNotes}
+          isLoadingNotes={isLoadingDetailNotes}
           onClose={() => setDetailHomeworkId(null)}
           onUpdate={handleUpdateDetail}
-          onAddNote={handleAddNoteDetail}
           onDelete={handleDeleteDetail}
         />
       )}
