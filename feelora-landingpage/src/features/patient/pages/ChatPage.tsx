@@ -8,6 +8,7 @@ import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { patientService } from '../api/patient-service';
 import { notificationService } from '../../notifications/api/notification-service';
 import { useS3Download } from '@/hooks/use-s3-download';
+import { S3Avatar } from '@/components/s3/S3Avatar';
 
 // --- Interface for the Sidebar ---
 interface SidebarChat {
@@ -45,30 +46,6 @@ const getAvailabilityLabel = (id: string, t: any) => {
     so: t('q.t.availability.sun', 'Sonntag'),
   };
   return map[id] || id.toUpperCase();
-};
-
-// --- Smart S3 Avatar Component (Used only for the Chat Sidebar) ---
-const S3Avatar = ({
-  userId,
-  fallbackSrc,
-  className,
-  alt = '',
-}: {
-  userId?: string;
-  fallbackSrc: string;
-  className: string;
-  alt?: string;
-}) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) {
-      download('profile', 'public', userId).catch(() => {});
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
 };
 
 const ChatPage = () => {

@@ -4,7 +4,7 @@ import avatar from '@/assets/avatar-Placeholder.png';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { therapistService } from '../api/therapist-service';
-import { useS3Download } from '@/hooks/use-s3-download';
+import { S3Avatar } from '@/components/s3/S3Avatar';
 import { notificationService } from '../../notifications/api/notification-service';
 
 interface MatchedPatient {
@@ -17,27 +17,6 @@ interface MatchedPatient {
   Languages?: string[] | null;
   sessionStarted?: boolean | null;
 }
-
-const S3Avatar = ({
-  userId,
-  fallbackSrc,
-  className,
-  alt = '',
-}: {
-  userId?: string;
-  fallbackSrc: string;
-  className: string;
-  alt?: string;
-}) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) download('profile', 'public', userId).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
-};
 
 const calcAge = (birthDateSeconds?: number | null): string => {
   if (!birthDateSeconds) return '—';

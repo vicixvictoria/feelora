@@ -5,7 +5,7 @@ import { ExternalLink, Loader2, Check, Ghost, Link, Copy } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { useQuery } from '@apollo/client';
 import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
-import { useS3Download } from '@/hooks/use-s3-download';
+import { S3Avatar } from '@/components/s3/S3Avatar';
 // Notification center is disabled on this page (see below) — re-add these imports
 // (plus `useRef` from 'react') if it gets re-enabled.
 // import { useWebsocket } from '@/contexts/WebsocketContext';
@@ -114,17 +114,6 @@ const translateSpecialty = (spec: string, t: any) => {
 //     sk?: string;
 //   };
 // }
-
-const S3Avatar = ({ userId, fallbackSrc, className, alt = '' }: { userId?: string; fallbackSrc: string; className: string; alt?: string; }) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) download('profile', 'public', userId).catch(() => {});
-    else download('profile', 'public').catch(() => {});
-  }, [userId]);
-
-  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
-};
 
 const TherapistProfilePage = () => {
   const { t } = useTranslation();

@@ -5,37 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import placeholderAvatar from '@/assets/avatar-Placeholder.png';
 import { therapistService } from '../api/therapist-service';
 import { emojiDictionary } from '@/components/ui/moodtracker/mood-tracker';
-import { useS3Download } from '@/hooks/use-s3-download';
+import { S3Avatar } from '@/components/s3/S3Avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Sentinel value for the "show all patients" option in the filter dropdown.
 // Radix Select does not allow an empty string as an item value, so we use this instead.
 const ALL_PATIENTS_VALUE = 'all';
-
-// --- S3 Avatar Component ---
-const S3Avatar = ({
-  userId,
-  fallbackSrc,
-  className,
-  alt = '',
-}: {
-  userId?: string;
-  fallbackSrc: string;
-  className: string;
-  alt?: string;
-}) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) {
-      // Pass the userId to fetch that specific patient's profile picture
-      download('profile', 'public', userId).catch(() => {});
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
-};
 
 // helper for date format
 const formatDate = (isoString: string) => {

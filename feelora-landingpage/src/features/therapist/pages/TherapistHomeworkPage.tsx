@@ -6,7 +6,7 @@ import { therapistService } from '../api/therapist-service';
 import { homeworkService } from '@/features/homework/api/homework-service';
 import { Homework, HomeworkStatus } from '@/features/homework/types/homework';
 import TherapistHomeworkDetailDialog from '@/features/homework/components/TherapistHomeworkDetailDialog';
-import { useS3Download } from '@/hooks/use-s3-download';
+import { S3Avatar } from '@/components/s3/S3Avatar';
 import { notificationService } from '@/features/notifications/api/notification-service';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -51,29 +51,6 @@ const STATUS_META: Record<HomeworkStatus, { className: string; icon: typeof Chec
   NEW: { className: 'bg-yellow-100 text-yellow-700', icon: Clock, labelKey: 'app.therapist.homework.inProgress' },
   IN_PROGRESS: { className: 'bg-yellow-100 text-yellow-700', icon: Clock, labelKey: 'app.therapist.homework.inProgress' },
   COMPLETED: { className: 'bg-green-100 text-green-700', icon: Check, labelKey: 'app.therapist.homework.completed' },
-};
-
-// Local copy of the S3Avatar pattern from TherapistPatientsPage.tsx (no
-// shared component for it yet) — resolves a patient's uploaded profile
-// picture from S3, falling back to the placeholder while it loads or if
-// the patient has none.
-const S3Avatar = ({
-  userId,
-  className,
-  alt = '',
-}: {
-  userId?: string;
-  className: string;
-  alt?: string;
-}) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) download('profile', 'public', userId).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  return <img src={imageUrl || placeholderAvatar} alt={alt} className={className} />;
 };
 
 const TherapistHomeworkPage = () => {
@@ -273,6 +250,7 @@ const TherapistHomeworkPage = () => {
               <div key={patient.Id} className="feelora-card flex items-center gap-4">
                 <S3Avatar
                   userId={patient.Id}
+                  fallbackSrc={placeholderAvatar}
                   alt={patientLabel(patient)}
                   className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                 />
@@ -390,6 +368,7 @@ const TherapistHomeworkPage = () => {
               <div className="flex items-center gap-4">
                 <S3Avatar
                   userId={task.patientId}
+                  fallbackSrc={placeholderAvatar}
                   alt={patientName(task.patientId)}
                   className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                 />

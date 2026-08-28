@@ -8,7 +8,8 @@ import { useWebsocket } from '@/contexts/WebsocketContext';
 import { chatService, ChatMessage } from '@/features/chat/api/chatService';
 import { therapistService } from '../api/therapist-service';
 import { useS3Download } from '@/hooks/use-s3-download';
-import { notificationService } from '../../notifications/api/notification-service'; 
+import { S3Avatar } from '@/components/s3/S3Avatar';
+import { notificationService } from '../../notifications/api/notification-service';
 
 // --- Interface for the Sidebar ---
 interface SidebarChat {
@@ -91,29 +92,6 @@ const translateLanguage = (langKey: string, t: any) => {
 
   const translationPath = langMap[langKey.toLowerCase()];
   return translationPath ? t(translationPath) : langKey.charAt(0).toUpperCase() + langKey.slice(1);
-};
-
-// --- S3 Avatar Component (Used only for the Sidebar) ---
-const S3Avatar = ({
-  userId,
-  fallbackSrc,
-  className,
-  alt = '',
-}: {
-  userId?: string;
-  fallbackSrc: string;
-  className: string;
-  alt?: string;
-}) => {
-  const { download, imageUrl } = useS3Download();
-
-  useEffect(() => {
-    if (userId) {
-      download('profile', 'public', userId).catch(() => {});
-    }
-  }, [userId]);
-
-  return <img src={imageUrl || fallbackSrc} alt={alt} className={className} />;
 };
 
 const calculateAge = (birthDate: string | number | null | undefined): string => {
