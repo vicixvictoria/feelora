@@ -11,6 +11,7 @@ import { useS3Download } from '@/hooks/use-s3-download';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY } from '../api/patient-service';
 import {
   notificationService,
+  getNotificationId,
   HOMEWORK_NOTIFICATION_TYPES,
   NotificationType,
 } from '@/features/notifications/api/notification-service';
@@ -23,6 +24,7 @@ interface IncomingNotification {
   data?: {
     type?: string;
     homeworkId?: string;
+    sk?: string;
   };
 }
 const isHomeworkNotification = (type?: string) =>
@@ -95,12 +97,12 @@ const HomeworkPage = () => {
       try {
         const { notifications } = await notificationService.getNotifications({});
         const homeworkNotifs = notifications.filter(
-          (n) => n.type && HOMEWORK_NOTIFICATION_TYPES.includes(n.type) && n.homeworkId,
+          (n) => n.type && HOMEWORK_NOTIFICATION_TYPES.includes(n.type) && getNotificationId(n),
         );
         if (homeworkNotifs.length > 0) {
           await Promise.all(
             homeworkNotifs.map((n) =>
-              notificationService.readNotification({ notificationType: n.type!, notificationId: n.homeworkId! }),
+              notificationService.readNotification({ notificationType: n.type!, notificationId: getNotificationId(n) }),
             ),
           );
           window.dispatchEvent(new Event('notificationsRead'));
@@ -131,11 +133,13 @@ const HomeworkPage = () => {
     fetchHomeworks();
     homeworkNotifs.forEach((msg) => {
       const parsed = msg as IncomingNotification;
-      if (!parsed.data?.type || !parsed.data.homeworkId) return;
+      if (!parsed.data?.type) return;
+      const notificationId = getNotificationId({ homeworkId: parsed.data.homeworkId, sk: parsed.data.sk });
+      if (!notificationId) return;
       notificationService
         .readNotification({
           notificationType: parsed.data.type as NotificationType,
-          notificationId: parsed.data.homeworkId,
+          notificationId,
         })
         .then(() => window.dispatchEvent(new Event('notificationsRead')))
         .catch((err) => console.error('Failed to ack homework notification:', err));

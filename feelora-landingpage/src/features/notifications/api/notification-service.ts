@@ -52,6 +52,27 @@ export interface NotificationBatch {
   nextToken?: string | null;
 }
 
+// Extracts the id to pass as readNotification's notificationId. Not every
+// notification type reliably populates its own dedicated field (see
+// Dashboard.tsx's long-standing version of this same fallback for
+// new_match/new_unmatch/new_message) — when the type-specific field is
+// missing, fall back to parsing it out of `sk`, which the backend documents
+// as "<notificationType>#<notificationId>" for every type. Missing this
+// fallback for homework notifications specifically was the cause of
+// updated_homework items never getting marked read.
+export const getNotificationId = (n: NotificationItem): string => {
+  if (n.homeworkId) return n.homeworkId;
+  if (n.bookingId) return n.bookingId;
+  if (n.conversationId) return n.conversationId;
+  if (n.unmatchedId) return n.unmatchedId;
+  if (n.matchedId) return n.matchedId;
+  if (n.sk) {
+    const parts = n.sk.split('#');
+    return parts.length > 1 ? parts[1] : n.sk;
+  }
+  return '';
+};
+
 // Websocket token
 const GENERATE_WEBSOCKET_TOKEN = gql`
   mutation GenerateWSAuthToken {

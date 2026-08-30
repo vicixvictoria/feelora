@@ -7,7 +7,7 @@ import { homeworkService } from '@/features/homework/api/homework-service';
 import { Homework, HomeworkNotes, HomeworkStatus } from '@/features/homework/types/homework';
 import TherapistHomeworkDetailDialog from '@/features/homework/components/TherapistHomeworkDetailDialog';
 import { S3Avatar } from '@/components/s3/S3Avatar';
-import { notificationService } from '@/features/notifications/api/notification-service';
+import { notificationService, getNotificationId } from '@/features/notifications/api/notification-service';
 import { useWebsocket } from '@/contexts/WebsocketContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -31,6 +31,7 @@ interface IncomingNotification {
   data?: {
     type?: string;
     homeworkId?: string;
+    sk?: string;
   };
 }
 
@@ -140,8 +141,8 @@ const TherapistHomeworkPage = () => {
         if (notifications.length > 0) {
           await Promise.all(
             notifications
-              .filter((n) => n.homeworkId)
-              .map((n) => notificationService.readNotification({ notificationType: 'updated_homework', notificationId: n.homeworkId! })),
+              .filter((n) => getNotificationId(n))
+              .map((n) => notificationService.readNotification({ notificationType: 'updated_homework', notificationId: getNotificationId(n) })),
           );
           window.dispatchEvent(new Event('notificationsRead'));
         }
@@ -178,9 +179,10 @@ const TherapistHomeworkPage = () => {
     if (detailHomeworkId) loadDetailNotes(detailHomeworkId);
     homeworkNotifs.forEach((msg) => {
       const parsed = msg as IncomingNotification;
-      if (!parsed.data?.homeworkId) return;
+      const notificationId = getNotificationId({ homeworkId: parsed.data?.homeworkId, sk: parsed.data?.sk });
+      if (!notificationId) return;
       notificationService
-        .readNotification({ notificationType: 'updated_homework', notificationId: parsed.data.homeworkId })
+        .readNotification({ notificationType: 'updated_homework', notificationId })
         .then(() => window.dispatchEvent(new Event('notificationsRead')))
         .catch((err) => console.error('Failed to ack homework notification:', err));
     });
