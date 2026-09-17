@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { FeeloraLaptopNotification } from './FeeloraDeviceNotification';
 import { UsersIcon, TrendingUpIcon, BriefcaseIcon, BarChartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -11,6 +12,7 @@ export function ForTherapistsSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [ref, inView] = useScrollReveal();
+  const reduceMotion = useReducedMotion();
 
   const handleLoginClickTherapist = () => {
     navigate('/login');
@@ -58,12 +60,27 @@ export function ForTherapistsSection() {
             transition={{ duration: 1, delay: 0.3 }}
             className="relative hidden lg:flex order-2 lg:order-1 justify-center w-full"
           >
-            <img
-              src={forTherapistsImg}
-              alt="therapist connection concept"
-              className="w-[80%] max-w-none -ml-[10%] h-auto object-contain"
-              loading="lazy"
-            />
+            <motion.div
+              className="w-full flex justify-center [transform-origin:50%_90%]"
+              animate={
+                reduceMotion
+                  ? undefined
+                  : { rotate: [0, -0.7, 0, 0.7, 0], y: [0, -5, 0, -3, 0] }
+              }
+              transition={
+                reduceMotion
+                  ? undefined
+                  : { duration: 9, repeat: Infinity, ease: 'easeInOut' }
+              }
+            >
+              <img
+                src={forTherapistsImg}
+                alt="therapist connection concept"
+                className="w-[80%] max-w-none -ml-[10%] h-auto object-contain"
+                loading="lazy"
+              />
+            </motion.div>
+            <FeeloraLaptopNotification className="bottom-[12%] left-[8%]" />
           </motion.div>
 
           <div className="order-1 lg:order-2 min-w-0">

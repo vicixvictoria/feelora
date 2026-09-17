@@ -1,6 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { FeeloraPhoneNotification } from './FeeloraDeviceNotification';
 import { HeartIcon, CalendarIcon, BrainIcon, HandshakeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button-landing';
 import { Card } from '@/components/ui/card-landing';
@@ -13,6 +14,7 @@ export function ForPatientsSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [ref, inView] = useScrollReveal();
+  const reduceMotion = useReducedMotion();
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -172,12 +174,27 @@ export function ForPatientsSection() {
             transition={{ duration: 1, delay: 0.3 }}
             className="relative hidden lg:flex justify-center w-full"
           >
-            <img
-              src={forPatientsImg}
-              alt="patient digital therapy concept"
-              className="w-[150%] max-w-none -ml-[30%] h-auto object-contain"
-              loading="lazy"
-            />
+            <motion.div
+              className="relative w-full flex justify-center [transform-origin:50%_90%]"
+              animate={
+                reduceMotion
+                  ? undefined
+                  : { rotate: [0, 0.7, 0, -0.7, 0], y: [0, -6, 0, -4, 0] }
+              }
+              transition={
+                reduceMotion
+                  ? undefined
+                  : { duration: 8, repeat: Infinity, ease: 'easeInOut' }
+              }
+            >
+              <img
+                src={forPatientsImg}
+                alt="patient digital therapy concept"
+                className="w-[132%] max-w-none -ml-[14%] h-auto object-contain"
+                loading="lazy"
+              />
+            </motion.div>
+            <FeeloraPhoneNotification className="bottom-[20%] left-[56%]" />
           </motion.div>
         </motion.div>
       </div>
