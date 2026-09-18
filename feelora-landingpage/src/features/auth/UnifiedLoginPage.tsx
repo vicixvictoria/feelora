@@ -1,16 +1,10 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button-landing';
 import { User, Stethoscope } from 'lucide-react';
 
 function UnifiedLoginPage() {
-  const { login, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const { t } = useTranslation();
-
-  const handleLogin = (type: 'user' | 'therapist') => {
-    // triggers the backend redirect logic already in your AuthContext
-    login(type, '/');
-  };
 
   if (isLoading) {
     return (
@@ -37,12 +31,6 @@ function UnifiedLoginPage() {
           <p className="text-gray-500 mb-8 min-h-[3rem]">
             {t('login.patient.subtitle.preReg')}
           </p>
-          <Button 
-            onClick={() => handleLogin('user')} 
-            className="w-full py-6 text-lg"
-          >
-            {t('login.continueSignIn.patient.preReg')}
-          </Button>
         </div>
 
         {/* Therapist Option */}
@@ -54,13 +42,6 @@ function UnifiedLoginPage() {
           <p className="text-gray-500 mb-8 min-h-[3rem]">
             {t('login.therapist.subtitle')}
           </p>
-          <Button 
-            onClick={() => handleLogin('therapist')} 
-            variant="outline"
-            className="w-full py-6 text-lg border-secondary text-secondary hover:bg-secondary hover:text-white"
-          >
-            {t('login.continueSignIn.therapist')}
-          </Button>
         </div>
       </div>
 

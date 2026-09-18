@@ -1,15 +1,24 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { ShieldIcon, AwardIcon, UsersIcon } from 'lucide-react';
+import { ZapIcon, AwardIcon, UsersIcon, type LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card-landing';
 import { useTranslation } from 'react-i18next';
+
+type Stat = {
+  icon: LucideIcon;
+  value?: number;
+  suffix?: string;
+  bigText?: string;
+  label: string;
+  description: string;
+};
 
 export function WhyFeeloraSection() {
   const { t } = useTranslation();
   const [ref, inView] = useScrollReveal();
 
-  const stats = [
+  const stats: Stat[] = [
     {
       icon: UsersIcon,
       value: 50,
@@ -25,9 +34,8 @@ export function WhyFeeloraSection() {
       description: t('why.stat2.desc'),
     },
     {
-      icon: ShieldIcon,
-      value: 100,
-      suffix: '%',
+      icon: ZapIcon,
+      bigText: t('why.stat3.value'),
       label: t('why.stat3.label'),
       description: t('why.stat3.desc'),
     },
@@ -63,14 +71,21 @@ export function WhyFeeloraSection() {
                 <div className="w-20 h-20 rounded-full bg-tertiary flex items-center justify-center mx-auto mb-8">
                   <stat.icon className="w-10 h-10 text-tertiary-foreground" strokeWidth={1.5} />
                 </div>
-                <div className="mb-6">
-                  <AnimatedCounter
-                    value={stat.value}
-                    suffix={stat.suffix}
-                    inView={inView}
-                    delay={index * 0.2}
-                  />
-                </div>
+                {stat.value !== undefined && (
+                  <div className="mb-6">
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix ?? ''}
+                      inView={inView}
+                      delay={index * 0.2}
+                    />
+                  </div>
+                )}
+                {stat.bigText !== undefined && (
+                  <div className="mb-6 text-4xl font-headline font-bold text-tertiary-foreground">
+                    {stat.bigText}
+                  </div>
+                )}
                 <h3 className="text-h4 font-headline font-semibold text-gray-800 mb-4">
                   {stat.label}
                 </h3>

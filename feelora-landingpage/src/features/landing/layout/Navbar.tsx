@@ -97,14 +97,6 @@ export function Navbar() {
                     {t('nav.whyFeelora')}
                   </button>
                 </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <button
-                    onClick={() => scrollToSection('testimonials')}
-                    className="text-gray-700 hover:text-primary transition-colors cursor-pointer font-normal"
-                  >
-                    {t('nav.testimonials')}
-                  </button>
-                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
 
