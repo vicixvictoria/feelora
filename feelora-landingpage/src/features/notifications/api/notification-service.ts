@@ -1,5 +1,9 @@
-import { gql } from '@apollo/client';
-import { apolloClient } from '@/lib/apollo-client';
+// PORTFOLIO DEMO MODE: the backend is offline, so the real API calls below are
+// commented out (not deleted) and `notificationService` at the bottom of this
+// file serves demo data from src/mocks instead.
+// import { gql } from '@apollo/client';
+// import { apolloClient } from '@/lib/apollo-client';
+import { db, getCurrentUserId, notifyDemoStoreChanged, respond } from '@/mocks/demo-store';
 
 type NotificationType =
   | 'new_message'
@@ -73,84 +77,122 @@ export const getNotificationId = (n: NotificationItem): string => {
   return '';
 };
 
-// Websocket token
-const GENERATE_WEBSOCKET_TOKEN = gql`
-  mutation GenerateWSAuthToken {
-    generateWSAuthToken {
-      sessionId
-      profileId
-      used
-    }
-  }
-`;
+// // Websocket token
+// const GENERATE_WEBSOCKET_TOKEN = gql`
+//   mutation GenerateWSAuthToken {
+//     generateWSAuthToken {
+//       sessionId
+//       profileId
+//       used
+//     }
+//   }
+// `;
+//
+// // Batch notification fetch
+// const GET_NOTIFICATIONS = gql`
+//   query GetNotifications($notificationType: NotificationType, $limit: Int, $nextToken: String) {
+//     getNotifications(notificationType: $notificationType, limit: $limit, nextToken: $nextToken) {
+//       notifications {
+//         recipientId
+//         sk
+//         type
+//         conversationId
+//         count
+//         senderName
+//         matchedId
+//         unmatchedId
+//         createdAt
+//         updatedAt
+//         bookingId
+//         homeworkId
+//       }
+//       nextToken
+//     }
+//   }
+// `;
+//
+// // Read notification (deletes the item from notification store)
+// const READ_NOTIFICATION = gql`
+//   mutation ReadNotification($notificationType: NotificationType!, $notificationId: String!) {
+//     readNotification(notificationType: $notificationType, notificationId: $notificationId)
+//   }
+// `;
+//
+// // --- Service Object ---
+// export const notificationService = {
+//   // Generate Websocket Token
+//   generateWebsocketToken: async () => {
+//     // no "await" here! It's a "fire-and-forget" call.
+//     const { data }: any = await apolloClient
+//       .mutate({
+//         mutation: GENERATE_WEBSOCKET_TOKEN,
+//         fetchPolicy: 'network-only',
+//       })
+//       .catch((error) => {
+//         // We catch the error silently.
+//         console.debug('Generate Websocket Token (ignored):', error);
+//       });
+//
+//     console.warn(data);
+//
+//     return data.generateWSAuthToken.sessionId;
+//   },
+//
+//   getNotifications: async ({
+//     notificationType,
+//     limit,
+//     nextToken,
+//   }: {
+//     notificationType?: NotificationType;
+//     limit?: number;
+//     nextToken?: string;
+//   } = {}): Promise<NotificationBatch> => {
+//     const { data }: any = await apolloClient.query({
+//       query: GET_NOTIFICATIONS,
+//       variables: { notificationType, limit, nextToken },
+//       fetchPolicy: 'network-only',
+//     });
+//     return data?.getNotifications ?? { notifications: [], nextToken: null };
+//   },
+//
+//   readNotification: async ({
+//     notificationType,
+//     notificationId,
+//   }: {
+//     notificationType: NotificationType;
+//     notificationId: string;
+//   }): Promise<boolean> => {
+//     const { data }: any = await apolloClient.mutate({
+//       mutation: READ_NOTIFICATION,
+//       variables: { notificationType, notificationId },
+//       fetchPolicy: 'network-only',
+//     });
+//     return Boolean(data?.readNotification);
+//   },
+// };
 
-// Batch notification fetch
-const GET_NOTIFICATIONS = gql`
-  query GetNotifications($notificationType: NotificationType, $limit: Int, $nextToken: String) {
-    getNotifications(notificationType: $notificationType, limit: $limit, nextToken: $nextToken) {
-      notifications {
-        recipientId
-        sk
-        type
-        conversationId
-        count
-        senderName
-        matchedId
-        unmatchedId
-        createdAt
-        updatedAt
-        bookingId
-        homeworkId
-      }
-      nextToken
-    }
-  }
-`;
-
-// Read notification (deletes the item from notification store)
-const READ_NOTIFICATION = gql`
-  mutation ReadNotification($notificationType: NotificationType!, $notificationId: String!) {
-    readNotification(notificationType: $notificationType, notificationId: $notificationId)
-  }
-`;
-
-// --- Service Object ---
+// --- Demo Service Object (portfolio mode — serves src/mocks data, no network) --- //
 export const notificationService = {
-  // Generate Websocket Token
-  generateWebsocketToken: async () => {
-    // no "await" here! It's a "fire-and-forget" call.
-    const { data }: any = await apolloClient
-      .mutate({
-        mutation: GENERATE_WEBSOCKET_TOKEN,
-        fetchPolicy: 'network-only',
-      })
-      .catch((error) => {
-        // We catch the error silently.
-        console.debug('Generate Websocket Token (ignored):', error);
-      });
-
-    console.warn(data);
-
-    return data.generateWSAuthToken.sessionId;
-  },
+  // The websocket is disabled in demo mode (see WebsocketContext), so this
+  // is never called — kept so the service shape stays the same.
+  generateWebsocketToken: async () => respond('demo-websocket-session'),
 
   getNotifications: async ({
     notificationType,
     limit,
-    nextToken,
   }: {
     notificationType?: NotificationType;
     limit?: number;
     nextToken?: string;
   } = {}): Promise<NotificationBatch> => {
-    const { data }: any = await apolloClient.query({
-      query: GET_NOTIFICATIONS,
-      variables: { notificationType, limit, nextToken },
-      fetchPolicy: 'network-only',
-    });
-    return data?.getNotifications ?? { notifications: [], nextToken: null };
+    const inbox = db.notifications[getCurrentUserId()] ?? [];
+    const matching = inbox
+      .filter((n) => !notificationType || n.type === notificationType)
+      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
+    return respond({ notifications: limit ? matching.slice(0, limit) : matching, nextToken: null }, 150);
   },
 
+  // Like the real API: reading a notification deletes it from the store.
   readNotification: async ({
     notificationType,
     notificationId,
@@ -158,11 +200,14 @@ export const notificationService = {
     notificationType: NotificationType;
     notificationId: string;
   }): Promise<boolean> => {
-    const { data }: any = await apolloClient.mutate({
-      mutation: READ_NOTIFICATION,
-      variables: { notificationType, notificationId },
-      fetchPolicy: 'network-only',
-    });
-    return Boolean(data?.readNotification);
+    const userId = getCurrentUserId();
+    const inbox = db.notifications[userId] ?? [];
+    const remaining = inbox.filter(
+      (n) => !(n.type === notificationType && getNotificationId(n) === notificationId),
+    );
+    const removedAny = remaining.length !== inbox.length;
+    db.notifications[userId] = remaining;
+    if (removedAny) notifyDemoStoreChanged();
+    return respond(removedAny, 100);
   },
 };

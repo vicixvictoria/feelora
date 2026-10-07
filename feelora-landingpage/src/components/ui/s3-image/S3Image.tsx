@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUrl } from 'aws-amplify/storage';
+// import { getUrl } from 'aws-amplify/storage'; // PORTFOLIO DEMO MODE: S3 is offline
 import { Loader2, ImageOff } from 'lucide-react';
 
 //Interface tells TypeScript that this component accepts all standard image attributes (like className, alt, onClick) plus a mandatory (but potentially null) imagePath.
@@ -24,38 +24,43 @@ export function S3Image({ imagePath, className, alt, ...props }: S3ImageProps) {
       return;
     }
 
-    // 3. Type Narrowing: Create a local constant.
-    // TypeScript now knows 'validatedPath' is strictly a string.
-    const validatedPath = imagePath;
-    let isMounted = true; //cleanup flag to prevent state updates on unmounted component
+    // PORTFOLIO DEMO MODE: S3 is offline — the real fetch below is commented
+    // out, so every image falls back to the "image off" placeholder.
+    setError(true);
+    setIsLoading(false);
 
-    // 4. Async function to fetch the signed URL from S3 using Amplify's getUrl method.
-    async function fetchImage() {
-      try {
-        setIsLoading(true);
-
-        // This now matches Overload 1 (GetUrlWithPathInput)
-        const result = await getUrl({
-          path: validatedPath,
-          options: {
-            validateObjectExistence: true, // makes the call faile if the file doesn't exist
-          },
-        });
-
-        if (isMounted) setSrc(result.url.toString()); //Converts the AWS URL object into a string for the <img src="...">
-      } catch (err) {
-        console.error(`Failed to load image:`, err);
-        if (isMounted) setError(true);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
-
-    fetchImage();
-
-    return () => {
-      isMounted = false;
-    };
+    // // 3. Type Narrowing: Create a local constant.
+    // // TypeScript now knows 'validatedPath' is strictly a string.
+    // const validatedPath = imagePath;
+    // let isMounted = true; //cleanup flag to prevent state updates on unmounted component
+    //
+    // // 4. Async function to fetch the signed URL from S3 using Amplify's getUrl method.
+    // async function fetchImage() {
+    //   try {
+    //     setIsLoading(true);
+    //
+    //     // This now matches Overload 1 (GetUrlWithPathInput)
+    //     const result = await getUrl({
+    //       path: validatedPath,
+    //       options: {
+    //         validateObjectExistence: true, // makes the call faile if the file doesn't exist
+    //       },
+    //     });
+    //
+    //     if (isMounted) setSrc(result.url.toString()); //Converts the AWS URL object into a string for the <img src="...">
+    //   } catch (err) {
+    //     console.error(`Failed to load image:`, err);
+    //     if (isMounted) setError(true);
+    //   } finally {
+    //     if (isMounted) setIsLoading(false);
+    //   }
+    // }
+    //
+    // fetchImage();
+    //
+    // return () => {
+    //   isMounted = false;
+    // };
   }, [imagePath]);
 
   // UI States - Conditional Rendering based on loading and error states

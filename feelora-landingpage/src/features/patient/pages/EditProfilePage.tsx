@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { Loader2, Camera, ArrowLeft, Save } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { patientService, GET_OWN_USER_PROFILE_QUERY } from '../api/patient-service';
@@ -35,7 +36,9 @@ const EditProfilePage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load existing profile data
-  const { data, loading, error } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data, loading, error } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  const { data, loading, error } = useMockQuery(GET_OWN_USER_PROFILE_QUERY);
   const patient = data?.getOwnUserProfile;
 
   // Form State

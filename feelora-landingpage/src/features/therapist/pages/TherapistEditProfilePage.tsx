@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { Loader2, Camera, ArrowLeft, Save } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
 import { therapistService, GET_OWN_THERAPIST_PROFILE_QUERY } from '../api/therapist-service';
@@ -80,7 +81,11 @@ const TherapistEditProfilePage = () => {
   const currentLang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   // Force Apollo to skip the cache to get fresh data including Title, Country, HasInsurance, etc.
-  const { data, loading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY, {
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data, loading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY, {
+  //   fetchPolicy: 'network-only',
+  // });
+  const { data, loading, error } = useMockQuery(GET_OWN_THERAPIST_PROFILE_QUERY, {
     fetchPolicy: 'network-only',
   });
   const profile = data?.getOwnTherapistProfile;

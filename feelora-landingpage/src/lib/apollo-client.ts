@@ -1,11 +1,25 @@
-import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+// PORTFOLIO DEMO MODE: the GraphQL backend is offline. The real HTTP + auth
+// links are commented out below (not deleted); in their place `offlineLink`
+// rejects every operation, so nothing can reach the network even by accident.
+// All data now comes from the demo services (see src/mocks).
+import { ApolloClient, InMemoryCache, ApolloLink, Observable } from '@apollo/client';
+// import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
+// import { setContext } from '@apollo/client/link/context';
 
-const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_API_URL;
-
-const httpLink = createHttpLink({
-  uri: graphqlEndpoint,
-});
+const offlineLink = new ApolloLink(
+  (operation) =>
+    new Observable((observer) => {
+      observer.error(
+        new Error(`[Demo mode] Backend is offline — "${operation.operationName}" was not sent.`),
+      );
+    }),
+);
+//
+// const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_API_URL;
+//
+// const httpLink = createHttpLink({
+//   uri: graphqlEndpoint,
+// });
 
 /**
  * Holds a reference to the current access token.
@@ -21,19 +35,19 @@ export function getApolloAccessToken(): string | null {
   return _accessToken;
 }
 
-/**
- * Auth link that attaches the current access token to every request.
- * Falls back to VITE_TEST_AUTH_TOKEN for local testing without login.
- */
-const authLink = setContext((_, { headers }) => {
-  const token = _accessToken || import.meta.env.VITE_TEST_AUTH_TOKEN;
-  return {
-    headers: {
-      ...headers,
-      ...(token ? { Authorization: token } : {}),
-    },
-  };
-});
+// /**
+//  * Auth link that attaches the current access token to every request.
+//  * Falls back to VITE_TEST_AUTH_TOKEN for local testing without login.
+//  */
+// const authLink = setContext((_, { headers }) => {
+//   const token = _accessToken || import.meta.env.VITE_TEST_AUTH_TOKEN;
+//   return {
+//     headers: {
+//       ...headers,
+//       ...(token ? { Authorization: token } : {}),
+//     },
+//   };
+// });
 
 // 30-second TTL for cacheable queries (profile data etc.)
 // Tracks the last time a given query key was fetched from the network.
@@ -50,7 +64,8 @@ export function markCacheFresh(key: string): void {
 }
 
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink]),
+  // link: ApolloLink.from([authLink, httpLink]),
+  link: offlineLink,
   cache: new InMemoryCache(),
   defaultOptions: {
     mutate: { fetchPolicy: 'no-cache' },

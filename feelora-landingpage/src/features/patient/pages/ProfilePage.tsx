@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Send, Loader2, UserMinus, AlertTriangle } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { useEffect, useState } from 'react';
 import { GET_OWN_USER_PROFILE_QUERY, GET_MATCHED_THERAPISTS_QUERY, patientService } from '../api/patient-service';
 import { useS3Download } from '@/hooks/use-s3-download';
@@ -25,16 +26,27 @@ const ProfilePage = () => {
   const [isUnmatching, setIsUnmatching] = useState(false);
 
   // 1. Fetch Patient Profile
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const {
+  //   data: patientData,
+  //   loading: patientLoading,
+  //   error: patientError,
+  // } = useQuery(GET_OWN_USER_PROFILE_QUERY);
   const {
     data: patientData,
     loading: patientLoading,
     error: patientError,
-  } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  } = useMockQuery(GET_OWN_USER_PROFILE_QUERY);
 
   const patient = patientData?.getOwnUserProfile;
 
   // 2. Fetch Therapist only if we have match IDs
-  const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  //   variables: { TherapistsIds: patient?.Matches },
+  //   skip: !patient?.Matches || patient.Matches.length === 0,
+  // });
+  const { data: therapistData } = useMockQuery(GET_MATCHED_THERAPISTS_QUERY, {
     variables: { TherapistsIds: patient?.Matches },
     skip: !patient?.Matches || patient.Matches.length === 0,
   });

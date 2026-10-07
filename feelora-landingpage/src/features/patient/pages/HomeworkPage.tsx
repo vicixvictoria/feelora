@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { Check, FileText, Loader2, RefreshCw } from 'lucide-react';
 import avatar from '@/assets/avatar-Placeholder.png';
 import { homeworkService } from '@/features/homework/api/homework-service';
@@ -51,9 +52,16 @@ const HomeworkPage = () => {
   // Same pattern as ProfilePage.tsx: resolve the patient's matched therapist
   // (there's only ever one) so we can show their real profile picture next
   // to each task instead of the generic placeholder.
-  const { data: patientData } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: patientData } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  const { data: patientData } = useMockQuery(GET_OWN_USER_PROFILE_QUERY);
   const patient = patientData?.getOwnUserProfile;
-  const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  //   variables: { TherapistsIds: patient?.Matches },
+  //   skip: !patient?.Matches || patient.Matches.length === 0,
+  // });
+  const { data: therapistData } = useMockQuery(GET_MATCHED_THERAPISTS_QUERY, {
     variables: { TherapistsIds: patient?.Matches },
     skip: !patient?.Matches || patient.Matches.length === 0,
   });

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import {
   addDays,
   addWeeks,
@@ -139,7 +140,11 @@ const TherapistCalendarPage = () => {
   // from the therapist's matched-patients list (same data the chat feature uses).
   const [patientNames, setPatientNames] = useState<Record<string, string>>({});
 
-  const { data: therapistData, loading: therapistLoading } = useQuery(
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: therapistData, loading: therapistLoading } = useQuery(
+  //   GET_OWN_THERAPIST_PROFILE_QUERY,
+  // );
+  const { data: therapistData, loading: therapistLoading } = useMockQuery(
     GET_OWN_THERAPIST_PROFILE_QUERY,
   );
   const therapist = therapistData?.getOwnTherapistProfile;

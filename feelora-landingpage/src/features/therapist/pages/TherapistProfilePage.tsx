@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ExternalLink, Loader2, Check, Ghost, Link, Copy } from 'lucide-react';
 import avatarPlaceholder from '@/assets/avatar-Placeholder.png';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { GET_OWN_THERAPIST_PROFILE_QUERY, therapistService } from '../api/therapist-service';
 import { S3Avatar } from '@/components/s3/S3Avatar';
 // Notification center is disabled on this page (see below) — re-add these imports
@@ -119,7 +120,9 @@ const TherapistProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { data, loading: isLoading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data, loading: isLoading, error } = useQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
+  const { data, loading: isLoading, error } = useMockQuery(GET_OWN_THERAPIST_PROFILE_QUERY);
   const profile = data?.getOwnTherapistProfile;
 
   // --- Ghost Mode State ---

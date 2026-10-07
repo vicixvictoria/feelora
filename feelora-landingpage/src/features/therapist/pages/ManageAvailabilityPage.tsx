@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { addDays, addMinutes, format, getDay, parse, startOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { AlertTriangle, Ban, ChevronDown, ChevronLeft, Loader2, Plus, X } from 'lucide-react';
@@ -67,7 +68,11 @@ const ManageAvailabilityPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { data: therapistData, loading: therapistLoading } = useQuery(
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: therapistData, loading: therapistLoading } = useQuery(
+  //   GET_OWN_THERAPIST_PROFILE_QUERY,
+  // );
+  const { data: therapistData, loading: therapistLoading } = useMockQuery(
     GET_OWN_THERAPIST_PROFILE_QUERY,
   );
   const therapist = therapistData?.getOwnTherapistProfile;

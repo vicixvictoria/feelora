@@ -1,41 +1,46 @@
+// PORTFOLIO DEMO MODE: the backend is offline, so the real API calls below are
+// commented out (not deleted) and `patientService` at the bottom of this file
+// serves demo data from src/mocks instead.
 import { gql } from '@apollo/client';
-import { apolloClient, isCacheStale, markCacheFresh } from '@/lib/apollo-client';
+// import { apolloClient, isCacheStale, markCacheFresh } from '@/lib/apollo-client';
 import { QuestionnaireData } from '../types/questionnaire';
 import { PatientProfile, MatchedTherapist, AlgorithmMatch } from '../types/profiles';
+import { db, getCurrentUserId, notifyDemoStoreChanged, respond } from '@/mocks/demo-store';
+import { EVA_ID, NINA_ID } from '@/mocks/demo-data';
 
 // --- GraphQL Definitions (Aligned with Schema) --- //
 
 // -- Matching Algorithm and Questionnaire Mutations --
 
 // Matching Algorithm Mutation -- Accepts 'MatchingInput' and returns a list of 'Match'
-const MATCHING_ALGORITHM_MUTATION = gql`
-  mutation MatchingAlgorithm($input: MatchingInput!) {
-    matchingAlgorithm(input: $input) {
-      Id
-      Email
-      Name
-      Surname
-      Gender
-      BirthDate
-      City
-      Languages
-      Availability
-      Specialties
-      Address
-      Title
-      JobTitle
-      PriceRange
-      HasInsurance
-      Ranking
-    }
-  }
-`;
-
-const SAVE_MATCH_MUTATION = gql`
-  mutation SaveMatch($match: ID!) {
-    saveMatch(match: $match)
-  }
-`;
+// const MATCHING_ALGORITHM_MUTATION = gql`
+//   mutation MatchingAlgorithm($input: MatchingInput!) {
+//     matchingAlgorithm(input: $input) {
+//       Id
+//       Email
+//       Name
+//       Surname
+//       Gender
+//       BirthDate
+//       City
+//       Languages
+//       Availability
+//       Specialties
+//       Address
+//       Title
+//       JobTitle
+//       PriceRange
+//       HasInsurance
+//       Ranking
+//     }
+//   }
+// `;
+//
+// const SAVE_MATCH_MUTATION = gql`
+//   mutation SaveMatch($match: ID!) {
+//     saveMatch(match: $match)
+//   }
+// `;
 
 // -- User Profile Mutations --
 
@@ -59,42 +64,42 @@ export const GET_OWN_USER_PROFILE_QUERY = gql`
   }
 `;
 
-const SAVE_USER_PROFILE_MUTATION = gql`
-  mutation saveUserProfile($input: CreateUserProfileInput!) {
-    saveUserProfile(input: $input) {
-      Name
-      Surname
-      Gender
-      BirthDate
-      City
-      Languages
-      Availability
-    }
-  }
-`;
-
-// -- Update User Profile Mutation --
-const UPDATE_OWN_USER_PROFILE_MUTATION = gql`
-  mutation UpdateOwnUserProfile($input: UserProfileInput!) {
-    updateOwnUserProfile(input: $input) {
-      Id
-      Name
-      Surname
-      Gender
-      BirthDate
-      City
-      Languages
-      Availability
-      MoodTracker
-    }
-  }
-`;
-
-const MOOD_TRACKER_SHARE_CONSENT_MUTATION = gql`
-  mutation MoodTrackerShareConsent($allow: Boolean!) {
-    MoodTrackerShareConsent(allow: $allow)
-  }
-`;
+// const SAVE_USER_PROFILE_MUTATION = gql`
+//   mutation saveUserProfile($input: CreateUserProfileInput!) {
+//     saveUserProfile(input: $input) {
+//       Name
+//       Surname
+//       Gender
+//       BirthDate
+//       City
+//       Languages
+//       Availability
+//     }
+//   }
+// `;
+//
+// // -- Update User Profile Mutation --
+// const UPDATE_OWN_USER_PROFILE_MUTATION = gql`
+//   mutation UpdateOwnUserProfile($input: UserProfileInput!) {
+//     updateOwnUserProfile(input: $input) {
+//       Id
+//       Name
+//       Surname
+//       Gender
+//       BirthDate
+//       City
+//       Languages
+//       Availability
+//       MoodTracker
+//     }
+//   }
+// `;
+//
+// const MOOD_TRACKER_SHARE_CONSENT_MUTATION = gql`
+//   mutation MoodTrackerShareConsent($allow: Boolean!) {
+//     MoodTrackerShareConsent(allow: $allow)
+//   }
+// `;
 
 // export to use for cache in profile page
 export const GET_MATCHED_THERAPISTS_QUERY = gql`
@@ -124,15 +129,15 @@ export const GET_MATCHED_THERAPISTS_QUERY = gql`
 
 // --- Chat & Mood Tracker Chat Mutations ---
 
-const CREATE_CONVERSATION_MUTATION = gql`
-  mutation CreateConversation($participantId: ID!) {
-    createConversation(participantId: $participantId) {
-      conversationId
-      participantIds
-      createdAt
-    }
-  }
-`;
+// const CREATE_CONVERSATION_MUTATION = gql`
+//   mutation CreateConversation($participantId: ID!) {
+//     createConversation(participantId: $participantId) {
+//       conversationId
+//       participantIds
+//       createdAt
+//     }
+//   }
+// `;
 
 /* After MVP Feature
 const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
@@ -152,164 +157,502 @@ const SEND_MOOD_TRACKER_MESSAGE_MUTATION = gql`
   }
 `;*/
 
-const GET_CONVERSATIONS_QUERY = gql`
-  query GetConversations {
-    getConversations {
-      items {
-        conversationId
-        participantIds
-      }
-    }
-  }
-`;
+// const GET_CONVERSATIONS_QUERY = gql`
+//   query GetConversations {
+//     getConversations {
+//       items {
+//         conversationId
+//         participantIds
+//       }
+//     }
+//   }
+// `;
+//
+// // -- Mood Tracker Questionnaire Mutations--
+//
+// const SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION = gql`
+//   mutation SaveMoodTrackerQuestionnaire($input: MoodTrackerQuestionnaireInput!) {
+//     saveMoodTrackerQuestionnaire(input: $input) {
+//       CreatedAt
+//       UpdatedAt
+//     }
+//   }
+// `;
+//
+// const GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY = gql`
+//   query GetMoodTrackerQuestionnaires($limit: Int) {
+//     getMoodTrackerQuestionnaires(limit: $limit) {
+//       items {
+//         CreatedAt
+//         Questionnaire
+//         QuestionnaireSummary
+//       }
+//     }
+//   }
+// `;
+//
+// // -- Invited Patient Flow Queries & Mutations --
+// const GET_INVITER_DETAILS_QUERY = gql`
+//   query GetInviterDetails($invitationId: ID!) {
+//     getInviterDetails(invitationId: $invitationId) {
+//       Id
+//       Email
+//       Name
+//       Surname
+//       Title
+//       JobTitle
+//       City
+//     }
+//   }
+// `;
+//
+// // Delete Match Mutation
+// const DELETE_MATCH_MUTATION = gql`
+//   mutation DeleteMatch($match: ID!) {
+//     deleteMatch(match: $match)
+//   }
+// `;
+//
+// // -- Delete Account Data Mutation --
+// const DELETE_DATA_MUTATION = gql`
+//   mutation DeleteData {
+//     deleteData
+//   }
+// `;
+//
+// // -- Save Consent Mutation --
+// const CREATE_CONSENTS_MUTATION = gql`
+//   mutation CreateConsents($input: ConsentInput!) {
+//     createConsents(input: $input) {
+//       id
+//       timestamp
+//       subject_id
+//     }
+//   }
+// `;
+//
+// // For pinging algorithm
+// const PING_LAMBDA_QUERY = gql`
+//   query PingLambda {
+//     pingLambda
+//   }
+// `;
 
-// -- Mood Tracker Questionnaire Mutations--
+// // --- Service Object --- //
+// export const patientService = {
+//   // -- API call to submit the questionnaire and get matches based on the input data --
+//   submitQuestionnaire: async (
+//     data: QuestionnaireData,
+//   ): Promise<{ success: boolean; matches: AlgorithmMatch[]; error?: string }> => {
+//     // 1. Prepare Input (Matches 'MatchingInput' in schema)
+//     const input = {
+//       Questionnaire: JSON.stringify(data),
+//       filters: JSON.stringify({
+//         languages: data.languages?.selected || [],
+//         gender: data.therapistGender,
+//         setting: data.therapySetting,
+//         availability: data.availability || [],
+//       }),
+//     };
+//
+//     try {
+//       const { data: responseData } = await apolloClient.mutate({
+//         mutation: MATCHING_ALGORITHM_MUTATION,
+//         variables: { input },
+//       });
+//
+//       // The backend returns [Match]!, so responseData.matchingAlgorithm is an array
+//       return {
+//         success: true,
+//         matches: responseData.matchingAlgorithm,
+//       };
+//     } catch (error: unknown) {
+//       console.error('Matching Error:', error);
+//       const errorMessage =
+//         error instanceof Error ? error.message : 'An error during the matching algorithm occurred';
+//
+//       return {
+//         success: false,
+//         matches: [],
+//         error: errorMessage,
+//       };
+//     }
+//   },
+//
+//   //-- Create User Profile API call --
+//   createPatientProfile: async (
+//     data: Partial<QuestionnaireData>,
+//   ): Promise<Partial<PatientProfile>> => {
+//     //Prepare Payload according to the UserProfileInput type in the schema
+//     const input = {
+//       Name: data.personalData?.firstName,
+//       Surname: data.personalData?.lastName,
+//       BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
+//       Gender: data.personalData?.gender,
+//       City: data.contactInfo?.city,
+//       Languages: data.languages?.selected || [],
+//       Availability: data.availability || [],
+//     };
+//
+//     const { data: responseData } = await apolloClient.mutate({
+//       mutation: SAVE_USER_PROFILE_MUTATION,
+//       variables: { input },
+//     });
+//
+//     return responseData.saveUserProfile;
+//   },
+//
+//   //Get patient profile API call
+//   getProfile: async (forceRefresh = false): Promise<PatientProfile> => {
+//     const CACHE_KEY = 'patient:getOwnUserProfile';
+//     const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
+//     const { data: responseData } = await apolloClient.query({
+//       query: GET_OWN_USER_PROFILE_QUERY,
+//       fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
+//     });
+//     if (useNetwork) markCacheFresh(CACHE_KEY);
+//     return responseData.getOwnUserProfile;
+//   },
+//
+//   // -- Update Patient Profile API call --
+//   updateProfile: async (data: {
+//     Name?: string;
+//     Surname?: string;
+//     Gender?: string;
+//     BirthDate?: number | null;
+//     City?: string;
+//     Languages?: string[];
+//     Availability?: string[];
+//   }) => {
+//     try {
+//       const { data: responseData } = await apolloClient.mutate({
+//         mutation: UPDATE_OWN_USER_PROFILE_MUTATION,
+//         variables: { input: data },
+//         // Refetch the profile query so the ProfilePage updates immediately
+//         refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
+//       });
+//       return responseData.updateOwnUserProfile;
+//     } catch (error) {
+//       console.error('Error updating profile:', error);
+//       throw error;
+//     }
+//   },
+//
+//   // -- Update Mood Tracker Sharing Consent --
+// updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
+//   try {
+//     const { data } = await apolloClient.mutate({
+//       mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
+//       variables: { allow: consent },
+//       // refetchQueries removed temporarily for debugging
+//     });
+//     console.log('Raw mutation response:', data);
+//     return consent;
+//   } catch (error) {
+//     console.error('Error updating GDPR consent firewall:', error);
+//     throw error;
+//   }
+// },
+//
+//   // Fetch matched therapist(s)
+//   getMatchedTherapists: async (
+//     therapistIds: string[],
+//     forceRefresh = false,
+//   ): Promise<MatchedTherapist[]> => {
+//     console.log('Sending IDs to backend:', therapistIds);
+//     console.log('Is it an array?', Array.isArray(therapistIds));
+//
+//     if (!therapistIds || therapistIds.length === 0) return [];
+//
+//     const CACHE_KEY = 'patient:getMatchedTherapists';
+//     const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
+//     const { data: responseData } = await apolloClient.query({
+//       query: GET_MATCHED_THERAPISTS_QUERY,
+//       variables: { TherapistsIds: therapistIds },
+//       fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
+//     });
+//     if (useNetwork) markCacheFresh(CACHE_KEY);
+//     return responseData.getMatchedTherapists.items || [];
+//   },
+//
+//   // -- API call to accept and save a therapist match and automatically create conversations --
+//   saveMatch: async (therapistId: string): Promise<boolean> => {
+//     try {
+//       // save the match
+//       const { data } = await apolloClient.mutate({
+//         mutation: SAVE_MATCH_MUTATION,
+//         variables: { match: therapistId },
+//       });
+//
+//       // 2. Automatically create the required conversations for the chat and mood tracker
+//       console.log('Creating conversation for Therapist...');
+//       await apolloClient.mutate({
+//         mutation: CREATE_CONVERSATION_MUTATION,
+//         variables: { participantId: therapistId },
+//       });
+//
+//       /* //not in the MVP, but we can keep it here for later! We create the mood tracker conversation already at this step, so that it's ready to go when the patient enters the mood tracker for the first time. The conversation will be created with a special participantId "moodtracker" that we can use to identify it when we fetch the conversations list later and get its conversationId for sending messages into it.
+//       console.log("Creating conversation for Mood Tracker...");
+//       await apolloClient.mutate({
+//         mutation: CREATE_CONVERSATION_MUTATION,
+//         variables: { participantId: "moodtracker" }
+//       });*/
+//
+//       return data.saveMatch; // returns true or false
+//     } catch (error) {
+//       console.error('Error saving match or creating conversations:', error);
+//       throw error;
+//     }
+//   },
+//
+//   // -- Fetch Conversations to find the Mood Tracker ID --
+//   getMoodTrackerConversationId: async (): Promise<string | null> => {
+//     try {
+//       const { data } = await apolloClient.query({
+//         query: GET_CONVERSATIONS_QUERY,
+//         fetchPolicy: 'network-only', // Always get fresh in case it was just created, dont rely on cache
+//       });
+//
+//       // Find the specific conversation where "moodtracker" is in the participantIds array!
+//       const moodChat = data.getConversations.items.find(
+//         (chat: any) => chat.participantIds && chat.participantIds.includes('moodtracker'),
+//       );
+//
+//       return moodChat ? moodChat.conversationId : null; // Return conversationId, not id
+//     } catch (error) {
+//       console.error('Error fetching conversations:', error);
+//       return null;
+//     }
+//   },
+//
+//   // -- Save Mood Tracker Chat Message --
+//   //Not in the MVP but keep it for later
+//   /*
+//   saveMoodData: async (
+//     conversationId: string,
+//     moodData: Record<number, string[]>,
+//   ): Promise<boolean> => {
+//     try {
+//       // Stringify the questionnaire answers as schema requires
+//       const payload = JSON.stringify(moodData);
+//
+//       // Send the mood data as a message in the mood tracker conversation, with a flag to identify it as mood tracker data
+//       await apolloClient.mutate({
+//         mutation: SEND_MOOD_TRACKER_MESSAGE_MUTATION,
+//         variables: {
+//           conversationId: conversationId,
+//           content: payload,
+//           moodTrackerQuestionnaire: true,
+//         },
+//       });
+//
+//       return true;
+//     } catch (error: any) {
+//       console.error('Error saving mood data:', error);
+//       // Using the 'cause' property links the two errors for better debugging
+//       throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
+//     }
+//   },*/
+//
+//   // Delete a therapist match
+//   deleteMatch: async (therapistId: string): Promise<boolean> => {
+//     try {
+//       const { data } = await apolloClient.mutate({
+//         mutation: DELETE_MATCH_MUTATION,
+//         variables: { match: therapistId },
+//         // Refetch the patient profile so the "Matches" array updates and the UI clears the therapist
+//         refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
+//       });
+//       return data.deleteMatch;
+//     } catch (error) {
+//       console.error('Error unmatching therapist:', error);
+//       throw error;
+//     }
+//   },
+//
+//   // -- Delete User Profile and all associated data --
+//   deleteProfile: async (): Promise<boolean> => {
+//     try {
+//       const { data } = await apolloClient.mutate({
+//         mutation: DELETE_DATA_MUTATION,
+//       });
+//       return data.deleteData; // This will return true if successful
+//     } catch (error) {
+//       console.error('Error deleting profile data:', error);
+//       throw error;
+//     }
+//   },
+//
+//   // -- MOOD TRACKER API --
+//
+//   // -- Save Mood Tracker Data from Questionnaire --
+//   saveMoodTrackerQuestionnaire: async (moodData: Record<number, string[]>): Promise<boolean> => {
+//     try {
+//       // The backend requires a 'QuestionnaireSummary' AWSJSON object.
+//       // We create a basic summary of the main mood (Question 0) and total answered.
+//       const summary = {
+//         totalCategoriesAnswered: Object.keys(moodData).length,
+//         primaryMood: moodData[0]?.[0] || 'Not specified',
+//       };
+//
+//       const input = {
+//         Questionnaire: JSON.stringify(moodData),
+//         QuestionnaireSummary: JSON.stringify(summary),
+//       };
+//
+//       // for debugging: Capture the response from the mutation
+//       const response = await apolloClient.mutate({
+//         mutation: SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION,
+//         variables: { input },
+//       });
+//
+//       //debugging: Log the successful return data from the backend
+//       console.log(
+//         '✅ Mood Tracker data successfully saved in backend:',
+//         response.data?.saveMoodTrackerQuestionnaire,
+//       );
+//
+//       return true;
+//     } catch (error: any) {
+//       console.error('Error saving mood tracking data:', error);
+//       throw new Error(`Failed to save mood tracking data: ${error.message}`);
+//     }
+//   },
+//
+//   // -- Fetch all saved Mood Trackers for the Dashboard --
+//   getMoodTrackers: async () => {
+//     try {
+//       const { data } = await apolloClient.query({
+//         query: GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY,
+//         variables: { limit: 20 }, // Fetch the 10 most recent --> do we need more / all?
+//         fetchPolicy: 'network-only', // Always get fresh data for the dashboard
+//       });
+//       return data.getMoodTrackerQuestionnaires.items || [];
+//     } catch (error) {
+//       console.error('Error fetching mood trackers:', error);
+//       return [];
+//     }
+//   },
+//
+//   // -- PING API --
+//
+//   // -- Wake up the matching algorithm Lambda --
+//   pingMatchingAlgorithm: () => {
+//     // no "await" here! It's a "fire-and-forget" call.
+//     apolloClient
+//       .query({
+//         query: PING_LAMBDA_QUERY,
+//         fetchPolicy: 'network-only',
+//       })
+//       .catch((error) => {
+//         // We catch the error silently. If the ping fails, we don't want to
+//         // alert the user or stop them from continuing the questionnaire.
+//         console.debug('Ping Lambda failed (ignored):', error);
+//       });
+//   },
+//
+// // -- Fetch Inviter (Therapist) Details from an Invitation ID --
+//   getInviterDetails: async (invitationId: string) => {
+//     try {
+//       const { data } = await apolloClient.query({
+//         query: GET_INVITER_DETAILS_QUERY,
+//         variables: { invitationId },
+//         fetchPolicy: 'network-only', // Always get fresh data for invitations
+//       });
+//       
+//       if (!data || !data.getInviterDetails) {
+//         throw new Error('Invitation details not found');
+//       }
+//       
+//       return data.getInviterDetails;
+//     } catch (error) {
+//       console.error('Error fetching inviter details:', error);
+//       throw error;
+//     }
+//   },
+//
+//   // -- Log Patient Consent --
+//   submitConsent: async (): Promise<boolean> => {
+//     const input = {
+//       preferences: [
+//         { key: "health_data_processing", value: true },
+//         { key: "ai_usage", value: true },
+//         { key: "terms_and_conditions", value: true }
+//       ],
+//       legal_notices: [
+//         { identifier: "privacy_policy" },
+//         { identifier: "terms_and_conditions" }
+//       ],
+//       proofs: [
+//         {
+//           content: "Patient actively checked the box agreeing to health data processing (Art. 9 GDPR), AI disclaimer, and T&C on the Welcome Step.",
+//           form: "patient_welcome_step"
+//         }
+//       ]
+//     };
+//
+//     try {
+//       await apolloClient.mutate({
+//         mutation: CREATE_CONSENTS_MUTATION,
+//         variables: { input },
+//       });
+//       return true;
+//     } catch (error) {
+//       console.error('Error saving patient consent:', error);
+//       return false;
+//     }
+//   },
+//
+// };
 
-const SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION = gql`
-  mutation SaveMoodTrackerQuestionnaire($input: MoodTrackerQuestionnaireInput!) {
-    saveMoodTrackerQuestionnaire(input: $input) {
-      CreatedAt
-      UpdatedAt
-    }
-  }
-`;
+// --- Demo Service Object (portfolio mode — serves src/mocks data, no network) --- //
 
-const GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY = gql`
-  query GetMoodTrackerQuestionnaires($limit: Int) {
-    getMoodTrackerQuestionnaires(limit: $limit) {
-      items {
-        CreatedAt
-        Questionnaire
-        QuestionnaireSummary
-      }
-    }
-  }
-`;
+// The logged-in demo patient (Nina Newton).
+const ownProfile = () => db.patients[getCurrentUserId()] ?? db.patients[NINA_ID]!;
 
-// -- Invited Patient Flow Queries & Mutations --
-const GET_INVITER_DETAILS_QUERY = gql`
-  query GetInviterDetails($invitationId: ID!) {
-    getInviterDetails(invitationId: $invitationId) {
-      Id
-      Email
-      Name
-      Surname
-      Title
-      JobTitle
-      City
-    }
-  }
-`;
+const therapistAsMatch = (): MatchedTherapist & AlgorithmMatch =>
+  ({
+    Id: db.therapist.Id,
+    Email: db.therapist.Email,
+    Name: db.therapist.Name,
+    Surname: db.therapist.Surname,
+    Gender: db.therapist.Gender,
+    BirthDate: db.therapist.BirthDate,
+    City: db.therapist.City,
+    Address: db.therapist.Address,
+    LicenseVerified: db.therapist.LicenseVerified,
+    Languages: db.therapist.Languages,
+    Availability: db.therapist.Availability,
+    Specialties: db.therapist.Specialties,
+    JobTitle: db.therapist.JobTitle ?? '',
+    Title: db.therapist.Title,
+    PriceRange: db.therapist.PriceRange,
+    HasInsurance: db.therapist.HasInsurance,
+    Ranking: 0.94,
+  }) as unknown as MatchedTherapist & AlgorithmMatch;
 
-// Delete Match Mutation
-const DELETE_MATCH_MUTATION = gql`
-  mutation DeleteMatch($match: ID!) {
-    deleteMatch(match: $match)
-  }
-`;
-
-// -- Delete Account Data Mutation --
-const DELETE_DATA_MUTATION = gql`
-  mutation DeleteData {
-    deleteData
-  }
-`;
-
-// -- Save Consent Mutation --
-const CREATE_CONSENTS_MUTATION = gql`
-  mutation CreateConsents($input: ConsentInput!) {
-    createConsents(input: $input) {
-      id
-      timestamp
-      subject_id
-    }
-  }
-`;
-
-// For pinging algorithm
-const PING_LAMBDA_QUERY = gql`
-  query PingLambda {
-    pingLambda
-  }
-`;
-
-// --- Service Object --- //
 export const patientService = {
-  // -- API call to submit the questionnaire and get matches based on the input data --
   submitQuestionnaire: async (
-    data: QuestionnaireData,
-  ): Promise<{ success: boolean; matches: AlgorithmMatch[]; error?: string }> => {
-    // 1. Prepare Input (Matches 'MatchingInput' in schema)
-    const input = {
-      Questionnaire: JSON.stringify(data),
-      filters: JSON.stringify({
-        languages: data.languages?.selected || [],
-        gender: data.therapistGender,
-        setting: data.therapySetting,
-        availability: data.availability || [],
-      }),
-    };
+    _data: QuestionnaireData,
+  ): Promise<{ success: boolean; matches: AlgorithmMatch[]; error?: string }> =>
+    // A little longer than other calls — the matching algorithm "thinking".
+    respond({ success: true, matches: [therapistAsMatch()] }, 1200),
 
-    try {
-      const { data: responseData } = await apolloClient.mutate({
-        mutation: MATCHING_ALGORITHM_MUTATION,
-        variables: { input },
-      });
-
-      // The backend returns [Match]!, so responseData.matchingAlgorithm is an array
-      return {
-        success: true,
-        matches: responseData.matchingAlgorithm,
-      };
-    } catch (error: unknown) {
-      console.error('Matching Error:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'An error during the matching algorithm occurred';
-
-      return {
-        success: false,
-        matches: [],
-        error: errorMessage,
-      };
-    }
+  createPatientProfile: async (data: Partial<QuestionnaireData>): Promise<Partial<PatientProfile>> => {
+    const profile = ownProfile();
+    if (data.personalData?.firstName) profile.Name = data.personalData.firstName;
+    if (data.personalData?.lastName) profile.Surname = data.personalData.lastName;
+    if (data.personalData?.bday) profile.BirthDate = new Date(data.personalData.bday).getTime() / 1000;
+    if (data.personalData?.gender) profile.Gender = data.personalData.gender;
+    if (data.contactInfo?.city) profile.City = data.contactInfo.city;
+    if (data.languages?.selected?.length) profile.Languages = data.languages.selected;
+    if (data.availability?.length) profile.Availability = data.availability;
+    notifyDemoStoreChanged();
+    return respond(profile);
   },
 
-  //-- Create User Profile API call --
-  createPatientProfile: async (
-    data: Partial<QuestionnaireData>,
-  ): Promise<Partial<PatientProfile>> => {
-    //Prepare Payload according to the UserProfileInput type in the schema
-    const input = {
-      Name: data.personalData?.firstName,
-      Surname: data.personalData?.lastName,
-      BirthDate: data.personalData?.bday ? new Date(data.personalData.bday).getTime() / 1000 : null,
-      Gender: data.personalData?.gender,
-      City: data.contactInfo?.city,
-      Languages: data.languages?.selected || [],
-      Availability: data.availability || [],
-    };
+  getProfile: async (_forceRefresh = false): Promise<PatientProfile> => respond(ownProfile()),
 
-    const { data: responseData } = await apolloClient.mutate({
-      mutation: SAVE_USER_PROFILE_MUTATION,
-      variables: { input },
-    });
-
-    return responseData.saveUserProfile;
-  },
-
-  //Get patient profile API call
-  getProfile: async (forceRefresh = false): Promise<PatientProfile> => {
-    const CACHE_KEY = 'patient:getOwnUserProfile';
-    const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
-    const { data: responseData } = await apolloClient.query({
-      query: GET_OWN_USER_PROFILE_QUERY,
-      fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
-    });
-    if (useNetwork) markCacheFresh(CACHE_KEY);
-    return responseData.getOwnUserProfile;
-  },
-
-  // -- Update Patient Profile API call --
   updateProfile: async (data: {
     Name?: string;
     Surname?: string;
@@ -319,283 +662,85 @@ export const patientService = {
     Languages?: string[];
     Availability?: string[];
   }) => {
-    try {
-      const { data: responseData } = await apolloClient.mutate({
-        mutation: UPDATE_OWN_USER_PROFILE_MUTATION,
-        variables: { input: data },
-        // Refetch the profile query so the ProfilePage updates immediately
-        refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
-      });
-      return responseData.updateOwnUserProfile;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
-    }
+    const profile = ownProfile();
+    Object.assign(profile, {
+      ...data,
+      BirthDate: data.BirthDate ?? profile.BirthDate,
+    });
+    notifyDemoStoreChanged();
+    return respond(profile, 400);
   },
 
-  // -- Update Mood Tracker Sharing Consent --
-updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
-  try {
-    const { data } = await apolloClient.mutate({
-      mutation: MOOD_TRACKER_SHARE_CONSENT_MUTATION,
-      variables: { allow: consent },
-      // refetchQueries removed temporarily for debugging
-    });
-    console.log('Raw mutation response:', data);
-    return consent;
-  } catch (error) {
-    console.error('Error updating GDPR consent firewall:', error);
-    throw error;
-  }
-},
-
-  // Fetch matched therapist(s)
-  getMatchedTherapists: async (
-    therapistIds: string[],
-    forceRefresh = false,
-  ): Promise<MatchedTherapist[]> => {
-    console.log('Sending IDs to backend:', therapistIds);
-    console.log('Is it an array?', Array.isArray(therapistIds));
-
-    if (!therapistIds || therapistIds.length === 0) return [];
-
-    const CACHE_KEY = 'patient:getMatchedTherapists';
-    const useNetwork = forceRefresh || isCacheStale(CACHE_KEY);
-    const { data: responseData } = await apolloClient.query({
-      query: GET_MATCHED_THERAPISTS_QUERY,
-      variables: { TherapistsIds: therapistIds },
-      fetchPolicy: useNetwork ? 'network-only' : 'cache-first',
-    });
-    if (useNetwork) markCacheFresh(CACHE_KEY);
-    return responseData.getMatchedTherapists.items || [];
+  updateMoodTrackerConsent: async (consent: boolean): Promise<boolean> => {
+    ownProfile().MoodTracker = consent;
+    notifyDemoStoreChanged();
+    return respond(consent);
   },
 
-  // -- API call to accept and save a therapist match and automatically create conversations --
+  getMatchedTherapists: async (therapistIds: string[], _forceRefresh = false): Promise<MatchedTherapist[]> =>
+    respond(therapistIds?.includes(EVA_ID) ? [therapistAsMatch()] : []),
+
   saveMatch: async (therapistId: string): Promise<boolean> => {
-    try {
-      // save the match
-      const { data } = await apolloClient.mutate({
-        mutation: SAVE_MATCH_MUTATION,
-        variables: { match: therapistId },
-      });
-
-      // 2. Automatically create the required conversations for the chat and mood tracker
-      console.log('Creating conversation for Therapist...');
-      await apolloClient.mutate({
-        mutation: CREATE_CONVERSATION_MUTATION,
-        variables: { participantId: therapistId },
-      });
-
-      /* //not in the MVP, but we can keep it here for later! We create the mood tracker conversation already at this step, so that it's ready to go when the patient enters the mood tracker for the first time. The conversation will be created with a special participantId "moodtracker" that we can use to identify it when we fetch the conversations list later and get its conversationId for sending messages into it.
-      console.log("Creating conversation for Mood Tracker...");
-      await apolloClient.mutate({
-        mutation: CREATE_CONVERSATION_MUTATION,
-        variables: { participantId: "moodtracker" }
-      });*/
-
-      return data.saveMatch; // returns true or false
-    } catch (error) {
-      console.error('Error saving match or creating conversations:', error);
-      throw error;
+    const profile = ownProfile();
+    if (!profile.Matches?.includes(therapistId)) profile.Matches = [...(profile.Matches ?? []), therapistId];
+    if (!db.therapist.Matches?.includes(profile.Id)) db.therapist.Matches = [...(db.therapist.Matches ?? []), profile.Id];
+    // Mirrors the real saveMatch, which also creates the chat conversation.
+    if (!db.conversations.some((c) => c.participantIds.includes(profile.Id))) {
+      const conversationId = `demo-conversation-${profile.Id}`;
+      db.conversations.push({ conversationId, participantIds: [therapistId, profile.Id], createdAt: Date.now() });
+      db.messages[conversationId] = [];
     }
+    notifyDemoStoreChanged();
+    return respond(true, 500);
   },
 
-  // -- Fetch Conversations to find the Mood Tracker ID --
-  getMoodTrackerConversationId: async (): Promise<string | null> => {
-    try {
-      const { data } = await apolloClient.query({
-        query: GET_CONVERSATIONS_QUERY,
-        fetchPolicy: 'network-only', // Always get fresh in case it was just created, dont rely on cache
-      });
+  // The mood tracker chat conversation is a post-MVP feature (see above).
+  getMoodTrackerConversationId: async (): Promise<string | null> => respond(null),
 
-      // Find the specific conversation where "moodtracker" is in the participantIds array!
-      const moodChat = data.getConversations.items.find(
-        (chat: any) => chat.participantIds && chat.participantIds.includes('moodtracker'),
-      );
-
-      return moodChat ? moodChat.conversationId : null; // Return conversationId, not id
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-      return null;
-    }
-  },
-
-  // -- Save Mood Tracker Chat Message --
-  //Not in the MVP but keep it for later
-  /*
-  saveMoodData: async (
-    conversationId: string,
-    moodData: Record<number, string[]>,
-  ): Promise<boolean> => {
-    try {
-      // Stringify the questionnaire answers as schema requires
-      const payload = JSON.stringify(moodData);
-
-      // Send the mood data as a message in the mood tracker conversation, with a flag to identify it as mood tracker data
-      await apolloClient.mutate({
-        mutation: SEND_MOOD_TRACKER_MESSAGE_MUTATION,
-        variables: {
-          conversationId: conversationId,
-          content: payload,
-          moodTrackerQuestionnaire: true,
-        },
-      });
-
-      return true;
-    } catch (error: any) {
-      console.error('Error saving mood data:', error);
-      // Using the 'cause' property links the two errors for better debugging
-      throw new (Error as any)('Failed to save mood tracking data.', { cause: error });
-    }
-  },*/
-
-  // Delete a therapist match
   deleteMatch: async (therapistId: string): Promise<boolean> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_MATCH_MUTATION,
-        variables: { match: therapistId },
-        // Refetch the patient profile so the "Matches" array updates and the UI clears the therapist
-        refetchQueries: [{ query: GET_OWN_USER_PROFILE_QUERY }],
-      });
-      return data.deleteMatch;
-    } catch (error) {
-      console.error('Error unmatching therapist:', error);
-      throw error;
-    }
+    const profile = ownProfile();
+    profile.Matches = (profile.Matches ?? []).filter((id) => id !== therapistId);
+    db.therapist.Matches = (db.therapist.Matches ?? []).filter((id) => id !== profile.Id);
+    notifyDemoStoreChanged();
+    return respond(true, 400);
   },
 
-  // -- Delete User Profile and all associated data --
-  deleteProfile: async (): Promise<boolean> => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_DATA_MUTATION,
-      });
-      return data.deleteData; // This will return true if successful
-    } catch (error) {
-      console.error('Error deleting profile data:', error);
-      throw error;
-    }
-  },
+  // Demo accounts can't actually be deleted — report success so the
+  // account page flow (confirm → logout) still works.
+  deleteProfile: async (): Promise<boolean> => respond(true, 600),
 
-  // -- MOOD TRACKER API --
-
-  // -- Save Mood Tracker Data from Questionnaire --
   saveMoodTrackerQuestionnaire: async (moodData: Record<number, string[]>): Promise<boolean> => {
-    try {
-      // The backend requires a 'QuestionnaireSummary' AWSJSON object.
-      // We create a basic summary of the main mood (Question 0) and total answered.
-      const summary = {
+    const entries = (db.moodTrackers[ownProfile().Id] ??= []);
+    entries.unshift({
+      CreatedAt: new Date().toISOString(),
+      Questionnaire: JSON.stringify(moodData),
+      QuestionnaireSummary: JSON.stringify({
         totalCategoriesAnswered: Object.keys(moodData).length,
         primaryMood: moodData[0]?.[0] || 'Not specified',
-      };
-
-      const input = {
-        Questionnaire: JSON.stringify(moodData),
-        QuestionnaireSummary: JSON.stringify(summary),
-      };
-
-      // for debugging: Capture the response from the mutation
-      const response = await apolloClient.mutate({
-        mutation: SAVE_MOOD_TRACKER_QUESTIONNAIRE_MUTATION,
-        variables: { input },
-      });
-
-      //debugging: Log the successful return data from the backend
-      console.log(
-        '✅ Mood Tracker data successfully saved in backend:',
-        response.data?.saveMoodTrackerQuestionnaire,
-      );
-
-      return true;
-    } catch (error: any) {
-      console.error('Error saving mood tracking data:', error);
-      throw new Error(`Failed to save mood tracking data: ${error.message}`);
-    }
+      }),
+    });
+    notifyDemoStoreChanged();
+    return respond(true, 400);
   },
 
-  // -- Fetch all saved Mood Trackers for the Dashboard --
-  getMoodTrackers: async () => {
-    try {
-      const { data } = await apolloClient.query({
-        query: GET_MOOD_TRACKER_QUESTIONNAIRES_QUERY,
-        variables: { limit: 20 }, // Fetch the 10 most recent --> do we need more / all?
-        fetchPolicy: 'network-only', // Always get fresh data for the dashboard
-      });
-      return data.getMoodTrackerQuestionnaires.items || [];
-    } catch (error) {
-      console.error('Error fetching mood trackers:', error);
-      return [];
-    }
-  },
+  getMoodTrackers: async () =>
+    respond(
+      [...(db.moodTrackers[ownProfile().Id] ?? [])].sort((a, b) => b.CreatedAt.localeCompare(a.CreatedAt)),
+    ),
 
-  // -- PING API --
+  // Nothing to wake up anymore.
+  pingMatchingAlgorithm: () => {},
 
-  // -- Wake up the matching algorithm Lambda --
-  pingMatchingAlgorithm: () => {
-    // no "await" here! It's a "fire-and-forget" call.
-    apolloClient
-      .query({
-        query: PING_LAMBDA_QUERY,
-        fetchPolicy: 'network-only',
-      })
-      .catch((error) => {
-        // We catch the error silently. If the ping fails, we don't want to
-        // alert the user or stop them from continuing the questionnaire.
-        console.debug('Ping Lambda failed (ignored):', error);
-      });
-  },
+  getInviterDetails: async (_invitationId: string) =>
+    respond({
+      Id: db.therapist.Id,
+      Email: db.therapist.Email,
+      Name: db.therapist.Name,
+      Surname: db.therapist.Surname,
+      Title: db.therapist.Title,
+      JobTitle: db.therapist.JobTitle,
+      City: db.therapist.City,
+    }),
 
-// -- Fetch Inviter (Therapist) Details from an Invitation ID --
-  getInviterDetails: async (invitationId: string) => {
-    try {
-      const { data } = await apolloClient.query({
-        query: GET_INVITER_DETAILS_QUERY,
-        variables: { invitationId },
-        fetchPolicy: 'network-only', // Always get fresh data for invitations
-      });
-      
-      if (!data || !data.getInviterDetails) {
-        throw new Error('Invitation details not found');
-      }
-      
-      return data.getInviterDetails;
-    } catch (error) {
-      console.error('Error fetching inviter details:', error);
-      throw error;
-    }
-  },
-
-  // -- Log Patient Consent --
-  submitConsent: async (): Promise<boolean> => {
-    const input = {
-      preferences: [
-        { key: "health_data_processing", value: true },
-        { key: "ai_usage", value: true },
-        { key: "terms_and_conditions", value: true }
-      ],
-      legal_notices: [
-        { identifier: "privacy_policy" },
-        { identifier: "terms_and_conditions" }
-      ],
-      proofs: [
-        {
-          content: "Patient actively checked the box agreeing to health data processing (Art. 9 GDPR), AI disclaimer, and T&C on the Welcome Step.",
-          form: "patient_welcome_step"
-        }
-      ]
-    };
-
-    try {
-      await apolloClient.mutate({
-        mutation: CREATE_CONSENTS_MUTATION,
-        variables: { input },
-      });
-      return true;
-    } catch (error) {
-      console.error('Error saving patient consent:', error);
-      return false;
-    }
-  },
-
+  submitConsent: async (): Promise<boolean> => respond(true),
 };

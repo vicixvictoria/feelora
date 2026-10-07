@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
+import { useMockQuery } from '@/mocks/use-mock-query'; // PORTFOLIO DEMO MODE: backend is offline
 import { endOfMonth, format, parseISO, startOfMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarPlus, Loader2 } from 'lucide-react';
@@ -51,10 +52,17 @@ const CalendarPage = () => {
   // (same query pattern as ProfilePage). This is also what enforces "only
   // book with your matched therapist": the booking page simply never has
   // any other therapist to show.
-  const { data: patientData, loading: patientLoading } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: patientData, loading: patientLoading } = useQuery(GET_OWN_USER_PROFILE_QUERY);
+  const { data: patientData, loading: patientLoading } = useMockQuery(GET_OWN_USER_PROFILE_QUERY);
   const patient = patientData?.getOwnUserProfile;
 
-  const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  // PORTFOLIO DEMO MODE: original API call kept for reference
+  // const { data: therapistData } = useQuery(GET_MATCHED_THERAPISTS_QUERY, {
+  //   variables: { TherapistsIds: patient?.Matches },
+  //   skip: !patient?.Matches || patient.Matches.length === 0,
+  // });
+  const { data: therapistData } = useMockQuery(GET_MATCHED_THERAPISTS_QUERY, {
     variables: { TherapistsIds: patient?.Matches },
     skip: !patient?.Matches || patient.Matches.length === 0,
   });
